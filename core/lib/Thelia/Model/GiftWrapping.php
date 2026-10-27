@@ -57,6 +57,15 @@ class GiftWrapping extends BaseGiftWrapping
         return 0.0 === round((float) $this->getPrice(), 6);
     }
 
+    /**
+     * What the service costs without tax, to the cent: the one reading of it, for the cart total
+     * ({@see Cart::getUntaxedGiftWrapping()}) and for what a theme prints.
+     */
+    public function getUntaxedPrice(): float
+    {
+        return round((float) $this->getPrice(), 2);
+    }
+
     public function preInsert(?ConnectionInterface $con = null): bool
     {
         $this->setPosition($this->getNextPosition());

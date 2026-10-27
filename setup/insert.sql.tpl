@@ -986,6 +986,9 @@ INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `upda
 (2, 0, 2, NOW(), NOW()),
 (3, 0, 3, NOW(), NOW());
 
+INSERT INTO `customer_group`(`id`, `code`, `position`, `is_default`, `discount`, `display_taxed_price`, `created_at`, `updated_at`) VALUES
+(1, 'default', 1, 1, 0.000000, 1, NOW(), NOW());
+
 INSERT INTO `currency` (`id`, `code`, `isocode_numeric`, `symbol`, `format`, `rate`, `visible`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
 (1, 'EUR', '978', '€', '%n %s','1.00', 1, 1, '1', NOW(), NOW()),
@@ -2254,7 +2257,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (63, 'admin.customer.payment-method', NOW(), NOW()),
 (64, 'admin.configuration.webhook', NOW(), NOW()),
 (65, 'admin.configuration.ai', NOW(), NOW()),
-(66, 'admin.configuration.ai-mcp', NOW(), NOW())
+(66, 'admin.configuration.ai-mcp', NOW(), NOW()),
+(67, 'admin.customer.group', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -3245,6 +3249,13 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 {% endfor %}
 ;
 
+INSERT INTO `customer_group_i18n` (`id`, `locale`, `title`, `description`) VALUES
+{% for locale in locales %}
+    (1, '{{ locale }}', {{ intl('Default customer group', locale) }}, NULL){% if not loop.last %},{% endif %}
+
+{% endfor %}
+;
+
 INSERT INTO `currency_i18n` (`id`, `locale`, `name`) VALUES
 {% for locale in locales %}
     (1, '{{ locale }}', {{ intl('Euro', locale) }}),
@@ -4096,7 +4107,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, '{{ locale }}', {{ intl('Saved payment methods', locale) }}, NULL, NULL, NULL),
     (64, '{{ locale }}', {{ intl('Configuration webhooks', locale) }}, NULL, NULL, NULL),
     (65, '{{ locale }}', {{ intl('Configuration AI', locale) }}, NULL, NULL, NULL),
-    (66, '{{ locale }}', {{ intl('Configuration AI MCP tokens', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (66, '{{ locale }}', {{ intl('Configuration AI MCP tokens', locale) }}, NULL, NULL, NULL),
+    (67, '{{ locale }}', {{ intl('Customer groups', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

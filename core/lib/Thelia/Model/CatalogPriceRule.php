@@ -30,7 +30,7 @@ class CatalogPriceRule extends BaseCatalogPriceRule
 
     public const AUDIENCE_MODE_CUSTOMERS = 1;
 
-    /** Customer groups are US #122: the mode exists, nothing reads the groups yet. */
+    /** Open to the customer groups the {@see getCustomerGroupIds()} lists. */
     public const AUDIENCE_MODE_CUSTOMER_GROUPS = 2;
 
     /** The criterion types the core knows; a module may register more through ScopeCriterionResolverInterface. */
@@ -54,6 +54,27 @@ class CatalogPriceRule extends BaseCatalogPriceRule
     public const STATE_RUNNING = 'running';
 
     public const STATE_EXPIRED = 'expired';
+
+    /**
+     * The ids of the customer groups the rule is reserved for, in one query. Only
+     * meaningful for the customer groups audience mode: a link left behind by a change of
+     * audience is still listed here, and counts for nothing there.
+     *
+     * @return list<int>
+     */
+    public function getCustomerGroupIds(): array
+    {
+        if (null === $this->getId()) {
+            return [];
+        }
+
+        return array_map('intval', CatalogPriceRuleCustomerGroupQuery::create()
+            ->filterByCatalogPriceRuleId($this->getId())
+            ->orderByCustomerGroupId()
+            ->select('CustomerGroupId')
+            ->find()
+            ->getData());
+    }
 
     /**
      * Whether the rule prices for a named audience rather than for everyone.

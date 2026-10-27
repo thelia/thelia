@@ -42,7 +42,7 @@ class Sale extends BaseSale
 
     public const AUDIENCE_MODE_CUSTOMERS = 1;
 
-    /** Customer groups are US #122: the mode exists, nothing reads the groups yet. */
+    /** Open to the customer groups the {@see getCustomerGroupIds()} lists. */
     public const AUDIENCE_MODE_CUSTOMER_GROUPS = 2;
 
     /** When the countdown to the end of the operation is shown. */
@@ -51,6 +51,27 @@ class Sale extends BaseSale
     public const COUNTDOWN_MODE_LEAD_HOURS = 1;
 
     public const COUNTDOWN_MODE_FROM_OPENING = 2;
+
+    /**
+     * The ids of the customer groups the operation is reserved for, in one query. Only
+     * meaningful for the customer groups audience mode: a link left behind by a change of
+     * audience is still listed here, and counts for nothing there.
+     *
+     * @return list<int>
+     */
+    public function getCustomerGroupIds(): array
+    {
+        if (null === $this->getId()) {
+            return [];
+        }
+
+        return array_map('intval', SaleCustomerGroupQuery::create()
+            ->filterBySaleId($this->getId())
+            ->orderByCustomerGroupId()
+            ->select('CustomerGroupId')
+            ->find()
+            ->getData());
+    }
 
     /**
      * Whether the operation is open to a named audience rather than to everyone.
