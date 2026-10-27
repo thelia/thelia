@@ -64,9 +64,10 @@ try {
 ## The body guard
 
 A content cannot go online with nothing to show in the default language of the shop. The guard sits in
-`Content::preSave()` and fires whenever an existing row goes from hidden to visible, whichever path writes the flag:
-the publication events, the old update and toggle events, the facade, the admin API and the scheduled command. A
-content created visible is not checked, nor are the other languages; a back office may warn about them.
+`Content::preSave()` and fires whenever a row is created visible or goes from hidden to visible, whichever path
+writes the flag: the publication events, the old creation, update and toggle events, the facade, the admin API, the
+demo import and the scheduled command. A content created online with no body is not written at all. The other
+languages are not checked; a back office may warn about them.
 
 Whichever path writes `visible` on an existing row, the dates are kept in step with it (`VisibilityDatesAligner`,
 also asked from `preSave()`): a row taken offline by the old toggle or update events, the admin API or a module gets
@@ -84,7 +85,7 @@ fraction and MySQL rounds a fraction up where MariaDB truncates it. A date sent 
 `EmptyBodyDetector` decides: tags, `<style>` and `<script>` blocks, entities, non-breaking and zero-width spaces are
 nothing to show; an image, a video, an embedded frame on its own is a body. The exception is translated for the
 person who asked and never quotes the body. The row in memory is reloaded from the database on a refusal, so a later
-save of the same instance does not put it online after all.
+save of the same instance does not put it online after all; a new row has nothing to reload and stays unsaved.
 
 ## What the shop shows
 
@@ -95,11 +96,13 @@ save of the same instance does not put it online after all.
 - The `content` and `associated_content` loops apply the same rule when they list the visible rows (`visible`
   left to its default, or set to `1`): a visible content held by a default folder not online yet is not listed, since
   its page answers 404. Asked for the hidden rows or for every row (`visible="*"`), they read every row as before.
-- The core content slots (`NativeContentSlotResolver`) link a content only when the shop shows it, and the footer
-  is empty while the information folder is not visible.
+- The core content slots (`NativeContentSlotResolver`) link a content only when the shop shows it. The footer is
+  empty while the information folder is a draft or is still scheduled; a folder taken offline still gives its
+  published contents, as a hidden folder did, since the update turns every hidden folder into one taken offline.
 - `/api/front/contents` and `/api/front/folders` serve published rows only, under the same folder rule, whatever
   `visible` filter the caller passes. What hangs from a content follows it (`ContentPublicationExtension`):
-  `/api/front/content_folders`, `/api/front/content_images` and `/api/front/content_documents` with their `/file`
+  `/api/front/content_folders` (which also answers 404 for the link to a folder that is not online, so it never tells
+  a draft folder exists), `/api/front/content_images` and `/api/front/content_documents` with their `/file`
   routes, `/api/front/product_associated_contents` answer 404 or leave out what belongs to a content the shop does
   not show. The relations a front read serializes are pruned the same way (`ContentPublicationLinksListener`, one
   query per resource that carries links): `contentFolders` of a folder names the contents the shop shows, `contentFolders`
@@ -160,6 +163,8 @@ too, and is tried again by the next run. In both cases the pass goes on with the
 left to do. Two runs at once are kept apart by a lock (`framework.lock`, `LOCK_DSN`), refreshed after each batch so
 a long pass keeps it.
 
-Nothing runs it automatically: schedule it every few minutes alongside `sale:check-activation`. A shop that does not
-run it sees its overdue rows (`PublicationStatus::isOverdue()`), which the back office reports on its dashboard;
-nothing catches them up on a visit.
+It is one of the recurring tasks of the shop (`Thelia\Scheduler\TheliaSchedule`): a worker consuming
+`scheduler_thelia` runs it every minute, as `sale:check-activation`. `THELIA_SCHEDULE_CONTENT_PUBLICATION` changes
+the cron expression, and an empty one leaves the task out for a shop that keeps it in its crontab (never both). A
+shop where nothing runs it sees its overdue rows (`PublicationStatus::isOverdue()`), which the back office reports on
+its dashboard; nothing catches them up on a visit.
