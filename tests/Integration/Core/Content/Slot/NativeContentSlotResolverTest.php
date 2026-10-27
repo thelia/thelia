@@ -161,6 +161,25 @@ final class NativeContentSlotResolverTest extends IntegrationTestCase
         self::assertSame([], $this->service()->links(ContentSlots::FOOTER, 'en_US'), 'a draft folder has no footer to give yet');
     }
 
+    public function testTheFooterStillListsThePublishedContentsOfAnInformationFolderTakenOffline(): void
+    {
+        $information = $this->fixtures->folder();
+        $terms = $this->fixtures->content($information, ['title' => 'Terms']);
+        $hidden = $this->fixtures->content($information, ['visible' => 0]);
+        // As the update leaves a folder a shop kept hidden: taken offline, not a draft.
+        $information->setVisible(0)->save();
+        $information->setUnpublishAt(new \DateTimeImmutable('-1 day'))->save();
+
+        ConfigQuery::write(NativeContentSlotResolver::INFORMATION_FOLDER_CONFIG, (string) $information->getId());
+
+        self::assertSame(
+            [['content', $terms->getId()]],
+            $this->sources($this->service()->links(ContentSlots::FOOTER, 'en_US')),
+            'a shop that hid its information folder keeps its footer links',
+        );
+        self::assertNotContains($hidden->getId(), array_column($this->sources($this->service()->links(ContentSlots::FOOTER, 'en_US')), 1));
+    }
+
     public function testTheFooterLeavesOutAContentHeldByAFolderNotOnlineYet(): void
     {
         $information = $this->fixtures->folder();

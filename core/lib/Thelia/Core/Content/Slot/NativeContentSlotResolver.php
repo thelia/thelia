@@ -108,9 +108,10 @@ final readonly class NativeContentSlotResolver implements ContentSlotResolverInt
             return [];
         }
 
-        // The folder is the one the shop reads the footer from: a draft, or a folder
-        // taken offline, has no footer to give yet.
-        if (!FolderQuery::create()->filterById((int) $folderId)->filterByVisible(1)->exists()) {
+        // A draft folder, or one waiting for its date, has no footer to give yet. A folder
+        // taken offline still gives its published contents, as a hidden folder always did:
+        // the update turns every hidden folder into one taken offline.
+        if (FolderQuery::create()->filterById((int) $folderId)->where($this->folderPublicationRule->unreleasedFolderCondition())->exists()) {
             return [];
         }
 

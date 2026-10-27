@@ -41,7 +41,7 @@ final readonly class ContentFolderPublicationRule
     public function outsideAnUnreleasedFolderClause(string $contentIdColumn): string
     {
         return \sprintf(
-            '%s NOT IN (SELECT %s FROM %s INNER JOIN %s ON %s = %s WHERE %s = 1 AND (%s IS NULL OR %s <> 1) AND (%s IS NULL OR %s > %s))',
+            '%s NOT IN (SELECT %s FROM %s INNER JOIN %s ON %s = %s WHERE %s = 1 AND %s)',
             $contentIdColumn,
             ContentFolderTableMap::COL_CONTENT_ID,
             ContentFolderTableMap::TABLE_NAME,
@@ -49,6 +49,18 @@ final readonly class ContentFolderPublicationRule
             FolderTableMap::COL_ID,
             ContentFolderTableMap::COL_FOLDER_ID,
             ContentFolderTableMap::COL_DEFAULT_FOLDER,
+            $this->unreleasedFolderCondition(),
+        );
+    }
+
+    /**
+     * The condition on a `folder` row that is a draft or still waiting for its date, as
+     * opposed to a folder online or taken offline.
+     */
+    public function unreleasedFolderCondition(): string
+    {
+        return \sprintf(
+            '(%s IS NULL OR %s <> 1) AND (%s IS NULL OR %s > %s)',
             FolderTableMap::COL_VISIBLE,
             FolderTableMap::COL_VISIBLE,
             FolderTableMap::COL_UNPUBLISH_AT,
