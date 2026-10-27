@@ -83,6 +83,47 @@ serves `?view=…` links where French serves slugs.
 npx playwright test specs/rtl.spec.ts
 ```
 
+## Customer groups
+
+Seven specs cover the customer-group feature (`specs/customer-groups-*.spec.ts`), one per domain:
+
+| Spec | What it proves |
+|------|----------------|
+| `customer-groups-prices` | default group taxed without discount; member (15%, untaxed) sees untaxed prices + mention on listing, product page, cart (Total excl. tax, VAT, Total incl. tax to pay); a group price beats the discount; the catalog promotion is not discounted by the group |
+| `customer-groups-catalog` | category whitelist: menu, way-through parent, 404 on other categories and on a product filed elsewhere only; the default group sees everything |
+| `customer-groups-payment` | payment whitelist: only Cheque, no gift card, no instant parts; the default group keeps them |
+| `customer-groups-cart` | a guest cart loses the closed product (with a message) when a restricted member signs in |
+| `customer-groups-order` | an order keeps the untaxed display, group and rate after the customer changes group |
+| `customer-groups-backoffice` | groups screen, whitelists, emptied-list warning, customer sheet, customer list filter, group prices on the product sheet, registration link |
+| `customer-groups-registration` | `/register/{token}`: account created in the group; regenerated, closed or unknown token: 404; standard form: default group |
+
+```bash
+# Local DDEV host is https://thelia.ddev.site (the config default is another host): pass BASE_URL
+cd tests/Playwright
+BASE_URL=https://thelia.ddev.site npx playwright test specs/customer-groups- --reporter=line > ../../var/log/pw-cg.log 2>&1
+tail -30 ../../var/log/pw-cg.log
+
+# One domain, one viewport
+BASE_URL=https://thelia.ddev.site npx playwright test specs/customer-groups-catalog --project=customer-groups-mobile-390
+```
+
+Projects: `customer-groups-desktop-1440` (all the specs) and `customer-groups-mobile-390` (prices and
+catalog only). The `chromium` project skips these specs.
+
+On a distribution Playwright does not know (the installer refuses `ubuntu26.04`), install the browser with
+`PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=ubuntu24.04-x64 npx playwright install chromium`.
+
+Data: every spec creates its own groups, customers and categories in `beforeAll` / the test itself, through
+`helpers/customer-group.ts` (SQL on the DDEV database `db` via `helpers/db.ts`), all named with the `e2e-cg-`
+prefix, and removes them in `afterAll` (`purgeCustomerGroupData()`). The demo data and the groups made by
+hand (`default`, `pro`) are never written. The suite runs with one worker: the purge removes every
+`e2e-cg-` row (and the anonymous carts created since the run started), so two runs must not overlap. After an interrupted run, `purgeCustomerGroupData()` runs again at
+the start of the next one.
+
+Helpers: `helpers/customer-group.ts` (data), `helpers/group-pricing.ts` (price and totals readers),
+`helpers/checkout.ts` (`goToPaymentStep`, `placeOrderWithCheque`), `poms/backoffice/customer-group-*.ts` and
+`product-group-prices-section.ts`.
+
 ## Reports
 
 After a run, open `playwright-report/index.html` (`npm run report`).
