@@ -75,6 +75,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         ?int $stateId = null,
         ?string $siret = null,
         ?string $vatNumber = null,
+        ?int $customerGroupId = null,
     ): void {
         $this
             ->setTitleId($titleId)
@@ -89,6 +90,11 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
         if (null !== $lang) {
             $this->setLangId($lang);
+        }
+
+        // Left untouched when absent: a new customer gets the default group from preInsert().
+        if (null !== $customerGroupId) {
+            $this->setCustomerGroupId($customerGroupId);
         }
 
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
@@ -149,6 +155,7 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
         ?float $discount = null,
         ?string $ref = null,
         bool $enabled = false,
+        ?int $customerGroupId = null,
     ): void {
         $this
             ->setTitleId($titleId)
@@ -169,6 +176,11 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
         if (null !== $langId) {
             $this->setLangId($langId);
+        }
+
+        // Left untouched when absent: a new customer gets the default group from preInsert().
+        if (null !== $customerGroupId) {
+            $this->setCustomerGroupId($customerGroupId);
         }
 
         $this->save();
@@ -400,6 +412,11 @@ class Customer extends BaseCustomer implements UserInterface, SecurityUserInterf
 
         if (null === $this->getRef()) {
             $this->setRef($this->generateRef());
+        }
+
+        // Every customer belongs to a group: a creation that names none joins the default one.
+        if (null === $this->getCustomerGroupId()) {
+            $this->setCustomerGroupId((int) CustomerGroupQuery::findDefault()->getId());
         }
 
         return true;

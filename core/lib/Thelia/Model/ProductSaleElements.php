@@ -24,6 +24,7 @@ use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Product\Identifier\Gtin;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\ProductSaleElements as BaseProductSaleElements;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -95,6 +96,13 @@ class ProductSaleElements extends BaseProductSaleElements
      *      the currency or when the `from_default_currency` flag is set to `true`
      * - set directly in the product price when `from_default_currency` is set to `false`
      *
+     * @param float $discount @deprecated since 3.3, the argument only (the method is not): a percentage
+     *                        taken off both prices. What a customer pays - the discount of the customer and of
+     *                        the group, the price of the group, the price rules and the reserved operations - is
+     *                        resolved by CustomerPriceContextInterface::resolve(); read the catalog price here
+     *                        and let the context apply the rest. Kept, with its signature, for the callers
+     *                        outside the core
+     *
      * @throws \RuntimeException
      * @throws PropelException
      */
@@ -114,10 +122,11 @@ class ProductSaleElements extends BaseProductSaleElements
                 ->filterByCurrencyId($defaultCurrency->getId())
                 ->findOne();
 
-            if (null !== $productPrice) {
-                $price = $productPrice->getPrice() * $currency->getRate() / $defaultCurrency->getRate();
-                $promoPrice = $productPrice->getPromoPrice() * $currency->getRate() / $defaultCurrency->getRate();
-            } else {
+            $currencyConverter = new CurrencyConverter();
+            $price = null === $productPrice ? null : $currencyConverter->fromDefaultCurrency((float) $productPrice->getPrice(), $currency);
+            $promoPrice = null === $productPrice ? null : $currencyConverter->fromDefaultCurrency((float) $productPrice->getPromoPrice(), $currency);
+
+            if (null === $price || null === $promoPrice) {
                 throw new \RuntimeException('Cannot find product prices for currency id: `'.$currency->getId().'`');
             }
         } else {

@@ -22,6 +22,7 @@ use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleLineContents;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
@@ -78,15 +79,22 @@ class Cart extends BaseCart
     /**
      * Duplicate the current existing cart. Only the token is changed.
      *
+     * The lines of the copy are priced by the line pricer for the customer and the currency of
+     * the copy, in one resolution: the discount, the price of the group, the rules and the
+     * reserved operations all apply, and a sale element nothing prices keeps the price of the
+     * line it copies. The pricer is required: a copy made without it would be the one path that
+     * ignores the group of the customer.
+     *
      * @throws \Exception
      * @throws PropelException
      */
     public function duplicate(
         ?string $token,
-        ?Customer $customer = null,
-        ?Currency $currency = null,
-        ?EventDispatcherInterface $dispatcher = null,
-        ?SaleUnitStockResolver $saleUnitStockResolver = null,
+        ?Customer $customer,
+        ?Currency $currency,
+        ?EventDispatcherInterface $dispatcher,
+        ?SaleUnitStockResolver $saleUnitStockResolver,
+        CartLinePricer $linePricer,
         ?CartLineAvailability $cartLineAvailability = null,
     ): self|bool {
         if (!$dispatcher instanceof EventDispatcherInterface) {
@@ -103,8 +111,6 @@ class Cart extends BaseCart
         // unit is the job of the session, which checks the copy again if needed.
         $cart->setSaleUnitId($this->getSaleUnitId());
 
-        $discount = 0.0;
-
         if (!$currency instanceof Currency) {
             $currencyQuery = CurrencyQuery::create();
             $currency = $currencyQuery->findPk($this->getCurrencyId()) ?: $currencyQuery->findOneByByDefault(1);
@@ -114,16 +120,13 @@ class Cart extends BaseCart
 
         if ($customer instanceof Customer) {
             $cart->setCustomer($customer);
-
-            if ($customer->getDiscount() > 0) {
-                // getDiscount() maps a DECIMAL column and returns a string.
-                $discount = (float) $customer->getDiscount();
-            }
         }
 
         $cart->save();
 
         $saleUnitQuantities = $this->saleUnitQuantitiesOf($cartItems, $saleUnitStockResolver);
+        /** @var list<array{0: CartItem, 1: CartItem}> $copies the new line and the line it copies */
+        $copies = [];
 
         foreach ($cartItems as $cartItem) {
             if (1 === (int) $cartItem->getIsOffered()) {
@@ -149,15 +152,22 @@ class Cart extends BaseCart
                 $item->setProductSaleElements($productSaleElements);
                 // The composition the customer chose is part of the line.
                 $item->setBundleComposition($cartItem->getBundleComposition());
-                $prices = $productSaleElements->getPricesByCurrency($currency, $discount);
-                $item
-                    ->setPrice((string) $prices->getPrice())
-                    ->setPromoPrice((string) $prices->getPromoPrice())
-                    ->setPromo($productSaleElements->getPromo());
 
-                $item->save();
-                $dispatcher->dispatch(new CartItemDuplicationItem($item, $cartItem), TheliaEvents::CART_ITEM_DUPLICATE);
+                // Priced below, in one resolution: until then the line keeps the price it copies.
+                $item
+                    ->setPrice($cartItem->getPrice())
+                    ->setPromoPrice($cartItem->getPromoPrice())
+                    ->setPromo($cartItem->getPromo());
+
+                $copies[] = [$item, $cartItem];
             }
+        }
+
+        $linePricer->price(array_column($copies, 0), $currency, $customer);
+
+        foreach ($copies as [$item, $cartItem]) {
+            $item->save();
+            $dispatcher->dispatch(new CartItemDuplicationItem($item, $cartItem), TheliaEvents::CART_ITEM_DUPLICATE);
         }
 
         // Dispatche the duplication event before delting the cart from the database,
@@ -498,7 +508,7 @@ class Cart extends BaseCart
      */
     public function getUntaxedGiftWrapping(): float
     {
-        return round((float) $this->getGiftWrapping()?->getPrice(), 2);
+        return $this->getGiftWrapping()?->getUntaxedPrice() ?? 0.0;
     }
 
     /**

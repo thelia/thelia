@@ -1720,4 +1720,6 @@ return [
     'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)' => 'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)',
     'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)' => 'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)',
     'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)',
+    'Customer groups' => 'Customer groups',
+    'Default customer group' => 'Default customer group',
 ];
