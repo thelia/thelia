@@ -72,15 +72,28 @@ single-handle slider (`range`) sends one figure read as the maximum.
 The price compared is the one the product card shows:
 
 - the default combination;
-- its promotional price when it is on sale, or the price a catalog price rule or a reserved sale
-  gives the visitor (`EffectivePriceCatalog`, as `EffectivePriceListener` does for the API);
+- what the visitor pays for it, from `VisitorPriceReader` (the customer price context, as
+  `EffectivePriceListener` does for the API): the price of their customer group, the promotional
+  price, the price a catalog price rule or a reserved sale gives them, then the discount of their
+  group and their own;
 - in the currency the shop is browsed in (`ProductPriceCurrencyListener::currentCurrency()`), the
   default currency's price converted when none was typed;
 - taxes of the visitor's delivery country included (`TaxEngine::getDeliveryCountry()`), computed
-  product by product since a tax can read a feature of the product.
+  product by product since a tax can read a feature of the product, unless their group is shown
+  untaxed prices: the slider is then drawn on untaxed ones.
 
 Prices are computed in PHP and kept for the request. Narrowing the listing adds a condition on
 the product ids and joins nothing, so the order the listing is sorted in is untouched.
+
+### Price sort
+
+`untaxed_price_order` (`ProductPriceOrderFilter`) sorts in SQL on the public catalog price of
+the default combination, in the currency browsed. The price of a customer group, a rule, a
+reserved sale or a discount is resolved per customer in PHP and is not in the database: the sort
+leaves them out, whoever asks, where the slider above and the cards show them
+(`tests/Api/Front/ProductPriceOrderApiTest.php`). The `min_price` and `max_price` orders and
+filters of the `product` loop have the same limit
+(`tests/Integration/Core/Template/ProductLoopCustomerPriceTest.php`).
 
 ## Tests
 
@@ -89,5 +102,5 @@ the product ids and joins nothing, so the order the listing is sorted in is unto
 | Counts, sibling values, scopes | `tests/Integration/Api/FacetSelectionTest.php` |
 | Availability | `tests/Integration/Api/AvailabilityFacetTest.php` |
 | Customer rating, with and without a source | `tests/Integration/Api/RatingFacetTest.php` |
-| Price | `tests/Integration/Api/PriceFacetTest.php` |
+| Price | `tests/Integration/Api/PriceFacetTest.php`, `tests/Integration/Api/PriceFacetCustomerPriceTest.php` |
 | Rows of an upgraded shop | `tests/Integration/Install/ChoiceFilterOtherListingFacetRowsMigrationTest.php` |

@@ -8,6 +8,9 @@ two kinds of rules with AND, and a product is visible when each of them lets it 
 2. every rule a module declares through `Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface`, such as a
    catalog closed brand by brand for each customer.
 
+A third source joins them since the customer groups: the categories the group of the visitor is restricted to
+(`ClosedCategoryProductRule`, see [Categories closed to a customer group](#categories-closed-to-a-customer-group)).
+
 The rules narrow the query itself, so a collection, an item read and a count agree on what the catalog holds: a product
 left reachable by its id is not hidden, it is only harder to find.
 
@@ -22,12 +25,14 @@ left reachable by its id is not hidden, it is only harder to find.
 | Quick order, and a purchase list loaded into it (`ReferenceResolver`) | yes; the purchase list itself is not |
 | `product`, `accessory` and `product_sale_elements` loops | yes, front only |
 | Listing facets (`/api/front/tfilters/products`) | yes, a hidden product feeds no facet and is not counted |
-| Theme sitemap (Flexy) | yes, through `ReservedSaleVisibility`, for the visitor who generates it: the sitemap is then cached for everybody |
-| Images, documents, prices, features, attribute combinations, categories and associated contents read by the id of a product or of a combination | no |
+| Theme sitemap (Flexy) | yes, as the default group sees the catalog (`ProductVisibility::visibleProductClauseForDefaultVisitor()`), whoever generates it: the sitemap is cached for everybody |
+| Prices, attribute combinations, feature values, associated contents, images and documents read by the id of a product or of a combination, and the links between a combination and an image | yes, a hidden product answers 404 on them and the collection leaves it out |
+| Categories read by the id of a product | the categories closed to the group are left out (see [Categories closed to a customer group](#categories-closed-to-a-customer-group)) |
 | Products listed by a sale (`/api/front/sales`) | no |
-| `image`, `document` and `feature_value` loops | no |
+| `feature_value` loop | no |
 | Adding to the cart through the front API (`POST /api/front/cart_items`) | yes, a hidden combination answers 422: see [The cart](#the-cart) |
-| Adding to the cart by id (`CartFacade::addItem()`, the theme) | no: see [The cart](#the-cart) |
+| Adding to the cart by id (`CartFacade::addItem()`, the theme, live components, a module dispatching `CART_ADDITEM`) | yes, a hidden product is refused: see [The cart](#the-cart) |
+| Lines already in a cart | yes, removed at sign-in and at the restore of the cart: see [The cart](#the-cart) |
 
 The back office and the admin API are never narrowed: the readers above only ask on a front operation, outside the
 back-office context.
@@ -91,22 +96,82 @@ The rule is asked on every front read of the catalog, several times per request:
   the next. A rule reads its data with plain queries, never through a front reader of the catalog, which would ask it
   again.
 
+## Categories closed to a customer group
+
+Each group lists the categories it may browse (`customer_group_category`). The list is read only when the group is
+restricted (`customer_group.restricts_categories`, set by the write of the list: a non-empty list sets it, an empty list
+clears it). A group that is not restricted sees the whole catalog. A restricted group sorts every category in three, for
+the members of that group only:
+
+- open: the categories listed and their whole sub-trees;
+- passing: the ancestors of a listed category that are not open themselves. They stay on the menu, in the breadcrumb
+  and on their own page, so that an open sub-category can be reached, but the products filed in them are visible only
+  when an open category holds them too;
+- closed: every other one, hidden altogether.
+
+The list of a restricted group can be empty, when the only category it listed was deleted. Nothing is then open and
+nothing is passing: every category is closed, and only the products filed in no category stay visible. The group stays
+shut out until an administrator edits the list or lifts the restriction in the back office. Emptying the list by hand
+through the API or the back office clears the flag instead, and opens the whole catalog again.
+
+A product is visible when at least one of its categories is open. A product filed in no category stays visible to every
+group, as before the groups existed: a merchant who files nothing restricts nothing. The list of one group never opens
+nor closes anything to another group.
+
+An example, the tree Living Room > [Armchairs, Sofas], Dining Room > [Chairs, Stools], the professionals listing Sofas:
+Sofas is open, Living Room is passing, Armchairs and the whole Dining Room are closed. A sofa is visible to them, an
+armchair is not, and a product filed in Living Room alone is not either. The default group, with no list, sees
+everything. If the professionals' only listed category, Sofas, is deleted, they stay restricted with an empty list: every
+category is closed to them and they see only the products filed in no category.
+
+`Thelia\Domain\Catalog\Category\CategoryVisibility` is the one place that sorts the categories for the current visitor
+(a visitor, or a guest, is the default group; a customer is read back from the database, not from the session object):
+`closedCategoryIds()` and `closedCategoryIdsFor()` answer the closed ones, `openCategoryIdsFor()` the open ones (null
+when the group is not restricted). It is read by:
+
+- `CategoryVisibilityExtension`: `/api/front/categories`, `/api/front/category_images`,
+  `/api/front/category_documents` and the product links of a category, collection and item (404 on a closed one);
+- `ProductCategoryVisibilityListener`: the `productCategories` a product embeds leave out the closed categories;
+- `Action\Category::viewCheck`: the page of a closed category answers 404;
+- the `category`, `category-tree`, `category-path`, `image`, `document` and `associated_content` loops, outside the
+  back-office context (the child count of a category leaves out the closed ones, and its product count the products of
+  the passing and closed categories, and the ones reached only through a closed sub-category);
+- the category facet and filter of `/api/front/tfilters/products`;
+- `ClosedCategoryProductRule`, joined by `ProductVisibility` with the rules above: the product rule, also applied to the
+  product links of a category (`/api/front/product_categories/{product}/categories/{category}`);
+- the Flexy sitemap, for the default group: `ProductVisibility::visibleProductClauseForDefaultVisitor()` gives the product
+  condition whoever generates the file, so the categories of a restricted member never shape it.
+
 ## The data access cache
 
 The cross-request cache of the data access layer keys on the path, the format and the locale, not on the visitor. While
 a module rule is declared, `/api/front/products` and `/api/front/product_sale_elements` step aside from it, as they do
 while a reserved operation runs.
 
+The categories a customer group is restricted to do not count as such a rule (`ProductVisibility::hasModuleRules()`):
+while at least one group is restricted to categories, the catalog paths are kept on the cache with the group of the visitor in their key,
+and a shop where no group is restricted keeps the keys it had.
+
 ## The cart
 
-An addition through the front API (`POST /api/front/cart_items`, `FrontCartItemProcessor`) reads the combination the way
-the catalog shows it to the visitor: one that a rule hides answers 422, like one that does not exist.
+The cart holds only what the catalog shows its visitor. The addition is narrowed on every path: the front API
+(`POST /api/front/cart_items`, where a hidden combination answers 422, like one that does not exist), `CartFacade::addItem()`,
+the live components of the theme and a module that dispatches `TheliaEvents::CART_ADDITEM`. The product is judged on the
+sale element of the line, and a hidden one is refused with a `Thelia\Domain\Cart\Exception\ProductNotAvailableException`
+(an `InvalidCartException`). A module that forbids buying a product still adds its own rule through
+`ProductVisibilityRuleInterface`; it no longer needs a listener of `CART_ADDITEM`.
 
-An addition by id through `CartFacade::addItem()`, the way a theme adds from the product page or a list, reads the
-combination by its id and is not narrowed. A module that forbids buying a product therefore also listens to
-`TheliaEvents::CART_ADDITEM` with a priority above 128, the one `Thelia\Action\Cart::addItem` adds the line at, and
-throws a `Thelia\Domain\Cart\Exception\InvalidCartException`: that refusal holds on every path, the front API
-included.
+A line that the customer no longer sees is taken out of the cart when the customer signs in (`CUSTOMER_LOGIN`) and when the
+cart is restored from its cookie, and a notice is left in the `error` flash bag of the session. Before the payment,
+`CartGuard::checkLinesAreAvailable()` refuses a cart that still holds such a line: the checkout answers with the violation
+code `cart-line-unavailable` and the ids of the products and of the cart lines in `productIds` and `cartItemIds`. The
+visibility is read in one query per cart, and none when no rule restricts anything. The lines a promotion offers
+(`is_offered`) are never judged. A hidden line can be reduced or removed, never increased (`CART_UPDATEITEM` and
+`PUT /api/front/cart_items/{id}` refuse a higher quantity), and the payment refuses it. The sign-in and the cookie restore are
+detailed in [customer-groups.md](customer-groups.md#the-cart-at-sign-in).
+
+Example. The professionals are restricted to Sofas and have a table in their cart from before the restriction. At their
+next sign-in the table line is removed and the notice tells them so. A forged `formValues` that adds the table is refused.
 
 ## Test map
 
