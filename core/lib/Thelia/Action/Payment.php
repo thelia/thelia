@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Checkout\Service\CheckoutPaymentOffer;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 
 /**
@@ -46,6 +47,14 @@ class Payment implements EventSubscriberInterface
     private function judge(IsValidPaymentEvent $event, EventDispatcherInterface $dispatcher): void
     {
         $module = $event->getModule();
+
+        // A wallet whose button the checkout will not show cannot be paid with there, and no
+        // listener of the module gets to say otherwise.
+        if (!CheckoutPaymentOffer::isOfferedAtCheckout($module)) {
+            $event->setValidModule(false);
+
+            return;
+        }
 
         // dispatch event to target specific module
         $dispatcher->dispatch(
