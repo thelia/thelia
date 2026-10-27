@@ -28,7 +28,21 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      // The customer-group specs have their own projects below (1440 desktop, 390 mobile).
+      testIgnore: /customer-groups-.*\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'customer-groups-desktop-1440',
+      testMatch: /customer-groups-.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // Prices and catalog menu must also hold on a phone: same Chromium, 390x844, so the
+      // theme's own breakpoints switch to the mobile layout.
+      name: 'customer-groups-mobile-390',
+      testMatch: /customer-groups-(prices|catalog)\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } },
     },
   ],
 });
