@@ -53,6 +53,7 @@ final class AttributeAccessServiceTest extends IntegrationTestCase
         $content->setVisible(1);
         $content->setLocale('en_US');
         $content->setTitle('Content without folder');
+        $content->setDescription('<p>A body</p>');
         $content->save($this->getPropelConnection());
 
         self::assertSame(0, $content->getDefaultFolderId());

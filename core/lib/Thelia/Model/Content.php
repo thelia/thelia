@@ -176,11 +176,11 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
     }
 
     /**
-     * An existing content going from hidden to visible needs a body in the default
-     * language, whichever path writes the flag (publication event, update or toggle
-     * event, facade, admin API, scheduled command). A new content is not checked. The
-     * dates are then kept in step with the flag, so the state read from the row is
-     * always the one the flag says.
+     * A content created visible, or going from hidden to visible, needs a body in the
+     * default language, whichever path writes the flag (creation or update event,
+     * toggle event, facade, admin API, import, scheduled command). The dates are then
+     * kept in step with the flag, so the state read from the row is always the one the
+     * flag says.
      *
      * @throws EmptyContentPublicationException
      */
@@ -188,7 +188,7 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
     {
         $visibilityChanged = !$this->isNew() && $this->isColumnModified(ContentTableMap::COL_VISIBLE);
 
-        if ($visibilityChanged && 1 === (int) $this->getVisible()) {
+        if (($this->isNew() || $visibilityChanged) && 1 === (int) $this->getVisible()) {
             $locale = PublicationGuard::defaultLocale();
             // The translation held in memory carries the body being saved along with the
             // flag; it is not in the database yet. Reading it through getTranslation() would
@@ -200,8 +200,11 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
             } catch (EmptyContentPublicationException $exception) {
                 // With the instance pool on, the row in memory is the one every later read of
                 // this content gets: left as it is, it says visible, and the next save of the
-                // same content would put it online after all.
-                $this->reload(false, $con);
+                // same content would put it online after all. A new content has no row to
+                // read back.
+                if (!$this->isNew()) {
+                    $this->reload(false, $con);
+                }
 
                 throw $exception;
             }

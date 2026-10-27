@@ -91,11 +91,37 @@ final class ContentPublicationGuardTest extends IntegrationTestCase
         self::assertSame(1, (int) $this->reloaded($content)->getVisible());
     }
 
-    public function testANewContentCreatedVisibleIsNotChecked(): void
+    public function testANewContentCreatedVisibleWithoutABodyIsRefused(): void
     {
-        $content = $this->factory->content($this->factory->folder(), ['visible' => 1]);
+        $content = (new Content())->setVisible(1)->setLocale('en_US')->setTitle('Created online, empty');
+
+        try {
+            $content->save();
+            self::fail('A content was created online with no body.');
+        } catch (EmptyContentPublicationException $exception) {
+            self::assertSame('en_US', $exception->locale);
+        }
+
+        self::assertTrue($content->isNew(), 'nothing was written');
+        self::assertSame(0, ContentQuery::create()->useContentI18nQuery()->filterByTitle('Created online, empty')->endUse()->count());
+    }
+
+    public function testANewContentCreatedVisibleWithABodyIsSaved(): void
+    {
+        $content = (new Content())->setVisible(1)->setLocale('en_US')->setTitle('Created online')->setDescription('<p>A body</p>');
+
+        $content->save();
 
         self::assertSame(1, (int) $this->reloaded($content)->getVisible());
+    }
+
+    public function testANewContentCreatedHiddenIsNotChecked(): void
+    {
+        $content = (new Content())->setVisible(0)->setLocale('en_US')->setTitle('Created as a draft');
+
+        $content->save();
+
+        self::assertSame(0, (int) $this->reloaded($content)->getVisible());
     }
 
     public function testAVisibleContentSavedAgainIsNotChecked(): void

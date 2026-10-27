@@ -482,10 +482,14 @@ final class FixtureFactory
     {
         $n = $this->next();
 
+        $visible = $overrides['visible'] ?? 1;
+
         $content = new Content();
-        $content->setVisible($overrides['visible'] ?? 1);
+        $content->setVisible($visible);
         $content->setLocale($overrides['locale'] ?? 'en_US');
         $content->setTitle($overrides['title'] ?? 'Content '.$n);
+        // A content created online needs a body in the default language of the shop.
+        $content->setDescription($overrides['description'] ?? (1 === (int) $visible ? '<p>Content '.$n.'</p>' : null));
         $content->save($this->connection);
 
         // Content requires a default folder link via ContentFolder.
