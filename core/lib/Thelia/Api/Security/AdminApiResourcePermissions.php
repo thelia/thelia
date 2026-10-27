@@ -38,6 +38,8 @@ use Thelia\Api\Resource\ContentImage;
 use Thelia\Api\Resource\Country;
 use Thelia\Api\Resource\Currency;
 use Thelia\Api\Resource\Customer;
+use Thelia\Api\Resource\CustomerGroup;
+use Thelia\Api\Resource\CustomerGroupProductPrice;
 use Thelia\Api\Resource\CustomerPaymentMethod;
 use Thelia\Api\Resource\CustomerTitle;
 use Thelia\Api\Resource\DestinationRestriction;
@@ -133,6 +135,9 @@ final readonly class AdminApiResourcePermissions
         Country::class => AdminResources::COUNTRY,
         Currency::class => AdminResources::CURRENCY,
         Customer::class => AdminResources::CUSTOMER,
+        // The prices of a group answer to the group code: they are part of what the group is.
+        CustomerGroup::class => AdminResources::CUSTOMER_GROUP,
+        CustomerGroupProductPrice::class => AdminResources::CUSTOMER_GROUP,
         CustomerPaymentMethod::class => AdminResources::CUSTOMER_PAYMENT_METHOD,
         CustomerTitle::class => AdminResources::TITLE,
         Feature::class => AdminResources::FEATURE,
