@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Checkout\DTO\ExpressWalletAnswer;
 use Thelia\Domain\Checkout\Enum\CheckoutDisplayMode;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
@@ -267,6 +268,7 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
      */
     public function testACartThatChoseTheWalletBeforeTheCheckoutZoneWasTurnedOffGetsTheOrderButtonBack(): void
     {
+        $this->skipUnlessTheOrderButtonReadsTheCheckoutZone();
         ConfigQuery::write('checkout_display_mode', CheckoutDisplayMode::Steps->value);
         $cart = $this->aGuestReadyToPay();
         CartQuery::create()->findPk($cart->getId())?->setPaymentModuleId($this->walletModuleId)->save($this->getPropelConnection());
@@ -560,6 +562,21 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
         $modules = json_decode((string) $this->client->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR);
 
         return array_column(array_filter($modules, static fn (array $module): bool => true === ($module['valid'] ?? null)), 'code');
+    }
+
+    /**
+     * The order button that gives way to a wallet, and takes its place back once the zone
+     * is off, ships with the theme. Reported as a skip on a theme without it: the core is
+     * tested with whichever theme version it is given.
+     */
+    private function skipUnlessTheOrderButtonReadsTheCheckoutZone(): void
+    {
+        $themeRoot = $this->getService(TemplateHelperInterface::class)->getActiveFrontTemplate()->getAbsolutePath();
+        $path = $themeRoot.\DIRECTORY_SEPARATOR.'components'.\DIRECTORY_SEPARATOR.'Organisms'.\DIRECTORY_SEPARATOR.'NextButton'.\DIRECTORY_SEPARATOR.'Base.php';
+
+        if (!file_exists($path) || !str_contains((string) file_get_contents($path), 'isOfferedAtCheckout')) {
+            self::markTestSkipped('The order button of the installed front-office theme does not read the checkout zone.');
+        }
     }
 
     private function expressPaymentSlotsOn(string $path): Crawler
