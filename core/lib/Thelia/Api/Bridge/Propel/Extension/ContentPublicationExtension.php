@@ -29,6 +29,7 @@ use Thelia\Model\Map\ContentDocumentTableMap;
 use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentImageTableMap;
 use Thelia\Model\Map\ContentTableMap;
+use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Map\ProductAssociatedContentTableMap;
 
 /**
@@ -94,6 +95,17 @@ final readonly class ContentPublicationExtension implements QueryCollectionExten
 
         if (null !== $contentIdColumn) {
             $query->where($this->ofAPublishedContentClause($contentIdColumn));
+        }
+
+        // A link names its folder too: one not online would tell the shop it exists.
+        if (ContentFolder::class === $resourceClass) {
+            $query->where(\sprintf(
+                '%s IN (SELECT %s FROM %s WHERE %s = 1)',
+                ContentFolderTableMap::COL_FOLDER_ID,
+                FolderTableMap::COL_ID,
+                FolderTableMap::TABLE_NAME,
+                FolderTableMap::COL_VISIBLE,
+            ));
         }
     }
 

@@ -202,6 +202,17 @@ final class ContentPublicationApiTest extends ApiTestCase
         self::assertSame(200, $this->jsonRequest('GET', \sprintf('/api/front/content_folders/%d/folders/%d', $published->getId(), $folder->getId()))->getStatusCode());
     }
 
+    public function testTheLinkOfAPublishedContentToAFolderNotOnlineIsNotOnTheFrontApi(): void
+    {
+        $folder = $this->factory->folder(0, ['visible' => 1]);
+        $draftFolder = $this->factory->folder(0, ['visible' => 0]);
+        $published = $this->factory->content($folder, ['visible' => 1]);
+        $this->fileIn($published, $draftFolder);
+
+        self::assertSame(404, $this->jsonRequest('GET', \sprintf('/api/front/content_folders/%d/folders/%d', $published->getId(), $draftFolder->getId()))->getStatusCode(), 'the link would tell the draft folder exists');
+        self::assertSame(200, $this->jsonRequest('GET', \sprintf('/api/front/content_folders/%d/folders/%d', $published->getId(), $folder->getId()))->getStatusCode());
+    }
+
     public function testTheLinksOfAFolderOnTheFrontApiNameOnlyTheContentsTheShopShows(): void
     {
         $folder = $this->factory->folder(0, ['visible' => 1]);
