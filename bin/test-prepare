@@ -102,6 +102,20 @@ try {
         fwrite(STDERR, "  WARN {$warning}\n");
     }
 
+    // Some integration tests drop a sample module under vendor/thelia/modules or
+    // local/modules for the length of a test, and those folders are shared by every
+    // test process. A preparation that runs meanwhile registers the sample: its row
+    // is active and outlives the folder, and every later boot fails on
+    // "Class ZipUpgradeSample\ZipUpgradeSample not found". The samples are
+    // the tests' own: drop their rows (the tests register what they need themselves).
+    // A sample module a new test writes must be named here.
+    $samples = $setup->getPdo()->exec(
+        "DELETE FROM `module` WHERE `code` REGEXP '^(ZipUpgrade|ThemeShipSample|SchemaChange|ConfigXmlLessProbe|PropelInitService)'"
+    );
+    if ($samples > 0) {
+        echo "  {$samples} test sample module(s) found on disk and left unregistered\n";
+    }
+
     // Purge Propel test cache so it regenerates with the correct DSN.
     // Without this, a stale cache pointing at a different database name
     // (e.g. "db" instead of "test") causes tests to hit the wrong DB.
