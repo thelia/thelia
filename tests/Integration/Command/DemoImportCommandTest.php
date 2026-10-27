@@ -17,9 +17,13 @@ namespace Thelia\Tests\Integration\Command;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Thelia\Domain\CMS\Publication\EmptyBodyDetector;
+use Thelia\Domain\CMS\Publication\PublicationGuard;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\BrandQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\ContentI18nQuery;
+use Thelia\Model\ContentQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\LangQuery;
@@ -64,6 +68,25 @@ final class DemoImportCommandTest extends IntegrationTestCase
         $order = OrderQuery::create()->findOne();
         self::assertNotNull($order);
         self::assertGreaterThan(0.0, $order->getTotalAmount(), 'order total is computed from its products');
+    }
+
+    /**
+     * The demo creates its contents online: each needs a body in the default language,
+     * or the guard of the content refuses it and the import stops.
+     */
+    public function testTheDemoContentsAreOnlineWithABodyInTheDefaultLanguage(): void
+    {
+        $this->runImport();
+
+        $locale = PublicationGuard::defaultLocale();
+        $contents = ContentQuery::create()->filterByVisible(1)->find();
+        $detector = new EmptyBodyDetector();
+
+        self::assertGreaterThanOrEqual(11, $contents->count(), 'the demo contents are online');
+        foreach ($contents as $content) {
+            $body = ContentI18nQuery::create()->filterById($content->getId())->filterByLocale($locale)->findOne()?->getDescription();
+            self::assertFalse($detector->isEmpty($body), \sprintf('content #%d has a body in %s', $content->getId(), $locale));
+        }
     }
 
     public function testReimportIsIdempotent(): void
