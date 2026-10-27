@@ -25,7 +25,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
-use Thelia\Model\ConfigQuery;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
@@ -320,25 +320,50 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     }
 
     /**
+     * The codes the groups of the page have now, read in one query. The code is not
+     * frozen on the order, only the group id is: a group renamed shows its new code on
+     * every order it was applied to.
+     *
+     * @return array<int, string>
+     */
+    private function customerGroupCodesOf(LoopResult $loopResult): array
+    {
+        $groupIds = [];
+
+        /** @var \Thelia\Model\Order $order */
+        foreach ($loopResult->getResultDataCollection() as $order) {
+            if (null !== $order->getCustomerGroupId()) {
+                $groupIds[$order->getCustomerGroupId()] = $order->getCustomerGroupId();
+            }
+        }
+
+        if ([] === $groupIds) {
+            return [];
+        }
+
+        $codes = [];
+
+        foreach (CustomerGroupQuery::create()->filterById($groupIds, Criteria::IN)->find() as $group) {
+            $codes[$group->getId()] = $group->getCode();
+        }
+
+        return $codes;
+    }
+
+    /**
      * @throws PropelException
      */
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $lastLegacyOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
+        $customerGroupCodes = $this->customerGroupCodesOf($loopResult);
 
         /** @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
-            $tax = 0;
             $itemsTax = 0;
-            $amount = $order->getTotalAmount($tax);
+            $amount = $order->getTotalAmount();
             $itemsAmount = $order->getTotalAmount($itemsTax, false, false);
 
-            // Legacy orders have no discount tax calculation
-            if ($order->getId() <= $lastLegacyOrderId) {
-                $discountWithoutTax = $order->getDiscount();
-            } else {
-                $discountWithoutTax = $this->createTaxCalculator()->computeUntaxedOrderDiscount($order);
-            }
+            $discountWithoutTax = $order->getUntaxedDiscount();
 
             $hasVirtualDownload = $order->hasVirtualProductWithDocument();
 
@@ -378,11 +403,27 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('DISCOUNT_WITHOUT_TAX', $discountWithoutTax)
                 ->set('DISCOUNT_TAX', $order->getDiscount() - $discountWithoutTax)
                 ->set('CUSTOMER_DISCOUNT_RATE', (float) $order->getCustomerDiscountRate())
+                // Frozen on the order: the group id, the rate and the taxed or untaxed display; NULL id once
+                // the group is deleted. The code is read on the group as it is now: NULL once it is deleted,
+                // another one if the group was renamed.
+                ->set('CUSTOMER_GROUP_ID', $order->getCustomerGroupId())
+                ->set('CUSTOMER_GROUP_CODE', $customerGroupCodes[$order->getCustomerGroupId()] ?? null)
+                ->set('CUSTOMER_GROUP_DISCOUNT_RATE', (float) $order->getCustomerGroupDiscountRate())
+                ->set('CUSTOMER_GROUP_DISPLAY_TAXED_PRICE', (bool) $order->getCustomerGroupDisplayTaxedPrice())
                 ->set('TOTAL_ITEMS_TAX', $itemsTax)
                 ->set('TOTAL_ITEMS_AMOUNT', $itemsAmount - $itemsTax)
                 ->set('TOTAL_TAXED_ITEMS_AMOUNT', $itemsAmount)
-                ->set('TOTAL_TAX', $tax)
-                ->set('TOTAL_AMOUNT', $amount - $tax)
+                // The articles alone: TOTAL_ITEMS_AMOUNT counts the service lines (a gift wrapping) in.
+                ->set('TOTAL_GOODS_AMOUNT', $order->getTotalGoodsWithoutTaxes())
+                ->set('TOTAL_TAXED_GOODS_AMOUNT', $order->getTotalGoodsWithTaxes())
+                // The recap of an order without tax: the goods once the discount is off, the postage
+                // (POSTAGE_UNTAXED), then TOTAL_AMOUNT, TOTAL_TAX and TOTAL_TAXED_AMOUNT. Each one is
+                // read through the method of the model the API reads, to the cent, so that
+                // TOTAL_AMOUNT + TOTAL_TAX = TOTAL_TAXED_AMOUNT and the loop and the API agree.
+                ->set('TOTAL_AMOUNT_AFTER_DISCOUNT', $order->getTotalAmountWithoutTaxesAfterDiscount())
+                ->set('TOTAL_TAXED_AMOUNT_AFTER_DISCOUNT', $order->getTotalAmountWithTaxesAfterDiscount())
+                ->set('TOTAL_TAX', $order->getTotalTaxAmount())
+                ->set('TOTAL_AMOUNT', $order->getTotalAmountWithoutTaxesWithShipping())
                 ->set('TOTAL_TAXED_AMOUNT', $amount)
                 ->set('WEIGHT', $order->getWeight())
                 ->set('HAS_PAID_STATUS', $order->isPaid())

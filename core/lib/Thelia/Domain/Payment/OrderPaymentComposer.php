@@ -16,6 +16,7 @@ namespace Thelia\Domain\Payment;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Payment\DTO\InstantShare;
 use Thelia\Domain\Payment\DTO\PaymentComposition;
 use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
@@ -39,12 +40,17 @@ use Thelia\Module\InstantPaymentModuleInterface;
  * the cancellation of the previous unpaid one; and again inside the transaction that
  * writes the order, on the total of the order itself, which is the one the parts are
  * written from.
+ *
+ * A module the group of the customer of the cart is shut out of applies nothing, whatever
+ * it says it holds for the cart: a part it was given before the group lost it is not part
+ * of any composition, so it is neither written on the order nor settled.
  */
 final readonly class OrderPaymentComposer
 {
     public function __construct(
         private OrderPaymentSplitter $splitter,
         private ContainerInterface $container,
+        private CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
     ) {
     }
 
@@ -96,6 +102,11 @@ final readonly class OrderPaymentComposer
             }
 
             if (!$instance instanceof InstantPaymentModuleInterface) {
+                continue;
+            }
+
+            // Not even asked: a module off the list of the group has nothing to say about this cart.
+            if (!$this->customerGroupPaymentPolicy->isAllowedForCart((int) $module->getId(), $cart)) {
                 continue;
             }
 
