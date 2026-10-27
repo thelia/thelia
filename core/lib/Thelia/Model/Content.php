@@ -192,8 +192,9 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
             $locale = PublicationGuard::defaultLocale();
             // The translation held in memory carries the body being saved along with the
             // flag; it is not in the database yet. Reading it through getTranslation() would
-            // switch the locale of the row, so the array is read directly.
-            $bodyInMemory = isset($this->currentTranslations[$locale]) ? $this->currentTranslations[$locale]->getDescription() : null;
+            // switch the locale of the row, so the array is read directly. A body cleared in
+            // memory is an empty body, not a reason to look at the one still in the database.
+            $bodyInMemory = isset($this->currentTranslations[$locale]) ? (string) $this->currentTranslations[$locale]->getDescription() : null;
 
             try {
                 (new PublicationGuard())->assertHasBody($this, $bodyInMemory, $locale);

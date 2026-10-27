@@ -64,6 +64,18 @@ final class ContentPublicationGuardTest extends IntegrationTestCase
         self::assertSame('<p>Written in the same save</p>', $this->reloaded($content)->setLocale('en_US')->getDescription());
     }
 
+    public function testABodyClearedInTheSameSaveIsNotReplacedByTheOneInTheDatabase(): void
+    {
+        $content = $this->hidden('<p>Body about to be cleared</p>');
+
+        try {
+            $content->setLocale('en_US')->setDescription(null)->setVisible(1)->save();
+            self::fail('A content whose body was cleared in the same save went online.');
+        } catch (EmptyContentPublicationException) {
+            self::assertSame(0, (int) $this->reloaded($content)->getVisible());
+        }
+    }
+
     public function testTheBodyOfTheDefaultLanguageIsReadFromTheDatabaseWhileAnotherLanguageIsEdited(): void
     {
         $content = $this->hidden('<p>English body</p>');
