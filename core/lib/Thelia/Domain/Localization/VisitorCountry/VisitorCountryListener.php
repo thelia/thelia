@@ -15,11 +15,15 @@ declare(strict_types=1);
 namespace Thelia\Domain\Localization\VisitorCountry;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\EventListener\SessionGuardTrait;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\RequestPath;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\CountryQuery;
 
 final readonly class VisitorCountryListener
 {
@@ -49,19 +53,64 @@ final readonly class VisitorCountryListener
 
         $mode = $this->settings->mode();
 
-        if (VisitorCountryMode::Off === $mode || null !== $this->session->detectedCountryId()) {
+        if (VisitorCountryMode::Off === $mode) {
             return;
         }
 
-        $country = $this->detector->detect($request);
+        $detectedId = $this->session->detectedCountryId();
 
-        // Remembered even when nothing was found: the chain, and the log line of a
-        // database that cannot be read, run once per session.
-        $this->session->rememberDetected($country?->getId() ?? 0);
+        if (null === $detectedId) {
+            $detectedId = $this->detector->detect($request)?->getId() ?? 0;
 
-        if (null !== $country && VisitorCountryMode::Apply === $mode) {
-            $this->session->retain($country->getId());
+            // Remembered even when nothing was found: the chain, and the log line of a
+            // database that cannot be read, run once per session. A header that is absent
+            // costs nothing to read again, and may well come with the next request.
+            if ($detectedId > 0 || VisitorCountrySource::IpDatabase === $this->settings->source()) {
+                $this->session->rememberDetected($detectedId);
+            }
         }
+
+        if ($detectedId < 1) {
+            return;
+        }
+
+        // A session opened in another mode is brought to the current one: the mode of the
+        // shop may change while the visitor browses.
+        if (VisitorCountryMode::Apply === $mode) {
+            if (null === $this->session->retainedCountryId()) {
+                $this->session->retain($detectedId);
+            }
+
+            return;
+        }
+
+        if (!$this->session->isAnswered() && $this->isOnTheDomainOfTheCountry($request, $detectedId)) {
+            $this->session->retain($detectedId);
+            $this->session->markAnswered();
+        }
+    }
+
+    /**
+     * With one domain per language, reaching the domain of a language of the detected
+     * country (`nl_BE` for BE) is the answer to the suggestion.
+     */
+    private function isOnTheDomainOfTheCountry(Request $request, int $countryId): bool
+    {
+        if (!ConfigQuery::isMultiDomainActivated()) {
+            return false;
+        }
+
+        $session = $request->getSession();
+        $locale = (string) ($session instanceof Session ? $session->getLang()?->getLocale() : '');
+        $separator = strrpos($locale, '_');
+
+        if (false === $separator) {
+            return false;
+        }
+
+        $country = CountryQuery::create()->findPk($countryId);
+
+        return null !== $country && strtoupper(substr($locale, $separator + 1)) === strtoupper((string) $country->getIsoalpha2());
     }
 
     private function isBackendPath(string $path): bool

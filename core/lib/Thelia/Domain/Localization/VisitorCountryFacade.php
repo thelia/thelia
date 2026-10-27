@@ -63,7 +63,11 @@ final readonly class VisitorCountryFacade
      */
     public function currentCountry(): Country
     {
-        if (VisitorCountryMode::Off !== $this->mode()) {
+        $mode = $this->mode();
+
+        // In suggest mode only a country the visitor accepted counts: one kept from a time
+        // the shop applied it is not applied any more.
+        if (VisitorCountryMode::Apply === $mode || (VisitorCountryMode::Suggest === $mode && $this->session->isAnswered())) {
             $country = $this->visibleCountry($this->session->retainedCountryId());
 
             if (null !== $country) {
