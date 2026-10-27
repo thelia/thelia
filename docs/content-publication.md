@@ -66,7 +66,9 @@ try {
 A content cannot go online with nothing to show in the default language of the shop. The guard sits in
 `Content::preSave()` and fires whenever a row is created visible or goes from hidden to visible, whichever path
 writes the flag: the publication events, the old creation, update and toggle events, the facade, the admin API, the
-demo import and the scheduled command. A content created online with no body is not written at all. The other
+demo import and the scheduled command. A content created online with no body is not written at all. The creation
+event (`TheliaEvents::CONTENT_CREATE`) and `ContentFacade::create()` carry no body, so a content created online
+through them is always refused: create it as a draft, write its body, then publish it. The other
 languages are not checked; a back office may warn about them.
 
 Whichever path writes `visible` on an existing row, the dates are kept in step with it (`VisibilityDatesAligner`,
