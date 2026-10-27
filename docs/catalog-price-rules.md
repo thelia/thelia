@@ -206,7 +206,7 @@ every `CATALOG_PRICE_RULE_*` event and by the recompute command.
   over the `pse` and `p` aliases. A type no installed resolver answers for makes the
   rule cover nothing.
 - `Audience\AudienceResolverInterface` (tag `thelia.catalog_price_rule.audience`):
-  customer groups (US #122) plug in here.
+  the named customers and the customer groups modes are the two the core ships.
 - `Thelia\Domain\Pricing\CatalogPriceResolverInterface`: the contract a module pricing
   by rules of its own decorates, answering for the sale elements it covers and handing
   the rest to the core resolver. The alias to `Rule\CatalogPriceRuleResolver` is declared
