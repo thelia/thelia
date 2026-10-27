@@ -68,19 +68,28 @@ final class MaxMindDatabaseLookupTest extends TestCase
         yield 'empty' => [''];
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testAMissingDatabaseIsOneWarningWithoutTheAddress(): void
     {
+        // The library stands in, so the lookup reaches the file whether it is installed or not.
+        $this->declareReader('return null;');
         $logger = $this->logger();
 
         $result = (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.7', 'GeoLite2-Country.mmdb');
 
         self::assertNull($result);
         self::assertCount(1, $logger->warnings);
+        self::assertStringContainsString('missing or not readable', $logger->warnings[0]);
         self::assertStringNotContainsString('203.0.113.7', json_encode($logger->records, \JSON_THROW_ON_ERROR));
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testTheSameWarningIsLoggedOnceWhateverTheNumberOfSessions(): void
     {
+        // The library stands in, so the lookup reaches the file whether it is installed or not.
+        $this->declareReader('return null;');
         $logger = $this->logger();
         $pool = new ArrayAdapter();
 
@@ -93,14 +102,19 @@ final class MaxMindDatabaseLookupTest extends TestCase
         (new MaxMindDatabaseLookup($logger, $this->directory, $pool))->lookup('203.0.113.9', 'Other.mmdb');
 
         self::assertCount(2, $logger->warnings, 'Another file is another warning.');
+        self::assertStringContainsString('missing or not readable', $logger->warnings[1]);
     }
 
     /**
      * Two requests of a FPM pool are two processes: only a cache they share can tell that
      * the second warning is the first one again.
      */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testTwoInstancesSharingTheCacheLogTheWarningOnce(): void
     {
+        // The library stands in, so the lookup reaches the file whether it is installed or not.
+        $this->declareReader('return null;');
         $logger = $this->logger();
         $pool = new ArrayAdapter();
 
@@ -110,8 +124,12 @@ final class MaxMindDatabaseLookupTest extends TestCase
         self::assertCount(1, $logger->warnings);
     }
 
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testWithoutACacheEveryFailureIsLogged(): void
     {
+        // The library stands in, so the lookup reaches the file whether it is installed or not.
+        $this->declareReader('return null;');
         $logger = $this->logger();
         $lookup = new MaxMindDatabaseLookup($logger, $this->directory);
 
