@@ -21,6 +21,7 @@ use Thelia\Api\Resource\ContentDocument;
 use Thelia\Api\Resource\ContentFolder;
 use Thelia\Api\Resource\ContentImage;
 use Thelia\Api\Resource\Folder;
+use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductAssociatedContent;
 use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
 use Thelia\Model\ContentQuery;
@@ -58,6 +59,7 @@ final readonly class ContentPublicationExtension implements QueryCollectionExten
     public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $this->scopeToWhatTheShopPublishes($query, $resourceClass, $operation);
+        $this->scopeTheFilteredLinksToWhatTheShopPublishes($query, $resourceClass, $operation, $context['filters'] ?? []);
     }
 
     public function applyToItem(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -106,6 +108,46 @@ final readonly class ContentPublicationExtension implements QueryCollectionExten
                 FolderTableMap::TABLE_NAME,
                 FolderTableMap::COL_VISIBLE,
             ));
+        }
+    }
+
+    /**
+     * A filter through a link answers whether the row it names exists: folders filtered
+     * on a draft content, products on a draft associated content, contents on a draft
+     * folder would each tell the draft is there. The joined link is held to the rows the
+     * shop publishes, under the alias the eager loading extension gives it, which the
+     * search filter names too.
+     *
+     * @param array<string, mixed> $filters
+     */
+    private function scopeTheFilteredLinksToWhatTheShopPublishes(ModelCriteria $query, string $resourceClass, ?Operation $operation, array $filters): void
+    {
+        if (!str_starts_with((string) $operation?->getUriTemplate(), '/front/')) {
+            return;
+        }
+
+        [$relation, $clause] = match ($resourceClass) {
+            Folder::class => ['contentFolders', $this->ofAPublishedContentClause('folder_contentfolders.content_id')],
+            Product::class => ['productAssociatedContents', $this->ofAPublishedContentClause('product_productassociatedcontents.content_id')],
+            Content::class => ['contentFolders', \sprintf(
+                'content_contentfolders.folder_id IN (SELECT %s FROM %s WHERE %s = 1)',
+                FolderTableMap::COL_ID,
+                FolderTableMap::TABLE_NAME,
+                FolderTableMap::COL_VISIBLE,
+            )],
+            default => [null, null],
+        };
+
+        if (null === $relation) {
+            return;
+        }
+
+        foreach (array_keys($filters) as $filter) {
+            if (str_starts_with((string) $filter, $relation.'.')) {
+                $query->where($clause);
+
+                return;
+            }
         }
     }
 

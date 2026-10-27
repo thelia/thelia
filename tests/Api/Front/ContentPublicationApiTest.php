@@ -269,6 +269,40 @@ final class ContentPublicationApiTest extends ApiTestCase
         self::assertSame(404, $this->jsonRequest('GET', '/api/front/product_associated_contents/'.$draftAssociation->getId())->getStatusCode());
     }
 
+    public function testFilteringTheFoldersOnADraftContentFindsNoFolder(): void
+    {
+        $folder = $this->factory->folder(0, ['visible' => 1]);
+        $draft = $this->factory->content($folder, ['visible' => 0]);
+        $published = $this->factory->content($folder, ['visible' => 1]);
+
+        self::assertSame(404, $this->jsonRequest('GET', '/api/front/contents/'.$draft->getId())->getStatusCode());
+        self::assertNotContains((int) $folder->getId(), $this->idsOf($this->jsonRequest('GET', '/api/front/folders?itemsPerPage=500&contentFolders.content.id='.$draft->getId())->getContent()), 'the folder would tell the draft exists and where it is filed');
+        self::assertContains((int) $folder->getId(), $this->idsOf($this->jsonRequest('GET', '/api/front/folders?itemsPerPage=500&contentFolders.content.id='.$published->getId())->getContent()));
+    }
+
+    public function testFilteringTheProductsOnADraftContentFindsNoProduct(): void
+    {
+        $product = $this->product();
+        $draft = $this->factory->content($this->factory->folder(), ['visible' => 0]);
+        $published = $this->factory->content($this->factory->folder(), ['visible' => 1]);
+        $this->associate($product, $draft);
+        $this->associate($product, $published);
+
+        self::assertNotContains((int) $product->getId(), $this->idsOf($this->jsonRequest('GET', '/api/front/products?itemsPerPage=500&productAssociatedContents.content.id='.$draft->getId())->getContent()), 'the product would tell the draft exists');
+        self::assertContains((int) $product->getId(), $this->idsOf($this->jsonRequest('GET', '/api/front/products?itemsPerPage=500&productAssociatedContents.content.id='.$published->getId())->getContent()));
+    }
+
+    public function testFilteringTheContentsOnADraftFolderFindsNoContent(): void
+    {
+        $folder = $this->factory->folder(0, ['visible' => 1]);
+        $draftFolder = $this->factory->folder(0, ['visible' => 0]);
+        $published = $this->factory->content($folder, ['visible' => 1]);
+        $this->fileIn($published, $draftFolder);
+
+        self::assertSame([], $this->idsOf($this->jsonRequest('GET', '/api/front/contents?itemsPerPage=500&contentFolders.folder.id='.$draftFolder->getId())->getContent()), 'the content would tell the draft folder exists');
+        self::assertContains((int) $published->getId(), $this->idsOf($this->jsonRequest('GET', '/api/front/contents?itemsPerPage=500&contentFolders.folder.id='.$folder->getId())->getContent()));
+    }
+
     public function testTheImagesAndDocumentsOfADraftContentAreNotOnTheFrontApi(): void
     {
         $draft = $this->factory->content($this->factory->folder(), ['visible' => 0]);
