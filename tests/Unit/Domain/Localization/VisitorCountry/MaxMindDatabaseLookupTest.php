@@ -29,6 +29,7 @@ final class MaxMindDatabaseLookupTest extends TestCase
     {
         $this->directory = sys_get_temp_dir().'/thelia-geoip-'.bin2hex(random_bytes(4));
         mkdir($this->directory);
+        MaxMindDatabaseLookup::forgetWarnings();
     }
 
     protected function tearDown(): void
@@ -76,6 +77,28 @@ final class MaxMindDatabaseLookupTest extends TestCase
         self::assertNull($result);
         self::assertCount(1, $logger->warnings);
         self::assertStringNotContainsString('203.0.113.7', json_encode($logger->records, \JSON_THROW_ON_ERROR));
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testTheSameWarningIsLoggedOncePerProcessWhateverTheNumberOfSessions(): void
+    {
+        $logger = $this->logger();
+
+        foreach (range(1, 3) as $session) {
+            (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.'.$session, 'GeoLite2-Country.mmdb');
+        }
+
+        self::assertCount(1, $logger->warnings);
+
+        (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.9', 'Other.mmdb');
+
+        self::assertCount(2, $logger->warnings, 'Another file is another warning.');
+
+        MaxMindDatabaseLookup::forgetWarnings();
+        (new MaxMindDatabaseLookup($logger, $this->directory))->lookup('203.0.113.9', 'Other.mmdb');
+
+        self::assertCount(3, $logger->warnings);
     }
 
     #[RunInSeparateProcess]

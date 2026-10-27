@@ -33,6 +33,7 @@ use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Lang;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
 
@@ -94,15 +95,121 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
         self::assertSame(Country::getDefaultCountry()->getId(), $this->facade()->currentCountry()->getId());
     }
 
-    public function testAVisitorWhoseCountryCannotBeFoundIsRememberedAsSuch(): void
+    public function testAVisitorWhoseCountryCannotBeFoundIsRememberedAsSuchWithAnIpDatabase(): void
     {
         $this->mode('apply');
+        ConfigQuery::write('visitor_country_source', 'ip_database');
+        ConfigQuery::resetCache();
 
         $this->visit('XX');
 
         self::assertSame(0, $this->session()->get('thelia.visitor_country.detected'));
         self::assertFalse($this->session()->has('thelia.visitor_country.id'));
         self::assertNull($this->facade()->detectedCountry());
+    }
+
+    public function testNothingFoundInTheHeaderIsNotRememberedSoTheNextRequestDetectsAgain(): void
+    {
+        $this->mode('apply');
+        $belgium = $this->belgium();
+
+        $this->visit('XX');
+
+        self::assertFalse($this->session()->has('thelia.visitor_country.detected'));
+        self::assertFalse($this->session()->has('thelia.visitor_country.id'));
+
+        $this->visit('BE');
+
+        self::assertSame($belgium->getId(), $this->session()->get('thelia.visitor_country.detected'));
+        self::assertSame($belgium->getId(), $this->session()->get('thelia.visitor_country.id'));
+    }
+
+    public function testOnTheDomainOfALanguageOfTheDetectedCountryTheSuggestionIsAnsweredAndTheCountryRetained(): void
+    {
+        $this->mode('suggest');
+        $this->multiDomain('1');
+        $belgium = $this->belgium();
+        $this->session()->setLang((new Lang())->setLocale('nl_BE'));
+
+        $this->visit('BE');
+
+        self::assertSame($belgium->getId(), $this->session()->get('thelia.visitor_country.id'));
+        self::assertTrue($this->session()->get('thelia.visitor_country.answered'));
+        self::assertNull($this->facade()->suggestion());
+        self::assertSame($belgium->getId(), $this->facade()->currentCountry()->getId());
+    }
+
+    #[DataProvider('visitsThatAreNotTheDomainOfTheCountry')]
+    public function testOtherwiseTheSuggestionStaysOpen(string $multiDomain, string $locale, bool $answered): void
+    {
+        $this->mode('suggest');
+        $this->multiDomain($multiDomain);
+        $this->belgium();
+        $this->session()->setLang((new Lang())->setLocale($locale));
+
+        if ($answered) {
+            $this->session()->set('thelia.visitor_country.answered', true);
+        }
+
+        $this->visit('BE');
+
+        self::assertFalse($this->session()->has('thelia.visitor_country.id'));
+        self::assertSame($answered, $this->session()->has('thelia.visitor_country.answered'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string, bool}>
+     */
+    public static function visitsThatAreNotTheDomainOfTheCountry(): iterable
+    {
+        yield 'one domain per language is off' => ['0', 'nl_BE', false];
+        yield 'the language is of another country' => ['1', 'fr_FR', false];
+        yield 'the language has no region' => ['1', 'nl', false];
+        yield 'the visitor already answered' => ['1', 'nl_BE', true];
+    }
+
+    public function testTheApplyModeRetainsTheCountryOfASessionOpenedInSuggestMode(): void
+    {
+        $this->mode('suggest');
+        $belgium = $this->belgium();
+        $this->visit('BE');
+        self::assertFalse($this->session()->has('thelia.visitor_country.id'));
+
+        $this->mode('apply');
+        $this->visit('BE');
+
+        self::assertSame($belgium->getId(), $this->session()->get('thelia.visitor_country.id'));
+        self::assertSame($belgium->getId(), $this->facade()->currentCountry()->getId());
+    }
+
+    public function testTheApplyModeKeepsTheCountryAlreadyRetained(): void
+    {
+        $this->mode('suggest');
+        $this->belgium();
+        $this->visit('BE');
+        $this->session()->set('thelia.visitor_country.id', $this->visitedId('FR'));
+
+        $this->mode('apply');
+        $this->visit('BE');
+
+        self::assertSame($this->visitedId('FR'), $this->session()->get('thelia.visitor_country.id'));
+    }
+
+    public function testACountryRetainedByAnEarlierApplyModeIsNotUsedInSuggestModeUntilTheVisitorAnswers(): void
+    {
+        $this->mode('apply');
+        $belgium = $this->belgium();
+        $this->visit('BE');
+        self::assertSame($belgium->getId(), $this->facade()->currentCountry()->getId());
+
+        $this->mode('suggest');
+
+        self::assertSame(Country::getDefaultCountry()->getId(), $this->facade()->currentCountry()->getId());
+        self::assertSame($belgium->getId(), $this->facade()->suggestion()?->getId());
+
+        $this->facade()->accept($belgium->getId());
+
+        self::assertSame($belgium->getId(), $this->facade()->currentCountry()->getId());
     }
 
     public function testTheDetectionDoesNotRunAgainOnceAttempted(): void
@@ -371,6 +478,12 @@ final class VisitorCountryFacadeTest extends IntegrationTestCase
     private function visitedId(string $isoAlpha2): int
     {
         return (int) CountryQuery::create()->findOneByIsoalpha2($isoAlpha2)?->getId();
+    }
+
+    private function multiDomain(string $value): void
+    {
+        ConfigQuery::write('one_domain_foreach_lang', $value);
+        ConfigQuery::resetCache();
     }
 
     private function mode(string $mode): void

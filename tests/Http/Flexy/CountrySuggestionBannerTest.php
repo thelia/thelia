@@ -16,9 +16,11 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Domain\Localization\VisitorCountry\VisitorCountrySession;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
@@ -83,7 +85,7 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
             self::markTestSkipped('The test database has no Belgium.');
         }
 
-        foreach (['visitor_country_mode', 'visitor_country_source'] as $name) {
+        foreach (['visitor_country_mode', 'visitor_country_source', SharedCacheMode::CONFIG_KEY] as $name) {
             $this->settings[$name] = (string) ConfigQuery::read($name, '');
         }
 
@@ -261,6 +263,78 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
         self::assertCount(0, $crawler->filter(self::BANNER.' a[href*="lang="]'));
     }
 
+    /**
+     * The page is the same URL for two visitors without a cookie: what tells them apart is
+     * the header of the CDN.
+     */
+    public function testTwoVisitorsOfTheSameUrlAreServedTheirOwnPage(): void
+    {
+        [$belgian, $french] = $this->twoVisitorsOfTheSameUrl();
+
+        self::assertCount(1, $belgian['crawler']->filter(self::BANNER));
+        self::assertCount(0, $french['crawler']->filter(self::BANNER));
+        self::assertNotSame($belgian['response']->getContent(), $french['response']->getContent());
+    }
+
+    /**
+     * Two pages for one URL are only safe in a shared cache if the response says it varies
+     * on the header.
+     */
+    public function testTheSharedCacheVariesOnTheHeaderOfTheCountry(): void
+    {
+        [$belgian, $french] = $this->twoVisitorsOfTheSameUrl();
+
+        // The same reservation as SharedCachePublicPagesTest: a theme or a module that reads a
+        // resource the shared cache list does not name keeps its pages personal, and a personal
+        // page has no Vary to read. The header is pinned on its own by VisitorCountrySharedCacheTest.
+        if (!$belgian['response']->headers->hasCacheControlDirective('public')) {
+            self::markTestSkipped('The home page of the installed theme is not shareable in the test shop: '.$belgian['response']->headers->get('Cache-Control'));
+        }
+
+        foreach ([$belgian, $french] as $visitor) {
+            self::assertContains('CF-IPCountry', $visitor['response']->getVary());
+        }
+    }
+
+    /**
+     * With one domain per language, arriving on the domain of a language of the detected
+     * country is the answer: no banner, and the prices are the ones of that country.
+     */
+    public function testOnTheDomainOfTheLanguageOfTheCountryThereIsNoBannerAndTheCountryIsRetained(): void
+    {
+        $this->languageOfBelgium('https://be.example.test');
+
+        $crawler = $this->visitorFrom('suggest', ['one_domain_foreach_lang' => '1'], 'https://be.example.test/?lang=nl_BE');
+
+        self::assertCount(0, $crawler->filter(self::BANNER));
+        self::assertSame($this->belgium?->getId(), $this->sessionValue(VisitorCountrySession::ID_KEY));
+        self::assertTrue($this->sessionValue(VisitorCountrySession::ANSWERED_KEY));
+    }
+
+    /**
+     * @return array{array{crawler: Crawler, response: Response}, array{crawler: Crawler, response: Response}}
+     */
+    private function twoVisitorsOfTheSameUrl(): array
+    {
+        $this->client->request('GET', '/');
+        self::assertResponseIsSuccessful();
+
+        ConfigQuery::write('visitor_country_mode', 'suggest');
+        ConfigQuery::write('visitor_country_source', 'header');
+        ConfigQuery::write(SharedCacheMode::CONFIG_KEY, SharedCacheMode::ENABLED->value);
+        ConfigQuery::resetCache();
+
+        $visitors = [];
+
+        foreach (['BE', 'FR'] as $country) {
+            $this->client->getCookieJar()->clear();
+            $crawler = $this->client->request('GET', '/', server: ['HTTP_CF_IPCOUNTRY' => $country]);
+            $visitors[] = ['crawler' => $crawler, 'response' => $this->client->getResponse()];
+        }
+
+        return $visitors;
+    }
+
     private function languageOfBelgium(string $url): void
     {
         (new Lang())
@@ -286,7 +360,7 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
     /**
      * @param array<string, string> $more other shop settings, written with the mode
      */
-    private function visitorFrom(string $mode, array $more = []): Crawler
+    private function visitorFrom(string $mode, array $more = [], string $url = '/'): Crawler
     {
         $this->client->request('GET', '/');
         self::assertResponseIsSuccessful();
@@ -300,7 +374,7 @@ final class CountrySuggestionBannerTest extends WebIntegrationTestCase
 
         ConfigQuery::resetCache();
 
-        $crawler = $this->client->request('GET', '/', server: ['HTTP_CF_IPCOUNTRY' => 'BE']);
+        $crawler = $this->client->request('GET', $url, server: ['HTTP_CF_IPCOUNTRY' => 'BE']);
         self::assertResponseIsSuccessful();
 
         return $crawler;
