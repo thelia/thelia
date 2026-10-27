@@ -109,6 +109,10 @@ save of the same instance does not put it online after all; a new row has nothin
   not show. The relations a front read serializes are pruned the same way (`ContentPublicationLinksListener`, one
   query per resource that carries links): `contentFolders` of a folder names the contents the shop shows, `contentFolders`
   of a content names the folders online, `productAssociatedContents` of a product names the contents the shop shows.
+  A filter through these links matches the same rows only: `/api/front/folders?contentFolders.content.id=` and
+  `/api/front/products?productAssociatedContents.content.id=` find nothing for a draft content, and
+  `/api/front/contents?contentFolders.folder.id=` finds nothing for a folder that is not online, so a filter never
+  tells a draft exists either.
   A front read carries `publicationState`, which is always `published` there, and not the dates: when a row went
   online or goes offline is the back office's. The admin endpoints read every state: `publicationState` (read only)
   and `publishAt`, `unpublishAt` (writable) are on both resources; a withdrawal before the publication, or an empty
