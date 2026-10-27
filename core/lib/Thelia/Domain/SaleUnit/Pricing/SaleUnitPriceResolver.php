@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\SaleUnit\Pricing;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Currency;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -34,8 +35,10 @@ use Thelia\Model\SaleUnitProductPriceQuery;
  */
 class SaleUnitPriceResolver
 {
-    public function __construct(private readonly SaleUnitContext $saleUnitContext)
-    {
+    public function __construct(
+        private readonly SaleUnitContext $saleUnitContext,
+        private readonly CurrencyConverter $currencyConverter,
+    ) {
     }
 
     /**
@@ -102,7 +105,12 @@ class SaleUnitPriceResolver
             }
 
             $value = (float) ($isPromo ? $defaultRow->getPromoPrice() : $defaultRow->getPrice());
-            $prices[$pseId] = $value * (float) $currency->getRate() / (float) $defaultCurrency->getRate();
+            $converted = $this->currencyConverter->fromDefaultCurrency($value, $currency);
+
+            // The default currency has no usable rate: nothing converts, the catalog price stands.
+            if (null !== $converted) {
+                $prices[$pseId] = $converted;
+            }
         }
 
         return $prices;

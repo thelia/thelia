@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Domain\Pricing\CatalogPriceResolverInterface;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContext;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\Pricing\Rule\CatalogPriceRuleResolver;
 
 /*
@@ -25,9 +27,13 @@ use Thelia\Domain\Pricing\Rule\CatalogPriceRuleResolver;
  * loader: that rule spans the core and the modules of one container build, so the
  * decorator of a module, which implements the interface too, would remove the
  * alias and leave every reader of a price without a resolver.
+ *
+ * The customer price context is aliased the same way, for the same reason: a module
+ * may decorate it.
  */
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services();
 
     $services->alias(CatalogPriceResolverInterface::class, CatalogPriceRuleResolver::class);
+    $services->alias(CustomerPriceContextInterface::class, CustomerPriceContext::class);
 };

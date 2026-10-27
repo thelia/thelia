@@ -20,6 +20,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 
 class DepthProductFilter extends AbstractFilter
 {
@@ -43,7 +44,11 @@ class DepthProductFilter extends AbstractFilter
             return;
         }
 
-        $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: (int) $value);
+        $categoriesWithDepth = $this->filterService->getCategoriesRecursively(
+            categoryId: $categoryId,
+            maxDepth: (int) $value,
+            openToVisitorOnly: FrontOperation::isFront($operation),
+        );
         $idCategories = [(int) $categoryId];
 
         foreach ($categoriesWithDepth as $categories) {

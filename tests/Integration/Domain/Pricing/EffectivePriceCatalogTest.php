@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Pricing;
 
+use Thelia\Domain\Pricing\CatalogActivity;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
-use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\Currency;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
@@ -100,14 +102,10 @@ final class EffectivePriceCatalogTest extends ActionIntegrationTestCase
             },
         );
 
-        $activityChecker = $this->createStub(PricingActivityChecker::class);
-        $activityChecker->method('hasActivePublicRule')->willReturn($publicRule);
-        $activityChecker->method('hasActiveNamedRule')->willReturn(false);
+        $probe = $this->createStub(CatalogActivityProbe::class);
+        $probe->method('read')->willReturn(new CatalogActivity($publicRule, false, false, false, false, false, 1));
 
-        $saleAudienceChecker = $this->createStub(SaleAudienceChecker::class);
-        $saleAudienceChecker->method('hasActiveReservedSale')->willReturn(false);
-
-        return new EffectivePriceCatalog($resolver, $activityChecker, $saleAudienceChecker);
+        return new EffectivePriceCatalog($resolver, new PricingActivityChecker($probe, new CustomerDiscountRate()));
     }
 
     private function product(): Product

@@ -25,6 +25,7 @@ use Thelia\Api\Resource\Currency as CurrencyResource;
 use Thelia\Api\Resource\ProductPrice as ProductPriceResource;
 use Thelia\Api\Resource\ProductSaleElements as ProductSaleElementsResource;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
@@ -49,6 +50,7 @@ class ProductPriceCurrencyListener implements EventSubscriberInterface
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly ApiResourcePropelTransformerService $transformerService,
+        private readonly CurrencyConverter $currencyConverter,
     ) {
     }
 
@@ -63,7 +65,7 @@ class ProductPriceCurrencyListener implements EventSubscriberInterface
         $prices = $resource->getProductPrices();
         $context = $modelToResourceEvent->getContext();
 
-        if ([] === $prices || !$this->isFrontRead($context)) {
+        if ([] === $prices || !EffectivePriceListener::isFrontRead($context)) {
             return;
         }
 
@@ -140,38 +142,6 @@ class ProductPriceCurrencyListener implements EventSubscriberInterface
     }
 
     /**
-     * A front read is one no admin group takes part in. Group names carry the
-     * side they belong to, "front:product:read" against "admin:product:read",
-     * so a module resource embedding sale elements is covered too.
-     *
-     * @param array<string, mixed> $context
-     */
-    private function isFrontRead(array $context): bool
-    {
-        $groups = $context['groups'] ?? [];
-
-        if (!\is_array($groups)) {
-            $groups = [$groups];
-        }
-
-        $isFrontRead = false;
-
-        foreach ($groups as $group) {
-            if (!\is_string($group)) {
-                continue;
-            }
-
-            if (str_starts_with($group, 'admin:')) {
-                return false;
-            }
-
-            $isFrontRead = $isFrontRead || str_starts_with($group, 'front:');
-        }
-
-        return $isFrontRead;
-    }
-
-    /**
      * @param array<ProductPriceResource> $prices
      * @param array<string, mixed>        $context
      */
@@ -210,15 +180,22 @@ class ProductPriceCurrencyListener implements EventSubscriberInterface
             return $ownPrice;
         }
 
-        $rate = $currency->getRate() / ($defaultCurrency->getRate() ?: 1.0);
+        $convertedPrice = $this->currencyConverter->fromDefaultCurrency($defaultCurrencyPrice->getPrice(), $currency);
+        $convertedPromoPrice = $this->currencyConverter->fromDefaultCurrency($defaultCurrencyPrice->getPromoPrice(), $currency);
+
+        // A default currency without a usable rate converts nothing: the sale element
+        // has no price in this currency.
+        if (null === $convertedPrice || null === $convertedPromoPrice) {
+            return null;
+        }
 
         // Cloning keeps everything the row of the default currency carries and
         // only re-quotes it: the sale element it belongs to, its dates, the
         // addons a module attached to it.
         $price = $ownPrice ?? clone $defaultCurrencyPrice;
         $price
-            ->setPrice($defaultCurrencyPrice->getPrice() * $rate)
-            ->setPromoPrice($defaultCurrencyPrice->getPromoPrice() * $rate);
+            ->setPrice($convertedPrice)
+            ->setPromoPrice($convertedPromoPrice);
 
         if (!$ownPrice instanceof ProductPriceResource) {
             $price->setCurrency($this->currencyResource($currency, $context));

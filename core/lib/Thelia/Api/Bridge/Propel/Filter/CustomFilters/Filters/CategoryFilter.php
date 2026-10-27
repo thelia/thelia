@@ -35,7 +35,7 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
     {
     }
 
-    public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
+    public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null, bool $openToVisitorOnly = false): void
     {
         $categoryIds = $this->flattenSelectedValues($value);
 
@@ -43,8 +43,20 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
             return;
         }
 
+        // A closed category is hidden altogether: asking for it names nothing, and a product
+        // that an open category keeps visible must not betray the closed one it also sits in.
+        if ($openToVisitorOnly) {
+            $categoryIds = array_values(array_diff($categoryIds, $this->filterService->closedCategoryIds()));
+        }
+
+        if ([] === $categoryIds) {
+            $query->useProductCategoryQuery()->filterByCategoryId([], Criteria::IN)->endUse();
+
+            return;
+        }
+
         if ($categoryDepth) {
-            foreach ($this->filterService->getCategoriesRecursively($categoryIds, $categoryDepth) as $categories) {
+            foreach ($this->filterService->getCategoriesRecursively($categoryIds, $categoryDepth, openToVisitorOnly: $openToVisitorOnly) as $categories) {
                 foreach ($categories as $category) {
                     $categoryIds[] = $category->getId();
                 }
@@ -125,11 +137,11 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
         foreach ($valueSearched as $categoryId) {
             $mainCategory = CategoryQuery::create()->joinWithI18n($locale)->findOneById($categoryId);
 
-            if (!$mainCategory) {
+            if (!$mainCategory || \in_array((int) $mainCategory->getId(), $this->filterService->closedCategoryIds(), true)) {
                 continue;
             }
 
-            $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth ?? 1);
+            $categoriesWithDepth = $this->filterService->getCategoriesRecursively(categoryId: $categoryId, maxDepth: $depth ?? 1, openToVisitorOnly: true);
 
             if ([] === $categoriesWithDepth) {
                 return [];
