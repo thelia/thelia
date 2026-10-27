@@ -123,11 +123,7 @@ final readonly class WebhookPublisher
 
     private function listensTo(WebhookSubscription $subscription, string $eventName): bool
     {
-        try {
-            return \in_array($eventName, json_decode($subscription->getEvents(), true, 512, \JSON_THROW_ON_ERROR) ?: [], true);
-        } catch (\JsonException) {
-            return false;
-        }
+        return \in_array($eventName, $subscription->getEventNames(), true);
     }
 
     private function uuid(): string
