@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Sale;
 use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\Customer;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleCustomerGroup;
 use Thelia\Model\SaleQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
@@ -69,17 +70,39 @@ final class SaleAudienceCheckerTest extends IntegrationTestCase
     }
 
     /**
-     * Customer groups are US #122. Until the groups are read, an operation targeting
-     * them names nobody, and nobody is entitled — which is the safe way round.
+     * An operation reserved for customer groups entitles the members of its groups,
+     * not the other customers, not a visitor, and not a guest account of the group.
      */
-    public function testAnOperationTargetingCustomerGroupsEntitlesNobodyYet(): void
+    public function testAnOperationTargetingCustomerGroupsEntitlesTheirMembers(): void
     {
-        $sale = $this->factory->sale([
-            'active' => true,
-            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
-        ]);
+        $group = $this->factory->customerGroup();
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $guestMember = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $guestMember->setIsGuest(1)->save();
+        $sale = $this->reservedSale(['audienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS]);
+        (new SaleCustomerGroup())->setSaleId($sale->getId())->setCustomerGroupId($group->getId())->save();
 
+        self::assertTrue($this->checker->isCustomerEntitled($sale, $member));
         self::assertFalse($this->checker->isCustomerEntitled($sale, $this->newCustomer()));
+        self::assertFalse($this->checker->isCustomerEntitled($sale, $guestMember));
+        self::assertFalse($this->checker->isCustomerEntitled($sale, null));
+        self::assertSame([$sale->getId()], $this->checker->getEntitledReservedSaleIds($member));
+        self::assertSame([], $this->checker->getEntitledReservedSaleIds($this->newCustomer()));
+    }
+
+    /**
+     * A link to a group left behind on an operation for named customers opens it to
+     * nobody in the group.
+     */
+    public function testAGroupLinkCountsOnlyOnAnOperationForGroups(): void
+    {
+        $group = $this->factory->customerGroup();
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
+        $sale = $this->reservedSale();
+        (new SaleCustomerGroup())->setSaleId($sale->getId())->setCustomerGroupId($group->getId())->save();
+
+        self::assertFalse($this->checker->isCustomerEntitled($sale, $member));
+        self::assertSame([], $this->checker->getEntitledReservedSaleIds($member));
     }
 
     public function testAShopWithNoReservedOperationSaysSo(): void

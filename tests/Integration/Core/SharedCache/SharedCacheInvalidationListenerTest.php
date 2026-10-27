@@ -16,9 +16,15 @@ namespace Thelia\Tests\Integration\Core\SharedCache;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Api\Service\API\ResourceCache;
+use Thelia\Api\Service\API\ResourceCacheInvalidationListener;
 use Thelia\Core\Event\Brand\BrandEvent;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\DefaultActionEvent;
@@ -50,6 +56,7 @@ use Thelia\Model\Brand;
 use Thelia\Model\BrandDocument;
 use Thelia\Model\BrandImage;
 use Thelia\Model\Cart;
+use Thelia\Model\Category;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\ChoiceFilter;
@@ -57,6 +64,10 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\ContentImage;
+use Thelia\Model\CustomerGroup;
+use Thelia\Model\CustomerGroupCategory;
+use Thelia\Model\CustomerGroupPaymentModule;
+use Thelia\Model\CustomerGroupProductPrice;
 use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
 use Thelia\Model\Folder;
@@ -83,6 +94,8 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
 
     private ResourceCache&MockObject $resourceCache;
 
+    private ResourceCacheInvalidationListener $resourceCacheInvalidation;
+
     protected function tearDown(): void
     {
         ConfigQuery::resetCache();
@@ -97,7 +110,8 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->purger = new RecordingSharedCachePurger();
         $this->resourceCache = $this->createMock(ResourceCache::class);
         $queue = new SharedCachePurgeQueue($this->purger);
-        $this->listener = new SharedCacheInvalidationListener(new SharedCacheInvalidator($queue, $this->resourceCache), $queue);
+        $this->resourceCacheInvalidation = new ResourceCacheInvalidationListener($this->resourceCache);
+        $this->listener = new SharedCacheInvalidationListener(new SharedCacheInvalidator($queue, $this->resourceCacheInvalidation), $queue);
     }
 
     public function testAProductChangePurgesThatProductAndWhatListsProducts(): void
@@ -171,6 +185,13 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         }
     }
 
+    public function testACategoryDeletedFromTheBackOfficeIsSubscribedAsAWholeShopChange(): void
+    {
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
+
+        self::assertSame('onWholeShopChange', $subscribed[TheliaEvents::CATEGORY_DELETE][0]);
+    }
+
     /**
      * The back office writes the filters of a category straight to their table, with no
      * catalogue event: the save still reaches the listener through Propel.
@@ -214,6 +235,26 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         foreach ([ChoiceFilterEvent::POST_SAVE, ChoiceFilterEvent::POST_DELETE] as $eventName) {
             self::assertArrayHasKey($eventName, $subscribed);
             self::assertSame('onChoiceFilterChange', $subscribed[$eventName][0]);
+        }
+    }
+
+    public function testTheEndOfAMessageHandledByAWorkerPurgesWhatWasQueued(): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->listener);
+
+        // An import run by messenger:consume ends neither a request nor a command.
+        foreach ([
+            new WorkerMessageHandledEvent(new Envelope(new \stdClass()), 'async_heavy'),
+            new WorkerMessageFailedEvent(new Envelope(new \stdClass()), 'async_heavy', new \RuntimeException('the import failed')),
+        ] as $endOfTheMessage) {
+            $this->purger->calls = [];
+            $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
+            self::assertSame([], $this->purger->calls, 'nothing is purged while the message runs');
+
+            $dispatcher->dispatch($endOfTheMessage);
+
+            self::assertNotSame([], $this->purger->calls, 'the purge is sent once the message is over: '.$endOfTheMessage::class);
         }
     }
 
@@ -390,6 +431,69 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         yield 'attribute removed from every template' => [TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES];
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function writesToWhatACustomerGroupSeesOrPays(): iterable
+    {
+        foreach (ResourceCacheInvalidationListener::CUSTOMER_GROUP_WRITES as $eventName) {
+            yield $eventName => [$eventName];
+        }
+    }
+
+    /**
+     * What a group is shut out of, owes and discounts decides the pages of the visitors of
+     * the default group: a write to those tables purges the shop, whoever wrote it.
+     */
+    #[DataProvider('writesToWhatACustomerGroupSeesOrPays')]
+    public function testAWriteToWhatACustomerGroupSeesOrPaysPurgesTheWholeShop(string $eventName): void
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->listener);
+
+        $dispatcher->dispatch(new Event(), $eventName);
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
+    public function testTheEightWritesAreTheFourTablesSavedAndDeleted(): void
+    {
+        self::assertSame(
+            [
+                'propel.post.save.customer_group',
+                'propel.post.delete.customer_group',
+                'propel.post.save.customer_group_category',
+                'propel.post.delete.customer_group_category',
+                'propel.post.save.customer_group_product_price',
+                'propel.post.delete.customer_group_product_price',
+                'propel.post.save.customer_group_payment_module',
+                'propel.post.delete.customer_group_payment_module',
+            ],
+            ResourceCacheInvalidationListener::CUSTOMER_GROUP_WRITES,
+        );
+    }
+
+    /**
+     * @return iterable<string, array{object}>
+     */
+    public static function customerGroupModelsWrittenThroughTheApi(): iterable
+    {
+        yield 'a group' => [new CustomerGroup()];
+        yield 'a category of a group' => [new CustomerGroupCategory()];
+        yield 'a price of a group' => [new CustomerGroupProductPrice()];
+        yield 'a payment module of a group' => [new CustomerGroupPaymentModule()];
+    }
+
+    #[DataProvider('customerGroupModelsWrittenThroughTheApi')]
+    public function testACustomerGroupModelWrittenThroughTheApiPurgesTheWholeShop(object $model): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, $model, ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
+    }
+
     public function testAProductWrittenThroughTheApiPurgesThatProduct(): void
     {
         $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
@@ -404,6 +508,22 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->flush();
 
         self::assertSame([SharedCacheKey::forChange('product', 42)], $this->purger->calls);
+    }
+
+    public function testACategoryDeletedThroughTheApiPurgesTheWholeShop(): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Category())->setId(42), ResourcePersistedEvent::OPERATION_DELETE));
+        $this->listener->flush();
+
+        self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls, 'its deletion cascades on the lists of the groups: what a restricted group sees changes across the shop');
+    }
+
+    public function testACategoryUpdatedThroughTheApiStillPurgesThatCategory(): void
+    {
+        $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Category())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
+        $this->listener->flush();
+
+        self::assertSame([SharedCacheKey::forChange('category', 42)], $this->purger->calls);
     }
 
     #[DataProvider('modelsWrittenThroughTheApiThatHaveNoFamily')]
@@ -455,14 +575,24 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         self::assertSame([[SharedCacheKey::ALL]], $this->purger->calls);
     }
 
-    public function testTheResourceCachePoolIsClearedWithEveryPurge(): void
+    public function testTheResourceCachePoolIsClearedOnceTheRequestEndsNotWhilstTheWriteStillRuns(): void
     {
         ConfigQuery::write(SharedCacheMode::CONFIG_KEY, SharedCacheMode::ENABLED->value);
-        $this->resourceCache->expects(self::exactly(3))->method('clear');
+        $cleared = 0;
+        $this->resourceCache->method('clear')->willReturnCallback(static function () use (&$cleared): void {
+            ++$cleared;
+        });
 
         $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
         $this->listener->onWholeShopChange();
         $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
+
+        // The write is not committed yet: a pool flushed now is refilled with the rows as they were.
+        self::assertSame(0, $cleared);
+
+        $this->resourceCacheInvalidation->flush();
+
+        self::assertSame(1, $cleared, 'three purges, one flush, once the request ends');
     }
 
     public function testTheListenerHearsTheWritesOfTheApi(): void

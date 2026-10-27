@@ -25,16 +25,20 @@ use Thelia\Core\Event\CatalogPriceRule\CatalogPriceRuleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Pricing\Rule\CatalogPriceRuleDefinitionValidator;
 use Thelia\Domain\Pricing\Rule\Exception\CatalogPriceRuleNotFoundException;
+use Thelia\Domain\Pricing\Rule\Exception\InvalidCatalogPriceRuleException;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Domain\Pricing\Rule\Storage\ScopeReader;
 use Thelia\Model\CatalogPriceRule as CatalogPriceRuleModel;
 use Thelia\Model\CatalogPriceRuleCriterion;
 use Thelia\Model\CatalogPriceRuleCriterionQuery;
 use Thelia\Model\CatalogPriceRuleCustomer;
+use Thelia\Model\CatalogPriceRuleCustomerGroup;
+use Thelia\Model\CatalogPriceRuleCustomerGroupQuery;
 use Thelia\Model\CatalogPriceRuleCustomerQuery;
 use Thelia\Model\CatalogPriceRuleEffectCurrency;
 use Thelia\Model\CatalogPriceRuleEffectCurrencyQuery;
 use Thelia\Model\CatalogPriceRuleQuery;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\Map\CatalogPriceRuleTableMap;
 
 /**
@@ -57,6 +61,7 @@ class CatalogPriceRule extends BaseAction implements EventSubscriberInterface
     public function create(CatalogPriceRuleCreateEvent $event): void
     {
         $this->validator->validate($event);
+        $this->assertCustomerGroupsExist($event);
 
         $rule = $this->transactional(function (ConnectionInterface $con) use ($event): CatalogPriceRuleModel {
             $rule = new CatalogPriceRuleModel();
@@ -72,6 +77,7 @@ class CatalogPriceRule extends BaseAction implements EventSubscriberInterface
     public function update(CatalogPriceRuleUpdateEvent $event): void
     {
         $this->validator->validate($event);
+        $this->assertCustomerGroupsExist($event);
         $rule = $this->ruleOrFail($event->getCatalogPriceRuleId());
 
         $this->transactional(function (ConnectionInterface $con) use ($rule, $event): void {
@@ -134,6 +140,25 @@ class CatalogPriceRule extends BaseAction implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * A group the rule names must exist: an unknown id is refused here, as a rule definition
+     * the merchant can read, instead of failing later on the foreign key.
+     *
+     * @throws InvalidCatalogPriceRuleException
+     */
+    private function assertCustomerGroupsExist(CatalogPriceRuleCreateEvent $event): void
+    {
+        if (CatalogPriceRuleModel::AUDIENCE_MODE_CUSTOMER_GROUPS !== $event->getAudienceMode()) {
+            return;
+        }
+
+        $unknownIds = CustomerGroupQuery::findUnknownIds($event->getCustomerGroupIds());
+
+        if ([] !== $unknownIds) {
+            throw new InvalidCatalogPriceRuleException(\sprintf('No customer group has the id "%s".', implode('", "', $unknownIds)));
+        }
+    }
+
     private function writeDefinition(CatalogPriceRuleModel $rule, CatalogPriceRuleCreateEvent $event, ConnectionInterface $con): void
     {
         $rule
@@ -155,6 +180,7 @@ class CatalogPriceRule extends BaseAction implements EventSubscriberInterface
         $this->syncCriteria($rule, $event->getCriteria(), $con);
         $this->syncEffectValues($rule, $event->getEffectValuesByCurrency(), $con);
         $this->syncCustomers($rule, $event->getAudienceMode(), $event->getCustomerIds(), $con);
+        $this->syncCustomerGroups($rule, $event->getAudienceMode(), $event->getCustomerGroupIds(), $con);
     }
 
     /**
@@ -216,6 +242,27 @@ class CatalogPriceRule extends BaseAction implements EventSubscriberInterface
             (new CatalogPriceRuleCustomer())
                 ->setCatalogPriceRuleId($rule->getId())
                 ->setCustomerId($customerId)
+                ->save($con);
+        }
+    }
+
+    /**
+     * Same rule as the named customers: only a rule reserved for groups keeps rows.
+     *
+     * @param list<int> $customerGroupIds
+     */
+    private function syncCustomerGroups(CatalogPriceRuleModel $rule, int $audienceMode, array $customerGroupIds, ConnectionInterface $con): void
+    {
+        CatalogPriceRuleCustomerGroupQuery::create()->filterByCatalogPriceRuleId($rule->getId())->delete($con);
+
+        if (CatalogPriceRuleModel::AUDIENCE_MODE_CUSTOMER_GROUPS !== $audienceMode) {
+            return;
+        }
+
+        foreach ($customerGroupIds as $customerGroupId) {
+            (new CatalogPriceRuleCustomerGroup())
+                ->setCatalogPriceRuleId($rule->getId())
+                ->setCustomerGroupId($customerGroupId)
                 ->save($con);
         }
     }

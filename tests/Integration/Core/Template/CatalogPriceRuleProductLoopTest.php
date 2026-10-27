@@ -16,7 +16,6 @@ namespace Thelia\Tests\Integration\Core\Template;
 
 use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
-use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\Category;
@@ -94,7 +93,7 @@ final class CatalogPriceRuleProductLoopTest extends IntegrationTestCase
         // Two reads in one request here, where the shop has one per request: the
         // per-request memos are reset by hand the way kernel.reset would.
         $this->getService(EffectivePriceCatalog::class)->reset();
-        $this->getService(PricingActivityChecker::class)->reset();
+        $this->getService('services_resetter')->reset();
 
         self::assertEqualsWithDelta(50.0, (float) $this->productRow($product)['PROMO_PRICE'], 0.000001, 'the manual promo price is back');
     }

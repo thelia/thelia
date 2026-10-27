@@ -59,6 +59,25 @@ final class CatalogPriceRuleApiTest extends ApiTestCase
         self::assertArrayNotHasKey('criteria', $members[0], 'the definition travels with the single read only');
     }
 
+    public function testARuleReservedForGroupsIsReadWithItsGroups(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $factory = $this->createFixtureFactory();
+        $group = $factory->customerGroup();
+        $other = $factory->customerGroup();
+
+        $rule = $factory->catalogPriceRule(['active' => true, 'audienceMode' => CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS]);
+        $factory->catalogPriceRuleCustomerGroup($rule, $group);
+        $factory->catalogPriceRuleCustomerGroup($rule, $other);
+
+        $response = $this->jsonRequest('GET', '/api/admin/catalog_price_rules/'.$rule->getId(), token: $token);
+        self::assertJsonResponseSuccessful($response);
+        $payload = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertSame(CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS, $payload['audienceMode']);
+        self::assertEqualsCanonicalizing([$group->getId(), $other->getId()], $payload['customerGroupIds']);
+    }
+
     public function testARuleIsNotWritableThroughTheApi(): void
     {
         $token = $this->authenticateAsAdmin();

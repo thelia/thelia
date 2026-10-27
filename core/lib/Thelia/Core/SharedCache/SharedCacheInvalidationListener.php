@@ -17,7 +17,10 @@ namespace Thelia\Core\SharedCache;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
+use Thelia\Api\Service\API\ResourceCacheInvalidationListener;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
@@ -93,7 +96,6 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
         TheliaEvents::CATEGORY_CREATE => self::CATEGORY,
         TheliaEvents::CATEGORY_UPDATE => self::CATEGORY,
-        TheliaEvents::CATEGORY_DELETE => self::CATEGORY,
         TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => self::CATEGORY,
         TheliaEvents::CATEGORY_UPDATE_POSITION => self::CATEGORY,
         TheliaEvents::CATEGORY_ADD_CONTENT => self::CATEGORY,
@@ -128,6 +130,9 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
     private const WHOLE_SHOP = [
         TheliaEvents::CACHE_CLEAR,
+        // The deletion cascades on the lists of the customer groups: what a restricted group
+        // sees changes across the shop, not on the pages of the category.
+        TheliaEvents::CATEGORY_DELETE,
         TheliaEvents::SALE_CREATE,
         TheliaEvents::SALE_UPDATE,
         TheliaEvents::SALE_DELETE,
@@ -351,6 +356,9 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         $subscribed = [
             KernelEvents::TERMINATE => ['flush', 0],
             ConsoleEvents::TERMINATE => ['flush', 0],
+            // A message handled by `messenger:consume` ends no request nor command: the end of the message does.
+            WorkerMessageHandledEvent::class => ['flush', 0],
+            WorkerMessageFailedEvent::class => ['flush', 0],
         ];
 
         foreach (array_keys(self::FAMILIES) as $eventName) {
@@ -367,6 +375,12 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
         foreach (self::WRITES as $eventName) {
             $subscribed[$eventName] = ['onWrite', -255];
+        }
+
+        // What a customer group sees and pays decides the pages of its visitors, the default
+        // group's among them, and is written to its own tables with no catalogue event.
+        foreach (ResourceCacheInvalidationListener::CUSTOMER_GROUP_WRITES as $eventName) {
+            $subscribed[$eventName] = ['onWholeShopChange', -255];
         }
 
         $subscribed[ConfigEvent::POST_SAVE] = ['onWholeShopChange', -255];
@@ -431,7 +445,15 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     {
         $model = $event->getModel();
 
-        if (1 !== preg_match(self::CATALOGUE_MODEL, $model::class)) {
+        // The deletion of a category cascades on the lists of the customer groups, with no event
+        // of their own: what a restricted group sees changes across the shop, not on one page.
+        if ($model instanceof Category && $event->isDelete()) {
+            $this->invalidator->purge([SharedCacheKey::ALL]);
+
+            return;
+        }
+
+        if (1 !== preg_match(self::CATALOGUE_MODEL, $model::class) && !ResourceCacheInvalidationListener::isCustomerGroupModel($model)) {
             return;
         }
 

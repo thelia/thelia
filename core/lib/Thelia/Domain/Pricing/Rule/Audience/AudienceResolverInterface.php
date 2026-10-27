@@ -20,8 +20,8 @@ use Thelia\Model\Customer;
 /**
  * Answers, for one audience mode, which turned-on rules a customer is named on.
  *
- * The core ships the named customers mode; customer groups (US #122) will ship
- * theirs by implementing this, and the resolver will take the union without being
+ * The core ships the named customers and the customer groups modes; another mode
+ * ships its own by implementing this, and the resolver takes the union without being
  * touched.
  */
 #[AutoconfigureTag(self::TAG)]
