@@ -1658,7 +1658,6 @@ INNER JOIN (
     UNION ALL SELECT 'visitor_country_database', 'ru_RU', 'Имя файла базы стран MaxMind (.mmdb) в local/geoip, если источник ip_database'
 ) AS `labels` ON `labels`.`name` = `config`.`name`;
 
-SET FOREIGN_KEY_CHECKS = 1;
 -- ---------------------------------------------------------------------
 -- Publication of contents and folders
 --
@@ -1771,3 +1770,4 @@ PREPARE migrate_statement FROM @statement;
 EXECUTE migrate_statement;
 DEALLOCATE PREPARE migrate_statement;
 
+SET FOREIGN_KEY_CHECKS = 1;
