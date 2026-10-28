@@ -241,7 +241,8 @@ final readonly class AiToolRegistry implements AiToolRegistryInterface
             ->setProposedByAdminLogin($adminRow?->getLogin())
             ->setTokenId($token?->getId())
             ->setTokenPrefix($token?->getTokenPrefix())
-            ->setExpiresAt((new \DateTimeImmutable())->modify(\sprintf('+%d hours', $this->settings->toolApprovalTtlHours())));
+            // At a whole second: MySQL rounds a fraction, and the answer must name the expiry it stored.
+            ->setExpiresAt(new \DateTimeImmutable(date('Y-m-d H:i:s', time() + 3600 * $this->settings->toolApprovalTtlHours())));
         $approval->save();
 
         return $approval;
