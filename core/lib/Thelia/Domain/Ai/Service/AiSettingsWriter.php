@@ -106,8 +106,8 @@ final readonly class AiSettingsWriter
 
         $apiKeyEnv = null === $apiKeyEnv || '' === trim($apiKeyEnv) ? null : trim($apiKeyEnv);
 
-        if (null !== $apiKeyEnv && 1 !== preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $apiKeyEnv)) {
-            throw new InvalidAiArgumentException('The environment variable name is letters, digits and underscores.');
+        if (null !== $apiKeyEnv) {
+            $this->vault->assertEnvironmentVariableName($apiKeyEnv);
         }
 
         $connection
