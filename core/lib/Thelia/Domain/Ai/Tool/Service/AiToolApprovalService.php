@@ -97,7 +97,7 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         $tool = $this->instances->get($declaration->name());
         \assert($tool instanceof AiWriteToolInterface);
 
-        $amendment = null === $amendedArguments || $amendedArguments == $this->decode($row->getArguments()) ? null : $this->amend($tool, $row, $approver, $amendedArguments);
+        $amendment = null === $amendedArguments || self::normalized($amendedArguments) === self::normalized($this->decode($row->getArguments())) ? null : $this->amend($tool, $row, $approver, $amendedArguments);
         $now = new \DateTimeImmutable();
 
         if (!$this->approvals->claim($approvalId, $approver->getId(), $approver->getLogin(), $amendment, $now)) {
@@ -338,6 +338,29 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
     /**
      * @return array<string, mixed>
      */
+    /**
+     * The keys of an object in a fixed order, so that two equal objects compare equal with `===`: a loose `==` would
+     * hold `"1e3"` for `"1000"` and silently drop the amendment of the approver.
+     *
+     * @param array<mixed> $data
+     *
+     * @return array<mixed>
+     */
+    private static function normalized(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (\is_array($value)) {
+                $data[$key] = self::normalized($value);
+            }
+        }
+
+        if (!array_is_list($data)) {
+            ksort($data);
+        }
+
+        return $data;
+    }
+
     private function decode(?string $json): array
     {
         $decoded = null === $json ? null : json_decode($json, true);
