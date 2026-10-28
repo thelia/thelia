@@ -17,6 +17,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
         // The hosts the MCP endpoint answers for (DNS rebinding protection), comma separated and without
-        // port: THELIA_MCP_ALLOWED_HOSTS=shop.example.com,www.example.com. Only localhost until the shop sets it.
-        ->set('env(THELIA_MCP_ALLOWED_HOSTS)', 'localhost');
+        // port: THELIA_MCP_ALLOWED_HOSTS=shop.example.com,www.example.com. Empty: the host of the shop
+        // (`url_site`, the domains of the languages) and the loopback names.
+        ->set('env(THELIA_MCP_ALLOWED_HOSTS)', '');
 };

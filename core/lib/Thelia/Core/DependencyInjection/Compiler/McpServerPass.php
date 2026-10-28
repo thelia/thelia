@@ -18,7 +18,9 @@ use Mcp\Schema\ServerCapabilities;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\DependencyInjection\McpServerConfiguration;
+use Thelia\Domain\Ai\Tool\Mcp\McpAllowedHosts;
 
 /**
  * Finishes the MCP server of symfony/mcp-bundle, which the core owns: the bundle gives no way to say it in its
@@ -26,8 +28,8 @@ use Thelia\Core\DependencyInjection\McpServerConfiguration;
  *
  * - The server announces tools and nothing else (`listChanged` false: no stream, no notification), instead of
  *   the capabilities the SDK deduces from its registry.
- * - The hosts of the DNS rebinding protection come from THELIA_MCP_ALLOWED_HOSTS at run time: the node of the
- *   bundle refuses an environment variable.
+ * - The hosts of the DNS rebinding protection are worked out when a request comes in ({@see McpAllowedHosts}): the
+ *   node of the bundle takes a fixed list, and the hosts of the shop are in the database.
  *
  * It also refuses a container where the core is not the only MCP server over HTTP: the `default` server must sit on
  * `/api/mcp`, the path of the token firewall, and no other server may answer a path of its own (it would reach the
@@ -65,7 +67,8 @@ final class McpServerPass implements CompilerPassInterface
         }
 
         if ($container->hasDefinition($middleware)) {
-            $container->getDefinition($middleware)->replaceArgument(0, '%env(csv:THELIA_MCP_ALLOWED_HOSTS)%');
+            $factory = $container->getDefinition($middleware);
+            $factory->setFactory([new Reference(McpAllowedHosts::class), 'middlewareFactory'])->setArguments([$factory->getArgument(1)]);
         }
     }
 
