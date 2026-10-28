@@ -325,6 +325,7 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         self::assertCount(1, $guardrail->requests);
         $seen = $guardrail->requests[0]->actor;
         self::assertNotNull($seen);
+        self::assertSame(AiActorType::Customer, $seen->type);
         self::assertSame($this->hasher->hash(AiActor::customer(4242)), $seen->identifier);
         self::assertStringNotContainsString('4242', $seen->identifier);
         self::assertSame('Hello', $guardrail->requests[0]->messages[0]->content);
