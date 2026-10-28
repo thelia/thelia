@@ -151,7 +151,7 @@ class BaseFacade implements FacadeInterface
             }
 
             if ($withItemsInPromo || !$cartItem->getPromo()) {
-                $total += $cartItem->getTotalRealPrice();
+                $total += $cartItem->getSummedTotalRealPrice();
             }
         }
 
@@ -176,7 +176,7 @@ class BaseFacade implements FacadeInterface
             }
 
             if ($withItemsInPromo || !$cartItem->getPromo()) {
-                $total += $cartItem->getTotalRealTaxedPrice($taxCountry);
+                $total += $cartItem->getSummedTotalRealTaxedPrice($taxCountry);
             }
         }
 

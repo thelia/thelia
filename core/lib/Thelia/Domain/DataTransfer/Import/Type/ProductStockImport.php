@@ -17,6 +17,10 @@ namespace Thelia\Domain\DataTransfer\Import\Type;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
 use Thelia\Model\ProductSaleElementsQuery;
 
@@ -59,7 +63,18 @@ class ProductStockImport extends AbstractImport
             );
         }
 
-        $pse->setQuantity((float) $data['stock']);
+        // A stock holds the decimals its combination is sold with: 12.5 of a combination
+        // sold by the piece is a unit the combination does not sell in.
+        try {
+            $stock = (new QuantityPolicy())->assertStockFits((float) $data['stock'], $pse);
+        } catch (QuantityRefusedException|UnreadableQuantityException|InvalidQuantityRuleException $refusal) {
+            return Translator::getInstance()->trans(
+                'The stock %stock of the product sale element id %id cannot be kept: %reason',
+                ['%stock' => self::cellText($data['stock']), '%id' => self::cellText($data['id']), '%reason' => $refusal->getMessage()],
+            );
+        }
+
+        $pse->setQuantity($stock);
 
         if (isset($data['ean']) && !empty($data['ean'])) {
             $pse->setEanCode((string) $data['ean']);

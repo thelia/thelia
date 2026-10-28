@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
 use Thelia\Model\ConfigQuery;
 
@@ -225,7 +226,11 @@ class OrderExport extends JsonFileAbstractExport
      * switched to rounding of sums keeps the historical rule, and the rest
      * follow the shop. Thelia\Model\Order::getTotalAmount() is the reference the
      * three branches mirror — an export that disagrees with it states an amount
-     * the customer was never charged.
+     * the customer was never charged. Past the upgrade, the total is rounded
+     * to the cent, as the order is charged: a line sold by measure (1.25 kg at
+     * 14.82) totals 18.525, charged 18.53. The sum is a floating point number
+     * (18.524999…), brought to six decimals before it is rounded, as PHP's
+     * round() does, or it would be rounded down.
      *
      * Whatever the branch, an order placed while order_product.promo_price was a
      * text keeps the total it was invoiced with.
@@ -233,13 +238,15 @@ class OrderExport extends JsonFileAbstractExport
     private function orderTotal(bool $taxed): string
     {
         return '
-                    CAST(SUM(
-                        CASE
-                            WHEN `order`.id <= :legacy_rounding_pivot THEN '.$this->lineTotalOfOrder(self::ROUNDING_MODE_LEGACY, $taxed).'
-                            WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotalOfOrder(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
-                            ELSE '.$this->lineTotalOfOrder(ConfigQuery::getOrderRoundingMode(), $taxed).'
-                        END
-                    ) AS DECIMAL(16,6))';
+                    CAST(CASE
+                        WHEN `order`.id <= :legacy_rounding_pivot THEN SUM('.$this->lineTotalOfOrder(self::ROUNDING_MODE_LEGACY, $taxed).')
+                        ELSE ROUND(CAST(SUM(
+                            CASE
+                                WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotalOfOrder(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
+                                ELSE '.$this->lineTotalOfOrder(ConfigQuery::getOrderRoundingMode(), $taxed).'
+                            END
+                        ) AS DECIMAL(20,6)), 2)
+                    END AS DECIMAL(16,6))';
     }
 
     /**
@@ -278,7 +285,8 @@ class OrderExport extends JsonFileAbstractExport
                             ))';
         }
 
-        $lineTotal = 'order_product.quantity * '.$unitAmount;
+        // The FLOAT quantity read back as sold: see Order::storedQuantity().
+        $lineTotal = 'ROUND(order_product.quantity, '.QuantityScale::MAXIMUM_DECIMALS.') * '.$unitAmount;
 
         return ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode
             ? 'ROUND('.$lineTotal.', 2)'

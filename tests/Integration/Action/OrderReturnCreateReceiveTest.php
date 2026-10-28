@@ -86,6 +86,30 @@ final class OrderReturnCreateReceiveTest extends ActionIntegrationTestCase
         );
     }
 
+    /**
+     * Two lines of 1.25 kg at 14.82 are charged 37.05, the order rounding their
+     * sum: each line refunds the 18.53 it shows, and the return the 37.05 paid.
+     */
+    public function testOpeningAReturnOfLinesSoldByMeasureRefundsTheAmountCharged(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $order = $this->factory->order($customer, ['statusCode' => OrderStatus::CODE_PAID]);
+        $first = $this->orderProduct($order, null, 1.25, price: '14.820000');
+        $second = $this->orderProduct($order, null, 1.25, price: '14.820000');
+
+        $return = $this->pendingReturn($customer, $order, $first, quantity: 1.25);
+        $return->addOrderReturnLine((new OrderReturnLine())->setOrderProduct($second)->setQuantity(1.25));
+
+        $this->dispatch(new OrderReturnEvent($return), TheliaEvents::ORDER_RETURN_CREATE);
+
+        self::assertSame(37.05, $order->getTotalAmount(), 'The fixture is not the order this test needs.');
+        self::assertSame(37.05, (float) $return->getRefundAmount());
+
+        foreach ($return->getOrderReturnLines() as $line) {
+            self::assertSame(18.53, (float) $line->getRefundAmount());
+        }
+    }
+
     public function testOpeningAReturnByDispatchGoesThroughTheEligibilityGate(): void
     {
         [$customer, $order, $orderProduct] = $this->paidOrder(quantity: 1.0);
@@ -260,7 +284,7 @@ final class OrderReturnCreateReceiveTest extends ActionIntegrationTestCase
         return [$return, $pse, $line];
     }
 
-    private function orderProduct(Order $order, ?ProductSaleElements $pse, float $quantity): OrderProductModel
+    private function orderProduct(Order $order, ?ProductSaleElements $pse, float $quantity, string $price = '10.000000'): OrderProductModel
     {
         $orderProduct = (new OrderProductModel())
             ->setOrderId((int) $order->getId())
@@ -269,8 +293,8 @@ final class OrderReturnCreateReceiveTest extends ActionIntegrationTestCase
             ->setProductSaleElementsId((int) ($pse?->getId() ?? 1))
             ->setTitle('A returnable product')
             ->setQuantity($quantity)
-            ->setPrice('10.000000')
-            ->setPromoPrice('10.000000')
+            ->setPrice($price)
+            ->setPromoPrice($price)
             ->setWasNew(1)
             ->setWasInPromo(0)
             ->setVirtual(0);

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Cart\Service;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemQuantityAdjustedEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -22,6 +23,7 @@ use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
 use Thelia\Domain\Catalog\Quantity\QuantityDecision;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
+use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
@@ -35,12 +37,15 @@ use Thelia\Model\ProductSaleElements;
  * it, or removed when even that is below the smallest quantity sold, and
  * CART_ITEM_QUANTITY_ADJUSTED tells which and why.
  *
- * A line a promotion offers is not sold: it is left to the promotion.
+ * A line a promotion offers is not sold: it is left to the promotion. So is the gift of
+ * a free product coupon, an ordinary line priced at zero by the discount, which only the
+ * session of the buyer knows to be the gift.
  */
 final readonly class CartQuantityReconciler
 {
     public function __construct(
         private QuantityPolicy $quantityPolicy = new QuantityPolicy(),
+        private ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -57,13 +62,14 @@ final readonly class CartQuantityReconciler
         }
 
         $adjusted = [];
+        $gifts = $this->freeProductGifts();
         $lines = CartItemQuery::create()
             ->filterByCartId($cart->getId())
             ->joinWithProductSaleElements()
             ->find();
 
         foreach ($lines as $line) {
-            if (1 === (int) $line->getIsOffered()) {
+            if (1 === (int) $line->getIsOffered() || \in_array((int) $line->getId(), $gifts, true)) {
                 continue;
             }
 
@@ -84,6 +90,16 @@ final readonly class CartQuantityReconciler
         }
 
         return $adjusted;
+    }
+
+    /**
+     * @return list<int> the lines the free product coupons of the session hold as their gift
+     */
+    private function freeProductGifts(): array
+    {
+        $request = $this->requestStack?->getMainRequest();
+
+        return null !== $request && $request->hasSession() ? FreeProduct::giftCartItemIds($request->getSession()) : [];
     }
 
     /**
