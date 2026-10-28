@@ -1721,7 +1721,7 @@ CREATE TABLE `ai_usage_log`
     `actor_hash` VARCHAR(64) NOT NULL COMMENT 'HMAC-SHA256 of the actor with the application secret: counts an actor, never names one',
     `status` VARCHAR(16) NOT NULL COMMENT 'succeeded, failed, blocked, rejected or aborted',
     `error` VARCHAR(255) COMMENT 'why the call was refused or failed, never the prompt',
-    `finish_reason` VARCHAR(16) COMMENT 'completed, max_tokens, tool_calls or content_filter',
+    `finish_reason` VARCHAR(16) COMMENT 'completed, max_tokens, tool_calls, content_filter or other',
     `latency_ms` INTEGER,
     `guardrail_verdicts` TEXT COMMENT 'JSON list of the guardrail verdicts',
     `correlation_id` VARCHAR(64) COMMENT 'groups the turns of one task, like the steps of a tool loop',

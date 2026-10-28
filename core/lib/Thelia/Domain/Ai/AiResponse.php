@@ -36,6 +36,8 @@ final readonly class AiResponse
      * @param list<GuardrailVerdict>    $guardrailVerdicts every check run, passed or not
      * @param int                       $logId             the row of `ai_usage_log`
      * @param AiProvenance|null         $provenance        set when the usage is generative (AI Act, article 50(2))
+     * @param array<string, mixed>      $providerState     opaque, do not read: what the provider needs back on the next turn (signed
+     *                                                     thinking blocks, container identifiers). AiMessage::fromResponse() carries it
      */
     public function __construct(
         public string $text,
@@ -50,6 +52,7 @@ final readonly class AiResponse
         public int $logId,
         public ?AiProvenance $provenance = null,
         public string $currency = 'USD',
+        public array $providerState = [],
     ) {
         AiAssert::listOf($toolCalls, AiToolCall::class, 'The tool calls');
         AiAssert::listOf($guardrailVerdicts, GuardrailVerdict::class, 'The guardrail verdicts');

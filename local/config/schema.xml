@@ -3503,7 +3503,7 @@
     <column description="HMAC-SHA256 of the actor with the application secret: counts an actor, never names one" name="actor_hash" required="true" size="64" type="VARCHAR" />
     <column description="succeeded, failed, blocked, rejected or aborted" name="status" required="true" size="16" type="VARCHAR" />
     <column description="why the call was refused or failed, never the prompt" name="error" size="255" type="VARCHAR" />
-    <column description="completed, max_tokens, tool_calls or content_filter" name="finish_reason" size="16" type="VARCHAR" />
+    <column description="completed, max_tokens, tool_calls, content_filter or other" name="finish_reason" size="16" type="VARCHAR" />
     <column name="latency_ms" type="INTEGER" />
     <column description="JSON list of the guardrail verdicts" name="guardrail_verdicts" type="LONGVARCHAR" />
     <column description="groups the turns of one task, like the steps of a tool loop" name="correlation_id" size="64" type="VARCHAR" />
