@@ -46,7 +46,7 @@ final class AiUsageLogWriterTest extends IntegrationTestCase
 
     public function testItWritesEveryColumnOfACall(): void
     {
-        $expires = new \DateTimeImmutable('+30 days');
+        $expires = new \DateTimeImmutable(date('Y-m-d H:i:s', time() + 30 * 86400));
         $id = $this->writer->write(new AiLogEntry(
             usageId: 'theliacms.page_generation',
             kind: AiLogKind::Completion,
