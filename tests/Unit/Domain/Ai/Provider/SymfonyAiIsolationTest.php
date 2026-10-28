@@ -28,7 +28,8 @@ final class SymfonyAiIsolationTest extends TestCase
         $offenders = [];
 
         foreach ((new Finder())->files()->in($coreLibrary)->name('*.php')->notPath('Domain/Ai/Provider') as $file) {
-            if (1 === preg_match('/^\s*(use|namespace)\s+Symfony\\\\AI\\\\|\\\\Symfony\\\\AI\\\\|[\'"]Symfony\\\\\\\\AI\\\\\\\\/m', $file->getContents())) {
+            // The MCP bundle (Symfony\AI\McpBundle) is another library, registered by the kernel: only the platform one is isolated.
+            if (1 === preg_match('/^\s*(use|namespace)\s+Symfony\\\\AI\\\\(?!McpBundle\\\\)|\\\\Symfony\\\\AI\\\\(?!McpBundle\\\\)|[\'"]Symfony\\\\\\\\AI\\\\\\\\(?!McpBundle)/m', $file->getContents())) {
                 $offenders[] = $file->getRelativePathname();
             }
         }
