@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Domain\Ai\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
-use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Ai\AiAudience;
 use Thelia\Domain\Ai\AiTransparency;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
@@ -45,6 +45,7 @@ class AiUsageRegistry implements AiUsageRegistryInterface
         private readonly array $usageClasses,
         private readonly AiUsageSettingRepository $settings,
         private readonly AiSettings $globalSettings,
+        private readonly AiTextTranslator $translator = new AiTextTranslator(new RequestStack()),
     ) {
     }
 
@@ -95,7 +96,7 @@ class AiUsageRegistry implements AiUsageRegistryInterface
     {
         $usage = $this->get($usageId);
 
-        if (AiTransparency::Interactive !== $usage->transparency) {
+        if (AiTransparency::Interactive !== $usage->transparency || !$this->isActive($usageId)) {
             return null;
         }
 
@@ -103,7 +104,7 @@ class AiUsageRegistry implements AiUsageRegistryInterface
             return null;
         }
 
-        return Translator::getInstance()->trans(self::TRANSPARENCY_NOTICE, [], 'core', $locale);
+        return $this->translator->trans(self::TRANSPARENCY_NOTICE, [], $locale);
     }
 
     /**
