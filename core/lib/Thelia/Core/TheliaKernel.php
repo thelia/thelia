@@ -28,6 +28,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
@@ -65,6 +66,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterAiToolPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\DependencyInjection\LoggingDefaults;
+use Thelia\Core\DependencyInjection\McpServerConfiguration;
 use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
@@ -164,6 +166,10 @@ class TheliaKernel extends Kernel
     {
         $contents = [
             TheliaBundle::class => ['all' => true],
+            // The MCP server of the core. Registered here and not left to the Flex recipe of the bundle, which
+            // writes config/bundles.php of a project only: a bundle missing there would break the `mcp` key of
+            // config/packages/mcp.yaml, the same recipe's file, and a shop would lose its endpoint without a word.
+            McpBundle::class => ['all' => true],
         ];
 
         if (file_exists(THELIA_ROOT.'config/bundles.php')) {
@@ -490,6 +496,7 @@ class TheliaKernel extends Kernel
         // Prepended once the config/packages of the shop have been read, so
         // that what the shop wrote about logging is what the shop gets.
         LoggingDefaults::prependTo($container);
+        McpServerConfiguration::applyTo($container);
 
         $this->loadAutoConfigureInterfaces($container);
         $this->loadUtilsXmlConfiguration($container);

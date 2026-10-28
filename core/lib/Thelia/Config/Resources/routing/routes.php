@@ -43,6 +43,15 @@ return static function (RoutingConfigurator $routes): void {
         ->controller([ContactController::class, 'send'])
         ->methods(['POST']);
 
+    // The MCP endpoint, served by symfony/mcp-bundle behind the firewall of the MCP tokens. Declared here rather
+    // than imported from the bundle (`type: mcp`, what its Flex recipe writes in config/routes/mcp.yaml): the
+    // bundle's loader refuses to be imported twice, and the endpoint must exist with or without that file. When
+    // the recipe's import is there as well, it answers the same path with the same controller. GET is kept for
+    // the answer 405: the server opens no stream.
+    $routes->add('thelia_mcp', '/api/mcp')
+        ->controller('mcp.server.default.controller::handle')
+        ->methods(['GET', 'POST', 'DELETE']);
+
     // The preview of a content or a folder whatever its publication state, for an
     // administrator or whoever holds the signed link the back office hands out.
     $routes->add(PublicationPreview::ROUTE, '/preview/{type}/{id}')
