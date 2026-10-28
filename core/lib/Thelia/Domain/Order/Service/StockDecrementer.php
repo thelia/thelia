@@ -186,10 +186,11 @@ readonly class StockDecrementer
     }
 
     /**
-     * A stock kept on the finest decimal a quantity is sold with. The national counter is
-     * a single precision FLOAT: it keeps 0.7 as 0.69999998, so the last 0.7 kg would fail
-     * a comparison with the 0.7 kg ordered, and every movement would add its error to the
-     * one before (ten orders of 10 g taken from 10 tonnes left 9999.902 kg).
+     * A stock kept on the finest decimal a quantity is sold with. The counters are binary
+     * floating point numbers (DOUBLE), which hold 0.7 only approximately: every movement
+     * would add its error to the one before, and a stock compared as it is could refuse
+     * the last 0.7 kg to a buyer of 0.7 kg (as a single precision FLOAT did, which left
+     * 9999.902 kg after ten orders of 10 g taken from 10 tonnes).
      */
     private static function onTheFinestDecimal(string $expression): string
     {

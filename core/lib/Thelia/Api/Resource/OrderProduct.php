@@ -216,7 +216,7 @@ class OrderProduct implements PropelResourceInterface
         OrderShipment::GROUP_FRONT_READ_SINGLE,
     ])]
     #[NotBlank(groups: [Order::GROUP_ADMIN_WRITE])]
-    // order_product.quantity is a FLOAT: a line of goods sold by weight carries
+    // order_product.quantity is a DOUBLE: a line of goods sold by weight carries
     // grams, not units. An int here billed 300.5 g as 300 g.
     public float $quantity;
 

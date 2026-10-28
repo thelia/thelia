@@ -110,7 +110,7 @@ final class DecimalQuantityOrderTest extends ActionIntegrationPromotionTestCase
     }
 
     /**
-     * The quantity column is a single precision FLOAT, which keeps 0.7 as 0.69999998: the
+     * The quantity column is a binary floating point number, which keeps 0.7 inexactly: the
      * order must not round 0.7 kg at 0.75 down to 0.52 where the cart showed 0.53.
      */
     public function testAQuantityTheColumnCannotKeepExactlyIsTotalledAsSold(): void

@@ -25,8 +25,8 @@ use Thelia\Model\ConfigQuery;
  *
  * The full order export is one row per order and has no place for them. Everything is
  * read from the order line, never from the catalogue: a GTIN or a part number corrected
- * since does not rewrite what was sold. The quantity carries its decimals, read back from
- * the single precision column (0.7, not 0.69999998), beside the unit frozen on the line
+ * since does not rewrite what was sold. The quantity carries its decimals, read back on
+ * the thousandth (0.7, not 0.69999998), beside the unit frozen on the line
  * (1.25 and kg). Bounded by the same
  * optional dates as the order export.
  */

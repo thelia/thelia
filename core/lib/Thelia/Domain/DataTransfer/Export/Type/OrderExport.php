@@ -300,7 +300,7 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
      * Chooses, line by line, how the promotional price is read. The choice is made on the line and not on the
      * price operand: an IF takes the type of its operands, so a text read for the frozen orders would make the
      * unit price of every order a text. The frozen line is a floating point number once rounded, and so is the
-     * quantity (a FLOAT) times a decimal: the cast to a DECIMAL is made on the SUM of the order, not on the line,
+     * quantity (a DOUBLE) times a decimal: the cast to a DECIMAL is made on the SUM of the order, not on the line,
      * because a CASE takes the type of its widest branch and would turn the cast line back into a DOUBLE.
      */
     private function lineTotalOfOrder(int $roundingMode, bool $taxed): string
@@ -332,7 +332,7 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
                             ))';
         }
 
-        // The FLOAT quantity read back as sold: see Order::storedQuantity().
+        // The quantity read back as sold: see Order::storedQuantity().
         $lineTotal = 'ROUND(order_product.quantity, '.QuantityScale::MAXIMUM_DECIMALS.') * '.$unitAmount;
 
         return ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode

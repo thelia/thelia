@@ -79,7 +79,7 @@ final class DecimalQuantityDataTransferTest extends IntegrationTestCase
 
     public function testTheOrderLineExportWritesTheQuantityWithItsDecimalsAndItsUnit(): void
     {
-        // Read as it is, the single precision column gives six significant digits: 1234.57.
+        // A single precision column gave six significant digits back: 1234.57.
         $weighed = $this->orderWithALine(1234.567, 'kg', 3);
         $legacy = $this->orderWithALine(3.0, null, 0);
 
