@@ -24,5 +24,6 @@ final class AiGlobalSettingsSeedTest extends IntegrationTestCase
         self::assertSame('1', ConfigQuery::create()->findOneByName('ai_enabled')?->getValue());
         self::assertSame('0', ConfigQuery::create()->findOneByName('ai_monthly_cap')?->getValue());
         self::assertSame('0', ConfigQuery::create()->findOneByName('ai_eu_only')?->getValue());
+        self::assertSame('400', ConfigQuery::create()->findOneByName('ai_log_retention_days')?->getValue());
     }
 }
