@@ -20,7 +20,10 @@ use Thelia\Domain\Ai\AiMessage;
 use Thelia\Domain\Ai\AiRequest;
 use Thelia\Domain\Ai\AiTier;
 use Thelia\Domain\Ai\AsAiUsage;
+use Thelia\Domain\Ai\Guardrail\AiGuardrailAvailabilityInterface;
+use Thelia\Domain\Ai\Guardrail\AiGuardrailInterface;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
+use Thelia\Domain\Ai\Guardrail\GuardrailAvailability;
 use Thelia\Domain\Ai\Guardrail\GuardrailMode;
 use Thelia\Domain\Ai\Guardrail\GuardrailStage;
 use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
@@ -92,9 +95,10 @@ final class AiGuardrailRunnerTest extends TestCase
         $atOutput = $runner->run(GuardrailStage::Output, $this->request(), 'text', ['mistral_moderation' => GuardrailMode::Block]);
 
         self::assertTrue($blocking[0]->blocks());
-        self::assertSame('guardrail_unavailable', $blocking[0]->reason);
+        self::assertSame('unavailable', $blocking[0]->reason);
         self::assertFalse($annotating[0]->blocks());
         self::assertFalse($annotating[0]->passed);
+        self::assertSame('unavailable', $annotating[0]->reason);
         self::assertSame([], $atOutput);
     }
 
@@ -106,6 +110,70 @@ final class AiGuardrailRunnerTest extends TestCase
 
         self::assertTrue($verdicts[0]->blocks());
         self::assertSame('guardrail_error', $verdicts[0]->reason);
+    }
+
+    public function testAGuardrailThatThrowsNeverBlocksInAnnotateMode(): void
+    {
+        $runner = new AiGuardrailRunner([$this->guardrail('moderation', null)]);
+
+        $verdicts = $runner->run(GuardrailStage::Input, $this->request(), null, ['moderation' => GuardrailMode::Annotate]);
+
+        self::assertCount(1, $verdicts);
+        self::assertFalse($verdicts[0]->passed);
+        self::assertFalse($verdicts[0]->blocks());
+        self::assertSame(GuardrailMode::Annotate, $verdicts[0]->mode);
+        self::assertSame('guardrail_error', $verdicts[0]->reason);
+    }
+
+    public function testAGuardrailThatSaysItIsUnavailableBlocksInBlockModeAndOnlyNotesInAnnotateMode(): void
+    {
+        $runner = new AiGuardrailRunner([$this->guardrail('moderation', GuardrailVerdict::fail('moderation', GuardrailStage::Input, 'unavailable'))]);
+
+        $blocking = $runner->run(GuardrailStage::Input, $this->request(), null, ['moderation' => GuardrailMode::Block]);
+        $annotating = $runner->run(GuardrailStage::Input, $this->request(), null, ['moderation' => GuardrailMode::Annotate]);
+
+        self::assertTrue($blocking[0]->blocks());
+        self::assertFalse($annotating[0]->blocks());
+        self::assertSame('unavailable', $annotating[0]->reason);
+    }
+
+    public function testTheAvailabilityOfTheInstalledGuardrailsComesFromThemWithoutAnyCall(): void
+    {
+        $plain = $this->guardrail('plain', GuardrailVerdict::pass('plain', GuardrailStage::Input));
+        $disconnected = new class implements AiGuardrailInterface, AiGuardrailAvailabilityInterface {
+            public int $inspected = 0;
+
+            public function name(): string
+            {
+                return 'disconnected';
+            }
+
+            public function supports(GuardrailStage $stage): bool
+            {
+                return true;
+            }
+
+            public function inspect(GuardrailStage $stage, AiRequest $request, ?string $output): GuardrailVerdict
+            {
+                ++$this->inspected;
+
+                return GuardrailVerdict::pass('disconnected', $stage);
+            }
+
+            public function availability(): GuardrailAvailability
+            {
+                return GuardrailAvailability::unusable(GuardrailAvailability::NO_CONNECTION);
+            }
+        };
+
+        $availability = (new AiGuardrailRunner([$plain, $disconnected]))->availability();
+
+        self::assertSame(['plain', 'disconnected'], array_keys($availability));
+        self::assertTrue($availability['plain']->usable);
+        self::assertFalse($availability['disconnected']->usable);
+        self::assertSame('no_connection', $availability['disconnected']->reason);
+        self::assertSame(0, $disconnected->inspected);
+        self::assertSame(0, $plain->calls);
     }
 
     public function testAStreamTurnsEveryModeIntoAnnotation(): void
