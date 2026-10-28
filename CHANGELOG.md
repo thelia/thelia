@@ -215,6 +215,13 @@
 ## Deprecations
 
 - `Thelia\Domain\Shipping\ZipCode\ZipCodePattern::normalize()` is deprecated and keeps its 3.3 behaviour (spaces and dashes removed, ASCII letters in upper case, always a string). Use `ZipCodePattern::normalForm()`, which folds compatibility characters and returns `null` for a code that has no normal form: empty once its spaces and dashes are removed, keeping a character outside `A` to `Z` and `0` to `9` once folded, or not valid UTF-8. A caller that uses it checks for `null`, or calls `matches()`, which judges such a code itself. See `UPGRADE-3.4.md`.
+## Catalog
+
+- Quantity rules and unit of measure of a combination. `product_sale_elements` gains `min_quantity` and `quantity_step` (DECIMAL, 1 by default), `quantity_decimals` (0 to 3, 0 by default: sold by the piece; more: sold by measure), and `unit_quantity`, `reference_unit_quantity` and `unit_code` (null by default), which say what one unit sold contains for a reference price such as a price per litre. The defaults are the behaviour every combination had, so nothing changes for a shop until a combination is given rules. `order_product` gains `unit_code` and `quantity_decimals`, to freeze the unit sold on the order line. `Thelia\Domain\Catalog\Quantity\UnitCode` lists the units (`pc`, `kg`, `g`, `l`, `ml`, `m`, `cm`, `m2`, `m3`) with their symbol and translated name, and `QuantityRule::fromProductSaleElements()` reads the rules of a loaded combination without a query, refusing a rule that cannot decide a quantity (`InvalidQuantityRuleException`). The rules are written through `PSEUpdateDTO::$quantityRule` and `ProductSaleElementUpdateEvent::setQuantityRule()` (null leaves them as they are) and through the API, where `/api/admin/product_sale_elements` and the combinations of `/api/admin/products` write `minQuantity`, `quantityStep`, `quantityDecimals`, `unitQuantity`, `referenceUnitQuantity` and `unitCode`, a step or a minimum that is not positive, more than 3 decimals, a step or a minimum with more decimals than `quantityDecimals`, a unit quantity that is not positive and an unknown unit code answering 422, and the front API reads them. `FixtureFactory::productSaleElement()` takes the same names as overrides.
+
+## Breaking changes
+
+- `Thelia\Api\Resource\ProductSaleElements::$quantity` is a float, and `getQuantity()` and `setQuantity()` return and take a float, since a combination sold by measure keeps a stock with decimals: a class that extends the resource and overrides them, or reads the getter into an `int`, has to follow. The JSON `quantity` of a combination may carry decimals, and the front read of a combination under a sale unit serves the stock of the unit as it is, no longer cut down to a whole number.
 
 # 3.3.3
 

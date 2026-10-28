@@ -1090,4 +1090,62 @@ FROM (
 ) AS `wording`
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang` ON `lang`.`locale` = `wording`.`locale`;
 
+-- ---------------------------------------------------------------------
+-- Quantity rules and unit of measure of a combination
+--
+-- The quantity rules and the unit of measure of a combination. The defaults (a minimum of 1,
+-- a step of 1, no decimals, no unit) are the behaviour every combination had before them, so
+-- nothing changes for an upgraded shop until a combination is given rules. The order line
+-- freezes the unit and the decimals sold, so its documents still write "1,25 kg" once the
+-- combination is changed or deleted.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'min_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `min_quantity` DECIMAL(16,6) DEFAULT 1 NOT NULL COMMENT ''the smallest quantity a cart line of this combination may hold'' AFTER `low_stock_threshold`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'quantity_step');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `quantity_step` DECIMAL(16,6) DEFAULT 1 NOT NULL COMMENT ''the quantity of a cart line is a multiple of this step'' AFTER `min_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'quantity_decimals');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `quantity_decimals` TINYINT DEFAULT 0 NOT NULL COMMENT ''how many decimals a quantity may carry: 0 sells by the piece, more sells by measure'' AFTER `quantity_step`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'unit_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `unit_quantity` DECIMAL(16,6) NULL COMMENT ''what one unit sold contains, in unit_code (0.75 for a 75 cl bottle), NULL when no reference price is shown'' AFTER `quantity_decimals`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'reference_unit_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `reference_unit_quantity` DECIMAL(16,6) NULL COMMENT ''the quantity the reference price is given for, in unit_code (1 for a price per litre)'' AFTER `unit_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'unit_code');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `unit_code` VARCHAR(16) NULL COMMENT ''the normalized code of the unit of measure (kg, l, m...), NULL when the combination has none'' AFTER `reference_unit_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'unit_code');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `unit_code` VARCHAR(16) NULL COMMENT ''the unit of measure of the combination, copied when the order is placed so the documents keep the unit sold'' AFTER `mpn`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'quantity_decimals');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `quantity_decimals` TINYINT DEFAULT 0 NOT NULL COMMENT ''the decimals the quantity of the combination carried when the order was placed'' AFTER `unit_code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;

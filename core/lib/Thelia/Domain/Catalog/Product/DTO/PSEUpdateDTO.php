@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Product\DTO;
 
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
 
 readonly class PSEUpdateDTO implements DTOEventActionInterface
@@ -33,6 +34,7 @@ readonly class PSEUpdateDTO implements DTOEventActionInterface
         public bool $fromDefaultCurrency = false,
         public ?string $mpn = null,
         public ?int $manufacturerBrandId = null,
+        public ?QuantityRule $quantityRule = null,
     ) {
     }
 
@@ -53,6 +55,7 @@ readonly class PSEUpdateDTO implements DTOEventActionInterface
             'from_default_currency' => $this->fromDefaultCurrency,
             'mpn' => $this->mpn,
             'manufacturer_brand_id' => $this->manufacturerBrandId,
+            'quantity_rule' => $this->quantityRule,
         ];
     }
 }

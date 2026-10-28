@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\ProductSaleElement;
 
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Model\Product;
 
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
@@ -38,6 +39,9 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /** Null leaves the stored manufacturer brand alone; 0 clears it, and the brand of the product applies again. */
     protected ?int $manufacturer_brand_id = null;
+
+    /** Null leaves the stored quantity rules and unit alone, so a caller that does not know them never resets them. */
+    protected ?QuantityRule $quantity_rule = null;
     protected int $tax_rule_id;
     protected int $from_default_currency;
 
@@ -214,6 +218,21 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
     public function setManufacturerBrandId(?int $manufacturerBrandId): self
     {
         $this->manufacturer_brand_id = $manufacturerBrandId;
+
+        return $this;
+    }
+
+    public function getQuantityRule(): ?QuantityRule
+    {
+        return $this->quantity_rule;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setQuantityRule(?QuantityRule $quantityRule): self
+    {
+        $this->quantity_rule = $quantityRule;
 
         return $this;
     }
