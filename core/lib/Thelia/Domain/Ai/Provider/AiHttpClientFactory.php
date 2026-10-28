@@ -80,6 +80,6 @@ final class AiHttpClientFactory
             $options['resolve'] = $this->pinnedHosts;
         }
 
-        return (new NoPrivateNetworkHttpClient($this->transport ?? HttpClient::create(), $refusedSubnets))->withOptions($options);
+        return new AiNoReplayHttpClient((new NoPrivateNetworkHttpClient($this->transport ?? HttpClient::create(), $refusedSubnets))->withOptions($options));
     }
 }
