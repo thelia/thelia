@@ -69,9 +69,15 @@ readonly class PropelCollectionProvider implements ProviderInterface
             }
         }
 
+        // The first one to answer wins: an extension that has the whole collection to itself
+        // (an order the database cannot make) goes ahead of the pagination one, by priority.
         /** @var QueryResultCollectionExtensionInterface $resultExtension */
         foreach ($resultExtensions as $resultExtension) {
             $results = $resultExtension->getResult($query, $resourceClass, $operation, $context);
+
+            if (null !== $results) {
+                break;
+            }
         }
 
         if (null === $results) {

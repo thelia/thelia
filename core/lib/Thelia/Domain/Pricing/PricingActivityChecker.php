@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Pricing;
 
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Model\Customer;
@@ -32,6 +33,7 @@ class PricingActivityChecker
     public function __construct(
         private readonly CatalogActivityProbe $catalogActivityProbe,
         private readonly CustomerDiscountRate $customerDiscountRate,
+        private readonly CustomerGroupResolver $customerGroupResolver,
         private readonly ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
     ) {
     }
@@ -47,6 +49,40 @@ class PricingActivityChecker
         return $this->hasDiscountedCustomer($customer)
             || $this->catalogActivityProbe->read()->customerGroupsPriceAnything()
             || $this->mayResolveEffectivePriceFor($customer);
+    }
+
+    /**
+     * Whether the order of the products by price may differ, for this visitor, from the order
+     * of the public prices: the guard of the price sort, which only has to rank. The public
+     * price is the catalog columns, or the stored price of a rule open to everyone when one is
+     * running, and it is readable in SQL.
+     *
+     * What changes the order is the group of the visitor (a visitor with no account, a guest
+     * and a console command belong to the default group) pricing something of its own or
+     * discounting the others, a rule or an operation reserved for named customers, or the sale
+     * unit. A rate that applies to every price alike, the discount of the customer, moves no
+     * product past another: it does not count. Neither do the groups the visitor is not in.
+     *
+     * Unlike {@see mayPriceBeyondCatalog()}, a running public rule does not count: it prices
+     * every visitor alike.
+     */
+    public function mayOrderDifferFromThePublicPrice(?Customer $customer): bool
+    {
+        $activity = $this->catalogActivityProbe->read();
+
+        if ((null !== $customer && ($activity->hasActiveNamedRule || $activity->hasActiveReservedSale))
+            || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()) {
+            return true;
+        }
+
+        if (!$activity->customerGroupsPriceAnything()) {
+            return false;
+        }
+
+        $customerGroupId = $this->customerGroupResolver->groupIdOf($customer);
+
+        return $this->catalogActivityProbe->groupHasOwnPrices($customerGroupId)
+            || $this->catalogActivityProbe->groupIsDiscounted($customerGroupId);
     }
 
     /**

@@ -25,6 +25,16 @@ class PaginationExtension implements QueryResultCollectionExtensionInterface
     ) {
     }
 
+    /**
+     * Last of the result extensions: it answers for every paginated collection, so the
+     * extensions that may have the whole collection to themselves (a priority of 0 or more, as
+     * a module's by default) are asked before it, and the first one that answers wins.
+     */
+    public static function getDefaultPriority(): int
+    {
+        return -100;
+    }
+
     public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
     }

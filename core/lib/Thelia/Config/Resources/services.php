@@ -53,7 +53,7 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
         ->bind('$sessionSavePath', '%kernel.project_dir%/var/sessions/%kernel.environment%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
         ->bind('$formDefinition', '%Thelia.parser.forms%')
-        ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
+        ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection', defaultPriorityMethod: 'getDefaultPriority'))
         ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'))
         ->bind('$apiResourceAddons', '%Thelia.api.resource.addons%')
         ->bind(Request::class, expr('service("request_stack").getMainRequest()'));
