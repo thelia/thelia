@@ -96,6 +96,18 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         self::assertCount(1, $this->sent);
     }
 
+    public function testACostIsLabelledWithTheCurrencyOfThePricesOfTheModel(): void
+    {
+        $this->model->setCurrency('EUR')->save();
+        $gateway = $this->gatewayAnswering([Wire::chat('Bonjour', promptTokens: 21, completionTokens: 20)]);
+
+        $response = $gateway->complete($this->request());
+
+        self::assertSame('0.00006100', $response->cost);
+        self::assertSame('EUR', $response->currency);
+        self::assertSame('EUR', $this->lastLog()->getCurrency());
+    }
+
     public function testTheBudgetHoldsTheWorstCaseDuringTheCallAndTheRealCostAfterIt(): void
     {
         $gateway = $this->gatewayAnswering([Wire::chat('Bonjour', promptTokens: 21, completionTokens: 20)]);

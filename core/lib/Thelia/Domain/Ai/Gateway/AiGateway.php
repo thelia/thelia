@@ -278,7 +278,7 @@ final class AiGateway implements AiGatewayInterface
             $settlement->verdicts,
             $settlement->logId,
             $marked ? new AiProvenance($call->usage->id, $model, new \DateTimeImmutable(), $settlement->logId) : null,
-            'USD',
+            $call->target->model->currency,
             $result->providerState,
             $result->requestId,
             $result->refusalCategory,
@@ -313,6 +313,7 @@ final class AiGateway implements AiGatewayInterface
             correlationId: $call->request->correlationId,
             prompt: $storePrompt ? $this->prompts->encode($call->request) : null,
             promptExpiresAt: $storePrompt ? new \DateTimeImmutable(\sprintf('+%d days', self::promptRetentionDays($call))) : null,
+            currency: $call->target->model->currency,
         );
     }
 
