@@ -81,8 +81,9 @@ final class AiMcpServerTest extends ApiTestCase
     {
         $session = $this->session($this->token($this->reader, [['resource' => 'admin.product', 'access' => 'VIEW']]));
 
-        $tools = $this->decode($this->call($session, 'tools/list', null, 2))['result']['tools'];
+        $tools = $this->coreTools($this->decode($this->call($session, 'tools/list', null, 2))['result']['tools']);
 
+        // The tools of the modules installed in the shop are not the business of this test: only those of the core.
         self::assertSame(['thelia_search_products'], array_column($tools, 'name'));
         self::assertSame(['readOnlyHint' => true, 'destructiveHint' => false, 'idempotentHint' => true, 'openWorldHint' => false], $tools[0]['annotations']);
         self::assertSame('object', $tools[0]['inputSchema']['type']);
@@ -93,14 +94,14 @@ final class AiMcpServerTest extends ApiTestCase
     public function testAnAdministratorWhoMayEditSeesTheWriteToolButAScopeCanHideIt(): void
     {
         $wide = $this->session($this->token($this->editor, [['resource' => 'admin.product', 'access' => 'VIEW'], ['resource' => 'admin.product', 'access' => 'UPDATE']]));
-        $tools = $this->decode($this->call($wide, 'tools/list', null, 2))['result']['tools'];
+        $tools = $this->coreTools($this->decode($this->call($wide, 'tools/list', null, 2))['result']['tools']);
         $byName = array_column($tools, null, 'name');
 
         self::assertSame(['thelia_search_products', 'thelia_update_product_price'], array_keys($byName));
         self::assertSame(['readOnlyHint' => false, 'destructiveHint' => false, 'idempotentHint' => false, 'openWorldHint' => false], $byName['thelia_update_product_price']['annotations']);
 
         $narrow = $this->session($this->token($this->editor, [['resource' => 'admin.product', 'access' => 'VIEW']]));
-        self::assertSame(['thelia_search_products'], array_column($this->decode($this->call($narrow, 'tools/list', null, 2))['result']['tools'], 'name'));
+        self::assertSame(['thelia_search_products'], array_column($this->coreTools($this->decode($this->call($narrow, 'tools/list', null, 2))['result']['tools']), 'name'));
     }
 
     public function testPromptsAndResourcesAreEmpty(): void
@@ -295,6 +296,16 @@ final class AiMcpServerTest extends ApiTestCase
         self::assertSame(Response::HTTP_OK, $shop->getStatusCode(), (string) $shop->getContent());
         self::assertSame(Response::HTTP_FORBIDDEN, $unknown->getStatusCode());
         self::assertSame(Response::HTTP_OK, $loopback->getStatusCode());
+    }
+
+    /**
+     * @param list<array<string, mixed>> $tools
+     *
+     * @return list<array<string, mixed>> the tools of the core, whatever the modules of the shop declare
+     */
+    private function coreTools(array $tools): array
+    {
+        return array_values(array_filter($tools, static fn (array $tool): bool => str_starts_with((string) $tool['name'], 'thelia_')));
     }
 
     /**
