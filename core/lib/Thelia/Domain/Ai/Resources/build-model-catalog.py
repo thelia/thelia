@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build model-catalog.json from LiteLLM's model_prices_and_context_window.json (MIT).
 
-Usage: python3 -I build-model-catalog.py [path/to/model_prices_and_context_window.json]
-Without argument: downloads the file into a temporary directory first.
+Usage: python3 -I build-model-catalog.py [path/to/model_prices_and_context_window.json [commit-label]]
+Without argument: downloads the file into a temporary directory first. With a local file, the optional label
+(`<sha> <commit date>`) is written as the source commit, so a catalogue is rebuilt from the very commit it names.
 
 Fine-tuned models (`ft:*`) and models whose deprecation date has passed are left out.
 """
@@ -48,7 +49,7 @@ def main():
     commit = None
     if len(sys.argv) > 1:
         src = Path(sys.argv[1])
-        commit = "local file " + src.name
+        commit = sys.argv[2] if len(sys.argv) > 2 else "local file " + src.name
     else:
         src = Path(tempfile.mkdtemp(prefix="litellm-prices-")) / "model_prices_and_context_window.json"
         download(RAW, src)
@@ -78,6 +79,7 @@ def main():
                 "input_usd_per_million": money(v.get("input_cost_per_token")),
                 "output_usd_per_million": money(v.get("output_cost_per_token")),
                 "cache_read_usd_per_million": money(v.get("cache_read_input_token_cost")),
+                "cache_write_usd_per_million": money(v.get("cache_creation_input_token_cost")),
                 "context_window": v.get("max_input_tokens", v.get("max_tokens")),
                 "max_output_tokens": v.get("max_output_tokens"),
                 "capabilities": {"structured_output": v.get("supports_response_schema"),

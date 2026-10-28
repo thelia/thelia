@@ -3,7 +3,7 @@
   "source_commit_or_date": "f6f49d16cc2422d2a83c93c074e0ac4d6a889cc5 2026-10-28T10:15:56Z",
   "license": "MIT",
   "attribution": "Copyright (c) 2023 Berri AI",
-  "generated_at": "2026-10-28T11:06:02+00:00",
+  "generated_at": "2026-10-28T13:59:27+00:00",
   "models": [
     {
       "provider": "anthropic",
@@ -12,6 +12,7 @@
       "input_usd_per_million": "10.00",
       "output_usd_per_million": "50.00",
       "cache_read_usd_per_million": "1.00",
+      "cache_write_usd_per_million": "12.50",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -28,6 +29,7 @@
       "input_usd_per_million": "10.00",
       "output_usd_per_million": "50.00",
       "cache_read_usd_per_million": "0.25",
+      "cache_write_usd_per_million": "12.50",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -44,6 +46,7 @@
       "input_usd_per_million": "1.00",
       "output_usd_per_million": "5.00",
       "cache_read_usd_per_million": "0.10",
+      "cache_write_usd_per_million": "1.25",
       "context_window": 200000,
       "max_output_tokens": 64000,
       "capabilities": {
@@ -60,6 +63,7 @@
       "input_usd_per_million": "1.00",
       "output_usd_per_million": "5.00",
       "cache_read_usd_per_million": "0.10",
+      "cache_write_usd_per_million": "1.25",
       "context_window": 200000,
       "max_output_tokens": 64000,
       "capabilities": {
@@ -76,6 +80,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.50",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": "0.125",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -92,6 +97,7 @@
       "input_usd_per_million": "10.00",
       "output_usd_per_million": "50.00",
       "cache_read_usd_per_million": "1.00",
+      "cache_write_usd_per_million": "12.50",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -108,6 +114,7 @@
       "input_usd_per_million": "10.00",
       "output_usd_per_million": "50.00",
       "cache_read_usd_per_million": "0.25",
+      "cache_write_usd_per_million": "12.50",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -124,6 +131,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 200000,
       "max_output_tokens": 64000,
       "capabilities": {
@@ -140,6 +148,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 200000,
       "max_output_tokens": 64000,
       "capabilities": {
@@ -156,6 +165,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -172,6 +182,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -188,6 +199,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -204,6 +216,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -220,6 +233,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -236,6 +250,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": "6.25",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -252,6 +267,7 @@
       "input_usd_per_million": "4.00",
       "output_usd_per_million": "20.00",
       "cache_read_usd_per_million": "0.20",
+      "cache_write_usd_per_million": "5.00",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -268,6 +284,7 @@
       "input_usd_per_million": "3.00",
       "output_usd_per_million": "15.00",
       "cache_read_usd_per_million": "0.30",
+      "cache_write_usd_per_million": "3.75",
       "context_window": 200000,
       "max_output_tokens": 64000,
       "capabilities": {
@@ -284,6 +301,7 @@
       "input_usd_per_million": "3.00",
       "output_usd_per_million": "15.00",
       "cache_read_usd_per_million": "0.30",
+      "cache_write_usd_per_million": "3.75",
       "context_window": 200000,
       "max_output_tokens": 64000,
       "capabilities": {
@@ -300,6 +318,7 @@
       "input_usd_per_million": "3.00",
       "output_usd_per_million": "15.00",
       "cache_read_usd_per_million": "0.30",
+      "cache_write_usd_per_million": "3.75",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -316,6 +335,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.20",
+      "cache_write_usd_per_million": "2.50",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -332,6 +352,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.10",
+      "cache_write_usd_per_million": "2.50",
       "context_window": 1000000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -348,6 +369,7 @@
       "input_usd_per_million": "0.30",
       "output_usd_per_million": "0.90",
       "cache_read_usd_per_million": "0.03",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -364,6 +386,7 @@
       "input_usd_per_million": "0.30",
       "output_usd_per_million": "0.90",
       "cache_read_usd_per_million": "0.03",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -380,6 +403,7 @@
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "0.25",
       "cache_read_usd_per_million": "0.025",
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 256000,
       "capabilities": {
@@ -396,6 +420,7 @@
       "input_usd_per_million": "0.40",
       "output_usd_per_million": "2.00",
       "cache_read_usd_per_million": "0.04",
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 256000,
       "capabilities": {
@@ -412,6 +437,7 @@
       "input_usd_per_million": "0.40",
       "output_usd_per_million": "2.00",
       "cache_read_usd_per_million": "0.04",
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 256000,
       "capabilities": {
@@ -428,6 +454,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.30",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 256000,
       "capabilities": {
@@ -444,6 +471,7 @@
       "input_usd_per_million": "1.40",
       "output_usd_per_million": "4.40",
       "cache_read_usd_per_million": "0.14",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -460,6 +488,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -476,6 +505,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -492,6 +522,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -508,6 +539,7 @@
       "input_usd_per_million": "0.20",
       "output_usd_per_million": "0.20",
       "cache_read_usd_per_million": "0.02",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -524,6 +556,7 @@
       "input_usd_per_million": "0.20",
       "output_usd_per_million": "0.20",
       "cache_read_usd_per_million": "0.02",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -540,6 +573,7 @@
       "input_usd_per_million": "0.20",
       "output_usd_per_million": "0.20",
       "cache_read_usd_per_million": "0.02",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -556,6 +590,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.10",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -572,6 +607,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.15",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -588,6 +624,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.10",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -604,6 +641,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.10",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -620,6 +658,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.15",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -636,6 +675,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.15",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -652,6 +692,7 @@
       "input_usd_per_million": "0.40",
       "output_usd_per_million": "2.00",
       "cache_read_usd_per_million": "0.04",
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 256000,
       "capabilities": {
@@ -668,6 +709,7 @@
       "input_usd_per_million": "0.30",
       "output_usd_per_million": "0.90",
       "cache_read_usd_per_million": "0.03",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -684,6 +726,7 @@
       "input_usd_per_million": "0.30",
       "output_usd_per_million": "0.90",
       "cache_read_usd_per_million": "0.03",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -700,6 +743,7 @@
       "input_usd_per_million": "0.50",
       "output_usd_per_million": "1.50",
       "cache_read_usd_per_million": "0.05",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -716,6 +760,7 @@
       "input_usd_per_million": "0.50",
       "output_usd_per_million": "1.50",
       "cache_read_usd_per_million": "0.05",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -732,6 +777,7 @@
       "input_usd_per_million": "0.68",
       "output_usd_per_million": "2.09",
       "cache_read_usd_per_million": "0.068",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 1048576,
       "capabilities": {
@@ -748,6 +794,7 @@
       "input_usd_per_million": "0.68",
       "output_usd_per_million": "2.09",
       "cache_read_usd_per_million": "0.068",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 1048576,
       "capabilities": {
@@ -764,6 +811,7 @@
       "input_usd_per_million": "0.50",
       "output_usd_per_million": "1.50",
       "cache_read_usd_per_million": "0.05",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -780,6 +828,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -796,6 +845,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -812,6 +862,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -828,6 +879,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -844,6 +896,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -860,6 +913,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -876,6 +930,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.30",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 8191,
       "capabilities": {
@@ -892,6 +947,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -908,6 +964,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -924,6 +981,7 @@
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "0.25",
       "cache_read_usd_per_million": "0.025",
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 8191,
       "capabilities": {
@@ -940,6 +998,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.015",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -956,6 +1015,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -972,6 +1032,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": "0.15",
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -988,6 +1049,7 @@
       "input_usd_per_million": "0.30",
       "output_usd_per_million": "0.30",
       "cache_read_usd_per_million": "0.03",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1004,6 +1066,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "6.00",
       "cache_read_usd_per_million": "0.20",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1020,6 +1083,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.40",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1036,6 +1100,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.40",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1052,6 +1117,7 @@
       "input_usd_per_million": "1.40",
       "output_usd_per_million": "4.40",
       "cache_read_usd_per_million": "0.14",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1068,6 +1134,7 @@
       "input_usd_per_million": "1.40",
       "output_usd_per_million": "4.40",
       "cache_read_usd_per_million": "0.14",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1084,6 +1151,7 @@
       "input_usd_per_million": "1.40",
       "output_usd_per_million": "4.40",
       "cache_read_usd_per_million": "0.14",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1100,6 +1168,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.50",
       "cache_read_usd_per_million": "0.03",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1116,6 +1185,7 @@
       "input_usd_per_million": "1.40",
       "output_usd_per_million": "4.40",
       "cache_read_usd_per_million": "0.14",
+      "cache_write_usd_per_million": null,
       "context_window": 1048576,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1132,6 +1202,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1148,6 +1219,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1164,6 +1236,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1180,6 +1253,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1196,6 +1270,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1212,6 +1287,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1228,6 +1304,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1244,6 +1321,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 163840,
       "max_output_tokens": 163840,
       "capabilities": {
@@ -1260,6 +1338,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1276,6 +1355,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
@@ -1292,6 +1372,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1308,6 +1389,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1324,6 +1406,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1340,6 +1423,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1356,6 +1440,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1372,6 +1457,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1388,6 +1474,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1404,6 +1491,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1420,6 +1508,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1436,6 +1525,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1452,6 +1542,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1468,6 +1559,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1484,6 +1576,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1500,6 +1593,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 65536,
       "max_output_tokens": 8192,
       "capabilities": {
@@ -1516,6 +1610,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 65536,
       "max_output_tokens": 65536,
       "capabilities": {
@@ -1532,6 +1627,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32768,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1548,6 +1644,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
@@ -1564,6 +1661,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
@@ -1580,6 +1678,7 @@
       "input_usd_per_million": "0.00",
       "output_usd_per_million": "0.00",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 2048,
       "max_output_tokens": 2048,
       "capabilities": {
@@ -1596,6 +1695,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "30.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 400000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1612,6 +1712,7 @@
       "input_usd_per_million": "4.00",
       "output_usd_per_million": "20.00",
       "cache_read_usd_per_million": "0.40",
+      "cache_write_usd_per_million": "5.00",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1628,6 +1729,7 @@
       "input_usd_per_million": "12.50",
       "output_usd_per_million": "75.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": "15.625",
       "context_window": 400000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1644,6 +1746,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "8.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 1047576,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1660,6 +1763,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "8.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 1047576,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1676,6 +1780,7 @@
       "input_usd_per_million": "0.40",
       "output_usd_per_million": "1.60",
       "cache_read_usd_per_million": "0.10",
+      "cache_write_usd_per_million": null,
       "context_window": 1047576,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1692,6 +1797,7 @@
       "input_usd_per_million": "0.40",
       "output_usd_per_million": "1.60",
       "cache_read_usd_per_million": "0.10",
+      "cache_write_usd_per_million": null,
       "context_window": 1047576,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -1708,6 +1814,7 @@
       "input_usd_per_million": "2.50",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1724,6 +1831,7 @@
       "input_usd_per_million": "2.50",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1740,6 +1848,7 @@
       "input_usd_per_million": "2.50",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1756,6 +1865,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.075",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1772,6 +1882,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.075",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1788,6 +1899,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": "0.075",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1804,6 +1916,7 @@
       "input_usd_per_million": "2.50",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -1820,6 +1933,7 @@
       "input_usd_per_million": "1.25",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.125",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1836,6 +1950,7 @@
       "input_usd_per_million": "1.25",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.125",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1852,6 +1967,7 @@
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "2.00",
       "cache_read_usd_per_million": "0.025",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1868,6 +1984,7 @@
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "2.00",
       "cache_read_usd_per_million": "0.025",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1884,6 +2001,7 @@
       "input_usd_per_million": "0.05",
       "output_usd_per_million": "0.40",
       "cache_read_usd_per_million": "0.005",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1900,6 +2018,7 @@
       "input_usd_per_million": "0.05",
       "output_usd_per_million": "0.40",
       "cache_read_usd_per_million": "0.005",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1916,6 +2035,7 @@
       "input_usd_per_million": "1.25",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.125",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1932,6 +2052,7 @@
       "input_usd_per_million": "1.25",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.125",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1948,6 +2069,7 @@
       "input_usd_per_million": "1.25",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.125",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1964,6 +2086,7 @@
       "input_usd_per_million": "1.25",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.125",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1980,6 +2103,7 @@
       "input_usd_per_million": "1.75",
       "output_usd_per_million": "14.00",
       "cache_read_usd_per_million": "0.175",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -1996,6 +2120,7 @@
       "input_usd_per_million": "1.75",
       "output_usd_per_million": "14.00",
       "cache_read_usd_per_million": "0.175",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2012,6 +2137,7 @@
       "input_usd_per_million": "2.50",
       "output_usd_per_million": "15.00",
       "cache_read_usd_per_million": "0.25",
+      "cache_write_usd_per_million": null,
       "context_window": 1050000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2028,6 +2154,7 @@
       "input_usd_per_million": "2.50",
       "output_usd_per_million": "15.00",
       "cache_read_usd_per_million": "0.25",
+      "cache_write_usd_per_million": null,
       "context_window": 1050000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2044,6 +2171,7 @@
       "input_usd_per_million": "0.75",
       "output_usd_per_million": "4.50",
       "cache_read_usd_per_million": "0.075",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2060,6 +2188,7 @@
       "input_usd_per_million": "0.75",
       "output_usd_per_million": "4.50",
       "cache_read_usd_per_million": "0.075",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2076,6 +2205,7 @@
       "input_usd_per_million": "0.20",
       "output_usd_per_million": "1.25",
       "cache_read_usd_per_million": "0.02",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2092,6 +2222,7 @@
       "input_usd_per_million": "0.20",
       "output_usd_per_million": "1.25",
       "cache_read_usd_per_million": "0.02",
+      "cache_write_usd_per_million": null,
       "context_window": 272000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2108,6 +2239,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "30.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 1050000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2124,6 +2256,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "30.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 1050000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2140,6 +2273,7 @@
       "input_usd_per_million": "12.50",
       "output_usd_per_million": "75.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": null,
       "context_window": null,
       "max_output_tokens": null,
       "capabilities": {
@@ -2156,6 +2290,7 @@
       "input_usd_per_million": "12.50",
       "output_usd_per_million": "75.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": null,
       "context_window": null,
       "max_output_tokens": null,
       "capabilities": {
@@ -2172,6 +2307,7 @@
       "input_usd_per_million": "4.00",
       "output_usd_per_million": "20.00",
       "cache_read_usd_per_million": "0.40",
+      "cache_write_usd_per_million": "5.00",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2188,6 +2324,7 @@
       "input_usd_per_million": "12.50",
       "output_usd_per_million": "75.00",
       "cache_read_usd_per_million": "1.25",
+      "cache_write_usd_per_million": "15.625",
       "context_window": 400000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2204,6 +2341,7 @@
       "input_usd_per_million": "0.20",
       "output_usd_per_million": "1.20",
       "cache_read_usd_per_million": "0.02",
+      "cache_write_usd_per_million": "0.25",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2220,6 +2358,7 @@
       "input_usd_per_million": "4.00",
       "output_usd_per_million": "20.00",
       "cache_read_usd_per_million": "0.40",
+      "cache_write_usd_per_million": "5.00",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2236,6 +2375,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "12.00",
       "cache_read_usd_per_million": "0.20",
+      "cache_write_usd_per_million": "2.50",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2252,6 +2392,7 @@
       "input_usd_per_million": "10.00",
       "output_usd_per_million": "50.00",
       "cache_read_usd_per_million": "1.00",
+      "cache_write_usd_per_million": "12.50",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2268,6 +2409,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.50",
       "cache_read_usd_per_million": "0.01",
+      "cache_write_usd_per_million": "0.125",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2284,6 +2426,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.20",
+      "cache_write_usd_per_million": "2.50",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2300,6 +2443,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "10.00",
       "cache_read_usd_per_million": "0.10",
+      "cache_write_usd_per_million": "2.50",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2316,6 +2460,7 @@
       "input_usd_per_million": "1.00",
       "output_usd_per_million": "5.00",
       "cache_read_usd_per_million": "0.05",
+      "cache_write_usd_per_million": "1.25",
       "context_window": 922000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2332,6 +2477,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": null,
       "max_output_tokens": null,
       "capabilities": {
@@ -2348,6 +2494,7 @@
       "input_usd_per_million": "5.00",
       "output_usd_per_million": "25.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": null,
       "max_output_tokens": null,
       "capabilities": {
@@ -2364,6 +2511,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "8.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 200000,
       "max_output_tokens": 100000,
       "capabilities": {
@@ -2380,6 +2528,7 @@
       "input_usd_per_million": "2.00",
       "output_usd_per_million": "8.00",
       "cache_read_usd_per_million": "0.50",
+      "cache_write_usd_per_million": null,
       "context_window": 200000,
       "max_output_tokens": 100000,
       "capabilities": {
@@ -2396,6 +2545,7 @@
       "input_usd_per_million": "0.67",
       "output_usd_per_million": "0.67",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131000,
       "max_output_tokens": 131000,
       "capabilities": {
@@ -2412,6 +2562,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.10",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131000,
       "max_output_tokens": 131000,
       "capabilities": {
@@ -2428,6 +2579,7 @@
       "input_usd_per_million": "0.67",
       "output_usd_per_million": "0.67",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131000,
       "max_output_tokens": 131000,
       "capabilities": {
@@ -2444,6 +2596,7 @@
       "input_usd_per_million": "0.67",
       "output_usd_per_million": "0.67",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131000,
       "max_output_tokens": 131000,
       "capabilities": {
@@ -2460,6 +2613,7 @@
       "input_usd_per_million": "0.10",
       "output_usd_per_million": "0.10",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 127000,
       "max_output_tokens": 127000,
       "capabilities": {
@@ -2476,6 +2630,7 @@
       "input_usd_per_million": "0.13",
       "output_usd_per_million": "0.13",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 118000,
       "max_output_tokens": 118000,
       "capabilities": {
@@ -2492,6 +2647,7 @@
       "input_usd_per_million": "0.09",
       "output_usd_per_million": "0.28",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 128000,
       "capabilities": {
@@ -2508,6 +2664,7 @@
       "input_usd_per_million": "0.63",
       "output_usd_per_million": "0.63",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 32000,
       "capabilities": {
@@ -2524,6 +2681,7 @@
       "input_usd_per_million": "0.87",
       "output_usd_per_million": "0.87",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 32000,
       "capabilities": {
@@ -2540,6 +2698,7 @@
       "input_usd_per_million": "0.91",
       "output_usd_per_million": "0.91",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 32000,
       "capabilities": {
@@ -2556,6 +2715,7 @@
       "input_usd_per_million": "0.08",
       "output_usd_per_million": "0.23",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 32000,
       "capabilities": {
@@ -2572,6 +2732,7 @@
       "input_usd_per_million": "0.08",
       "output_usd_per_million": "0.40",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131000,
       "max_output_tokens": 131000,
       "capabilities": {
@@ -2588,6 +2749,7 @@
       "input_usd_per_million": "0.04",
       "output_usd_per_million": "0.15",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 131000,
       "max_output_tokens": 131000,
       "capabilities": {
@@ -2604,6 +2766,7 @@
       "input_usd_per_million": "0.29",
       "output_usd_per_million": "0.29",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 32000,
       "max_output_tokens": 32000,
       "capabilities": {
@@ -2620,6 +2783,7 @@
       "input_usd_per_million": "0.19",
       "output_usd_per_million": "0.19",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 256000,
       "capabilities": {
@@ -2636,6 +2800,7 @@
       "input_usd_per_million": "0.40",
       "output_usd_per_million": "0.80",
       "cache_read_usd_per_million": "0.08",
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -2652,6 +2817,7 @@
       "input_usd_per_million": "1.80",
       "output_usd_per_million": "5.50",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -2668,6 +2834,7 @@
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "0.50",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -2684,6 +2851,7 @@
       "input_usd_per_million": "0.90",
       "output_usd_per_million": "0.90",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -2700,6 +2868,7 @@
       "input_usd_per_million": "1.50",
       "output_usd_per_million": "7.50",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -2716,6 +2885,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.35",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -2732,6 +2902,7 @@
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 128000,
       "max_output_tokens": 32768,
       "capabilities": {
@@ -2748,6 +2919,7 @@
       "input_usd_per_million": "0.75",
       "output_usd_per_million": "2.25",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -2764,6 +2936,7 @@
       "input_usd_per_million": "0.60",
       "output_usd_per_million": "3.60",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
@@ -2780,6 +2953,7 @@
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "1.50",
       "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {

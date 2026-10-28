@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Ai;
 
+use Thelia\Domain\Ai\AiTokenUsage;
+use Thelia\Domain\Ai\Catalog\AiCostCalculator;
 use Thelia\Domain\Ai\Catalog\AiModelCatalog;
 use Thelia\Domain\Ai\Catalog\AiModelSpecification;
 use Thelia\Model\AiConnection;
@@ -33,6 +35,8 @@ final class AiModelCatalogTest extends IntegrationTestCase
         self::assertSame('1.00', $model->inputPrice);
         self::assertSame('5.00', $model->outputPrice);
         self::assertSame('0.10', $model->cacheReadPrice);
+        self::assertSame('1.25', $model->cacheWritePrice, 'Anthropic bills a cache write above the input price');
+        self::assertSame('1.25000000', (new AiCostCalculator())->cost($model, new AiTokenUsage(0, 0, 0, 1_000_000)));
         self::assertSame('USD', $model->currency);
         self::assertSame(200000, $model->contextWindow);
         self::assertTrue($model->supportsTools);
