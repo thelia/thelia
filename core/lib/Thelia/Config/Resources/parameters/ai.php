@@ -22,5 +22,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('thelia.ai.http_max_duration', 300)
         // The models of the moderation guardrails (docs.mistral.ai/capabilities/guardrailing, developers.openai.com/api/docs/guides/moderation).
         ->set('thelia.ai.moderation.mistral_model', 'mistral-moderation-2603')
-        ->set('thelia.ai.moderation.openai_model', 'omni-moderation-latest');
+        ->set('thelia.ai.moderation.openai_model', 'omni-moderation-latest')
+        // The categories of Mistral that stop a call: the safety ones. `health`, `financial`, `law` and `pii` are advice
+        // categories (a customer who gives an address is not an offender): they are noted in the verdict, never blocking.
+        // A category a later version of the model adds is not blocking until it is listed here.
+        ->set('thelia.ai.moderation.mistral_blocking_categories', ['sexual', 'hate_and_discrimination', 'violence_and_threats', 'dangerous', 'criminal', 'selfharm', 'jailbreaking']);
 };
