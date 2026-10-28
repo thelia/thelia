@@ -18,12 +18,14 @@ use Thelia\Model\ConfigQuery;
 
 /**
  * The global settings of the AI layer, kept in the `config` table: the master switch, the monthly cap all
- * usages share and the option "EU only".
+ * usages share, the option "EU only" and how long the usage log is kept.
  *
  * @internal
  */
 class AiSettings
 {
+    public const int DEFAULT_LOG_RETENTION_DAYS = 400;
+
     public function isEnabled(): bool
     {
         return '0' !== trim((string) ConfigQuery::read('ai_enabled', '1'));
@@ -37,6 +39,16 @@ class AiSettings
         $cap = trim((string) ConfigQuery::read('ai_monthly_cap', '0'));
 
         return 1 === preg_match('/^\d+(\.\d+)?$/', $cap) ? $cap : '0';
+    }
+
+    /**
+     * @return int days a row of the usage log is kept, 400 when the setting is missing or is not a positive number
+     */
+    public function logRetentionDays(): int
+    {
+        $days = trim((string) ConfigQuery::read('ai_log_retention_days', (string) self::DEFAULT_LOG_RETENTION_DAYS));
+
+        return 1 === preg_match('/^[1-9]\d{0,5}$/', $days) ? (int) $days : self::DEFAULT_LOG_RETENTION_DAYS;
     }
 
     public function isEuropeanUnionOnly(): bool
