@@ -117,7 +117,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (106, 'visitor_country_database', '', 0, 0, NOW(), NOW()),
 (107, 'ai_enabled', '1', 0, 0, NOW(), NOW()),
 (108, 'ai_monthly_cap', '0', 0, 0, NOW(), NOW()),
-(109, 'ai_eu_only', '0', 0, 0, NOW(), NOW())
+(109, 'ai_eu_only', '0', 0, 0, NOW(), NOW()),
+(110, 'ai_log_retention_days', '400', 0, 0, NOW(), NOW())
 
 ;
 

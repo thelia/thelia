@@ -70,6 +70,7 @@ final class AiSchemaParityTest extends TestCase
         yield 'master switch on' => ['ai_enabled', '1'];
         yield 'no global cap' => ['ai_monthly_cap', '0'];
         yield 'EU only off' => ['ai_eu_only', '0'];
+        yield 'usage log kept 400 days' => ['ai_log_retention_days', '400'];
     }
 
     #[DataProvider('globalSettings')]
