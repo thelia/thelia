@@ -1240,4 +1240,6 @@ return [
     'This line was removed: the smallest quantity you can order is %quantity.' => 'Cette ligne a été retirée : la plus petite quantité que vous pouvez commander est %quantity.',
     'The quantity was brought down to %quantity: sold by %step.' => 'La quantité a été ramenée à %quantity : vendu par %step.',
     'The quantity was brought down to %quantity.' => 'La quantité a été ramenée à %quantity.',
+    'Quantities of your cart were adjusted to what the products are sold in. Check your cart before ordering.' => 'Des quantités de votre panier ont été ajustées aux conditionnements des produits. Vérifiez votre panier avant de commander.',
+    'This product is sold by measure: order it from its product page.' => 'Ce produit est vendu à la mesure : commandez-le depuis sa fiche produit.',
 ];

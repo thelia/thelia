@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\QuickOrder;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\QuickOrder\DTO\Candidate;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\Enum\LineStatus;
@@ -65,6 +66,32 @@ final class ReferenceResolverTest extends IntegrationTestCase
         self::assertSame('Nitrile gloves', $line->title);
         self::assertEqualsWithDelta(12.5, $line->untaxedUnitPrice, 0.0001);
         self::assertSame(3, $line->quantity);
+    }
+
+    public function testAQuantityTheRulesOfTheCombinationRefuseIsToldWithTheValidOnes(): void
+    {
+        $saleElements = $this->defaultSaleElementsOf($this->product());
+        (new QuantityRule(minQuantity: 2.0, step: 6.0))->applyTo($saleElements);
+        $saleElements->save($this->getPropelConnection());
+
+        $refused = $this->resolveOne((string) $saleElements->getRef(), 7);
+        $accepted = $this->resolveOne((string) $saleElements->getRef(), 12);
+
+        self::assertSame(LineStatus::QuantityRefused, $refused->status);
+        self::assertSame('Sold by 6: 6, 12, 18…', $refused->refusalReason);
+        self::assertSame(LineStatus::Resolved, $accepted->status);
+    }
+
+    public function testACombinationSoldByMeasureIsOrderedFromItsProductPage(): void
+    {
+        $saleElements = $this->defaultSaleElementsOf($this->product());
+        (new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2))->applyTo($saleElements);
+        $saleElements->save($this->getPropelConnection());
+
+        $line = $this->resolveOne((string) $saleElements->getRef(), 2);
+
+        self::assertSame(LineStatus::QuantityRefused, $line->status);
+        self::assertSame('This product is sold by measure: order it from its product page.', $line->refusalReason);
     }
 
     public function testTheCaseOfTheReferenceDoesNotMatter(): void

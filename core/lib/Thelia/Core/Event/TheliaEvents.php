@@ -312,6 +312,13 @@ final class TheliaEvents
      */
     public const CART_LINES_REMOVED = 'cart.lines.removed';
 
+    /**
+     * Sent when a line of a cart read back (restored, checked before the checkout, moved
+     * to another sale unit) no longer met the quantity rules of its combination and was
+     * brought down or removed (CartItemQuantityAdjustedEvent).
+     */
+    public const CART_ITEM_QUANTITY_ADJUSTED = 'cart.item.quantityAdjusted';
+
     /** sent when a new item is added to current cart. */
     public const AFTER_CARTADDITEM = 'cart.after.addItem';
 
