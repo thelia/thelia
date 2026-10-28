@@ -82,4 +82,34 @@ final class AccountCustomerUpdateApiTest extends ApiTestCase
         CustomerTableMap::clearInstancePool();
         self::assertSame('CUST-OWN', CustomerQuery::create()->findPk($customerId)?->getRef());
     }
+
+    public function testTheAccountReadNeverExposesTheEmailConfirmationToken(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password', 'email' => 'token-hidden@test.com']);
+        $customer->setConfirmationToken('secret-confirmation-token')->save($this->getPropelConnection());
+
+        $token = $this->authenticateAsCustomer($customer);
+        $response = $this->jsonRequest('GET', '/api/front/account/customers/'.$customer->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        self::assertArrayNotHasKey('confirmationToken', json_decode((string) $response->getContent(), true));
+        self::assertStringNotContainsString('secret-confirmation-token', (string) $response->getContent());
+    }
+
+    public function testTheOpenApiFrontReadSchemaOfTheCustomerHasNoConfirmationToken(): void
+    {
+        $this->client->request('GET', '/api/docs.jsonopenapi');
+        $schemas = json_decode((string) $this->client->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR)['components']['schemas'] ?? [];
+
+        $frontCustomerReads = array_filter(
+            array_keys($schemas),
+            static fn (string $name): bool => str_contains($name, 'front') && str_contains($name, 'customer') && str_contains($name, 'read') && !str_contains($name, 'group'),
+        );
+        self::assertNotEmpty($frontCustomerReads, 'No front customer read schema found: the check below proves nothing.');
+
+        foreach ($frontCustomerReads as $name) {
+            self::assertArrayNotHasKey('confirmationToken', $schemas[$name]['properties'] ?? [], $name);
+        }
+    }
 }
