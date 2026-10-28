@@ -346,6 +346,16 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         self::assertSame(0, ProbeToolState::$proposeCalls);
     }
 
+    public function testAProposalThatExpiresBetweenTheCheckAndTheClaimIsNotClaimed(): void
+    {
+        $id = $this->propose();
+        AiToolApprovalQuery::create()->filterById($id)->update(['ExpiresAt' => new \DateTimeImmutable('-1 minute')]);
+
+        self::assertFalse($this->approvalRows->claim($id, $this->approver->getId(), 'paul', null, new \DateTimeImmutable()));
+        self::assertFalse($this->approvalRows->reject($id, $this->approver->getId(), 'paul', null, new \DateTimeImmutable()));
+        self::assertSame('pending', AiToolApprovalQuery::create()->findPk($id)?->getStatus());
+    }
+
     public function testAnAmendmentThatBreaksTheSchemaIsRefusedBeforeAnythingIsDecided(): void
     {
         $id = $this->propose();
