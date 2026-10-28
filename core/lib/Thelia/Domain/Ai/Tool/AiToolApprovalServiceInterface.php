@@ -31,6 +31,19 @@ interface AiToolApprovalServiceInterface
     public function pendingFor(int $adminId, int $limit = 50): array;
 
     /**
+     * The changes left `applying` (decided, outcome never written) that this administrator may close, oldest first.
+     *
+     * @return list<AiToolApprovalView>
+     */
+    public function applyingFor(int $adminId, int $limit = 50): array;
+
+    /**
+     * One proposal, in any state, for the administrator who holds the right it asks for; null when it does not exist
+     * or when he does not hold the right (the two look the same).
+     */
+    public function viewFor(int $adminId, int $approvalId): ?AiToolApprovalView;
+
+    /**
      * Applies the change. With `$amendedArguments`, the proposal is rebuilt from them (schema, then propose() in
      * the context of the approver) and the original arguments are kept.
      *
