@@ -57,6 +57,16 @@ final class AiCoreOutputGuardrailsTest extends TestCase
         self::assertSame([], $check->verdicts);
     }
 
+    public function testAnAnswerTheProviderRefusedIsNotTakenForBrokenJson(): void
+    {
+        $result = new AiProviderResult('', null, [], new AiTokenUsage(5, 0), AiFinishReason::ContentFilter, 'm', refusalCategory: 'cyber');
+
+        $check = $this->guardrails()->check($this->request(self::SCHEMA), $result, false);
+
+        self::assertSame([], $check->verdicts);
+        self::assertFalse($check->blocks());
+    }
+
     public function testAnAnswerThatMatchesPassesInBlockMode(): void
     {
         $data = ['title' => 'Hello', 'body' => '<p>Fine</p>'];
