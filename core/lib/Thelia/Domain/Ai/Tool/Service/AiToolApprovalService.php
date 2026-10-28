@@ -90,6 +90,17 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         return $this->visibleTo($adminId, $limit, true);
     }
 
+    public function viewFor(int $adminId, int $approvalId): ?AiToolApprovalView
+    {
+        $row = $this->approvals->find($approvalId);
+
+        if (!$row instanceof AiToolApproval || !$this->accessChecker->adminHoldsRight($adminId, $row->getAclResource(), $row->getAclModule(), $row->getAclAccess())) {
+            return null;
+        }
+
+        return $this->approvals->toView($row);
+    }
+
     public function approve(int $approvalId, ?array $amendedArguments = null): AiToolApprovalView
     {
         $approver = $this->approver();

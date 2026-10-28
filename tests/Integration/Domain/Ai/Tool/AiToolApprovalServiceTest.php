@@ -395,6 +395,18 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         self::assertCount(1, $this->approvals->pendingFor($this->proposer->getId()));
     }
 
+    public function testViewForGivesAProposalOfAnyStateOnlyToWhoHoldsItsRight(): void
+    {
+        $id = $this->propose();
+        $viewer = $this->createFixtureFactory()->restrictedAdmin([AdminResources::PRODUCT => [AccessManager::VIEW]]);
+        $this->logInAsAdmin($this->approver);
+        $this->approvals->reject($id);
+
+        self::assertSame(AiToolApprovalStatus::Rejected, $this->approvals->viewFor($this->approver->getId(), $id)?->status);
+        self::assertNull($this->approvals->viewFor($viewer->getId(), $id));
+        self::assertNull($this->approvals->viewFor($this->approver->getId(), $id + 1000));
+    }
+
     public function testAFloodOfProposalsTheAdministratorMayNotDecideNeverHidesTheOnesHeMay(): void
     {
         $mine = $this->propose();
