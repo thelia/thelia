@@ -53,7 +53,8 @@ final readonly class AiSettingsWriter
     }
 
     /**
-     * Creates the connection when none is given, updates it otherwise. A blank `$apiKey` keeps the stored key.
+     * Creates the connection when none is given, updates it otherwise. A blank `$apiKey` keeps the stored key, as
+     * long as the connection keeps its provider and its address: the stored key is never sent to a new server.
      *
      * @param string|null $jurisdiction "eu" or "non_eu", read only for a provider that cannot tell
      *
@@ -110,6 +111,16 @@ final readonly class AiSettingsWriter
             $this->vault->assertEnvironmentVariableName($apiKeyEnv);
         }
 
+        $newKey = null === $apiKey || '' === trim($apiKey) ? null : trim($apiKey);
+        $movesTheStoredKey = null !== $connection->getId()
+            && null === $newKey
+            && null !== $connection->getApiKeyEncrypted() && '' !== $connection->getApiKeyEncrypted()
+            && ($connection->getBaseUrl() !== $baseUrl || $connection->getProvider() !== $provider->value);
+
+        if ($movesTheStoredKey) {
+            throw new InvalidAiArgumentException('The connection now points to another server: type its API key again, the saved key is not sent to a new address.');
+        }
+
         $connection
             ->setCode($code)
             ->setTitle(trim($title))
@@ -120,8 +131,8 @@ final readonly class AiSettingsWriter
             ->setAllowPrivateNetwork((int) $allowPrivateNetwork)
             ->setActive((int) $active);
 
-        if (null !== $apiKey && '' !== trim($apiKey)) {
-            $connection->setApiKeyEncrypted($this->vault->encrypt(trim($apiKey)));
+        if (null !== $newKey) {
+            $connection->setApiKeyEncrypted($this->vault->encrypt($newKey));
         }
 
         $connection->save();

@@ -96,6 +96,27 @@ final class AiSettingsWriterTest extends IntegrationTestCase
         $this->connection('mistral-main');
     }
 
+    public function testTheStoredKeyNeverFollowsAConnectionToAnotherServer(): void
+    {
+        $connection = $this->connection('compatible', provider: 'openai_compatible', jurisdiction: 'eu', baseUrl: 'https://93.184.216.34/v1', apiKey: 'sk-writer-0123456789');
+
+        try {
+            $this->connection('compatible', provider: 'openai_compatible', jurisdiction: 'eu', baseUrl: 'https://1.1.1.1/v1', existing: $connection);
+            self::fail('A new address without the key again is refused.');
+        } catch (InvalidAiArgumentException $refusal) {
+            self::assertStringContainsString('type its API key again', $refusal->getMessage());
+        }
+
+        $stored = AiConnectionQuery::create()->findOneByCode('compatible');
+        self::assertSame('https://93.184.216.34/v1', $stored->getBaseUrl());
+        self::assertSame('sk-writer-0123456789', $this->vault->resolve($stored));
+
+        $moved = $this->connection('compatible', provider: 'openai_compatible', jurisdiction: 'eu', baseUrl: 'https://1.1.1.1/v1', apiKey: 'sk-other-9876543210', existing: $stored);
+
+        self::assertSame('https://1.1.1.1/v1', $moved->getBaseUrl());
+        self::assertSame('sk-other-9876543210', $this->vault->resolve($moved));
+    }
+
     public function testAConnectionThatBreaksARuleIsRefusedAndNothingIsSaved(): void
     {
         foreach ([

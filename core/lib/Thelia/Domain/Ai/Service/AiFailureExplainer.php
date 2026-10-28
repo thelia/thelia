@@ -49,6 +49,7 @@ final readonly class AiFailureExplainer
         'The jurisdiction ("eu" or "non_eu") is required for this provider.',
         'The environment variable that holds an API key must end with "_KEY" or "_TOKEN" and must not be one of the application (APP_, DATABASE_, JWT_).',
         'The name of the environment variable that holds an API key must be letters, digits and underscores.',
+        'The connection now points to another server: type its API key again, the saved key is not sent to a new address.',
         'The connection does not exist.',
         'The model does not exist.',
         'The model is not served by this connection.',
