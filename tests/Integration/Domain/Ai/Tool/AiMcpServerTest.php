@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Ai\Tool\AiCreatedToolToken;
+use Thelia\Domain\Ai\Tool\Mcp\McpRequestGuardListener;
 use Thelia\Domain\Ai\Tool\Service\AiToolTokenService;
 use Thelia\Model\Admin;
 use Thelia\Model\AiToolApprovalQuery;
@@ -241,6 +242,27 @@ final class AiMcpServerTest extends ApiTestCase
         $response = $this->postBody($session['token'], " \n\t[]", $session['id']);
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function testABodyOverTheLimitIs413AndOneAtTheLimitIsServed(): void
+    {
+        $session = $this->session($this->token($this->reader, [['resource' => 'admin.product', 'access' => 'VIEW']]));
+        $message = static fn (int $size): string => json_encode(['jsonrpc' => '2.0', 'id' => 7, 'method' => 'ping', 'params' => ['padding' => str_repeat('a', $size)]], \JSON_THROW_ON_ERROR);
+        $empty = \strlen($message(0));
+
+        $tooLarge = $this->postBody($session['token'], $message(McpRequestGuardListener::MAX_BODY_BYTES - $empty + 1), $session['id']);
+        self::assertSame(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $tooLarge->getStatusCode());
+        self::assertSame(-32600, json_decode((string) $tooLarge->getContent(), true, flags: \JSON_THROW_ON_ERROR)['error']['code']);
+
+        $atTheLimit = $this->postBody($session['token'], $message(McpRequestGuardListener::MAX_BODY_BYTES - $empty), $session['id']);
+        self::assertSame(Response::HTTP_OK, $atTheLimit->getStatusCode(), (string) $atTheLimit->getContent());
+    }
+
+    public function testAnAnonymousCallerGets401NotAnAnswerAboutItsBody(): void
+    {
+        $this->client->request('POST', '/api/mcp', server: ['CONTENT_TYPE' => 'application/json'], content: str_repeat('[', McpRequestGuardListener::MAX_BODY_BYTES + 1));
+
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
     }
 
     /**
