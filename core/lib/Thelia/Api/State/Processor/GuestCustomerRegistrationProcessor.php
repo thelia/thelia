@@ -59,8 +59,10 @@ final readonly class GuestCustomerRegistrationProcessor implements ProcessorInte
 
         $email = (string) $data->email;
 
-        if (!$this->registrationLimiter->allows($email)) {
-            throw new TooManyRequestsHttpException(message: 'Too many guest checkout registrations from here. Try again later.');
+        $secondsToWait = $this->registrationLimiter->attempt($email);
+
+        if (null !== $secondsToWait) {
+            throw new TooManyRequestsHttpException($secondsToWait, 'Too many guest checkout registrations from here. Try again later.');
         }
 
         if (!$this->guestCheckoutPolicy->isGuestCheckoutEnabled()) {

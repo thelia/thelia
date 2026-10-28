@@ -276,4 +276,26 @@ final class GuestCustomerApiTest extends ApiTestCase
             'Opening guest accounts takes no credential: a caller must not be able to keep going indefinitely.',
         );
     }
+
+    public function testARefusedRegistrationSaysHowLongToWait(): void
+    {
+        $this->enableGuestCheckout();
+
+        $email = 'wait-'.bin2hex(random_bytes(6)).'@test.com';
+
+        for ($attempt = 0; $attempt < 8; ++$attempt) {
+            [$response] = $this->registerGuest(['email' => $email]);
+
+            if (429 === $response->getStatusCode()) {
+                $retryAfter = $response->headers->get('Retry-After');
+
+                self::assertNotNull($retryAfter, 'A refused caller is told when to try again.');
+                self::assertGreaterThan(0, (int) $retryAfter);
+
+                return;
+            }
+        }
+
+        self::fail('The address was never refused.');
+    }
 }

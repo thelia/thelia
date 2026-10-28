@@ -16,6 +16,7 @@ namespace Thelia\Api\Security;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Thelia\Domain\Customer\EmailAddress;
 
@@ -44,20 +45,39 @@ final readonly class GuestRegistrationLimiter
 
     public function allows(string $email): bool
     {
+        return null === $this->attempt($email);
+    }
+
+    /**
+     * Counts one more guest registration for this address, from this caller: null when it is
+     * allowed, otherwise the number of seconds after which the caller may try again.
+     */
+    public function attempt(string $email): ?int
+    {
         // No request in a CLI context: the per-client limit simply does not apply. It
         // is consumed first so that a caller who is already over it stops eating the
         // budget of the address, whose legitimate owner would then be turned away.
         $clientIp = $this->requestStack->getMainRequest()?->getClientIp();
 
-        if (null !== $clientIp && !$this->perClientLimiter->create($clientIp)->consume()->isAccepted()) {
-            return false;
+        if (null !== $clientIp) {
+            $perClient = $this->perClientLimiter->create($clientIp)->consume();
+
+            if (!$perClient->isAccepted()) {
+                return self::secondsToWait($perClient);
+            }
         }
 
         // The same normalisation the registration compares addresses with, or a caller
         // buys a fresh budget by changing the case of one letter.
-        return $this->perAddressLimiter
+        $perAddress = $this->perAddressLimiter
             ->create(hash('sha256', EmailAddress::normalize($email)))
-            ->consume()
-            ->isAccepted();
+            ->consume();
+
+        return $perAddress->isAccepted() ? null : self::secondsToWait($perAddress);
+    }
+
+    private static function secondsToWait(RateLimit $refusal): int
+    {
+        return max(1, $refusal->getRetryAfter()->getTimestamp() - time());
     }
 }
