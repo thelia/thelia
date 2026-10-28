@@ -87,7 +87,7 @@ final class ApiContractExampleTest extends TestCase
         $notice = AiComplianceStatus::evaluate($chat, noticeShown: false, provenanceMarked: true);
         self::assertSame([ComplianceState::NotMet], self::states($notice));
         self::assertSame(AiActObligation::Interaction, $notice[0]->obligation);
-        self::assertStringContainsString('article 50(1)', $notice[0]->message);
+        self::assertStringContainsString('article 50 of the EU AI Act', $notice[0]->message);
         self::assertSame(['%usage%' => 'commerceagents.shopping_assistant'], $notice[0]->parameters);
         self::assertSame([ComplianceState::NotMet], self::states(AiComplianceStatus::evaluate($page, noticeShown: true, provenanceMarked: false)));
         self::assertSame(AiActObligation::GeneratedContent, AiComplianceStatus::evaluate($page, true, true)[0]->obligation);
