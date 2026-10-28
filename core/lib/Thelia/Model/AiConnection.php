@@ -25,4 +25,24 @@ use Thelia\Model\Base\AiConnection as BaseAiConnection;
  */
 class AiConnection extends BaseAiConnection
 {
+    /**
+     * Whether a key can be found: one stored encrypted, or one in the environment variable the connection names.
+     * Says nothing of the key itself.
+     */
+    public function getHasKey(): bool
+    {
+        if (null !== $this->getApiKeyEncrypted() && '' !== $this->getApiKeyEncrypted()) {
+            return true;
+        }
+
+        $name = (string) $this->getApiKeyEnv();
+
+        if ('' === $name) {
+            return false;
+        }
+
+        $value = $_SERVER[$name] ?? $_ENV[$name] ?? getenv($name);
+
+        return \is_string($value) && '' !== trim($value);
+    }
 }

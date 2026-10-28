@@ -16,6 +16,7 @@ namespace Thelia\Api\Security;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Api\Resource\Address;
+use Thelia\Api\Resource\AiConnection;
 use Thelia\Api\Resource\Attribute;
 use Thelia\Api\Resource\AttributeAv;
 use Thelia\Api\Resource\AttributeCombination;
@@ -198,6 +199,7 @@ final readonly class AdminApiResourcePermissions
         TaxRule::class => AdminResources::TAX,
         TaxRuleCountry::class => AdminResources::TAX,
         Template::class => AdminResources::TEMPLATE,
+        AiConnection::class => AdminResources::AI,
         WebhookDelivery::class => AdminResources::WEBHOOK,
         WebhookSubscription::class => AdminResources::WEBHOOK,
     ];
