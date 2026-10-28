@@ -40,7 +40,8 @@ use Thelia\Model\AiBudgetReservationQuery;
  * the gateway outside long transactions.
  *
  * A refusal never rolls back: a nested rollback would mark the transaction of the caller as unable to commit.
- * Amounts are all in USD, whatever `ai_usage_setting.currency` says: the layer converts nothing.
+ * Amounts are added as they are written, in the currency of the prices that produced them, whatever
+ * `ai_usage_setting.currency` says: the layer converts nothing.
  *
  * @internal
  */
