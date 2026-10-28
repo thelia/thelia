@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\Ai\AiTier;
 use Thelia\Model\Base\AiUsageSetting as BaseAiUsageSetting;
 
 /**
@@ -25,6 +26,14 @@ use Thelia\Model\Base\AiUsageSetting as BaseAiUsageSetting;
  */
 class AiUsageSetting extends BaseAiUsageSetting
 {
+    /**
+     * The range the merchant chose for the usage, the one the module declared when none is chosen or the stored value is not a range.
+     */
+    public function effectiveTier(AiTier $declared): AiTier
+    {
+        return AiTier::tryFrom((string) $this->getTier()) ?? $declared;
+    }
+
     /**
      * The optional guardrails of the usage, guardrail name to mode; empty when none is chosen or the stored text is not a JSON object.
      *

@@ -58,6 +58,7 @@ final readonly class AiUsageRegisterProvider implements ProviderInterface
         $usage->purpose = $row['purpose'];
         $usage->audience = $row['audience'];
         $usage->tier = $row['tier'];
+        $usage->declaredTier = $row['declared_tier'];
         $usage->transparency = $row['transparency'];
         $usage->active = $row['active'];
         $usage->noticeEnabled = $row['notice_enabled'];
