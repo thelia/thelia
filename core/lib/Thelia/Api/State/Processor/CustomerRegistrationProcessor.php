@@ -70,10 +70,6 @@ final readonly class CustomerRegistrationProcessor implements ProcessorInterface
             context: $context,
         );
 
-        if ($resource instanceof CustomerResource) {
-            $resource->confirmationToken = null;
-        }
-
-        return $resource;
+        return $resource instanceof CustomerResource ? $resource : throw new \LogicException('The registration did not produce a customer resource.');
     }
 }
