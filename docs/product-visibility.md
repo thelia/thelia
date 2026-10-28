@@ -115,7 +115,7 @@ shut out until an administrator edits the list or lifts the restriction in the b
 through the API or the back office clears the flag instead, and opens the whole catalog again.
 
 A product is visible when at least one of its categories is open. A product filed in no category stays visible to every
-group, as before the groups existed: a merchant who files nothing restricts nothing. The list of one group never opens
+group, as before the groups existed, since a product filed nowhere falls under no restriction. The list of one group never opens
 nor closes anything to another group.
 
 An example, the tree Living Room > [Armchairs, Sofas], Dining Room > [Chairs, Stools], the professionals listing Sofas:
@@ -140,7 +140,7 @@ when the group is not restricted). It is read by:
 - `ClosedCategoryProductRule`, joined by `ProductVisibility` with the rules above: the product rule, also applied to the
   product links of a category (`/api/front/product_categories/{product}/categories/{category}`);
 - the Flexy sitemap, for the default group: `ProductVisibility::visibleProductClauseForDefaultVisitor()` gives the product
-  condition whoever generates the file, so the categories of a restricted member never shape it.
+  condition whoever generates the file. The categories of a restricted member never shape it, and a customer named on a private drop does not add its products to it.
 
 ## The data access cache
 
