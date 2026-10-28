@@ -324,6 +324,28 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         self::assertSame(AiActorType::Admin, $context?->actor->type);
     }
 
+    public function testAnAmendmentThatOnlyLooksEqualToTheOriginalIsStillAnAmendment(): void
+    {
+        $id = $this->propose(7, '1000');
+        $this->logInAsAdmin($this->approver);
+
+        $view = $this->approvals->approve($id, ['value' => '1e3', 'id' => 7]);
+
+        self::assertTrue($view->amended);
+        self::assertSame('1e3', ProbeToolState::$lastChange?->arguments['value'] ?? null);
+    }
+
+    public function testTheSameArgumentsInAnotherKeyOrderAreNotAnAmendment(): void
+    {
+        $id = $this->propose();
+        $this->logInAsAdmin($this->approver);
+
+        $view = $this->approvals->approve($id, ['value' => 'new', 'id' => 7]);
+
+        self::assertFalse($view->amended);
+        self::assertSame(0, ProbeToolState::$proposeCalls);
+    }
+
     public function testAnAmendmentThatBreaksTheSchemaIsRefusedBeforeAnythingIsDecided(): void
     {
         $id = $this->propose();
