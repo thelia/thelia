@@ -1,0 +1,69 @@
+{
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "url": "https://api.mistral.ai/v1/chat/completions",
+                "signature": "5878e9b78f9014f2ddfc026706eb3a53",
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "accept": [
+                        "application/json"
+                    ],
+                    "authorization": [
+                        "[redacted]"
+                    ]
+                },
+                "body": "{\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"get_weather\",\"description\":\"Get the current weather for a location\",\"parameters\":{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"The city, e.g. Paris\"}},\"required\":[\"location\"]}}}],\"tool_choice\":\"any\",\"messages\":[{\"role\":\"user\",\"content\":\"What is the weather in Paris?\"}],\"model\":\"mistral-large-latest\"}"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-max-retry-attempts-reached": [
+                        "false"
+                    ],
+                    "x-ratelimit-limit-tokens-minute": [
+                        "400000"
+                    ],
+                    "x-ratelimit-remaining-tokens-minute": [
+                        "399845"
+                    ],
+                    "x-ratelimit-tokens-query-cost": [
+                        "96"
+                    ],
+                    "x-ratelimit-limit-req-minute": [
+                        "15"
+                    ],
+                    "x-ratelimit-remaining-req-minute": [
+                        "12"
+                    ],
+                    "server": [
+                        "cloudflare"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "set-cookie": [
+                        "[redacted]"
+                    ],
+                    "strict-transport-security": [
+                        "max-age=15552000; includeSubDomains; preload"
+                    ],
+                    "x-content-type-options": [
+                        "nosniff"
+                    ],
+                    "content-encoding": [
+                        "gzip"
+                    ]
+                },
+                "body_format": "json",
+                "body": "{\"id\":\"43233ead680145268be8e914e4efb5e0\",\"created\":1786820847,\"model\":\"mistral-large-latest\",\"usage\":{\"prompt_tokens\":84,\"total_tokens\":96,\"completion_tokens\":12,\"prompt_tokens_details\":{\"cached_tokens\":0},\"service_tier\":\"standard\"},\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"finish_reason\":\"tool_calls\",\"message\":{\"role\":\"assistant\",\"tool_calls\":[{\"id\":\"aq1aPdShN\",\"type\":\"function\",\"function\":{\"name\":\"get_weather\",\"arguments\":\"{\\\"location\\\": \\\"Paris\\\"}\"},\"index\":0}],\"content\":\"\"}}]}"
+            }
+        }
+    ]
+}

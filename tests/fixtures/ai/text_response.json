@@ -1,0 +1,69 @@
+{
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "url": "https://api.mistral.ai/v1/chat/completions",
+                "signature": "2f7aa779f103549fae4561269691286d",
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "accept": [
+                        "application/json"
+                    ],
+                    "authorization": [
+                        "[redacted]"
+                    ]
+                },
+                "body": "{\"messages\":[{\"role\":\"user\",\"content\":\"Hello\"}],\"model\":\"mistral-large-latest\"}"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-max-retry-attempts-reached": [
+                        "false"
+                    ],
+                    "x-ratelimit-limit-tokens-minute": [
+                        "400000"
+                    ],
+                    "x-ratelimit-remaining-tokens-minute": [
+                        "399960"
+                    ],
+                    "x-ratelimit-tokens-query-cost": [
+                        "40"
+                    ],
+                    "x-ratelimit-limit-req-minute": [
+                        "15"
+                    ],
+                    "x-ratelimit-remaining-req-minute": [
+                        "14"
+                    ],
+                    "server": [
+                        "cloudflare"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "set-cookie": [
+                        "[redacted]"
+                    ],
+                    "strict-transport-security": [
+                        "max-age=15552000; includeSubDomains; preload"
+                    ],
+                    "x-content-type-options": [
+                        "nosniff"
+                    ],
+                    "content-encoding": [
+                        "gzip"
+                    ]
+                },
+                "body_format": "json",
+                "body": "{\"id\":\"5248f14cf2974cc29282cb6585a03296\",\"created\":1786820845,\"model\":\"mistral-large-latest\",\"usage\":{\"prompt_tokens\":4,\"total_tokens\":40,\"completion_tokens\":36,\"prompt_tokens_details\":{\"cached_tokens\":0},\"service_tier\":\"standard\"},\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"finish_reason\":\"stop\",\"message\":{\"role\":\"assistant\",\"tool_calls\":null,\"content\":\"Hello! 😊 How can I assist you today? Whether you have a question, need help with something, or just want to chat, I'm here for you!\"}}]}"
+            }
+        }
+    ]
+}
