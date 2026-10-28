@@ -19,6 +19,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\AiConnection;
 use Thelia\Model\AiModelQuery;
 use Thelia\Model\AiTierAssignmentQuery;
+use Thelia\Model\AiUsageSetting;
 use Thelia\Test\ApiTestCase;
 
 final class AiModelApiTest extends ApiTestCase
@@ -174,6 +175,24 @@ final class AiModelApiTest extends ApiTestCase
         self::assertSame('mistral', AiModelQuery::create()->findPk($modelId)->getProvider());
         self::assertNull(AiModelQuery::create()->findPk($modelId)->getConnectionId());
         self::assertSame(200, $this->jsonRequest('PATCH', self::MODELS.'/'.$modelId, ['connectionId' => $connection->getId()], $token, 'merge-patch+json')->getStatusCode());
+    }
+
+    public function testAModelAUsageIsPinnedToKeepsTheProviderOfTheConnectionOfItsTier(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $connection = $this->connection('mistral-tier');
+        $other = $this->connection('mistral-other');
+        $tierModelId = json_decode((string) $this->jsonRequest('POST', self::MODELS, $this->model(['name' => 'tier-model']), $token)->getContent(), true)['id'];
+        self::assertSame(201, $this->jsonRequest('POST', self::TIERS, ['tier' => 'advanced', 'connectionId' => $connection->getId(), 'modelId' => $tierModelId], $token)->getStatusCode());
+
+        $pinnedModelId = json_decode((string) $this->jsonRequest('POST', self::MODELS, $this->model(['name' => 'pinned-model']), $token)->getContent(), true)['id'];
+        (new AiUsageSetting())->setUsageId('test.pinned_model')->setTier('advanced')->setPinnedModelId($pinnedModelId)->save();
+
+        $provider = $this->jsonRequest('PATCH', self::MODELS.'/'.$pinnedModelId, ['provider' => 'anthropic'], $token, 'merge-patch+json');
+
+        self::assertSame(422, $provider->getStatusCode(), (string) $provider->getContent());
+        self::assertSame('mistral', AiModelQuery::create()->findPk($pinnedModelId)->getProvider());
+        self::assertSame(200, $this->jsonRequest('PATCH', self::MODELS.'/'.$pinnedModelId, ['connectionId' => $other->getId()], $token, 'merge-patch+json')->getStatusCode(), 'bound to a connection that serves it, the usage reaches it there');
     }
 
     public function testNoTokenIsRefused(): void
