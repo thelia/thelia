@@ -61,6 +61,7 @@ use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\Cache\ConfigCacheService;
+use Thelia\Core\DependencyInjection\Compiler\RegisterAiToolPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\DependencyInjection\LoggingDefaults;
@@ -85,6 +86,9 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Ai\AsAiUsage;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailInterface;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
+use Thelia\Domain\Ai\Tool\AiReadToolInterface;
+use Thelia\Domain\Ai\Tool\AiWriteToolInterface;
+use Thelia\Domain\Ai\Tool\AsAiTool;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
@@ -696,6 +700,19 @@ class TheliaKernel extends Kernel
                 $definition->addTag(RegisterAiUsagePass::TAG);
             },
         );
+
+        // A service that carries #[AsAiTool] declares a tool of the AI registry (RegisterAiToolPass checks the declaration);
+        // one that implements a tool interface without the attribute stops the build, so that no tool stays invisible by mistake.
+        $container->registerAttributeForAutoconfiguration(
+            AsAiTool::class,
+            static function (ChildDefinition $definition): void {
+                $definition->addTag(RegisterAiToolPass::TAG);
+            },
+        );
+        $container->registerForAutoconfiguration(AiReadToolInterface::class)
+            ->addTag(RegisterAiToolPass::INTERFACE_TAG);
+        $container->registerForAutoconfiguration(AiWriteToolInterface::class)
+            ->addTag(RegisterAiToolPass::INTERFACE_TAG);
 
         // The optional guardrails of the AI layer: a module only implements the interface (AiGuardrailRunner reads the tag).
         $container->registerForAutoconfiguration(AiGuardrailInterface::class)

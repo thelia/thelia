@@ -24,6 +24,7 @@ use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\HandledMessageClassesPass;
 use Thelia\Core\DependencyInjection\Compiler\LoopCompilerPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterAiToolPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterApiResourceAddonPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
@@ -86,6 +87,7 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterFormPass())
             ->addCompilerPass(new RegisterApiResourceAddonPass())
             ->addCompilerPass(new RegisterAiUsagePass())
+            ->addCompilerPass(new RegisterAiToolPass())
             // After MessengerPass, which registers the handlers it reads.
             ->addCompilerPass(new HandledMessageClassesPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
 
