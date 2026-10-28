@@ -46,12 +46,7 @@ final readonly class AiExternalCost
         public ?AiActor $actor = null,
     ) {
         AiAssert::usageId($usageId);
-        AiAssert::token($provider, 'The provider of an external cost');
-
-        if (mb_strlen($provider) > self::PROVIDER_MAXIMUM_LENGTH) {
-            throw new Exception\InvalidAiArgumentException(\sprintf('The provider of an external cost holds at most %d characters.', self::PROVIDER_MAXIMUM_LENGTH));
-        }
-
+        self::assertProvider($provider);
         AiAssert::notBlank($operation, 'The operation of an external cost');
         AiAssert::decimal($cost, 'The cost');
         AiAssert::currency($currency);
@@ -66,6 +61,21 @@ final readonly class AiExternalCost
 
         if (null !== $correlationId) {
             AiAssert::token($correlationId, 'A correlation identifier');
+        }
+    }
+
+    /**
+     * The rule of a provider name, shared with the hold taken before the call: a hold whose provider the cost
+     * would refuse could never be settled.
+     *
+     * @throws Exception\InvalidAiArgumentException
+     */
+    public static function assertProvider(string $provider): void
+    {
+        AiAssert::token($provider, 'The provider of an external cost');
+
+        if (mb_strlen($provider) > self::PROVIDER_MAXIMUM_LENGTH) {
+            throw new Exception\InvalidAiArgumentException(\sprintf('The provider of an external cost holds at most %d characters.', self::PROVIDER_MAXIMUM_LENGTH));
         }
     }
 }

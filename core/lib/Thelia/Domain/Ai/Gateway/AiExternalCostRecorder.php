@@ -73,7 +73,7 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
     public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0'): void
     {
         $usage = $this->usages->get($usageId);
-        AiAssert::token($provider, 'The provider of an external cost');
+        AiExternalCost::assertProvider($provider);
         AiAssert::decimal($maximumCost, 'The maximum cost');
 
         if (!$this->usages->isActive($usage->id)) {

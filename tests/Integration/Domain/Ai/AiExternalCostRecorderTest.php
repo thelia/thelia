@@ -23,6 +23,7 @@ use Thelia\Domain\Ai\AiUsageLogStatus;
 use Thelia\Domain\Ai\Exception\AiBudgetExceededException;
 use Thelia\Domain\Ai\Exception\AiJurisdictionRefusedException;
 use Thelia\Domain\Ai\Exception\InactiveAiUsageException;
+use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Gateway\AiExternalCostRecorder;
 use Thelia\Domain\Ai\Log\AiUsageLogWriter;
@@ -119,6 +120,19 @@ final class AiExternalCostRecorderTest extends AiGatewayTestCase
         $this->recorder->authorize('aiprobe.scoring', 'typesafe', AiJurisdiction::EuropeanUnion, '1');
 
         self::assertSame(1, $this->holds());
+    }
+
+    public function testAProviderNameTheCostWouldRefuseIsRefusedBeforeAnythingIsHeld(): void
+    {
+        $provider = str_repeat('p', AiExternalCost::PROVIDER_MAXIMUM_LENGTH + 1);
+
+        try {
+            $this->recorder->authorize('aiprobe.scoring', $provider, AiJurisdiction::EuropeanUnion, '0.5');
+            self::fail('A provider name longer than the cost allows is refused.');
+        } catch (InvalidAiArgumentException) {
+        }
+
+        self::assertSame(0, $this->holds());
     }
 
     public function testTheHighestCostOfTheCallIsHeldUntilTheCostIsRecorded(): void
