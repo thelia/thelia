@@ -73,7 +73,7 @@ final readonly class AiToolApprovalRepository
      *
      * @param array{arguments: string, summary: string, before: string, after: string}|null $amendment
      *
-     * @return bool false when the row was no longer pending: another decision won
+     * @return bool false when the row was no longer pending or has expired: another decision won, or the time ran out
      */
     public function claim(int $approvalId, int $adminId, string $adminLogin, ?array $amendment, \DateTimeImmutable $now): bool
     {
@@ -85,7 +85,7 @@ final readonly class AiToolApprovalRepository
             $parameters += [':arguments' => $amendment['arguments'], ':summary' => $amendment['summary'], ':before' => $amendment['before'], ':after' => $amendment['after']];
         }
 
-        return 1 === $this->update('UPDATE `ai_tool_approval` SET '.$set.' WHERE `id` = :id AND `status` = :pending', $parameters);
+        return 1 === $this->update('UPDATE `ai_tool_approval` SET '.$set.' WHERE `id` = :id AND `status` = :pending AND `expires_at` > :now', $parameters);
     }
 
     /**
@@ -105,7 +105,7 @@ final readonly class AiToolApprovalRepository
     public function reject(int $approvalId, int $adminId, string $adminLogin, ?string $note, \DateTimeImmutable $now): bool
     {
         return 1 === $this->update(
-            'UPDATE `ai_tool_approval` SET `status` = :rejected, `decided_by_admin_id` = :admin, `decided_by_admin_login` = :login, `decided_at` = :now, `decision_note` = :note, `updated_at` = :now WHERE `id` = :id AND `status` = :pending',
+            'UPDATE `ai_tool_approval` SET `status` = :rejected, `decided_by_admin_id` = :admin, `decided_by_admin_login` = :login, `decided_at` = :now, `decision_note` = :note, `updated_at` = :now WHERE `id` = :id AND `status` = :pending AND `expires_at` > :now',
             [':rejected' => AiToolApprovalStatus::Rejected->value, ':admin' => $adminId, ':login' => $adminLogin, ':now' => $this->time($now), ':note' => null === $note ? null : mb_strimwidth($note, 0, self::TEXT_LENGTH), ':id' => $approvalId, ':pending' => AiToolApprovalStatus::Pending->value],
         );
     }
