@@ -127,7 +127,8 @@ final class AiRotateKeysCommandTest extends IntegrationTestCase
         $definition = (new Application(self::$kernel))->find('thelia:ai:rotate-keys')->getDefinition();
 
         self::assertSame([], array_keys($definition->getArguments()));
-        self::assertFalse((new Application(self::$kernel))->find('thelia:ai:rotate-keys')->getDefinition()->hasOption('secret') || $definition->hasOption('previous-secret'));
+        self::assertFalse($definition->hasOption('secret'));
+        self::assertFalse($definition->hasOption('previous-secret'));
     }
 
     /**
