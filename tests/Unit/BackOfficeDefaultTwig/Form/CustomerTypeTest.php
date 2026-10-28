@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\BackOfficeDefaultTwig\Form;
 
 use BackOfficeDefaultTwigBundle\Form\Customer\CustomerType;
+use BackOfficeDefaultTwigBundle\Service\CustomerGroup\PostedCustomerGroupIds;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -33,6 +34,15 @@ final class CustomerTypeTest extends TestCase
     ];
 
     private const IDENTITY_FIELDS = ['title', 'firstname', 'lastname', 'email', 'lang_id', 'discount', 'reseller'];
+
+    protected function setUp(): void
+    {
+        // The core and the back-office theme ship in separate releases: a checkout of the
+        // core runs with a theme that may not carry the customer group field yet.
+        if (!class_exists(PostedCustomerGroupIds::class)) {
+            self::markTestSkipped('The back-office theme installed predates the customer groups.');
+        }
+    }
 
     public function testAddressFieldsArePresentByDefault(): void
     {
