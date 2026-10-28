@@ -82,18 +82,35 @@ The price compared is the one the product card shows:
   product by product since a tax can read a feature of the product, unless their group is shown
   untaxed prices: the slider is then drawn on untaxed ones.
 
-Prices are computed in PHP and kept for the request. Narrowing the listing adds a condition on
+Prices are computed in PHP for the products the query holds when the filter applies, and kept for the request. Narrowing the listing adds a condition on
 the product ids and joins nothing, so the order the listing is sorted in is untouched.
 
 ### Price sort
 
-`untaxed_price_order` (`ProductPriceOrderFilter`) sorts in SQL on the public catalog price of
-the default combination, in the currency browsed. The price of a customer group, a rule, a
-reserved sale or a discount is resolved per customer in PHP and is not in the database: the sort
-leaves them out, whoever asks, where the slider above and the cards show them
-(`tests/Api/Front/ProductPriceOrderApiTest.php`). The `min_price` and `max_price` orders and
-filters of the `product` loop have the same limit
-(`tests/Integration/Core/Template/ProductLoopCustomerPriceTest.php`).
+`untaxed_price_order` on `GET /api/front/products` sorts on the untaxed price the visitor pays for the default
+combination, in the currency browsed: the price of their group, the promotional price, the rules and reserved sales in
+force, the sale unit, and the discounts of their group and of their own.
+
+- Where the order cannot differ from the public one for this visitor, the database sorts (see
+  `PricingActivityChecker::mayOrderDifferFromThePublicPrice()`): the group of the visitor (the default group for a visitor
+  with no account, a guest or a console command) has no price or discount of its own, no rule or reserved sale names them,
+  and no sale unit prices. A group that prices for its own members does not count for the others, nor does the discount
+  of the customer alone, a rate every price gets alike. `ProductPublicPriceOrder` orders on the public price, which
+  follows the promotional price and the public catalog price rule in force.
+- Otherwise `ProductPriceSortExtension` takes the whole narrowed collection. `VisitorPriceReader` prices it, and the
+  extension sorts and paginates it (`hydra:totalItems` is unchanged), through `PresortedPropelModelPager`.
+- Past `THELIA_API_PRODUCT_PRICE_SORT_MAX_PRODUCTS` products (5000 by default), the collection is sorted in SQL on the
+  public price.
+- Combined with another `order[...]`, the price is the first key.
+- A page past the last one answers the last one, on both ways, as the pager of the database does.
+- On `/api/admin/products` the order stays on the catalog `price` of the default combination, in SQL
+  (`ProductPublicPriceOrder::applyCatalogPrice()`): neither the promotional price nor a rule is read.
+  `tests/Api/Admin/ProductPriceOrderAdminApiTest.php` freezes it.
+
+The sort is on untaxed prices: with mixed tax rates, the order of the taxed prices of the cards can differ. The
+`min_price` and `max_price` orders and filters of the `product` loop stay on the public catalog price
+(`tests/Integration/Core/Template/ProductLoopCustomerPriceTest.php`). The API sort is covered by
+`tests/Api/Front/ProductPriceOrderApiTest.php`.
 
 ## Tests
 
