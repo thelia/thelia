@@ -3402,6 +3402,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column description="the provider that serves the model, as in ai_connection.provider" name="provider" required="true" size="32" type="VARCHAR" />
     <column description="the identifier the provider gives the model" name="name" required="true" size="128" type="VARCHAR" />
+    <column description="the connection this model belongs to (a self-hosted or compatible endpoint), empty for the catalogue of the provider" name="connection_id" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column defaultValue="0" description="price of a million input tokens, in currency" name="input_price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0" description="price of a million output tokens, in currency" name="output_price" required="true" scale="6" size="16" type="DECIMAL" />
@@ -3416,9 +3417,16 @@
     <column defaultValue="1" name="supports_streaming" required="true" type="BOOLEAN" />
     <column defaultValue="catalog" description="catalog: from the embedded price list; manual: added or edited by the administrator" name="source" required="true" size="16" type="VARCHAR" />
     <column defaultValue="1" name="active" required="true" type="BOOLEAN" />
-    <unique name="ai_model_provider_name_UNIQUE">
+    <foreign-key foreignTable="ai_connection" name="fk_ai_model_connection_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="connection_id" />
+    </foreign-key>
+    <index name="idx_ai_model_connection_id">
+      <index-column name="connection_id" />
+    </index>
+    <unique name="ai_model_provider_name_connection_UNIQUE">
       <unique-column name="provider" />
       <unique-column name="name" />
+      <unique-column name="connection_id" />
     </unique>
     <behavior name="timestampable" />
   </table>
