@@ -222,6 +222,27 @@ final class AiMcpServerTest extends ApiTestCase
         self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testABatchOfCallsIsRefusedBeforeTheSdkAndProposesNothing(): void
+    {
+        $session = $this->session($this->token($this->editor, [['resource' => 'admin.product', 'access' => 'VIEW'], ['resource' => 'admin.product', 'access' => 'UPDATE']]));
+        $write = fn (int $id): array => ['jsonrpc' => '2.0', 'id' => $id, 'method' => 'tools/call', 'params' => ['name' => 'thelia_update_product_price', 'arguments' => ['pse_id' => $this->pse->getId(), 'price' => '9.00']]];
+
+        $response = $this->postBody($session['token'], json_encode([$write(10), $write(11)], \JSON_THROW_ON_ERROR), $session['id']);
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(-32600, json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR)['error']['code']);
+        self::assertSame(0, AiToolApprovalQuery::create()->count());
+    }
+
+    public function testABatchIsRefusedWhateverTheLeadingWhitespace(): void
+    {
+        $session = $this->session($this->token($this->reader, [['resource' => 'admin.product', 'access' => 'VIEW']]));
+
+        $response = $this->postBody($session['token'], " \n\t[]", $session['id']);
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
     /**
      * @param list<array<string, string>> $scopes
      */
@@ -288,6 +309,20 @@ final class AiMcpServerTest extends ApiTestCase
         }
 
         $this->client->request('POST', '/api/mcp', server: $server, content: json_encode($message, \JSON_THROW_ON_ERROR));
+
+        return $this->client->getResponse();
+    }
+
+    private function postBody(string $token, string $body, ?string $sessionId = null): Response
+    {
+        $server = ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json, text/event-stream', 'HTTP_AUTHORIZATION' => 'Bearer '.$token];
+
+        if (null !== $sessionId) {
+            $server['HTTP_MCP_SESSION_ID'] = $sessionId;
+            $server['HTTP_MCP_PROTOCOL_VERSION'] = self::PROTOCOL;
+        }
+
+        $this->client->request('POST', '/api/mcp', server: $server, content: $body);
 
         return $this->client->getResponse();
     }
