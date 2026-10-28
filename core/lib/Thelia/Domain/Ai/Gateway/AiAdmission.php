@@ -100,7 +100,7 @@ final readonly class AiAdmission
         $this->assertModelCan($usage, $target);
 
         // Who is asking is looked up here, before the first refusal that has to name them in the log.
-        $actor = $request->actor ?? $this->actors->resolve();
+        $actor = $request->actor ?? $this->actors->resolve($usage->audience);
         $actorHash = $this->hasher->hash($actor);
         $effective = self::withLimits($request, $request->actor, $this->outputLimit($request, $setting?->getMaxOutputTokens(), $target));
         // A guardrail may call a third party: it gets the real type of the actor and its hash, never the identifier.

@@ -15,10 +15,15 @@ declare(strict_types=1);
 namespace Thelia\Domain\Ai;
 
 /**
- * Finds who a call is made for, without assuming an HTTP request exists: the logged-in administrator, then
- * the logged-in customer, then the visitor by session or IP address; in a command or a worker, the system.
+ * Finds who a call is made for, without assuming an HTTP request exists: the logged-in administrator (unless the usage
+ * is for the public or for customers), then the logged-in customer, then the visitor by session or IP address; in a command or a worker, the system.
  */
 interface AiActorResolverInterface
 {
-    public function resolve(): AiActor;
+    /**
+     * @param AiAudience|null $audience the audience of the usage the call serves: a `public` or `customer` usage never
+     *                                  resolves an administrator, whoever is signed in (a chat of the shop is not an
+     *                                  action of the back office); without it, the administrator comes first
+     */
+    public function resolve(?AiAudience $audience = null): AiActor;
 }

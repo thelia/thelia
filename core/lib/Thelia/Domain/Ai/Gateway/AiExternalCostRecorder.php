@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Ai\Gateway;
 
 use Thelia\Domain\Ai\AiActorResolverInterface;
+use Thelia\Domain\Ai\AiAudience;
 use Thelia\Domain\Ai\AiCostRecorderInterface;
 use Thelia\Domain\Ai\AiExternalCost;
 use Thelia\Domain\Ai\AiJurisdiction;
@@ -80,7 +81,7 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
         }
 
         if ($this->globalSettings->isEuropeanUnionOnly() && AiJurisdiction::EuropeanUnion !== $jurisdiction) {
-            $this->refuse($usage->id, $provider, $jurisdiction, 'jurisdiction', []);
+            $this->refuse($usage->id, $usage->audience, $provider, $jurisdiction, 'jurisdiction', []);
 
             throw new AiJurisdictionRefusedException($provider, $jurisdiction);
         }
@@ -89,7 +90,7 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
             $hold = $this->ledger->reserve($usage->id, $maximumCost, $this->settings->findByUsage($usage->id)?->getMonthlyBudget(), $this->globalSettings->monthlyCap());
         } catch (AiBudgetExceededException $exceeded) {
             $reason = $exceeded->globalCap ? 'budget_global' : 'budget';
-            $this->refuse($usage->id, $provider, $jurisdiction, $reason, [GuardrailVerdict::fail(CoreGuardrail::Budget->value, GuardrailStage::Input, $reason)]);
+            $this->refuse($usage->id, $usage->audience, $provider, $jurisdiction, $reason, [GuardrailVerdict::fail(CoreGuardrail::Budget->value, GuardrailStage::Input, $reason)]);
 
             throw $exceeded;
         }
@@ -99,9 +100,9 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
 
     public function record(AiExternalCost $cost): int
     {
-        $this->usages->get($cost->usageId);
+        $usage = $this->usages->get($cost->usageId);
 
-        $actor = $cost->actor ?? $this->actors->resolve();
+        $actor = $cost->actor ?? $this->actors->resolve($usage->audience);
         $key = self::key($cost->usageId, $cost->provider);
         $held = isset($this->pending[$key]) ? array_shift($this->pending[$key]) : null;
 
@@ -132,9 +133,9 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
     /**
      * @param list<GuardrailVerdict> $verdicts
      */
-    private function refuse(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $reason, array $verdicts): void
+    private function refuse(string $usageId, AiAudience $audience, string $provider, AiJurisdiction $jurisdiction, string $reason, array $verdicts): void
     {
-        $actor = $this->actors->resolve();
+        $actor = $this->actors->resolve($audience);
 
         $this->log->write(new AiLogEntry(
             usageId: $usageId,
