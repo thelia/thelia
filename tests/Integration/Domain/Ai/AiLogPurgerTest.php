@@ -154,7 +154,7 @@ final class AiLogPurgerTest extends IntegrationTestCase
         static::getContainer()->get('event_dispatcher')->dispatch($event, TheliaEvents::MAINTENANCE_PURGE);
 
         $lines = array_values(array_filter($event->getResults(), static fn (string $line): bool => str_contains($line, 'AI ')));
-        self::assertCount(3, $lines);
+        self::assertCount(7, $lines);
         self::assertStringContainsString('AI usage log (>36500 days):</comment> <info>0 to delete', $lines[0]);
         self::assertStringContainsString('1 to delete', $lines[2]);
 
