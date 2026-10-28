@@ -31,6 +31,17 @@ use Thelia\Test\IntegrationTestCase;
 
 final class SaleTypeTest extends IntegrationTestCase
 {
+    protected function setUp(): void
+    {
+        // The core and the back-office theme ship in separate releases: a checkout of the
+        // core runs with a theme that may not carry the customer group audience yet.
+        if (!class_exists(PostedCustomerGroupIds::class)) {
+            self::markTestSkipped('The back-office theme installed predates the customer groups.');
+        }
+
+        parent::setUp();
+    }
+
     /** A submission that saves a plain public sale with no countdown. */
     private const VALID_SUBMISSION = [
         'id' => '7',
