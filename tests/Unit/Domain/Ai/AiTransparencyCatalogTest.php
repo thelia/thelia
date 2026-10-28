@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Ai\Compliance\AiComplianceStatus;
 use Thelia\Domain\Ai\Guardrail\AiVerdictReasons;
+use Thelia\Domain\Ai\Service\AiFailureExplainer;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
 use Thelia\Domain\Ai\Twig\AiTransparencyExtension;
 
@@ -49,7 +50,7 @@ final class AiTransparencyCatalogTest extends TestCase
      */
     public static function texts(): iterable
     {
-        foreach ([AiUsageRegistry::TRANSPARENCY_NOTICE, ...AiComplianceStatus::sources(), ...AiVerdictReasons::sources(), ...AiTransparencyExtension::sources()] as $source) {
+        foreach (array_unique([AiUsageRegistry::TRANSPARENCY_NOTICE, ...AiComplianceStatus::sources(), ...AiVerdictReasons::sources(), ...AiFailureExplainer::sources(), ...AiTransparencyExtension::sources()]) as $source) {
             yield $source => [$source];
         }
     }
