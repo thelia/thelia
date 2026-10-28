@@ -186,6 +186,11 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         }
 
         $now = new \DateTimeImmutable();
+
+        if ($this->approvals->rejectIfProposerIsGone($approvalId, $now)) {
+            throw new AiToolApprovalException(AiToolApprovalFailure::NotPending, 'The administrator who made this proposal no longer exists: it was rejected.');
+        }
+
         $expiresAt = $row->getExpiresAt();
 
         if (!$expiresAt instanceof \DateTimeInterface || $expiresAt <= $now) {

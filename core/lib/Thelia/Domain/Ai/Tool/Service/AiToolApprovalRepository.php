@@ -147,6 +147,18 @@ final readonly class AiToolApprovalRepository
     }
 
     /**
+     * pending to rejected, for a proposal of an administrator who no longer exists (a mass deletion raises no event):
+     * the check runs when somebody decides on it.
+     */
+    public function rejectIfProposerIsGone(int $approvalId, \DateTimeImmutable $now): bool
+    {
+        return 1 === $this->update(
+            'UPDATE `ai_tool_approval` SET `status` = :rejected, `decision_note` = :note, `decided_at` = :now, `updated_at` = :now WHERE `id` = :id AND `status` = :pending AND `proposed_by_type` = :admin AND `proposed_by_admin_id` IS NULL',
+            [':rejected' => AiToolApprovalStatus::Rejected->value, ':note' => self::NOTE_ADMIN_DELETED, ':now' => $this->time($now), ':id' => $approvalId, ':pending' => AiToolApprovalStatus::Pending->value, ':admin' => AiActorType::Admin->value],
+        );
+    }
+
+    /**
      * The proposals made through a token that is revoked, still waiting.
      *
      * @return int the proposals rejected
