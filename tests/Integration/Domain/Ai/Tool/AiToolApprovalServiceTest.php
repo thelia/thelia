@@ -224,7 +224,7 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         $this->logInAsAdmin($this->approver);
         ProfileResourceQuery::create()->filterByProfileId($this->approver->getProfileId())->delete();
 
-        $this->assertRefused(AiToolApprovalFailure::Forbidden, fn () => $this->approvals->approve($id));
+        $this->assertRefused(AiToolApprovalFailure::NotFound, fn () => $this->approvals->approve($id));
         self::assertSame(0, ProbeToolState::$applyCalls);
     }
 
@@ -234,13 +234,65 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         $viewer = $this->createFixtureFactory()->restrictedAdmin([AdminResources::PRODUCT => [AccessManager::VIEW]]);
         $this->logInAsAdmin($viewer);
 
-        $this->assertRefused(AiToolApprovalFailure::Forbidden, fn () => $this->approvals->reject($id, 'no'));
+        $this->assertRefused(AiToolApprovalFailure::NotFound, fn () => $this->approvals->reject($id, 'no'));
+    }
+
+    public function testAForgedIdOfAProposalHeMayNotSeeAnswersLikeAnIdThatDoesNotExistAndMovesNothing(): void
+    {
+        $viewer = $this->createFixtureFactory()->restrictedAdmin([AdminResources::PRODUCT => [AccessManager::VIEW]]);
+        $this->logInAsAdmin($viewer);
+        $unknown = null;
+
+        try {
+            $this->approvals->approve(2000000000);
+        } catch (AiToolApprovalException $refusal) {
+            $unknown = $refusal;
+        }
+
+        self::assertNotNull($unknown);
+
+        $expired = $this->propose();
+        AiToolApprovalQuery::create()->filterById($expired)->update(['ExpiresAt' => new \DateTimeImmutable('-1 minute')]);
+        $orphan = $this->propose(8);
+        $this->approvalRows->claim($orphan, $this->approver->getId(), 'paul', null, new \DateTimeImmutable());
+        $orphanOfDeletedProposer = $this->propose(9, 'new', $this->createFixtureFactory()->admin(['login' => 'gone'])->getId());
+        \Thelia\Model\AdminQuery::create()->filterByLogin('gone')->delete();
+
+        $before = [];
+
+        foreach ([$expired, $orphan, $orphanOfDeletedProposer] as $id) {
+            $row = AiToolApprovalQuery::create()->findPk($id);
+            $before[$id] = [$row?->getStatus(), $row?->getExpiresAt()?->format('c'), $row?->getUpdatedAt()?->format('c')];
+        }
+
+        foreach ([
+            'approve' => fn (int $id) => $this->approvals->approve($id),
+            'reject' => fn (int $id) => $this->approvals->reject($id, 'no'),
+            'markFailed' => fn (int $id) => $this->approvals->markFailed($id, 'no'),
+        ] as $decision => $call) {
+            foreach ([$expired, $orphan, $orphanOfDeletedProposer] as $id) {
+                try {
+                    $call($id);
+                    self::fail($decision.' was not refused.');
+                } catch (AiToolApprovalException $refusal) {
+                    self::assertSame($unknown->reason, $refusal->reason, $decision.' '.$id);
+                    self::assertSame($unknown->getMessage(), $refusal->getMessage(), $decision.' '.$id);
+                }
+            }
+        }
+
+        \Thelia\Model\Map\AiToolApprovalTableMap::clearInstancePool();
+
+        foreach ($before as $id => $state) {
+            $row = AiToolApprovalQuery::create()->findPk($id);
+            self::assertSame($state, [$row?->getStatus(), $row?->getExpiresAt()?->format('c'), $row?->getUpdatedAt()?->format('c')], 'proposal '.$id.' was touched');
+        }
     }
 
     public function testAToolThatNowAsksForAnotherRightIsGone(): void
     {
         $id = $this->propose();
-        AiToolApprovalQuery::create()->filterById($id)->update(['AclAccess' => 'DELETE']);
+        AiToolApprovalQuery::create()->filterById($id)->update(['AclAccess' => 'VIEW']);
         $this->logInAsAdmin($this->approver);
 
         $this->assertRefused(AiToolApprovalFailure::ToolGone, fn () => $this->approvals->approve($id));
