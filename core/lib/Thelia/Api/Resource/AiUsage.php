@@ -26,6 +26,9 @@ use Thelia\Api\State\Provider\AiUsageRegisterProvider;
  * AI Act duties in plain language. Read only: it is the register of the shop. The compliance messages come in
  * the language of the optional `locale` query parameter. Administration only, under the right
  * `admin.configuration.ai`.
+ *
+ * `tier` is the range the usage runs on, the one the merchant chose or else the one the module declared in
+ * `declaredTier`.
  */
 #[ApiResource(
     operations: [
@@ -61,6 +64,9 @@ final class AiUsage
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public string $tier = '';
+
+    #[Groups([self::GROUP_ADMIN_READ])]
+    public string $declaredTier = '';
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public string $transparency = '';

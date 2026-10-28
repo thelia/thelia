@@ -23,7 +23,7 @@ namespace Thelia\Domain\Ai\Service;
  */
 final readonly class AiUsageRegisterExport
 {
-    public const array COLUMNS = ['id', 'module', 'purpose', 'audience', 'tier', 'transparency', 'notice_enabled', 'provenance_mark_enabled', 'active', 'compliance', 'jurisdiction'];
+    public const array COLUMNS = ['id', 'module', 'purpose', 'audience', 'tier', 'declared_tier', 'transparency', 'notice_enabled', 'provenance_mark_enabled', 'active', 'compliance', 'jurisdiction'];
 
     /**
      * @param list<array<string, mixed>> $rows

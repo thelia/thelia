@@ -30,7 +30,8 @@ use Thelia\Model\AiModel;
 /**
  * The connection and the model a usage runs on.
  *
- * The model pinned to the usage wins; without one, the model the merchant gave to the tier of the usage.
+ * The model pinned to the usage wins; without one, the model the merchant gave to the tier of the usage: the tier
+ * the merchant chose for it, else the one the module declared.
  * A connection pinned to the usage replaces the one of the tier, and keeps the model of the tier only when
  * both belong to the same provider. The connection must be active; the key comes from the vault and the
  * jurisdiction from the provider and the address (the one the administrator declared, for a self-hosted or
@@ -58,7 +59,7 @@ final readonly class AiTargetResolver
     {
         $usage = $this->usages->get($usageId);
         $setting = $this->settings->findByUsage($usageId);
-        $assignment = $this->routing->tierAssignment($usage->tier);
+        $assignment = $this->routing->tierAssignment($setting?->effectiveTier($usage->tier) ?? $usage->tier);
 
         $tierConnection = null === $assignment?->getConnectionId() ? null : $this->routing->connection($assignment->getConnectionId());
         $tierModel = null === $assignment?->getModelId() ? null : $this->routing->model($assignment->getModelId());

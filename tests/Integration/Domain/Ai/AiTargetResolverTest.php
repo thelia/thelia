@@ -172,6 +172,35 @@ final class AiTargetResolverTest extends IntegrationTestCase
         $this->resolver->resolve('aiprobe.writing');
     }
 
+    public function testTheTierTheMerchantChoseForTheUsageReplacesTheOneTheModuleDeclared(): void
+    {
+        $connection = $this->connection('mistral-main', 'mistral', 'eu');
+        $this->assign(AiTier::Fast, $connection, $this->model('mistral', 'ministral-probe'));
+        $this->assign(AiTier::Advanced, $connection, $this->model('mistral', 'mistral-large-probe'));
+
+        self::assertSame('ministral-probe', $this->resolver->resolve('aiprobe.writing')->model->name);
+
+        $setting = (new AiUsageSetting())->setUsageId('aiprobe.writing')->setTier(AiTier::Advanced->value);
+        $setting->save();
+
+        self::assertSame('mistral-large-probe', $this->resolver->resolve('aiprobe.writing')->model->name);
+        self::assertSame('ministral-probe', $this->resolver->resolve('aiprobe.chat')->model->name, 'another usage keeps its own tier');
+
+        $setting->setTier('no-such-tier')->save();
+
+        self::assertSame('ministral-probe', $this->resolver->resolve('aiprobe.writing')->model->name, 'a stored value that is not a tier gives the declared one back');
+    }
+
+    public function testAChosenTierWithoutAssignmentStopsTheUsage(): void
+    {
+        $this->assign(AiTier::Fast, $this->connection('mistral-main', 'mistral', 'eu'), $this->model('mistral', 'ministral-probe'));
+        (new AiUsageSetting())->setUsageId('aiprobe.writing')->setTier(AiTier::Standard->value)->save();
+
+        $this->expectException(InactiveAiUsageException::class);
+
+        $this->resolver->resolve('aiprobe.writing');
+    }
+
     public function testAnInactiveConnectionStopsTheUsage(): void
     {
         $connection = $this->connection('mistral-main', 'mistral', 'eu', active: false);

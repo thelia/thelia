@@ -23,7 +23,9 @@ use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiMessage;
 use Thelia\Domain\Ai\AiOutputSchema;
 use Thelia\Domain\Ai\AiRequest;
+use Thelia\Domain\Ai\AiTier;
 use Thelia\Domain\Ai\AiToolDefinition;
+use Thelia\Domain\Ai\Catalog\AiModelSpecification;
 use Thelia\Domain\Ai\Exception\AiBudgetExceededException;
 use Thelia\Domain\Ai\Exception\AiGuardrailBlockedException;
 use Thelia\Domain\Ai\Exception\AiJurisdictionRefusedException;
@@ -35,6 +37,8 @@ use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Guardrail\GuardrailMode;
 use Thelia\Domain\Ai\Guardrail\GuardrailStage;
 use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
+use Thelia\Model\AiModel;
+use Thelia\Model\AiTierAssignment;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tests\Support\Ai\AiGatewayTestCase;
 use Thelia\Tests\Support\Ai\AiProviderFixtures as Wire;
@@ -174,6 +178,28 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         $this->expectException(InactiveAiUsageException::class);
 
         $gateway->complete($this->request());
+    }
+
+    public function testATierChosenForTheUsageWhoseModelLacksADeclaredCapabilityStopsTheUsage(): void
+    {
+        $this->assignModel(AiTier::Advanced, 'advanced-no-tools', tools: false);
+        $this->setting('aiprobe.pages', null, tier: AiTier::Advanced->value);
+        $gateway = $this->gatewayAnswering([]);
+
+        $this->expectException(InactiveAiUsageException::class);
+
+        $gateway->complete($this->request());
+    }
+
+    public function testATierChosenForTheUsageDecidesWhichModelAnswers(): void
+    {
+        $this->assignModel(AiTier::Advanced, 'advanced-model', tools: true);
+        $this->setting('aiprobe.pages', null, tier: AiTier::Advanced->value);
+        $gateway = $this->gatewayAnswering([Wire::chat('Bonjour')]);
+
+        $gateway->complete($this->request());
+
+        self::assertSame('advanced-model', $this->sent[0]['body']['model']);
     }
 
     public function testAConnectionOutsideTheEuIsAcceptedAndItsJurisdictionIsLoggedWhileTheOptionIsOff(): void
@@ -571,5 +597,15 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
     private function overloaded(): MockResponse
     {
         return Wire::json(['error' => ['message' => 'Overloaded', 'type' => 'api_error']], 503);
+    }
+
+    private function assignModel(AiTier $tier, string $name, bool $tools): void
+    {
+        $model = (new AiModel())
+            ->setProvider('openai_compatible')->setName($name)->setConnectionId($this->connection->getId())
+            ->setInputPrice('1.000000')->setOutputPrice('2.000000')->setSupportsStructuredOutput(true)->setSupportsTools($tools)->setSupportsStreaming(true)
+            ->setActive(true)->setSource(AiModelSpecification::SOURCE_MANUAL);
+        $model->save();
+        (new AiTierAssignment())->setTier($tier->value)->setConnectionId($this->connection->getId())->setModelId($model->getId())->save();
     }
 }

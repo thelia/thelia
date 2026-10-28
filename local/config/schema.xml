@@ -3456,6 +3456,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column description="the identifier a module declares, like theliacms.page_generation" name="usage_id" required="true" size="128" type="VARCHAR" />
     <column defaultValue="1" name="enabled" required="true" type="BOOLEAN" />
+    <column description="the range of model for this usage: fast, standard or advanced; empty: the range the module declared" name="tier" size="16" type="VARCHAR" />
     <column description="what the usage may spend in a calendar month, in currency; empty: no budget of its own, a public usage stays inactive" name="monthly_budget" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="USD" name="currency" required="true" size="3" type="VARCHAR" />
     <column description="requests an actor may send in a minute, empty: the default of the audience" name="requests_per_minute" type="INTEGER" />

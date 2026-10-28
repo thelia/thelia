@@ -1666,6 +1666,7 @@ CREATE TABLE `ai_usage_setting`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `usage_id` VARCHAR(128) NOT NULL COMMENT 'the identifier a module declares, like theliacms.page_generation',
     `enabled` TINYINT(1) DEFAULT 1 NOT NULL,
+    `tier` VARCHAR(16) COMMENT 'the range of model for this usage: fast, standard or advanced; empty: the range the module declared',
     `monthly_budget` DECIMAL(16,6) COMMENT 'what the usage may spend in a calendar month, in currency; empty: no budget of its own, a public usage stays inactive',
     `currency` VARCHAR(3) DEFAULT 'USD' NOT NULL,
     `requests_per_minute` INTEGER COMMENT 'requests an actor may send in a minute, empty: the default of the audience',

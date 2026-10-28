@@ -112,6 +112,17 @@ final class AiUsagesCommandTest extends IntegrationTestCase
         self::assertTrue($writing['notice_enabled']);
     }
 
+    public function testTheRegisterShowsTheTierTheMerchantChoseAndTheOneTheModuleDeclared(): void
+    {
+        $this->setting('aiprobe.writing', budget: null, notice: true, provenance: true);
+        AiUsageSettingQuery::create()->findOneByUsageId('aiprobe.writing')->setTier(AiTier::Advanced->value)->save();
+
+        $rows = json_decode($this->execute(['--format' => 'json'])->getDisplay(), true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertSame(['advanced', 'fast'], [$rows[0]['tier'], $rows[0]['declared_tier']]);
+        self::assertSame(['fast', 'fast'], [$rows[1]['tier'], $rows[1]['declared_tier']], 'a usage without a choice runs on the declared tier');
+    }
+
     public function testWithoutAConnectionTheJurisdictionIsEmpty(): void
     {
         $rows = json_decode($this->execute(['--format' => 'json'])->getDisplay(), true, flags: \JSON_THROW_ON_ERROR);
@@ -125,11 +136,11 @@ final class AiUsagesCommandTest extends IntegrationTestCase
 
         $lines = array_map(static fn (string $line): array => str_getcsv($line, ',', '"', ''), explode("\n", trim($this->execute(['--format' => 'csv', '--locale' => 'en_US'])->getDisplay())));
 
-        self::assertSame(['id', 'module', 'purpose', 'audience', 'tier', 'transparency', 'notice_enabled', 'provenance_mark_enabled', 'active', 'compliance', 'jurisdiction', 'compliance_explanation'], $lines[0]);
+        self::assertSame(['id', 'module', 'purpose', 'audience', 'tier', 'declared_tier', 'transparency', 'notice_enabled', 'provenance_mark_enabled', 'active', 'compliance', 'jurisdiction', 'compliance_explanation'], $lines[0]);
         self::assertCount(3, $lines);
-        self::assertSame(['aiprobe.writing', 'aiprobe', 'Writes probe texts.', 'admin', 'fast', 'generative', 'yes', 'no', 'yes', 'not_met', ''], \array_slice($lines[1], 0, 11));
-        self::assertStringContainsString('does not comply with article 50', $lines[1][11]);
-        self::assertSame('', $lines[2][11], 'nothing to explain when the duty is met');
+        self::assertSame(['aiprobe.writing', 'aiprobe', 'Writes probe texts.', 'admin', 'fast', 'fast', 'generative', 'yes', 'no', 'yes', 'not_met', ''], \array_slice($lines[1], 0, 12));
+        self::assertStringContainsString('does not comply with article 50', $lines[1][12]);
+        self::assertSame('', $lines[2][12], 'nothing to explain when the duty is met');
     }
 
     public function testTheTableIsTheDefaultFormat(): void

@@ -44,7 +44,7 @@ final readonly class AiUsageRegister
 
     /**
      * @return list<array{
-     *     id: string, module: string, purpose: string, audience: string, tier: string, transparency: string,
+     *     id: string, module: string, purpose: string, audience: string, tier: string, declared_tier: string, transparency: string,
      *     active: bool, notice_enabled: bool, provenance_mark_enabled: bool, compliance: string,
      *     compliance_details: list<array{obligation: string, state: string, reason: string|null, message: string}>,
      *     jurisdiction: string|null
@@ -79,7 +79,8 @@ final readonly class AiUsageRegister
             'module' => $usage->module(),
             'purpose' => $usage->purpose,
             'audience' => $usage->audience->value,
-            'tier' => $usage->tier->value,
+            'tier' => ($setting?->effectiveTier($usage->tier) ?? $usage->tier)->value,
+            'declared_tier' => $usage->tier->value,
             'transparency' => $usage->transparency->value,
             'active' => $this->usages->isActive($usage->id),
             'notice_enabled' => $setting?->getTransparencyNotice() ?? true,
