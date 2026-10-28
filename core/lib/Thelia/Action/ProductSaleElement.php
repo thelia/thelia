@@ -245,6 +245,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             }
 
             $this->applyStockSettings($salesElement, $event);
+            $event->getQuantityRule()?->applyTo($salesElement);
 
             $salesElement->save();
 

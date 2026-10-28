@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Api\Admin;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ApiTestCase;
 
@@ -128,5 +129,77 @@ final class ProductSaleElementsApiTest extends ApiTestCase
         self::assertSame($product->getId(), $reloaded->getProductId());
         self::assertSame($position, $reloaded->getPosition());
         self::assertSame('PSE-PARTIAL-PATCH', $reloaded->getRef());
+    }
+
+    public function testAnAdministratorWritesTheQuantityRulesOfACombination(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $pse = $factory->productSaleElement($product, ['ref' => 'PSE-RULES']);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/product_sale_elements/'.$pse->getId(), [
+            'quantity' => 37.5,
+            'minQuantity' => 1,
+            'quantityStep' => 0.25,
+            'quantityDecimals' => 2,
+            'unitQuantity' => 1,
+            'referenceUnitQuantity' => 1,
+            'unitCode' => 'kg',
+        ], $token, 'merge-patch+json');
+
+        self::assertJsonResponseSuccessful($response);
+        $json = json_decode((string) $response->getContent(), true);
+        self::assertSame(37.5, $json['quantity']);
+        self::assertEquals(0.25, $json['quantityStep']);
+        self::assertSame(2, $json['quantityDecimals']);
+        self::assertSame('kg', $json['unitCode']);
+
+        $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+        self::assertSame('0.250000', $reloaded->getQuantityStep());
+        self::assertSame(2, $reloaded->getQuantityDecimals());
+        self::assertSame('kg', $reloaded->getUnitCode());
+        self::assertEqualsWithDelta(37.5, $reloaded->getQuantity(), 0.0001);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string}>
+     */
+    public static function quantityRulesThatCannotDecideAQuantity(): iterable
+    {
+        yield 'a step of zero' => [['quantityStep' => 0], 'quantityStep'];
+        yield 'a negative minimum' => [['minQuantity' => -1], 'minQuantity'];
+        yield 'four decimals' => [['quantityDecimals' => 4], 'quantityDecimals'];
+        yield 'negative decimals' => [['quantityDecimals' => -1], 'quantityDecimals'];
+        yield 'a step finer than the decimals' => [['quantityStep' => 0.25, 'quantityDecimals' => 1], 'quantityStep'];
+        yield 'a minimum finer than the decimals' => [['minQuantity' => 1.5], 'minQuantity'];
+        yield 'a unit quantity of zero' => [['unitQuantity' => 0], 'unitQuantity'];
+        yield 'a negative reference unit quantity' => [['referenceUnitQuantity' => -1], 'referenceUnitQuantity'];
+        yield 'an unknown unit code' => [['unitCode' => 'furlong'], 'unitCode'];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('quantityRulesThatCannotDecideAQuantity')]
+    public function testAQuantityRuleThatCannotDecideAQuantityIsRefused(array $payload, string $property): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $pse = $factory->productSaleElement($product, ['ref' => 'PSE-BAD-RULES']);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/product_sale_elements/'.$pse->getId(), $payload, $token, 'merge-patch+json');
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        $violations = json_decode((string) $response->getContent(), true)['violations'] ?? [];
+        self::assertContains($property, array_column($violations, 'propertyPath'), (string) $response->getContent());
+
+        $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+        self::assertSame('1.000000', $reloaded->getQuantityStep());
+        self::assertSame(0, $reloaded->getQuantityDecimals());
+        self::assertNull($reloaded->getUnitCode());
     }
 }

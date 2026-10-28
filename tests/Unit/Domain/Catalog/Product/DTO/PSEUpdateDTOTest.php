@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Domain\Catalog\Product\DTO;
 
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Catalog\Product\DTO\PSEUpdateDTO;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 
 /**
  * The array a combination update hands to the event layer carries every field
@@ -58,8 +59,18 @@ final class PSEUpdateDTOTest extends TestCase
                 'from_default_currency' => true,
                 'mpn' => 'MPN-42',
                 'manufacturer_brand_id' => 8,
+                'quantity_rule' => null,
             ],
             $dto->toArray(),
         );
+    }
+
+    public function testTheQuantityRuleIsHandedOverAsItIs(): void
+    {
+        $rule = new QuantityRule(minQuantity: 2, step: 6);
+
+        $dto = new PSEUpdateDTO(reference: 'REF-001', price: 9.99, currencyId: 1, quantityRule: $rule);
+
+        self::assertSame($rule, $dto->toArray()['quantity_rule']);
     }
 }

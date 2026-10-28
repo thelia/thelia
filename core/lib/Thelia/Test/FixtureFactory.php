@@ -16,6 +16,8 @@ namespace Thelia\Test;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
+use Thelia\Domain\Catalog\Quantity\UnitCode;
 use Thelia\Domain\Customer\Service\CustomerGroupRegistration;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
@@ -838,7 +840,9 @@ final class FixtureFactory
     /**
      * Creates an ADDITIONAL ProductSaleElements row. The default PSE is
      * already created by Product::create() — never call this for the
-     * default one.
+     * default one. The quantity rules are set by `minQuantity`, `quantityStep`,
+     * `quantityDecimals`, `unitQuantity`, `referenceUnitQuantity` and `unitCode`
+     * (a UnitCode or its code), and default to from 1, by 1, whole numbers.
      */
     public function productSaleElement(Product $product, array $overrides = []): ProductSaleElements
     {
@@ -853,6 +857,15 @@ final class FixtureFactory
         $pse->setEanCode($overrides['eanCode'] ?? null);
         $pse->setMpn($overrides['mpn'] ?? null);
         $pse->setManufacturerBrandId($overrides['manufacturerBrandId'] ?? null);
+        $unitCode = $overrides['unitCode'] ?? null;
+        (new QuantityRule(
+            minQuantity: (float) ($overrides['minQuantity'] ?? 1.0),
+            step: (float) ($overrides['quantityStep'] ?? 1.0),
+            decimals: (int) ($overrides['quantityDecimals'] ?? 0),
+            unitQuantity: isset($overrides['unitQuantity']) ? (float) $overrides['unitQuantity'] : null,
+            referenceUnitQuantity: isset($overrides['referenceUnitQuantity']) ? (float) $overrides['referenceUnitQuantity'] : null,
+            unitCode: \is_string($unitCode) ? UnitCode::from($unitCode) : $unitCode,
+        ))->applyTo($pse);
         $pse->save($this->connection);
 
         return $pse;

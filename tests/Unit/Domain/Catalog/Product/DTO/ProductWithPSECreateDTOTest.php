@@ -51,6 +51,7 @@ final class ProductWithPSECreateDTOTest extends TestCase
                 'from_default_currency' => false,
                 'mpn' => null,
                 'manufacturer_brand_id' => null,
+                'quantity_rule' => null,
             ],
             $combination->toArray(),
         );
@@ -90,6 +91,7 @@ final class ProductWithPSECreateDTOTest extends TestCase
                 'from_default_currency' => false,
                 'mpn' => null,
                 'manufacturer_brand_id' => null,
+                'quantity_rule' => null,
             ],
             $combination->toArray(),
         );

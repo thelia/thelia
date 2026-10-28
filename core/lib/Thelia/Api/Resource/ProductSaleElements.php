@@ -25,11 +25,15 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -37,6 +41,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\GtinConstraint;
 use Thelia\Api\State\Processor\ProductSaleElementsStockProcessor;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
+use Thelia\Domain\Catalog\Quantity\UnitCode;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
@@ -168,7 +174,8 @@ class ProductSaleElements implements PropelResourceInterface
         ProductAssociation::GROUP_FRONT_READ,
     ])]
     #[NotNull(groups: [self::GROUP_ADMIN_WRITE])]
-    public int $quantity;
+    #[ApiProperty(description: 'The stock of the combination. A number with decimals for a combination sold by measure.')]
+    public float $quantity;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -362,6 +369,108 @@ class ProductSaleElements implements PropelResourceInterface
     #[ApiProperty(description: 'The brand that makes the combination, when it is not the brand of the product. Null means the brand of the product.')]
     public ?Brand $manufacturerBrand = null;
 
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'The smallest quantity a cart line of the combination may hold. 1 by default.')]
+    #[Positive(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public float $minQuantity = 1.0;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'Every quantity of a cart line is a multiple of this step: 6 sells by six, 0.25 by quarters. 1 by default.')]
+    #[Positive(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public float $quantityStep = 1.0;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'How many decimals a quantity may carry, from 0 to 3: 0 sells by the piece, more sells by measure. 0 by default.')]
+    #[Range(min: 0, max: QuantityScale::MAXIMUM_DECIMALS, groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public int $quantityDecimals = 0;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'What one unit sold contains, in unitCode: 0.75 for a 75 cl bottle sold in litres. With referenceUnitQuantity and unitCode it gives the reference price. Null when no reference price is shown.')]
+    #[Positive(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?float $unitQuantity = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'The quantity of unitCode the reference price is given for: 1 for a price per litre.')]
+    #[Positive(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?float $referenceUnitQuantity = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_ADMIN_WRITE,
+        CartItem::GROUP_ADMIN_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_ADMIN_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'The unit of measure of the combination: pc, kg, g, l, ml, m, cm, m2 or m3. Null when it has none.')]
+    #[Choice(callback: [UnitCode::class, 'values'], groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?string $unitCode = null;
+
     /**
      * The other combinations of the shop carrying the same GTIN, for the back office to
      * warn about: a duplicate is allowed, as two combinations may be the same physical
@@ -440,12 +549,12 @@ class ProductSaleElements implements PropelResourceInterface
         return $this;
     }
 
-    public function getQuantity(): int
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): self
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 
@@ -618,6 +727,99 @@ class ProductSaleElements implements PropelResourceInterface
         $this->manufacturerBrand = $manufacturerBrand;
 
         return $this;
+    }
+
+    public function getMinQuantity(): float
+    {
+        return $this->minQuantity;
+    }
+
+    public function setMinQuantity(float $minQuantity): self
+    {
+        $this->minQuantity = $minQuantity;
+
+        return $this;
+    }
+
+    public function getQuantityStep(): float
+    {
+        return $this->quantityStep;
+    }
+
+    public function setQuantityStep(float $quantityStep): self
+    {
+        $this->quantityStep = $quantityStep;
+
+        return $this;
+    }
+
+    public function getQuantityDecimals(): int
+    {
+        return $this->quantityDecimals;
+    }
+
+    public function setQuantityDecimals(int $quantityDecimals): self
+    {
+        $this->quantityDecimals = $quantityDecimals;
+
+        return $this;
+    }
+
+    public function getUnitQuantity(): ?float
+    {
+        return $this->unitQuantity;
+    }
+
+    public function setUnitQuantity(?float $unitQuantity): self
+    {
+        $this->unitQuantity = $unitQuantity;
+
+        return $this;
+    }
+
+    public function getReferenceUnitQuantity(): ?float
+    {
+        return $this->referenceUnitQuantity;
+    }
+
+    public function setReferenceUnitQuantity(?float $referenceUnitQuantity): self
+    {
+        $this->referenceUnitQuantity = $referenceUnitQuantity;
+
+        return $this;
+    }
+
+    public function getUnitCode(): ?string
+    {
+        return $this->unitCode;
+    }
+
+    public function setUnitCode(?string $unitCode): self
+    {
+        $this->unitCode = $unitCode;
+
+        return $this;
+    }
+
+    /**
+     * A step or a minimum is a quantity: it cannot carry more decimals than the quantities
+     * of the combination, or no quantity would ever be a multiple of it.
+     */
+    #[Callback(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public function validateQuantityRules(ExecutionContextInterface $context): void
+    {
+        if ($this->quantityDecimals < 0 || $this->quantityDecimals > QuantityScale::MAXIMUM_DECIMALS) {
+            return;
+        }
+
+        foreach (['quantityStep' => $this->quantityStep, 'minQuantity' => $this->minQuantity] as $property => $value) {
+            if ($value > 0 && !QuantityScale::fits($value, $this->quantityDecimals)) {
+                $context->buildViolation('This value cannot carry more decimals than quantityDecimals ({{ decimals }}).')
+                    ->setParameter('{{ decimals }}', (string) $this->quantityDecimals)
+                    ->atPath($property)
+                    ->addViolation();
+            }
+        }
     }
 
     /**
