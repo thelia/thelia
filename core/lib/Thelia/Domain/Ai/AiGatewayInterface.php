@@ -36,7 +36,9 @@ use Thelia\Domain\Ai\Stream\StreamEvent;
  * by default a cache breakpoint at the end of `system` and on the last message, for the providers that
  * support one, so that the next turns of a tool loop read the start of the conversation from the cache.
  *
- * The gateway never runs a tool and never retries on its own: a retryable failure is the caller's to retry.
+ * The gateway never runs a tool and never switches to another connection. It retries once, on its own, a call the
+ * provider failed to answer with a retryable error before any byte of the answer came back; any other failure, and
+ * a second one, is the caller's to retry when AiProviderUnavailableException::$retryable says so.
  */
 interface AiGatewayInterface
 {
@@ -57,7 +59,8 @@ interface AiGatewayInterface
      * complete() are thrown by the first iteration, not by this method. The last event is StreamCompleted.
      *
      * The log row is written when the stream ends, and also when the caller stops iterating before the end
-     * (status `aborted`, the tokens known at that moment). Output guardrails run on the whole text at the end.
+     * (status `aborted`, the tokens known at that moment). Output guardrails run on the whole text at the end, in annotate
+     * mode only: a delta that was sent cannot be taken back, so a stream never throws AiGuardrailBlockedException for its output.
      *
      * @return iterable<StreamEvent>
      */
