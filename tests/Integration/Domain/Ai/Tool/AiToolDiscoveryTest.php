@@ -18,6 +18,7 @@ use AiProbeModule\ProbeBothTool;
 use AiProbeModule\ProbeDuplicateNameTool;
 use AiProbeModule\ProbeReadTool;
 use AiProbeModule\ProbeUndeclaredTool;
+use AiProbeModule\ProbeUnsupportedKeywordTool;
 use AiProbeModule\ProbeWriteTool;
 use AiProbeModule\ProbeWrongPrefixTool;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -83,6 +84,14 @@ final class AiToolDiscoveryTest extends IntegrationTestCase
         $this->expectExceptionMessage('must start with "aiprobemodule_"');
 
         $this->compile([ProbeWrongPrefixTool::class]);
+    }
+
+    public function testAToolWhoseSchemaUsesAKeywordThatIsNotCheckedStopsTheBuild(): void
+    {
+        $this->expectException(InvalidAiArgumentException::class);
+        $this->expectExceptionMessageMatches('~tool "aiprobemodule_multiple" uses keywords the registry does not check.*/properties/quantity: multipleOf~');
+
+        $this->compile([ProbeUnsupportedKeywordTool::class]);
     }
 
     public function testAToolThatImplementsBothInterfacesStopsTheBuild(): void

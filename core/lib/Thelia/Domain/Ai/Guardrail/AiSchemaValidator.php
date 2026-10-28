@@ -36,6 +36,16 @@ final readonly class AiSchemaValidator
 
     private const int MAXIMUM_ERRORS = 5;
 
+    /** The keywords that check(): any other keyword of a schema is either an annotation or ignored. */
+    private const array ENFORCED_KEYWORDS = [
+        'type', 'enum', 'const', 'properties', 'required', 'additionalProperties', 'items', 'prefixItems',
+        'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'minLength', 'maxLength', 'pattern',
+        'minItems', 'maxItems', 'minProperties', 'maxProperties', 'uniqueItems', 'allOf', 'anyOf', 'oneOf', 'not', '$ref', '$defs',
+    ];
+
+    /** The keywords that describe a schema and never fail a value. */
+    private const array ANNOTATION_KEYWORDS = ['$schema', '$id', '$comment', 'title', 'description', 'default', 'examples', 'deprecated', 'readOnly', 'writeOnly'];
+
     /**
      * @param array<string, mixed> $schema
      *
@@ -62,6 +72,73 @@ final readonly class AiSchemaValidator
         }
 
         return \is_array($value) ? array_map(self::asArrays(...), $value) : $value;
+    }
+
+    /**
+     * The keywords of a schema that validate() would ignore without a word (`multipleOf`, `format`, `contains`,
+     * `patternProperties`... and any keyword it does not know): a schema that relies on them must be refused, not trusted.
+     *
+     * @param array<mixed> $schema
+     *
+     * @return list<string> `<path>: <keyword>`, empty when every keyword is enforced or an annotation
+     */
+    public static function unsupportedKeywords(array $schema): array
+    {
+        $found = [];
+        self::collectUnsupported($schema, '', 0, $found);
+
+        return $found;
+    }
+
+    /**
+     * @param list<string> $found
+     */
+    private static function collectUnsupported(mixed $schema, string $path, int $depth, array &$found): void
+    {
+        if (!\is_array($schema) || $depth > self::MAXIMUM_DEPTH) {
+            return;
+        }
+
+        foreach ($schema as $keyword => $value) {
+            $keyword = (string) $keyword;
+
+            if (\in_array($keyword, self::ANNOTATION_KEYWORDS, true)) {
+                continue;
+            }
+
+            if (!\in_array($keyword, self::ENFORCED_KEYWORDS, true)) {
+                $found[] = self::at($path, $keyword);
+
+                continue;
+            }
+
+            if (\in_array($keyword, ['exclusiveMinimum', 'exclusiveMaximum'], true) && !\is_int($value) && !\is_float($value)) {
+                $found[] = self::at($path, $keyword);
+
+                continue;
+            }
+
+            match ($keyword) {
+                'properties', '$defs' => self::collectUnsupportedIn($value, $path.'/'.$keyword, $depth, $found),
+                'items', 'additionalProperties', 'not' => self::collectUnsupported($value, $path.'/'.$keyword, $depth + 1, $found),
+                'prefixItems', 'allOf', 'anyOf', 'oneOf' => self::collectUnsupportedIn($value, $path.'/'.$keyword, $depth, $found),
+                default => null,
+            };
+        }
+    }
+
+    /**
+     * @param list<string> $found
+     */
+    private static function collectUnsupportedIn(mixed $schemas, string $path, int $depth, array &$found): void
+    {
+        if (!\is_array($schemas)) {
+            return;
+        }
+
+        foreach ($schemas as $key => $schema) {
+            self::collectUnsupported($schema, $path.'/'.$key, $depth + 1, $found);
+        }
     }
 
     /**
