@@ -39,6 +39,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterTemplateTranslationsPass;
 use Thelia\Core\DependencyInjection\Compiler\TestOfflineCurrencyProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\TestPublicServicesPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
+use Thelia\Core\DependencyInjection\Extension\AiRecipeConfigurationExtension;
 use Thelia\Domain\OrderReturn\Service\OrderReturnRefGeneratorInterface;
 use Thelia\Model\OrderReturn;
 
@@ -59,6 +60,12 @@ class TheliaBundle extends Bundle
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
+
+        // The kernel has registered the extension of every bundle before it calls build(): this one gives way
+        // to symfony/ai-bundle when a project installs it.
+        if (!$container->hasExtension(AiRecipeConfigurationExtension::ALIAS)) {
+            $container->registerExtension(new AiRecipeConfigurationExtension());
+        }
 
         $container
             ->addCompilerPass(new FallbackParserPass())
