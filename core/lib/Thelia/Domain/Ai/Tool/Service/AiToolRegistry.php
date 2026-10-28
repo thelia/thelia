@@ -112,10 +112,17 @@ final readonly class AiToolRegistry implements AiToolRegistryInterface
 
         $messages = [];
 
+        $refused = null;
+
         foreach ($calls as $position => $call) {
-            $result = $position < self::CALLS_PER_ANSWER
-                ? $this->call($call, $context)
-                : $this->refuse($call, $context, $this->declarations->find($call->name), AiToolCallStatus::Limited, 'answer_limit', hrtime(true));
+            if ($position < self::CALLS_PER_ANSWER) {
+                $result = $this->call($call, $context);
+            } else {
+                // One line of the journal for the whole surplus: a response that announces thousands of calls costs one write.
+                $refused ??= $this->refuse($call, $context, $this->declarations->find($call->name), AiToolCallStatus::Limited, 'answer_limit: '.(\count($calls) - self::CALLS_PER_ANSWER).' calls', hrtime(true));
+                $result = new AiToolResult($refused->status, $refused->content, null, $refused->logId);
+            }
+
             $messages[] = $result->toMessage($call->id);
         }
 
