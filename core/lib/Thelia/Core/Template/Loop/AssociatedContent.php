@@ -20,6 +20,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Domain\Catalog\Category\CategoryVisibility;
+use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
 use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\Map\CategoryAssociatedContentTableMap;
 use Thelia\Model\ProductAssociatedContentQuery;
@@ -43,7 +44,9 @@ class AssociatedContent extends Content
 
     public function __construct(
         private readonly CategoryVisibility $categoryVisibility,
+        ?ContentFolderPublicationRule $folderPublicationRule = null,
     ) {
+        parent::__construct($folderPublicationRule);
     }
 
     protected function getArgDefinitions(): ArgumentCollection
