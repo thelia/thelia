@@ -201,6 +201,13 @@ final class ApiContractExampleTest extends TestCase
         self::assertNull((new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast))->maxInputCharacters);
     }
 
+    public function testAFloatAmountPrintedInScientificNotationIsRefused(): void
+    {
+        $this->expectException(\Thelia\Domain\Ai\Exception\InvalidAiArgumentException::class);
+
+        new AiExternalCost('pricewatch.offer_judgement', 'typesafe', 'jev-latest', (string) 0.00000012);
+    }
+
     public function testTheContractHasNoToolRunByTheProvider(): void
     {
         foreach ([AsAiUsage::class, AiRequest::class] as $class) {
@@ -263,7 +270,7 @@ final class ApiContractExampleTest extends TestCase
             usageId: 'pricewatch.offer_judgement',
             provider: 'typesafe',
             operation: 'jev-latest',
-            cost: '0.00009870',
+            cost: sprintf('%.8F', 2350 * 0.042 / 1_000_000), // a float printed with %.8F: `1.2E-7` would be refused
             tokenUsage: new AiTokenUsage(2350, 0),
             latencyMilliseconds: 840,
             correlationId: 'pricewatch.collect.118',
@@ -271,6 +278,7 @@ final class ApiContractExampleTest extends TestCase
         ));
 
         self::assertSame(9004, $logId);
+        self::assertSame('0.00009870', $recorder->recorded[0]->cost);
         self::assertSame('USD', $recorder->recorded[0]->currency);
         self::assertSame(AiActorType::System, $recorder->recorded[0]->actor?->type);
     }

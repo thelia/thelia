@@ -31,6 +31,10 @@ interface AiGuardrailInterface
     public function supports(GuardrailStage $stage): bool;
 
     /**
+     * The request reaches a guardrail that may call a third party (a moderation API) without the actor in
+     * clear: only the hashed identifier, as the log stores it. The system prompt, the messages and the
+     * untrusted contents are there as sent.
+     *
      * @param string|null $output what the model produced (structured output as its JSON), null at the input stage
      */
     public function inspect(GuardrailStage $stage, AiRequest $request, ?string $output): GuardrailVerdict;

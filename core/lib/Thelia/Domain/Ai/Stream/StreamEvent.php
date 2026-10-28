@@ -16,6 +16,8 @@ namespace Thelia\Domain\Ai\Stream;
 
 /**
  * One event of AiGatewayInterface::stream(): TextDelta, ToolCallReceived, then one StreamCompleted last.
+ *
+ * The list can grow in 3.x: a module ignores an event it does not know (`default => null` in a `match`).
  */
 interface StreamEvent
 {
