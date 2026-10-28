@@ -33,8 +33,10 @@ use Thelia\Domain\Ai\Guardrail\GuardrailStage;
  * shows the failure to a person calls explain() instead of getMessage(): it works without a request (console,
  * queue worker), the locale being the one asked for, else the one of the visitor, else the one of the shop.
  *
- * An exception of the layer with no sentence of its own (a value refused with a message that carries a variable
- * part, a bug of the calling code) comes back with its own message, as AiVerdictReasons does with an unknown code.
+ * A refusal whose message carries a variable part (the accepted values, a field, the value given) is recognised by
+ * its shape and told with the same parts in a sentence of the catalog.
+ *
+ * An exception of the layer with no sentence of its own (a bug of the calling code) comes back with its own message, as AiVerdictReasons does with an unknown code.
  * Nothing the provider wrote, nor any key, is part of the sentence.
  */
 final readonly class AiFailureExplainer
@@ -59,6 +61,26 @@ final readonly class AiFailureExplainer
         'The base URL is not allowed: it must be an absolute http or https address.',
         'The base URL is not allowed: it must not carry credentials.',
         'The application secret (APP_SECRET) is empty: API keys cannot be encrypted with it.',
+    ];
+
+    /**
+     * The refusals whose message carries a variable part: the pattern that recognises the English message and
+     * the sentence (also the translation identifier) that tells it, with the named groups as %parameters%.
+     */
+    private const array VARIABLE_SENTENCES = [
+        '/^The tier must be one of: (?<allowed>.+)\.$/' => 'The tier must be one of: %allowed%.',
+        '/^The provider must be one of: (?<allowed>.+)\.$/' => 'The provider must be one of: %allowed%.',
+        '/^"(?<name>.+)" is not the name of an optional guardrail\.$/' => '"%name%" is not the name of an optional guardrail.',
+        '/^The mode of the guardrail "(?<name>.+)" is "block" or "annotate"\.$/' => 'The mode of the guardrail "%name%" is "block" or "annotate".',
+        '/^(?<field>The limit per minute|The limit per day|The output limit|The input limit|The prompt retention) must be a positive number\.$/' => '%field% must be a positive number.',
+        '/^(?<field>The monthly budget) must be a non-negative decimal string like "0\.05421000", "(?<value>.*)" given\.$/' => '%field% must be a non-negative decimal like "25.00", "%value%" given.',
+        '/^"(?<value>.*)" is not an ISO 4217 currency code\.$/' => '"%value%" is not an ISO 4217 currency code.',
+        '/^(?<field>A guardrail name) "(?<value>.*)" must hold at most 64 letters, digits, ".", "_", ":" or "-"\.$/' => '%field% "%value%" must hold at most 64 letters, digits, ".", "_", ":" or "-".',
+    ];
+
+    /** The names of a field a variable sentence carries (English source text, also the translation identifier). */
+    private const array FIELDS = [
+        'The limit per minute', 'The limit per day', 'The output limit', 'The input limit', 'The prompt retention', 'The monthly budget', 'A guardrail name',
     ];
 
     private const string BUDGET = 'The monthly budget of this usage is used up.';
@@ -94,7 +116,33 @@ final readonly class AiFailureExplainer
             default => null,
         };
 
+        $sentence ??= $this->variableSentence($failure->getMessage(), $locale);
+
         return null === $sentence ? $failure->getMessage() : $this->translator->trans($sentence[0], $sentence[1], $locale);
+    }
+
+    /**
+     * @return array{string, array<string, string>}|null
+     */
+    private function variableSentence(string $message, ?string $locale): ?array
+    {
+        foreach (self::VARIABLE_SENTENCES as $pattern => $sentence) {
+            if (1 !== preg_match($pattern, $message, $matches)) {
+                continue;
+            }
+
+            $parameters = [];
+
+            foreach ($matches as $name => $value) {
+                if (\is_string($name)) {
+                    $parameters['%'.$name.'%'] = 'field' === $name ? $this->translator->trans($value, [], $locale) : $value;
+                }
+            }
+
+            return [$sentence, $parameters];
+        }
+
+        return null;
     }
 
     /**
@@ -104,6 +152,8 @@ final readonly class AiFailureExplainer
     {
         return array_values(array_unique([
             ...self::FIXED_SENTENCES,
+            ...array_values(self::VARIABLE_SENTENCES),
+            ...self::FIELDS,
             self::BUDGET, self::BUDGET_GLOBAL, self::INPUT_BLOCKED, self::OUTPUT_BLOCKED, self::JURISDICTION, self::KEY_UNREADABLE,
             self::PROVIDER_RETRYABLE, self::PROVIDER_REFUSED, self::RATE_LIMIT, self::USAGE_VIOLATION, self::USAGE_INACTIVE, self::USAGE_UNKNOWN,
         ]));
