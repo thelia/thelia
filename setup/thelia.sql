@@ -1562,6 +1562,195 @@ CREATE TABLE `webhook_delivery`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- ai_connection
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_connection`;
+
+CREATE TABLE `ai_connection`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'the stable name modules and the log refer to',
+    `title` VARCHAR(255) NOT NULL COMMENT 'what the administrator calls this connection',
+    `provider` VARCHAR(32) NOT NULL COMMENT 'mistral, anthropic, openai, openai_compatible, scaleway, ovhcloud, albert, ollama or thelia_ai',
+    `jurisdiction` VARCHAR(8) NOT NULL COMMENT 'eu or non_eu: derived from the provider and the base URL, declared by the administrator for openai_compatible and ollama',
+    `base_url` VARCHAR(2048) COMMENT 'the endpoint, empty for the default one of the provider',
+    `api_key_encrypted` TEXT COMMENT 'the API key encrypted with a key derived from the application secret, never returned by the API',
+    `api_key_env` VARCHAR(128) COMMENT 'the environment variable whose value overrides the stored key',
+    `allow_private_network` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '1 lets the endpoint resolve to a private network, for a self-hosted server',
+    `active` TINYINT(1) DEFAULT 1 NOT NULL,
+    `checked_at` DATETIME COMMENT 'when the connection test last ran',
+    `check_error` VARCHAR(255) COMMENT 'what the last connection test answered when it failed, never the key',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ai_connection_code_UNIQUE` (`code`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_model
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_model`;
+
+CREATE TABLE `ai_model`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `provider` VARCHAR(32) NOT NULL COMMENT 'the provider that serves the model, as in ai_connection.provider',
+    `name` VARCHAR(128) NOT NULL COMMENT 'the identifier the provider gives the model',
+    `title` VARCHAR(255),
+    `input_price` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'price of a million input tokens, in currency',
+    `output_price` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'price of a million output tokens, in currency',
+    `cache_read_price` DECIMAL(16,6) COMMENT 'price of a million input tokens read from the cache, empty when the provider has no cache',
+    `cache_write_price` DECIMAL(16,6) COMMENT 'price of a million input tokens written to the cache',
+    `currency` VARCHAR(3) DEFAULT 'USD' NOT NULL,
+    `context_window` INTEGER COMMENT 'tokens the model reads at most',
+    `max_output_tokens` INTEGER COMMENT 'tokens the model writes at most',
+    `supports_structured_output` TINYINT(1) DEFAULT 0 NOT NULL,
+    `supports_tools` TINYINT(1) DEFAULT 0 NOT NULL,
+    `supports_vision` TINYINT(1) DEFAULT 0 NOT NULL,
+    `supports_streaming` TINYINT(1) DEFAULT 1 NOT NULL,
+    `source` VARCHAR(16) DEFAULT 'catalog' NOT NULL COMMENT 'catalog: from the embedded price list; manual: added or edited by the administrator',
+    `active` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ai_model_provider_name_UNIQUE` (`provider`, `name`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_tier_assignment
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_tier_assignment`;
+
+CREATE TABLE `ai_tier_assignment`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tier` VARCHAR(16) NOT NULL COMMENT 'fast, standard or advanced',
+    `connection_id` INTEGER NOT NULL,
+    `model_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ai_tier_assignment_tier_UNIQUE` (`tier`),
+    INDEX `idx_ai_tier_assignment_connection_id` (`connection_id`),
+    INDEX `idx_ai_tier_assignment_model_id` (`model_id`),
+    CONSTRAINT `fk_ai_tier_assignment_connection_id`
+        FOREIGN KEY (`connection_id`)
+        REFERENCES `ai_connection` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_ai_tier_assignment_model_id`
+        FOREIGN KEY (`model_id`)
+        REFERENCES `ai_model` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_usage_setting
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_usage_setting`;
+
+CREATE TABLE `ai_usage_setting`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `usage_id` VARCHAR(128) NOT NULL COMMENT 'the identifier a module declares, like theliacms.page_generation',
+    `enabled` TINYINT(1) DEFAULT 1 NOT NULL,
+    `monthly_budget` DECIMAL(16,6) COMMENT 'what the usage may spend in a calendar month, in currency; empty: no budget of its own, a public usage stays inactive',
+    `currency` VARCHAR(3) DEFAULT 'USD' NOT NULL,
+    `requests_per_minute` INTEGER COMMENT 'requests an actor may send in a minute, empty: the default of the audience',
+    `requests_per_day` INTEGER COMMENT 'requests an actor may send in a day, empty: the default of the audience',
+    `max_output_tokens` INTEGER COMMENT 'the output limit of every request, empty: the limit of the model',
+    `pinned_connection_id` INTEGER COMMENT 'a connection that replaces the one of the tier for this usage',
+    `pinned_model_id` INTEGER COMMENT 'a model that replaces the one of the tier for this usage',
+    `guardrails` TEXT COMMENT 'JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares',
+    `transparency_notice` TINYINT(1) DEFAULT 1 NOT NULL COMMENT '0 hides the notice of an interactive usage (AI Act 50(1)): allowed, the usage then shows as not compliant',
+    `provenance_mark` TINYINT(1) DEFAULT 1 NOT NULL COMMENT '0 drops the provenance mark of a generative usage (AI Act 50(2)): allowed, the usage then shows as not compliant',
+    `store_prompt` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '1 keeps the prompt of each call in the log',
+    `prompt_retention_days` INTEGER COMMENT 'days a stored prompt is kept before the maintenance purge removes it',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ai_usage_setting_usage_id_UNIQUE` (`usage_id`),
+    INDEX `idx_ai_usage_setting_pinned_connection_id` (`pinned_connection_id`),
+    INDEX `idx_ai_usage_setting_pinned_model_id` (`pinned_model_id`),
+    CONSTRAINT `fk_ai_usage_setting_pinned_connection_id`
+        FOREIGN KEY (`pinned_connection_id`)
+        REFERENCES `ai_connection` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_ai_usage_setting_pinned_model_id`
+        FOREIGN KEY (`pinned_model_id`)
+        REFERENCES `ai_model` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_usage_log
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_usage_log`;
+
+CREATE TABLE `ai_usage_log`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `usage_id` VARCHAR(128) NOT NULL,
+    `module` VARCHAR(55) NOT NULL COMMENT 'the namespace of the usage identifier, the module code in lower case',
+    `kind` VARCHAR(16) NOT NULL COMMENT 'completion, stream, or external for a cost a module paid outside the gateway',
+    `connection_code` VARCHAR(64) COMMENT 'the code of the connection, kept as text so that the log outlives the connection',
+    `provider` VARCHAR(32) COMMENT 'the provider, or the paid service of an external cost',
+    `model` VARCHAR(128) COMMENT 'the model, or the operation of an external cost',
+    `input_tokens` INTEGER DEFAULT 0 NOT NULL,
+    `output_tokens` INTEGER DEFAULT 0 NOT NULL,
+    `cache_read_tokens` INTEGER DEFAULT 0 NOT NULL,
+    `cache_write_tokens` INTEGER DEFAULT 0 NOT NULL,
+    `cost` DECIMAL(16,8) DEFAULT 0 NOT NULL,
+    `currency` VARCHAR(3) DEFAULT 'USD' NOT NULL,
+    `actor_type` VARCHAR(16) NOT NULL COMMENT 'admin, customer, visitor or system',
+    `actor_hash` VARCHAR(64) NOT NULL COMMENT 'HMAC-SHA256 of the actor with the application secret: counts an actor, never names one',
+    `status` VARCHAR(16) NOT NULL COMMENT 'succeeded, failed, blocked, rejected or aborted',
+    `error` VARCHAR(255) COMMENT 'why the call was refused or failed, never the prompt',
+    `finish_reason` VARCHAR(16) COMMENT 'completed, max_tokens, tool_calls or content_filter',
+    `latency_ms` INTEGER,
+    `guardrail_verdicts` TEXT COMMENT 'JSON list of the guardrail verdicts',
+    `correlation_id` VARCHAR(64) COMMENT 'groups the turns of one task, like the steps of a tool loop',
+    `prompt` LONGTEXT COMMENT 'the request as sent, only when the usage stores prompts',
+    `prompt_expires_at` DATETIME COMMENT 'when the maintenance purge empties the prompt',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_ai_usage_log_usage_created` (`usage_id`, `created_at`, `cost`),
+    INDEX `idx_ai_usage_log_created` (`created_at`, `cost`),
+    INDEX `idx_ai_usage_log_status_created` (`status`, `created_at`),
+    INDEX `idx_ai_usage_log_correlation_id` (`correlation_id`),
+    INDEX `idx_ai_usage_log_prompt_expires_at` (`prompt_expires_at`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_budget_reservation
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_budget_reservation`;
+
+CREATE TABLE `ai_budget_reservation`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `usage_id` VARCHAR(128) NOT NULL,
+    `amount` DECIMAL(16,8) NOT NULL COMMENT 'the highest cost the call can reach, held until the call is logged',
+    `currency` VARCHAR(3) DEFAULT 'USD' NOT NULL,
+    `expires_at` DATETIME NOT NULL COMMENT 'after this date the reservation no longer counts, so that a crashed call does not hold the budget',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_ai_budget_reservation_usage_expires` (`usage_id`, `expires_at`),
+    INDEX `idx_ai_budget_reservation_expires_at` (`expires_at`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- profile_resource
 -- ---------------------------------------------------------------------
 

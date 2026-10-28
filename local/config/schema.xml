@@ -3380,4 +3380,161 @@
     </unique>
     <behavior name="timestampable" />
   </table>
+  <table name="ai_connection" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the stable name modules and the log refer to" name="code" required="true" size="64" type="VARCHAR" />
+    <column description="what the administrator calls this connection" name="title" required="true" size="255" type="VARCHAR" />
+    <column description="mistral, anthropic, openai, openai_compatible, scaleway, ovhcloud, albert, ollama or thelia_ai" name="provider" required="true" size="32" type="VARCHAR" />
+    <column description="eu or non_eu: derived from the provider and the base URL, declared by the administrator for openai_compatible and ollama" name="jurisdiction" required="true" size="8" type="VARCHAR" />
+    <column description="the endpoint, empty for the default one of the provider" name="base_url" size="2048" type="VARCHAR" />
+    <column description="the API key encrypted with a key derived from the application secret, never returned by the API" name="api_key_encrypted" type="LONGVARCHAR" />
+    <column description="the environment variable whose value overrides the stored key" name="api_key_env" size="128" type="VARCHAR" />
+    <column defaultValue="0" description="1 lets the endpoint resolve to a private network, for a self-hosted server" name="allow_private_network" required="true" type="BOOLEAN" />
+    <column defaultValue="1" name="active" required="true" type="BOOLEAN" />
+    <column description="when the connection test last ran" name="checked_at" type="TIMESTAMP" />
+    <column description="what the last connection test answered when it failed, never the key" name="check_error" size="255" type="VARCHAR" />
+    <unique name="ai_connection_code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="ai_model" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the provider that serves the model, as in ai_connection.provider" name="provider" required="true" size="32" type="VARCHAR" />
+    <column description="the identifier the provider gives the model" name="name" required="true" size="128" type="VARCHAR" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column defaultValue="0" description="price of a million input tokens, in currency" name="input_price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0" description="price of a million output tokens, in currency" name="output_price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column description="price of a million input tokens read from the cache, empty when the provider has no cache" name="cache_read_price" scale="6" size="16" type="DECIMAL" />
+    <column description="price of a million input tokens written to the cache" name="cache_write_price" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="USD" name="currency" required="true" size="3" type="VARCHAR" />
+    <column description="tokens the model reads at most" name="context_window" type="INTEGER" />
+    <column description="tokens the model writes at most" name="max_output_tokens" type="INTEGER" />
+    <column defaultValue="0" name="supports_structured_output" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="supports_tools" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="supports_vision" required="true" type="BOOLEAN" />
+    <column defaultValue="1" name="supports_streaming" required="true" type="BOOLEAN" />
+    <column defaultValue="catalog" description="catalog: from the embedded price list; manual: added or edited by the administrator" name="source" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="1" name="active" required="true" type="BOOLEAN" />
+    <unique name="ai_model_provider_name_UNIQUE">
+      <unique-column name="provider" />
+      <unique-column name="name" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="ai_tier_assignment" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="fast, standard or advanced" name="tier" required="true" size="16" type="VARCHAR" />
+    <column name="connection_id" required="true" type="INTEGER" />
+    <column name="model_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="ai_connection" name="fk_ai_tier_assignment_connection_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="connection_id" />
+    </foreign-key>
+    <foreign-key foreignTable="ai_model" name="fk_ai_tier_assignment_model_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="model_id" />
+    </foreign-key>
+    <index name="idx_ai_tier_assignment_connection_id">
+      <index-column name="connection_id" />
+    </index>
+    <index name="idx_ai_tier_assignment_model_id">
+      <index-column name="model_id" />
+    </index>
+    <unique name="ai_tier_assignment_tier_UNIQUE">
+      <unique-column name="tier" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="ai_usage_setting" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="the identifier a module declares, like theliacms.page_generation" name="usage_id" required="true" size="128" type="VARCHAR" />
+    <column defaultValue="1" name="enabled" required="true" type="BOOLEAN" />
+    <column description="what the usage may spend in a calendar month, in currency; empty: no budget of its own, a public usage stays inactive" name="monthly_budget" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="USD" name="currency" required="true" size="3" type="VARCHAR" />
+    <column description="requests an actor may send in a minute, empty: the default of the audience" name="requests_per_minute" type="INTEGER" />
+    <column description="requests an actor may send in a day, empty: the default of the audience" name="requests_per_day" type="INTEGER" />
+    <column description="the output limit of every request, empty: the limit of the model" name="max_output_tokens" type="INTEGER" />
+    <column description="a connection that replaces the one of the tier for this usage" name="pinned_connection_id" type="INTEGER" />
+    <column description="a model that replaces the one of the tier for this usage" name="pinned_model_id" type="INTEGER" />
+    <column description="JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares" name="guardrails" type="LONGVARCHAR" />
+    <column defaultValue="1" description="0 hides the notice of an interactive usage (AI Act 50(1)): allowed, the usage then shows as not compliant" name="transparency_notice" required="true" type="BOOLEAN" />
+    <column defaultValue="1" description="0 drops the provenance mark of a generative usage (AI Act 50(2)): allowed, the usage then shows as not compliant" name="provenance_mark" required="true" type="BOOLEAN" />
+    <column defaultValue="0" description="1 keeps the prompt of each call in the log" name="store_prompt" required="true" type="BOOLEAN" />
+    <column description="days a stored prompt is kept before the maintenance purge removes it" name="prompt_retention_days" type="INTEGER" />
+    <foreign-key foreignTable="ai_connection" name="fk_ai_usage_setting_pinned_connection_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="pinned_connection_id" />
+    </foreign-key>
+    <foreign-key foreignTable="ai_model" name="fk_ai_usage_setting_pinned_model_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="pinned_model_id" />
+    </foreign-key>
+    <index name="idx_ai_usage_setting_pinned_connection_id">
+      <index-column name="pinned_connection_id" />
+    </index>
+    <index name="idx_ai_usage_setting_pinned_model_id">
+      <index-column name="pinned_model_id" />
+    </index>
+    <unique name="ai_usage_setting_usage_id_UNIQUE">
+      <unique-column name="usage_id" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="ai_usage_log" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="usage_id" required="true" size="128" type="VARCHAR" />
+    <column description="the namespace of the usage identifier, the module code in lower case" name="module" required="true" size="55" type="VARCHAR" />
+    <column description="completion, stream, or external for a cost a module paid outside the gateway" name="kind" required="true" size="16" type="VARCHAR" />
+    <column description="the code of the connection, kept as text so that the log outlives the connection" name="connection_code" size="64" type="VARCHAR" />
+    <column description="the provider, or the paid service of an external cost" name="provider" size="32" type="VARCHAR" />
+    <column description="the model, or the operation of an external cost" name="model" size="128" type="VARCHAR" />
+    <column defaultValue="0" name="input_tokens" required="true" type="INTEGER" />
+    <column defaultValue="0" name="output_tokens" required="true" type="INTEGER" />
+    <column defaultValue="0" name="cache_read_tokens" required="true" type="INTEGER" />
+    <column defaultValue="0" name="cache_write_tokens" required="true" type="INTEGER" />
+    <column defaultValue="0" name="cost" required="true" scale="8" size="16" type="DECIMAL" />
+    <column defaultValue="USD" name="currency" required="true" size="3" type="VARCHAR" />
+    <column description="admin, customer, visitor or system" name="actor_type" required="true" size="16" type="VARCHAR" />
+    <column description="HMAC-SHA256 of the actor with the application secret: counts an actor, never names one" name="actor_hash" required="true" size="64" type="VARCHAR" />
+    <column description="succeeded, failed, blocked, rejected or aborted" name="status" required="true" size="16" type="VARCHAR" />
+    <column description="why the call was refused or failed, never the prompt" name="error" size="255" type="VARCHAR" />
+    <column description="completed, max_tokens, tool_calls or content_filter" name="finish_reason" size="16" type="VARCHAR" />
+    <column name="latency_ms" type="INTEGER" />
+    <column description="JSON list of the guardrail verdicts" name="guardrail_verdicts" type="LONGVARCHAR" />
+    <column description="groups the turns of one task, like the steps of a tool loop" name="correlation_id" size="64" type="VARCHAR" />
+    <column description="the request as sent, only when the usage stores prompts" name="prompt" type="CLOB" />
+    <column description="when the maintenance purge empties the prompt" name="prompt_expires_at" type="TIMESTAMP" />
+    <index name="idx_ai_usage_log_usage_created">
+      <index-column name="usage_id" />
+      <index-column name="created_at" />
+      <index-column name="cost" />
+    </index>
+    <index name="idx_ai_usage_log_created">
+      <index-column name="created_at" />
+      <index-column name="cost" />
+    </index>
+    <index name="idx_ai_usage_log_status_created">
+      <index-column name="status" />
+      <index-column name="created_at" />
+    </index>
+    <index name="idx_ai_usage_log_correlation_id">
+      <index-column name="correlation_id" />
+    </index>
+    <index name="idx_ai_usage_log_prompt_expires_at">
+      <index-column name="prompt_expires_at" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="ai_budget_reservation" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="usage_id" required="true" size="128" type="VARCHAR" />
+    <column description="the highest cost the call can reach, held until the call is logged" name="amount" required="true" scale="8" size="16" type="DECIMAL" />
+    <column defaultValue="USD" name="currency" required="true" size="3" type="VARCHAR" />
+    <column description="after this date the reservation no longer counts, so that a crashed call does not hold the budget" name="expires_at" required="true" type="TIMESTAMP" />
+    <index name="idx_ai_budget_reservation_usage_expires">
+      <index-column name="usage_id" />
+      <index-column name="expires_at" />
+    </index>
+    <index name="idx_ai_budget_reservation_expires_at">
+      <index-column name="expires_at" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
 </database>

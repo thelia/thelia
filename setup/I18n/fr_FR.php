@@ -1551,6 +1551,7 @@ return [
     'Intra-Community VAT exemption: disabled, or verified_vat_number to exempt an order billed to a verified VAT number of another member state (requires a verification module)' => 'Exonération de TVA intracommunautaire : disabled (désactivée), ou verified_vat_number pour exonérer une commande facturée à un numéro de TVA vérifié d\'un autre État membre (nécessite un module de vérification)',
     'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Nombre de jours pendant lesquels la vérification d\'un numéro de TVA permet l\'exonération (0 ou moins revient à 90)',
     'Configuration webhooks' => 'Configuration des webhooks',
+    'Configuration AI' => 'Configuration de l\'IA',
     'Shipping notice sent to the customer' => 'Avis d\'expédition envoyé au client',
     'Your order {{ order_ref }} has been shipped' => 'Votre commande {{ order_ref }} a été expédiée',
     'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Envoyer un e-mail au client quand sa commande est expédiée (1 = oui, 0 = non)',

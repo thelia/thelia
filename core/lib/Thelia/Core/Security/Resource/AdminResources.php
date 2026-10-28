@@ -81,6 +81,8 @@ class AdminResources
     public const DESTINATION_RESTRICTION = 'admin.configuration.destination-restriction';
     public const BACKGROUND_JOBS = 'admin.configuration.background-jobs';
     public const WEBHOOK = 'admin.configuration.webhook';
+    /** Connections, models, budgets and log of the AI layer: it spends money and sends shop data to a provider. */
+    public const AI = 'admin.configuration.ai';
     public const HOME = 'admin.home';
     public const LANGUAGE = 'admin.configuration.language';
     public const MAILING_SYSTEM = 'admin.configuration.mailing-system';
