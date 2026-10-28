@@ -447,6 +447,21 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         self::assertSame('pending', AiToolApprovalQuery::create()->findPk($others)?->getStatus());
     }
 
+    public function testAProposalOfAnAdministratorDeletedInBulkIsRejectedWhenSomebodyDecides(): void
+    {
+        $leaving = $this->createFixtureFactory()->admin(['login' => 'bulk']);
+        $id = $this->propose(7, 'new', $leaving->getId());
+        $this->logInAsAdmin($this->approver);
+
+        \Thelia\Model\AdminQuery::create()->filterById($leaving->getId())->delete();
+
+        $this->assertRefused(AiToolApprovalFailure::NotPending, fn () => $this->approvals->approve($id));
+        $row = AiToolApprovalQuery::create()->findPk($id);
+        self::assertSame('rejected', $row?->getStatus());
+        self::assertSame('admin_deleted', $row?->getDecisionNote());
+        self::assertSame(0, ProbeToolState::$applyCalls);
+    }
+
     public function testRevokingATokenRejectsWhatWasProposedThroughIt(): void
     {
         $token = (new \Thelia\Model\AiToolToken())->setAdminId($this->proposer->getId())->setLabel('t')->setTokenHash(hash('sha256', 'x'))->setTokenPrefix('thelia_mcp_abcd')->setAllRights(true)->setExpiresAt(new \DateTimeImmutable('+1 day'));
