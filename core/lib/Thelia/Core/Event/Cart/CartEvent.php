@@ -21,7 +21,7 @@ use Thelia\Model\CartItem;
 
 class CartEvent extends ActionEvent
 {
-    protected ?int $quantity = null;
+    protected ?float $quantity = null;
     protected ?bool $append = null;
     protected ?bool $newness = null;
     protected ?int $productSaleElementsId = null;
@@ -127,14 +127,18 @@ class CartEvent extends ActionEvent
         return $this->productSaleElementsId;
     }
 
+    /**
+     * A combination sold by measure takes a quantity with decimals (1.25 kg): it is
+     * carried as it is, the rules of the combination deciding whether the cart takes it.
+     */
     public function setQuantity(int|float $quantity): static
     {
-        $this->quantity = (int) $quantity;
+        $this->quantity = (float) $quantity;
 
         return $this;
     }
 
-    public function getQuantity(): ?int
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
