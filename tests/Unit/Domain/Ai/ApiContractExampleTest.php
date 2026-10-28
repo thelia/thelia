@@ -193,6 +193,15 @@ final class ApiContractExampleTest extends TestCase
         self::assertSame(1742, $final->tokenUsage->total());
     }
 
+    public function testAuthorizeTakesTheCeilingOfTheCallAsAnOptionalDecimal(): void
+    {
+        $parameters = (new \ReflectionMethod(AiCostRecorderInterface::class, 'authorize'))->getParameters();
+
+        self::assertSame('maximumCost', $parameters[3]->getName());
+        self::assertTrue($parameters[3]->isDefaultValueAvailable());
+        self::assertSame('0', $parameters[3]->getDefaultValue());
+    }
+
     public function testPriceWatchRecordsTheCostOfAJevJudgement(): void
     {
         $recorder = new class implements AiCostRecorderInterface {
@@ -202,7 +211,7 @@ final class ApiContractExampleTest extends TestCase
             /** @var list<AiExternalCost> */
             public array $recorded = [];
 
-            public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction): void
+            public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0'): void
             {
                 if ($this->europeanUnionOnly && AiJurisdiction::EuropeanUnion !== $jurisdiction) {
                     throw new AiJurisdictionRefusedException($provider, $jurisdiction);
@@ -219,6 +228,8 @@ final class ApiContractExampleTest extends TestCase
 
         // By default a service outside the EU is allowed (the back office shows a warning).
         $recorder->authorize('pricewatch.offer_judgement', 'typesafe', AiJurisdiction::OutsideEuropeanUnion);
+        // A module that knows the ceiling of the call passes it, so the budget can hold it back.
+        $recorder->authorize('pricewatch.offer_judgement', 'typesafe', AiJurisdiction::OutsideEuropeanUnion, maximumCost: '0.00020000');
 
         $recorder->europeanUnionOnly = true;
 
