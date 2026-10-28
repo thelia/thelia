@@ -4,6 +4,7 @@ const baseURL = process.env.BASE_URL ?? 'https://thelia-3.ddev.site';
 
 export default defineConfig({
   testDir: './specs',
+  globalSetup: './global-setup.ts',
   outputDir: './test-results',
   timeout: 60_000,
   expect: { timeout: 10_000 },
