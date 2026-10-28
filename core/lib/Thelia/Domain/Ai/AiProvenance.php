@@ -51,4 +51,36 @@ final readonly class AiProvenance
             'log_id' => $this->logId,
         ];
     }
+
+    /**
+     * Reads back what toArray() wrote, from the stored JSON or array of a module. Null when it is not a valid
+     * mark: a module that stored something else, or an older shape, shows no mark instead of failing.
+     *
+     * @param array<string, mixed>|string|null $stored
+     */
+    public static function fromStored(array|string|null $stored): ?self
+    {
+        if (\is_string($stored)) {
+            $stored = json_decode($stored, true);
+        }
+
+        if (!\is_array($stored) || true !== ($stored['ai_generated'] ?? null)) {
+            return null;
+        }
+
+        $usage = $stored['usage'] ?? null;
+        $model = $stored['model'] ?? null;
+        $generatedAt = $stored['generated_at'] ?? null;
+        $logId = $stored['log_id'] ?? null;
+
+        if (!\is_string($usage) || !\is_string($model) || !\is_string($generatedAt) || !\is_int($logId)) {
+            return null;
+        }
+
+        try {
+            return new self($usage, $model, new \DateTimeImmutable($generatedAt), $logId);
+        } catch (Exception\InvalidAiArgumentException|\DateMalformedStringException) {
+            return null;
+        }
+    }
 }
