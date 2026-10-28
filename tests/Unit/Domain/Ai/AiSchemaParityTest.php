@@ -61,4 +61,25 @@ final class AiSchemaParityTest extends TestCase
             self::assertSame($expected, $found, $file);
         }
     }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function globalSettings(): iterable
+    {
+        yield 'master switch on' => ['ai_enabled', '1'];
+        yield 'no global cap' => ['ai_monthly_cap', '0'];
+        yield 'EU only off' => ['ai_eu_only', '0'];
+    }
+
+    #[DataProvider('globalSettings')]
+    public function testTheInstallAndTheUpdateSeedTheGlobalSettings(string $name, string $value): void
+    {
+        $root = \dirname(__DIR__, 4);
+        $row = "'".$name."', '".$value."', 0, 0, NOW(), NOW()";
+
+        foreach (['setup/insert.sql.tpl', 'setup/insert.sql', 'setup/update/sql/3.3.0.sql'] as $file) {
+            self::assertStringContainsString($row, (string) file_get_contents($root.'/'.$file), $file);
+        }
+    }
 }

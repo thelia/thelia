@@ -2032,4 +2032,16 @@ CREATE TABLE IF NOT EXISTS `ai_budget_reservation`
     INDEX `idx_ai_budget_reservation_expires_at` (`expires_at`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- AI layer: global settings. `ai_enabled` is the master switch, `ai_monthly_cap`
+-- the monthly spend all usages share (0 = no global cap), `ai_eu_only` refuses
+-- any provider outside the European Union when set to 1. INSERT IGNORE leaves
+-- alone a shop that already chose a value.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('ai_enabled', '1', 0, 0, NOW(), NOW()),
+    ('ai_monthly_cap', '0', 0, 0, NOW(), NOW()),
+    ('ai_eu_only', '0', 0, 0, NOW(), NOW());
+
 SET FOREIGN_KEY_CHECKS = 1;
