@@ -395,6 +395,33 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         self::assertCount(1, $this->approvals->pendingFor($this->proposer->getId()));
     }
 
+    public function testAFloodOfProposalsTheAdministratorMayNotDecideNeverHidesTheOnesHeMay(): void
+    {
+        $mine = $this->propose();
+
+        for ($index = 0; $index < 1005; ++$index) {
+            (new \Thelia\Model\AiToolApproval())
+                ->setToolName('aiprobemodule_update')
+                ->setModule('aiprobemodule')
+                ->setAclResource(AdminResources::ORDER)
+                ->setAclAccess('UPDATE')
+                ->setTarget('x:'.$index)
+                ->setSummary('x')
+                ->setOriginalArguments('{}')
+                ->setArguments('{}')
+                ->setBeforeState('{}')
+                ->setAfterState('{}')
+                ->setStatus('pending')
+                ->setChannel('gateway')
+                ->setProposedByType('system')
+                ->setProposedByHash(str_repeat('b', 64))
+                ->setExpiresAt(new \DateTimeImmutable('+1 day'))
+                ->save();
+        }
+
+        self::assertSame([$mine], array_map(static fn ($view): int => $view->id, $this->approvals->pendingFor($this->approver->getId())));
+    }
+
     public function testPendingForHidesTheExpiredAndHonoursTheLimit(): void
     {
         $ids = [$this->propose(1, 'a'), $this->propose(2, 'b'), $this->propose(3, 'c')];

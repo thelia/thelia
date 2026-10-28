@@ -305,22 +305,23 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
     private function visibleTo(int $adminId, int $limit, bool $applying): array
     {
         $views = [];
-        $granted = [];
         $now = new \DateTimeImmutable();
 
+        // The right of each kind of proposal is tested once, then only the proposals of the rights he holds are read:
+        // a flood of proposals he may not decide never hides the ones he may.
+        $granted = array_values(array_filter(
+            $this->approvals->rightsAsked($applying ? AiToolApprovalStatus::Applying : AiToolApprovalStatus::Pending, $applying ? null : $now),
+            fn (array $right): bool => $this->accessChecker->adminHoldsRight($adminId, $right['resource'], $right['module'], $right['access']),
+        ));
+
         for ($offset = 0; $offset < self::SCAN_LIMIT && \count($views) < $limit; $offset += self::SCAN_PAGE) {
-            $batch = $applying ? $this->approvals->applyingBatch($offset, self::SCAN_PAGE) : $this->approvals->pendingBatch($offset, self::SCAN_PAGE, $now);
+            $batch = $applying ? $this->approvals->applyingBatch($offset, self::SCAN_PAGE, $granted) : $this->approvals->pendingBatch($offset, self::SCAN_PAGE, $now, $granted);
 
             foreach ($batch as $row) {
-                $key = $row->getAclAccess().'|'.$row->getAclResource().'|'.$row->getAclModule();
-                $granted[$key] ??= $this->accessChecker->adminHoldsRight($adminId, $row->getAclResource(), $row->getAclModule(), $row->getAclAccess());
+                $views[] = $this->approvals->toView($row);
 
-                if ($granted[$key]) {
-                    $views[] = $this->approvals->toView($row);
-
-                    if (\count($views) >= $limit) {
-                        break;
-                    }
+                if (\count($views) >= $limit) {
+                    break;
                 }
             }
 

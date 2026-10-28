@@ -51,21 +51,47 @@ final readonly class AiToolApprovalRepository
     /**
      * Pending proposals, newest first, expired ones included: the caller filters what it may show.
      *
+     * @param list<array{access: string, resource: string|null, module: string|null}>|null $rights only the proposals that ask for one of these rights; null for all
+     *
      * @return list<AiToolApproval>
      */
-    public function pendingBatch(int $offset, int $limit, \DateTimeImmutable $now): array
+    public function pendingBatch(int $offset, int $limit, \DateTimeImmutable $now, ?array $rights = null): array
     {
-        return $this->batch(AiToolApprovalStatus::Pending, $offset, $limit, $now);
+        return $this->batch(AiToolApprovalStatus::Pending, $offset, $limit, $now, $rights);
+    }
+
+    /**
+     * The rights the proposals of a status ask for, one entry each: what an administrator is tested against once
+     * instead of once by row.
+     *
+     * @return list<array{access: string, resource: string|null, module: string|null}>
+     */
+    public function rightsAsked(AiToolApprovalStatus $status, ?\DateTimeImmutable $notExpiredAt): array
+    {
+        $connection = Propel::getConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
+        $statement = $connection->prepare('SELECT DISTINCT `acl_access`, `acl_resource`, `acl_module` FROM `ai_tool_approval` WHERE `status` = :status'.(null === $notExpiredAt ? '' : ' AND `expires_at` > :now'));
+        $statement->execute([':status' => $status->value] + (null === $notExpiredAt ? [] : [':now' => $this->time($notExpiredAt)]));
+        $rights = [];
+
+        while (false !== ($row = $statement->fetch(\PDO::FETCH_NUM))) {
+            $rights[] = ['access' => (string) $row[0], 'resource' => null === $row[1] ? null : (string) $row[1], 'module' => null === $row[2] ? null : (string) $row[2]];
+        }
+
+        $statement->closeCursor();
+
+        return $rights;
     }
 
     /**
      * Changes left `applying`, oldest first.
      *
+     * @param list<array{access: string, resource: string|null, module: string|null}>|null $rights only the changes that ask for one of these rights; null for all
+     *
      * @return list<AiToolApproval>
      */
-    public function applyingBatch(int $offset, int $limit): array
+    public function applyingBatch(int $offset, int $limit, ?array $rights = null): array
     {
-        return $this->batch(AiToolApprovalStatus::Applying, $offset, $limit, null);
+        return $this->batch(AiToolApprovalStatus::Applying, $offset, $limit, null, $rights);
     }
 
     /**
@@ -206,11 +232,32 @@ final readonly class AiToolApprovalRepository
     }
 
     /**
+     * @param list<array{access: string, resource: string|null, module: string|null}>|null $rights
+     *
      * @return list<AiToolApproval>
      */
-    private function batch(AiToolApprovalStatus $status, int $offset, int $limit, ?\DateTimeImmutable $notExpiredAt): array
+    private function batch(AiToolApprovalStatus $status, int $offset, int $limit, ?\DateTimeImmutable $notExpiredAt, ?array $rights): array
     {
         $query = AiToolApprovalQuery::create()->filterByStatus($status->value);
+
+        if (null !== $rights) {
+            if ([] === $rights) {
+                return [];
+            }
+
+            $conditions = [];
+
+            foreach ($rights as $index => $right) {
+                $name = 'right'.$index;
+                $query->condition($name.'a', 'AiToolApproval.AclAccess = ?', $right['access']);
+                $query->condition($name.'r', null === $right['resource'] ? 'AiToolApproval.AclResource IS NULL' : 'AiToolApproval.AclResource = ?', $right['resource']);
+                $query->condition($name.'m', null === $right['module'] ? 'AiToolApproval.AclModule IS NULL' : 'AiToolApproval.AclModule = ?', $right['module']);
+                $query->combine([$name.'a', $name.'r', $name.'m'], Criteria::LOGICAL_AND, $name);
+                $conditions[] = $name;
+            }
+
+            $query->where($conditions, Criteria::LOGICAL_OR);
+        }
 
         if (null !== $notExpiredAt) {
             $query->filterByExpiresAt($notExpiredAt, Criteria::GREATER_THAN)->orderById(Criteria::DESC);
