@@ -134,6 +134,26 @@ final class AiSettingsWriterTest extends IntegrationTestCase
         self::assertSame('anthropic', $this->connection('mistral-spare', provider: 'anthropic', existing: $unused)->getProvider());
     }
 
+    public function testTheProviderOfAConnectionAUsageIsPinnedToKeepsServingTheModelOfItsTier(): void
+    {
+        $tierConnection = $this->connection('mistral-main');
+        $this->writer->assignTier(null, 'fast', $tierConnection->getId(), $this->model($tierConnection, 'ministral-a')->getId());
+
+        $pinned = $this->connection('mistral-pinned');
+        $setting = $this->writer->saveUsageSetting(null, 'aiprobe.writing', pinnedConnectionId: $pinned->getId());
+
+        try {
+            $this->connection('mistral-pinned', provider: 'anthropic', existing: $pinned);
+            self::fail('The provider of a connection a usage runs the model of its declared tier on does not change.');
+        } catch (InvalidAiArgumentException) {
+        }
+
+        self::assertSame('mistral', AiConnectionQuery::create()->findOneByCode('mistral-pinned')->getProvider());
+
+        $this->writer->saveUsageSetting($setting, 'aiprobe.writing', tier: 'advanced', pinnedConnectionId: $pinned->getId());
+        self::assertSame('anthropic', $this->connection('mistral-pinned', provider: 'anthropic', existing: $pinned)->getProvider(), 'a tier without a model leaves nothing to keep');
+    }
+
     public function testAConnectionThatBreaksARuleIsRefusedAndNothingIsSaved(): void
     {
         foreach ([
