@@ -26,6 +26,7 @@ use Thelia\Domain\Ai\Budget\AiBudgetLedger;
 use Thelia\Domain\Ai\Catalog\AiCostCalculator;
 use Thelia\Domain\Ai\Exception\AiGuardrailBlockedException;
 use Thelia\Domain\Ai\Exception\AiProviderUnavailableException;
+use Thelia\Domain\Ai\Guardrail\AiCoreOutputGuardrails;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
 use Thelia\Domain\Ai\Guardrail\GuardrailStage;
 use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
@@ -40,7 +41,7 @@ use Thelia\Domain\Ai\Stream\TextDelta;
 
 /**
  * The single way to call a model (AiGatewayInterface): admission (AiAdmission), one call to the adapter of the
- * connection with one retry, the output guardrails, the cost, the log row and the settlement of the budget.
+ * connection with one retry, the output guardrails (those of the core, then the optional ones), the cost, the log row and the settlement of the budget.
  *
  * Whatever happens after the budget was reserved, the reservation is given back: with the log row that replaces
  * it, or in the `finally` of the call.
@@ -62,6 +63,7 @@ final class AiGateway implements AiGatewayInterface
         private readonly AiBudgetLedger $ledger,
         private readonly AiCostCalculator $calculator,
         private readonly AiGuardrailRunner $guardrails,
+        private readonly AiCoreOutputGuardrails $coreOutput,
         private readonly AiPromptSnapshot $prompts,
         private readonly int $retryDelayMicroseconds = 250_000,
     ) {
@@ -84,7 +86,7 @@ final class AiGateway implements AiGatewayInterface
                 throw new AiGuardrailBlockedException($settlement->blocking, $settlement->logId);
             }
 
-            return $this->response($call, $result, $settlement);
+            return $this->response($call, $settlement);
         } finally {
             $this->ledger->release($call->hold);
         }
@@ -130,7 +132,7 @@ final class AiGateway implements AiGatewayInterface
             $settlement = $this->settle($call, $result, $result->tokenUsage, annotateOnly: true);
             $logged = true;
 
-            yield new StreamCompleted($this->response($call, $result, $settlement));
+            yield new StreamCompleted($this->response($call, $settlement));
         } catch (AiProviderUnavailableException $unavailable) {
             $logId = $this->closeUnfinished($call, $stream, $receivedCharacters, $eventsSeen, $unavailable);
             $logged = true;
@@ -218,10 +220,18 @@ final class AiGateway implements AiGatewayInterface
     /**
      * Runs the output guardrails, prices the call and writes its row in place of the reservation.
      */
-    private function settle(AiAdmittedCall $call, AiProviderResult $result, AiTokenUsage $tokens, bool $annotateOnly): AiSettlement
+    private function settle(AiAdmittedCall $call, AiProviderResult $provided, AiTokenUsage $tokens, bool $annotateOnly): AiSettlement
     {
-        $output = '' !== $result->text ? $result->text : (null === $result->data ? null : json_encode($result->data, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES));
-        $outputVerdicts = $this->guardrails->run(GuardrailStage::Output, $call->guardedRequest, $output ?? '', $call->guardrailSelection, $annotateOnly);
+        $core = $this->coreOutput->check($call->request, $provided, $annotateOnly);
+        $result = $core->result;
+        $outputVerdicts = $core->verdicts;
+
+        // A refused answer is not sent to the optional guardrails: a moderation would be paid for nothing.
+        if (!$core->blocks()) {
+            $output = '' !== $result->text ? $result->text : (null === $result->data ? null : json_encode($result->data, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES));
+            $outputVerdicts = [...$outputVerdicts, ...$this->guardrails->run(GuardrailStage::Output, $call->guardedRequest, $output ?? '', $call->guardrailSelection, $annotateOnly)];
+        }
+
         $verdicts = [...$call->verdicts(), ...$outputVerdicts];
         $blocking = null;
 
@@ -246,11 +256,12 @@ final class AiGateway implements AiGatewayInterface
             $call->hold,
         );
 
-        return new AiSettlement($logId, $cost, $verdicts, $blocking);
+        return new AiSettlement($logId, $cost, $verdicts, $blocking, $result);
     }
 
-    private function response(AiAdmittedCall $call, AiProviderResult $result, AiSettlement $settlement): AiResponse
+    private function response(AiAdmittedCall $call, AiSettlement $settlement): AiResponse
     {
+        $result = $settlement->result;
         $model = '' !== $result->model ? $result->model : $call->target->model->name;
         $marked = AiTransparency::Generative === $call->usage->transparency && ($call->setting?->getProvenanceMark() ?? true);
 

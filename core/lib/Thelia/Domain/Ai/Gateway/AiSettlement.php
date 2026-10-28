@@ -16,6 +16,7 @@ namespace Thelia\Domain\Ai\Gateway;
 
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
+use Thelia\Domain\Ai\Provider\AiProviderResult;
 
 /**
  * What the log row of a finished call holds back for the response: its identifier, the cost, every verdict, and the
@@ -34,6 +35,7 @@ final readonly class AiSettlement
         public string $cost,
         public array $verdicts,
         public ?GuardrailVerdict $blocking,
+        public AiProviderResult $result,
     ) {
     }
 }
