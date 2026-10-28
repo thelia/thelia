@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Repository;
 
+use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\AiTier;
 use Thelia\Model\AiConnection;
 use Thelia\Model\AiConnectionQuery;
@@ -37,6 +38,21 @@ class AiRoutingRepository
     public function connection(int $id): ?AiConnection
     {
         return AiConnectionQuery::create()->findPk($id);
+    }
+
+    /**
+     * The active connections of a provider, oldest first.
+     *
+     * @return list<AiConnection>
+     */
+    public function activeConnections(AiProvider $provider): array
+    {
+        return array_values(AiConnectionQuery::create()
+            ->filterByProvider($provider->value)
+            ->filterByActive(true)
+            ->orderById()
+            ->find()
+            ->getArrayCopy());
     }
 
     public function model(int $id): ?AiModel
