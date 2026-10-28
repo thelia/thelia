@@ -60,6 +60,7 @@ final class AiMcpServerTest extends ApiTestCase
     protected function tearDown(): void
     {
         ConfigQuery::write('ai_mcp_enabled', '0');
+        ConfigQuery::resetCache();
 
         parent::tearDown();
     }
@@ -282,6 +283,20 @@ final class AiMcpServerTest extends ApiTestCase
         }
     }
 
+    public function testTheHostOfTheShopIsServedAndAnUnknownHostIs403(): void
+    {
+        ConfigQuery::write('url_site', 'https://shop.example.test');
+        $created = $this->token($this->reader, [['resource' => 'admin.product', 'access' => 'VIEW']]);
+
+        $shop = $this->postFrom('shop.example.test', $created->token);
+        $unknown = $this->postFrom('evil.example.test', $created->token);
+        $loopback = $this->postFrom('127.0.0.1:8080', $created->token);
+
+        self::assertSame(Response::HTTP_OK, $shop->getStatusCode(), (string) $shop->getContent());
+        self::assertSame(Response::HTTP_FORBIDDEN, $unknown->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $loopback->getStatusCode());
+    }
+
     /**
      * @param list<array<string, string>> $scopes
      */
@@ -362,6 +377,15 @@ final class AiMcpServerTest extends ApiTestCase
         }
 
         $this->client->request('POST', '/api/mcp', server: $server, content: $body);
+
+        return $this->client->getResponse();
+    }
+
+    private function postFrom(string $host, string $token): Response
+    {
+        $message = ['jsonrpc' => '2.0', 'id' => 1, 'method' => 'initialize', 'params' => ['protocolVersion' => self::PROTOCOL, 'capabilities' => new \stdClass(), 'clientInfo' => ['name' => 'test', 'version' => '1']]];
+
+        $this->client->request('POST', '/api/mcp', server: ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json, text/event-stream', 'HTTP_AUTHORIZATION' => 'Bearer '.$token, 'HTTP_HOST' => $host], content: json_encode($message, \JSON_THROW_ON_ERROR));
 
         return $this->client->getResponse();
     }
