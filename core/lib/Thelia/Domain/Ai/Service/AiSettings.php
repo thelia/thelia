@@ -92,6 +92,11 @@ class AiSettings
         return '1' === trim((string) ConfigQuery::read('ai_mcp_enabled', '0'));
     }
 
+    public function setMcpEnabled(bool $enabled): void
+    {
+        ConfigQuery::write('ai_mcp_enabled', $enabled ? '1' : '0');
+    }
+
     /**
      * @return int hours a proposal of a write tool waits for an administrator, 24 when the setting is missing or is not a positive number
      */

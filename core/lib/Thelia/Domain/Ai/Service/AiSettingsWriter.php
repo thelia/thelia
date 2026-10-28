@@ -342,6 +342,11 @@ final readonly class AiSettingsWriter
         $this->settings->setEnabled($enabled);
     }
 
+    public function setMcpEnabled(bool $enabled): void
+    {
+        $this->settings->setMcpEnabled($enabled);
+    }
+
     /**
      * @param string $cap a non-negative decimal like "25.00", '0' for no global cap
      *
