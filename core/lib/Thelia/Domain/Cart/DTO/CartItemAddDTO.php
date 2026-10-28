@@ -24,7 +24,7 @@ readonly class CartItemAddDTO implements DTOEventActionInterface, CartDTOInterfa
         private Cart $cart,
         private int $productId,
         private int $productSaleElementId,
-        private int $quantity = 1,
+        private float $quantity = 1.0,
         private bool $append = true,
         private bool $newness = true,
         private ?BundleComposition $bundleComposition = null,
