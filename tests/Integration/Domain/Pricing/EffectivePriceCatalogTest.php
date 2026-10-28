@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Pricing;
 
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CatalogActivity;
 use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
@@ -105,7 +106,7 @@ final class EffectivePriceCatalogTest extends ActionIntegrationTestCase
         $probe = $this->createStub(CatalogActivityProbe::class);
         $probe->method('read')->willReturn(new CatalogActivity($publicRule, false, false, false, false, false, 1));
 
-        return new EffectivePriceCatalog($resolver, new PricingActivityChecker($probe, new CustomerDiscountRate()));
+        return new EffectivePriceCatalog($resolver, new PricingActivityChecker($probe, new CustomerDiscountRate(), new CustomerGroupResolver($probe)));
     }
 
     private function product(): Product

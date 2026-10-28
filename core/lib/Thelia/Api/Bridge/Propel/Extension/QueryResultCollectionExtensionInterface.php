@@ -21,5 +21,9 @@ interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensi
 {
     public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool;
 
+    /**
+     * The collection, once every extension has applied to the query; null to leave it to the next
+     * result extension. The first one that answers is the one the provider serves.
+     */
     public function getResult(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []);
 }
