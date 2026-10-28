@@ -107,6 +107,21 @@ final class AiToolLogPurgerTest extends IntegrationTestCase
         self::assertNotNull(AiToolApprovalQuery::create()->findPk($recent->getId()));
     }
 
+    public function testTheArgumentsOfADecidedProposalAreEmptiedAfterThirtyDaysAndTheRowStays(): void
+    {
+        $old = $this->approval('applied', '2026-05-01 00:00:00', '2026-05-02 00:00:00', '{"price":"14.90"}');
+        $oldPending = $this->approval('pending', '2026-05-01 00:00:00', '2030-01-01 00:00:00', '{"price":"14.90"}');
+        $recent = $this->approval('applied', '2026-06-10 00:00:00', '2026-06-11 00:00:00', '{"price":"14.90"}');
+
+        $result = (new AiLogPurger())->purge(400, false, $this->now);
+
+        self::assertSame(1, $result->approvalArguments);
+        self::assertSame(['{}', '{}', 'applied'], [AiToolApprovalQuery::create()->findPk($old->getId())?->getArguments(), AiToolApprovalQuery::create()->findPk($old->getId())?->getOriginalArguments(), AiToolApprovalQuery::create()->findPk($old->getId())?->getStatus()]);
+        self::assertSame('{"price":"14.90"}', AiToolApprovalQuery::create()->findPk($oldPending->getId())?->getArguments());
+        self::assertSame('{"price":"14.90"}', AiToolApprovalQuery::create()->findPk($recent->getId())?->getOriginalArguments());
+        self::assertSame(0, (new AiLogPurger())->purge(400, false, $this->now)->approvalArguments);
+    }
+
     public function testADryRunCountsAndChangesNothing(): void
     {
         $this->logRow('2025-01-01 00:00:00', '{"a":1}', '2025-02-01 00:00:00');
@@ -155,7 +170,7 @@ final class AiToolLogPurgerTest extends IntegrationTestCase
         return $row;
     }
 
-    private function approval(string $status, string $createdAt, string $expiresAt): AiToolApproval
+    private function approval(string $status, string $createdAt, string $expiresAt, string $arguments = '{}'): AiToolApproval
     {
         $row = (new AiToolApproval())
             ->setToolName('shop_update')
@@ -164,8 +179,8 @@ final class AiToolLogPurgerTest extends IntegrationTestCase
             ->setAclAccess('UPDATE')
             ->setTarget('x:1')
             ->setSummary('x')
-            ->setOriginalArguments('{}')
-            ->setArguments('{}')
+            ->setOriginalArguments($arguments)
+            ->setArguments($arguments)
             ->setBeforeState('{}')
             ->setAfterState('{}')
             ->setStatus($status)

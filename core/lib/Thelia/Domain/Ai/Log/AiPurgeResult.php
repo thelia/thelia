@@ -32,6 +32,7 @@ final readonly class AiPurgeResult
         public int $toolArguments = 0,
         public int $expiredApprovals = 0,
         public int $decidedApprovals = 0,
+        public int $approvalArguments = 0,
     ) {
     }
 }
