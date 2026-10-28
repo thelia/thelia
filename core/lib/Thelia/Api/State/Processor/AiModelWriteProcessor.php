@@ -25,13 +25,17 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\AiModel as AiModelResource;
 use Thelia\Domain\Ai\AiProvider;
+use Thelia\Domain\Ai\AiTier;
+use Thelia\Domain\Ai\AiUsageRegistryInterface;
 use Thelia\Domain\Ai\Catalog\AiModelSpecification;
 use Thelia\Domain\Ai\Exception\AiExceptionInterface;
+use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Internal\AiAssert;
 use Thelia\Model\AiConnectionQuery;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiModelQuery;
 use Thelia\Model\AiTierAssignmentQuery;
+use Thelia\Model\AiUsageSetting;
 use Thelia\Model\AiUsageSettingQuery;
 
 /**
@@ -46,8 +50,10 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
 
     private const array PRICES = ['inputPrice' => 'The input price', 'outputPrice' => 'The output price', 'cacheReadPrice' => 'The cache read price', 'cacheWritePrice' => 'The cache write price'];
 
-    public function __construct(private ApiResourcePropelTransformerService $transformer)
-    {
+    public function __construct(
+        private ApiResourcePropelTransformerService $transformer,
+        private AiUsageRegistryInterface $usages,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
@@ -159,7 +165,8 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
 
     /**
      * A tier or a pinned usage reaches the model through a connection: that connection must still serve it
-     * once the provider or the connection of the model changes.
+     * once the provider or the connection of the model changes. A usage pinned to the model without a connection
+     * of its own reaches it through the connection of the model, else through the one of its tier.
      */
     private function assertItsTiersAndUsagesStillReachIt(AiModel $model, AiProvider $provider, ?int $connectionId): void
     {
@@ -169,9 +176,11 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
             $connectionIds[] = $assignment->getConnectionId();
         }
 
-        foreach (AiUsageSettingQuery::create()->filterByPinnedModelId($model->getId())->filterByPinnedConnectionId(null, Criteria::ISNOTNULL)->find() as $setting) {
-            $connectionIds[] = $setting->getPinnedConnectionId();
+        foreach (AiUsageSettingQuery::create()->filterByPinnedModelId($model->getId())->find() as $setting) {
+            $connectionIds[] = $setting->getPinnedConnectionId() ?? (null === $connectionId ? $this->tierConnectionIdOf($setting) : null);
         }
+
+        $connectionIds = array_filter($connectionIds, static fn (?int $id): bool => null !== $id);
 
         if ([] === $connectionIds) {
             return;
@@ -182,6 +191,21 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
                 throw new UnprocessableEntityHttpException('A tier or a usage reaches this model through a connection that would no longer serve it: give them another model first.');
             }
         }
+    }
+
+    /**
+     * The connection of the tier a usage runs at: the tier chosen for it, else the one its module declares (only
+     * the chosen one when the module is not installed).
+     */
+    private function tierConnectionIdOf(AiUsageSetting $setting): ?int
+    {
+        try {
+            $tier = $setting->effectiveTier($this->usages->get((string) $setting->getUsageId())->tier);
+        } catch (UnknownAiUsageException) {
+            $tier = AiTier::tryFrom((string) $setting->getTier());
+        }
+
+        return null === $tier ? null : AiTierAssignmentQuery::create()->filterByTier($tier->value)->findOne()?->getConnectionId();
     }
 
     private function positive(?int $value, string $label): ?int
