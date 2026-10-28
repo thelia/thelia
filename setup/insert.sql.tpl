@@ -114,7 +114,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (103, 'visitor_country_mode', 'off', 0, 0, NOW(), NOW()),
 (104, 'visitor_country_source', 'header', 0, 0, NOW(), NOW()),
 (105, 'visitor_country_header', 'CF-IPCountry', 0, 0, NOW(), NOW()),
-(106, 'visitor_country_database', '', 0, 0, NOW(), NOW())
+(106, 'visitor_country_database', '', 0, 0, NOW(), NOW()),
+(107, 'ai_enabled', '1', 0, 0, NOW(), NOW()),
+(108, 'ai_monthly_cap', '0', 0, 0, NOW(), NOW()),
+(109, 'ai_eu_only', '0', 0, 0, NOW(), NOW())
 
 ;
 
