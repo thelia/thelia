@@ -22,6 +22,7 @@ use Thelia\Domain\Ai\Guardrail\AiGuardrailAvailabilityInterface;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailInterface;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailTexts;
 use Thelia\Domain\Ai\Guardrail\GuardrailAvailability;
+use Thelia\Domain\Ai\Guardrail\GuardrailMode;
 use Thelia\Domain\Ai\Guardrail\GuardrailStage;
 use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
@@ -103,9 +104,28 @@ abstract class AbstractModerationGuardrail implements AiGuardrailInterface, AiGu
             return GuardrailVerdict::fail($this->name(), $stage, GuardrailAvailability::UNAVAILABLE);
         }
 
+        $blocking = $this->blocking($categories);
+
+        if ([] !== $blocking) {
+            return GuardrailVerdict::fail($this->name(), $stage, mb_substr('flagged: '.implode(',', $blocking), 0, 200));
+        }
+
+        // What the provider flagged without it being a reason to stop the call is kept in the log, as a note.
         return [] === $categories
             ? GuardrailVerdict::pass($this->name(), $stage)
-            : GuardrailVerdict::fail($this->name(), $stage, mb_substr('flagged: '.implode(',', $categories), 0, 200));
+            : new GuardrailVerdict($this->name(), $stage, true, GuardrailMode::Block, mb_substr('noted: '.implode(',', $categories), 0, 200));
+    }
+
+    /**
+     * The flagged categories that stop the call: all of them, unless the provider also flags categories of advice.
+     *
+     * @param list<string> $flagged
+     *
+     * @return list<string>
+     */
+    protected function blocking(array $flagged): array
+    {
+        return $flagged;
     }
 
     /**

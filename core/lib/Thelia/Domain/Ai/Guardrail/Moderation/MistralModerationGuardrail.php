@@ -23,9 +23,11 @@ use Thelia\Domain\Ai\Provider\AiHttpClientFactory;
  * The moderation of Mistral (`POST /v1/moderations`, model "Mistral Moderation 2", 26.03), with the key of an
  * active Mistral connection. The service runs in the EU and is free: the call has no cost line.
  *
- * The answer holds one result per text, each with a `categories` map. The names of the categories of the model
- * are not fixed by the documentation (the list grew with each version), so none is wired in: a text is flagged
- * as soon as the provider marks any category, as a boolean or as an object with `violated`.
+ * The answer holds one result per text, each with a `categories` map of booleans (measured on the real answer of
+ * mistral-moderation-2603: eleven categories, `category_scores` apart). Only the categories of safety stop a
+ * call (`thelia.ai.moderation.mistral_blocking_categories`); the categories of advice (`health`, `financial`,
+ * `law`, `pii`) and any category a later version of the model adds are noted in the verdict, never blocking: a
+ * customer who gives an address in the chat of a shop is not an offender.
  *
  * @internal
  */
@@ -39,6 +41,9 @@ final class MistralModerationGuardrail extends AbstractModerationGuardrail
         AiBaseUrlValidator $baseUrls,
         #[Autowire(param: 'thelia.ai.moderation.mistral_model')]
         private readonly string $model,
+        /** @var list<string> */
+        #[Autowire(param: 'thelia.ai.moderation.mistral_blocking_categories')]
+        private readonly array $blockingCategories,
     ) {
         parent::__construct($connections, $httpClients, $baseUrls);
     }
@@ -63,6 +68,11 @@ final class MistralModerationGuardrail extends AbstractModerationGuardrail
         return ['model' => $this->model, 'input' => $texts];
     }
 
+    protected function blocking(array $flagged): array
+    {
+        return array_values(array_filter($flagged, fn (string $name): bool => \in_array($name, $this->blockingCategories, true)));
+    }
+
     protected function flaggedCategories(array $response): ?array
     {
         $results = $response['results'] ?? null;
@@ -81,7 +91,12 @@ final class MistralModerationGuardrail extends AbstractModerationGuardrail
             }
 
             foreach ($categories as $name => $value) {
-                if (true === $value || (\is_array($value) && true === ($value['violated'] ?? null))) {
+                // A category that is not a boolean is a shape this code was not written for: no guess, unavailable.
+                if (!\is_bool($value)) {
+                    return null;
+                }
+
+                if ($value) {
                     $flagged[] = (string) $name;
                 }
             }

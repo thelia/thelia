@@ -91,7 +91,7 @@ final class AiModerationThroughGatewayTest extends AiModerationTestCase
     public function testAnOutputThatTheProviderFlagsIsRefusedInBlockMode(): void
     {
         $this->addConnection(AiProvider::Mistral);
-        $this->installedGuardrails = [$this->mistral([self::mistralAnswer(), self::mistralAnswer(['dangerous_and_criminal_content'])])];
+        $this->installedGuardrails = [$this->mistral([self::mistralAnswer(), self::mistralAnswer(['dangerous'])])];
         $this->setting('aiprobe.assistant', '5', guardrails: '{"mistral_moderation":"block"}');
         $gateway = $this->gatewayAnswering([Wire::chat('Something harmful', promptTokens: 21, completionTokens: 20)]);
 
@@ -102,7 +102,7 @@ final class AiModerationThroughGatewayTest extends AiModerationTestCase
             self::assertSame($this->lastLog()->getId(), $blocked->logId);
         }
 
-        self::assertSame(['blocked', 'flagged: dangerous_and_criminal_content', '0.00006100'], [$this->lastLog()->getStatus(), $this->lastLog()->getError(), $this->lastLog()->getCost()]);
+        self::assertSame(['blocked', 'flagged: dangerous', '0.00006100'], [$this->lastLog()->getStatus(), $this->lastLog()->getError(), $this->lastLog()->getCost()]);
         self::assertSame(['Hi', 'Something harmful'], array_map(static fn (array $call): string => $call['body']['input'][0], $this->moderationSent));
     }
 }

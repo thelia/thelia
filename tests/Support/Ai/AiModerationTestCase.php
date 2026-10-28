@@ -36,6 +36,9 @@ use Thelia\Model\AiConnection;
  */
 abstract class AiModerationTestCase extends AiGatewayTestCase
 {
+    /** @var list<string> */
+    public const array MISTRAL_BLOCKING = ['sexual', 'hate_and_discrimination', 'violence_and_threats', 'dangerous', 'criminal', 'selfharm', 'jailbreaking'];
+
     public const string MISTRAL_KEY = 'mistral-test-key-0123456789';
 
     public const string OPENAI_KEY = 'openai-test-key-0123456789';
@@ -63,7 +66,7 @@ abstract class AiModerationTestCase extends AiGatewayTestCase
      */
     protected function mistral(array $responses): MistralModerationGuardrail
     {
-        return new MistralModerationGuardrail($this->connections(), $this->httpClients($responses), new AiBaseUrlValidator(new WebhookUrlValidator()), 'mistral-moderation-2603');
+        return new MistralModerationGuardrail($this->connections(), $this->httpClients($responses), new AiBaseUrlValidator(new WebhookUrlValidator()), 'mistral-moderation-2603', self::MISTRAL_BLOCKING);
     }
 
     /**
@@ -75,13 +78,13 @@ abstract class AiModerationTestCase extends AiGatewayTestCase
     }
 
     /**
-     * What the provider answers: the documented shape, one result per text.
+     * What the provider answers: the shape measured on the real answer of mistral-moderation-2603 (28/10/2026), eleven categories and their scores.
      *
      * @param list<string> $flagged
      */
     protected static function mistralAnswer(array $flagged = []): MockResponse
     {
-        $names = ['sexual', 'hate_and_discrimination', 'violence_and_threats', 'dangerous_and_criminal_content', 'selfharm', 'health', 'financial', 'law', 'pii'];
+        $names = ['sexual', 'hate_and_discrimination', 'violence_and_threats', 'dangerous', 'criminal', 'selfharm', 'health', 'financial', 'law', 'pii', 'jailbreaking'];
 
         return AiProviderFixtures::json(['id' => '4d71ae510af942108ef7344f903e2b88', 'model' => 'mistral-moderation-2603', 'results' => [[
             'categories' => array_combine($names, array_map(static fn (string $name): bool => \in_array($name, $flagged, true), $names)),
