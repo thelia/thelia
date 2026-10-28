@@ -156,6 +156,70 @@ final class AnthropicAdapterTest extends AiProviderTestCase
         self::assertSame(['text', 'tool_use'], array_column($this->lastBody()['messages'][1]['content'], 'type'));
     }
 
+    public function testARequestThatDoesNotAskForThinkingGetsNoneSoItsBudgetGoesToTheAnswer(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport([Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => 'ok']])]));
+        $target = $this->target(AiProvider::Anthropic);
+
+        $adapter->complete($this->request(), $target);
+        self::assertSame(['type' => 'disabled'], $this->lastBody()['thinking']);
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => ['thinking' => ['type' => 'adaptive']]]), $target);
+        self::assertSame(['type' => 'adaptive'], $this->lastBody()['thinking'], 'a request that asks for thinking keeps it');
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => ['effort' => 'low']]), $target);
+        self::assertSame(['type' => 'disabled'], $this->lastBody()['thinking']);
+        self::assertSame('low', $this->lastBody()['output_config']['effort']);
+    }
+
+    public function testAToolCallCutAtTheLimitKeepsTheTextAndTheTokensInsteadOfFailing(): void
+    {
+        $cut = Wire::anthropic([['type' => 'text', 'text' => 'Let me look'], ['type' => 'tool_use', 'id' => 'toolu_01', 'name' => 'list_categories', 'input' => ['limit' => 3]]], 'max_tokens', ['input_tokens' => 40, 'output_tokens' => 600, 'cache_read_input_tokens' => 5, 'cache_creation_input_tokens' => 7]);
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport($cut));
+
+        $result = $adapter->complete($this->request(tools: [new AiToolDefinition('list_categories', 'Lists.', ['type' => 'object', 'properties' => []])], maxOutputTokens: 600), $this->target(AiProvider::Anthropic));
+
+        self::assertSame(AiFinishReason::MaxTokens, $result->finishReason);
+        self::assertSame('Let me look', $result->text);
+        self::assertSame([], $result->toolCalls);
+        self::assertEquals(new AiTokenUsage(40, 600, 5, 7), $result->tokenUsage);
+        self::assertSame('claude-probe-2026', $result->model);
+    }
+
+    public function testAStreamCutAtTheLimitDeliversItsTextThenSaysMaxTokens(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicStream(25, 600, stop: 'max_tokens')));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::Anthropic));
+        $texts = [];
+
+        foreach ($stream as $event) {
+            $texts[] = $event->text;
+        }
+
+        $result = $stream->result();
+
+        self::assertSame(['Bon', 'jour'], $texts);
+        self::assertSame('Bonjour', $result->text);
+        self::assertSame(AiFinishReason::MaxTokens, $result->finishReason);
+        self::assertTrue($result->complete);
+        self::assertSame([25, 600], [$result->tokenUsage->inputTokens, $result->tokenUsage->outputTokens]);
+    }
+
+    public function testAStreamThatSpentItsWholeBudgetThinkingIsAnEmptyMaxTokensAnswerWithItsTokens(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicThinkingOnlyStream()));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::Anthropic));
+
+        foreach ($stream as $_) {
+        }
+
+        $result = $stream->result();
+
+        self::assertSame('', $result->text);
+        self::assertSame(AiFinishReason::MaxTokens, $result->finishReason);
+        self::assertSame([22, 600], [$result->tokenUsage->inputTokens, $result->tokenUsage->outputTokens]);
+    }
+
     /** @return iterable<string, array{string, AiFinishReason}> */
     public static function stopReasons(): iterable
     {

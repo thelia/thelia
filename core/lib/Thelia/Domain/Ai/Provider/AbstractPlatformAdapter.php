@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Ai\Provider;
 
 use Symfony\AI\Platform\Capability;
+use Symfony\AI\Platform\Exception\MaxOutputTokensException;
 use Symfony\AI\Platform\Model;
 use Symfony\AI\Platform\Platform;
 use Symfony\AI\Platform\PlatformOptions;
@@ -65,7 +66,12 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
             $deferred = $this->invoke($request, $target, false);
             $this->assertSuccessful($deferred, $target);
 
-            return $this->results->fromDeferred($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred));
+            try {
+                return $this->results->fromDeferred($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred));
+            } catch (MaxOutputTokensException) {
+                // A tool call cut at the limit of the output: not a failure of the provider, an answer that stopped short.
+                return $this->results->fromTruncated($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred));
+            }
         } catch (\Throwable $error) {
             throw $this->errors->translate($error, $target) ?? $error;
         }
@@ -147,23 +153,28 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
 
         $progress->stream = $result;
 
-        foreach ($deferred->asStream() as $delta) {
-            if ($delta instanceof LibraryTextDelta) {
-                if ('' === $delta->getText()) {
-                    continue;
-                }
+        try {
+            foreach ($deferred->asStream() as $delta) {
+                if ($delta instanceof LibraryTextDelta) {
+                    if ('' === $delta->getText()) {
+                        continue;
+                    }
 
-                $progress->text .= $delta->getText();
+                    $progress->text .= $delta->getText();
 
-                yield new TextDelta($delta->getText());
-            } elseif ($delta instanceof ToolCallComplete) {
-                foreach ($delta->getToolCalls() as $toolCall) {
-                    $call = AiResultReader::toolCall($toolCall, $target->connectionCode);
-                    $progress->toolCalls[] = $call;
+                    yield new TextDelta($delta->getText());
+                } elseif ($delta instanceof ToolCallComplete) {
+                    foreach ($delta->getToolCalls() as $toolCall) {
+                        $call = AiResultReader::toolCall($toolCall, $target->connectionCode);
+                        $progress->toolCalls[] = $call;
 
-                    yield new ToolCallReceived($call);
+                        yield new ToolCallReceived($call);
+                    }
                 }
             }
+        } catch (MaxOutputTokensException) {
+            // The library raises it once the whole answer was read: the text received stays, the tokens are known.
+            $progress->truncated = true;
         }
 
         $progress->complete = true;

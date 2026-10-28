@@ -78,6 +78,26 @@ final readonly class AiResultReader
     }
 
     /**
+     * The answer of a call that is not streamed when the library refused it because the provider cut it at the
+     * limit of output tokens (a tool call cut in two): the text of the answer is read from the body of the
+     * response, the tool call is dropped, and the reason is MaxTokens.
+     */
+    public function fromTruncated(DeferredResult $deferred, AiTarget $target, bool $expectsData, ?string $announcedCost = null): AiProviderResult
+    {
+        $raw = $deferred->getRawResult();
+
+        try {
+            $data = $raw->getData();
+        } catch (\Throwable) {
+            $data = [];
+        }
+
+        $usage = $deferred->getResultConverter()->getTokenUsageExtractor()?->extract($raw, []);
+
+        return $this->build($target, self::textOf($data), [], [], $usage, AiFinishReason::MaxTokens, $expectsData, $announcedCost, true);
+    }
+
+    /**
      * What a stream has delivered, once it was read to its end or at the moment the caller stopped.
      */
     public function fromStream(AiStreamProgress $progress): AiProviderResult
@@ -99,7 +119,7 @@ final readonly class AiResultReader
             $progress->toolCalls,
             $thinking,
             $usage instanceof TokenUsageInterface ? $usage : null,
-            self::reason($metadata?->get('finish_reason')),
+            $progress->truncated ? AiFinishReason::MaxTokens : self::reason($metadata?->get('finish_reason')),
             $progress->expectsData,
             null,
             $progress->complete,
@@ -181,6 +201,35 @@ final readonly class AiResultReader
         $decoded = json_decode($json, true);
 
         return \is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * The text of a response body: the text blocks of Anthropic, the messages of the Responses API, the message of the first choice of the others.
+     *
+     * @param array<string, mixed> $data
+     */
+    private static function textOf(array $data): string
+    {
+        $text = '';
+
+        foreach (\is_array($data['content'] ?? null) ? $data['content'] : [] as $block) {
+            if (\is_array($block) && 'text' === ($block['type'] ?? null) && \is_string($block['text'] ?? null)) {
+                $text .= $block['text'];
+            }
+        }
+
+        // The Responses API of OpenAI: output items of type message, whose parts are output_text.
+        foreach (\is_array($data['output'] ?? null) ? $data['output'] : [] as $item) {
+            foreach (\is_array($item) && 'message' === ($item['type'] ?? null) && \is_array($item['content'] ?? null) ? $item['content'] : [] as $part) {
+                if (\is_array($part) && 'output_text' === ($part['type'] ?? null) && \is_string($part['text'] ?? null)) {
+                    $text .= $part['text'];
+                }
+            }
+        }
+
+        $content = $data['choices'][0]['message']['content'] ?? null;
+
+        return \is_string($content) ? $content : $text;
     }
 
     private static function reason(mixed $reason): AiFinishReason

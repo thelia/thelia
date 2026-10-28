@@ -46,9 +46,15 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
 
     /**
      * `effort` is written the short way in the contract (`['anthropic' => ['effort' => 'high']]`); the API reads it in `output_config`.
+     *
+     * Some models think by default and count the thinking in `max_tokens` (measured on claude-haiku-5-5: a 600-token
+     * budget fully spent thinking, no text, stop reason `max_tokens`). A request that does not ask for thinking
+     * (`['anthropic' => ['thinking' => ['type' => 'adaptive']]]`) gets none, so its budget is spent on the answer.
      */
     protected function nativeOptions(array $native): array
     {
+        $native['thinking'] ??= ['type' => 'disabled'];
+
         if (isset($native['effort'])) {
             $outputConfig = \is_array($native['output_config'] ?? null) ? $native['output_config'] : [];
             $outputConfig['effort'] ??= $native['effort'];
