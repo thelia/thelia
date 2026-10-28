@@ -25,4 +25,27 @@ use Thelia\Model\Base\AiUsageSetting as BaseAiUsageSetting;
  */
 class AiUsageSetting extends BaseAiUsageSetting
 {
+    /**
+     * The optional guardrails of the usage, guardrail name to mode; empty when none is chosen or the stored text is not a JSON object.
+     *
+     * @return array<string, string>
+     */
+    public function getGuardrailMap(): array
+    {
+        try {
+            $map = json_decode((string) $this->getGuardrails(), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return [];
+        }
+
+        return \is_array($map) ? array_filter($map, \is_string(...)) : [];
+    }
+
+    /**
+     * @param array<string, string> $map
+     */
+    public function setGuardrailMap(array $map): static
+    {
+        return $this->setGuardrails([] === $map ? null : json_encode($map, \JSON_THROW_ON_ERROR));
+    }
 }
