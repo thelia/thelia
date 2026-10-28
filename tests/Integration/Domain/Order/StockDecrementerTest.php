@@ -89,7 +89,7 @@ final class StockDecrementerTest extends ActionIntegrationTestCase
     }
 
     /**
-     * The column is a single precision FLOAT, which keeps 0.7 as 0.69999998: compared as it
+     * The column is a binary floating point number, which keeps 0.7 inexactly: compared as it
      * is, the last 0.7 kg in stock would be refused to a buyer of 0.7 kg.
      */
     public function testTheLastWeightInStockCanBeSold(): void
@@ -102,8 +102,8 @@ final class StockDecrementerTest extends ActionIntegrationTestCase
     }
 
     /**
-     * Each decrement of a FLOAT keeps the error of the one before it: ten orders of 10 g
-     * taken from 10 tonnes would leave 9999.902 kg in the column. The stock is compared
+     * Each decrement of a floating point column keeps the error of the one before it: ten
+     * orders of 10 g taken from 10 tonnes left 9999.902 kg in a single precision FLOAT. The stock is compared
      * on the thousandth, the finest decimal a quantity is sold with.
      */
     public function testTenWeighedOrdersLeaveTheStockWithoutDrift(): void
@@ -151,8 +151,8 @@ final class StockDecrementerTest extends ActionIntegrationTestCase
     }
 
     /**
-     * The stock as the column holds it, in thousandths. Read through the model, a FLOAT
-     * comes back with six significant digits, which hides the drift of the column.
+     * The stock as the column holds it, in thousandths, read without the model so that
+     * nothing between the column and the assertion rounds the drift away.
      */
     private function reloadQuantityInThousandths(ProductSaleElements $productSaleElements): int
     {

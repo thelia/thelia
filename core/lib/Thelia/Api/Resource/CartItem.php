@@ -111,7 +111,7 @@ class CartItem implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
     #[NotNull(groups: [Order::GROUP_ADMIN_WRITE])]
-    // cart_item.quantity is a FLOAT, like order_product.quantity: a line of
+    // cart_item.quantity is a DOUBLE, like order_product.quantity: a line of
     // goods sold by weight carries grams, not units. It is written through the
     // front API only, which holds it to the rules of its combination; the admin
     // write group stays out, so /admin/cart_items cannot go around them.

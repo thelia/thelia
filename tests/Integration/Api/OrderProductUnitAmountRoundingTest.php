@@ -62,7 +62,7 @@ final class OrderProductUnitAmountRoundingTest extends IntegrationTestCase
     }
 
     /**
-     * order_product.quantity and cart_item.quantity are both FLOAT columns: a
+     * order_product.quantity and cart_item.quantity are both DOUBLE columns: a
      * line of goods sold by weight carries grams, not units. Typed as an int the
      * resource billed 300.5 g as 300 g, whatever the rounding mode.
      */

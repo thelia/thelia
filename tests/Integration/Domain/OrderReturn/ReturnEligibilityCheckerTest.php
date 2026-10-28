@@ -299,7 +299,7 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
     }
 
     /**
-     * A quantity is a FLOAT - Thelia sells by weight and by length as well as
+     * A quantity is a DOUBLE - Thelia sells by weight and by length as well as
      * by the piece - so the remaining quantity is a subtraction of floats:
      * 0.7 ordered minus 0.3 already asked for is 0.39999999999999997, and the
      * customer asking for the 0.4 the shop displays used to be refused.
@@ -674,8 +674,8 @@ final class ReturnEligibilityCheckerTest extends IntegrationTestCase
 
     /**
      * The same line read back from the database, so that the quantity carries
-     * the precision the FLOAT column actually stores and not the double the
-     * fixture set.
+     * the precision the column actually stores and not the value the fixture
+     * set.
      */
     private function storedOrderProduct(OrderProductModel $orderProduct): OrderProductModel
     {
