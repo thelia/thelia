@@ -177,7 +177,7 @@ readonly class PostageTaxBreakdownCalculator
                 continue;
             }
 
-            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $cartItem->getTotalRealPrice();
+            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $cartItem->getSummedTotalRealPrice();
         }
 
         return $bases;

@@ -16,6 +16,7 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\DataTransfer\Export\SpreadsheetFormulaGuard;
 use Thelia\Model\ConfigQuery;
 
@@ -24,8 +25,10 @@ use Thelia\Model\ConfigQuery;
  *
  * The full order export is one row per order and has no place for them. Everything is
  * read from the order line, never from the catalogue: a GTIN or a part number corrected
- * since does not rewrite what was sold. Bounded by the same optional dates as the order
- * export.
+ * since does not rewrite what was sold. The quantity carries its decimals, read back from
+ * the single precision column (0.7, not 0.69999998), beside the unit frozen on the line
+ * (1.25 and kg). Bounded by the same
+ * optional dates as the order export.
  */
 class OrderLineExport extends OrderExport
 {
@@ -51,6 +54,7 @@ class OrderLineExport extends OrderExport
         'order_product_ean_code' => 'gtin',
         'order_product_mpn' => 'mpn',
         'order_product_quantity' => 'quantity',
+        'order_product_unit_code' => 'unit',
         'order_product_unit_price' => 'unit_price_excluding_taxes',
         'currency_code' => 'currency',
     ];
@@ -78,7 +82,8 @@ class OrderLineExport extends OrderExport
                 order_product.title as "order_product_title",
                 order_product.ean_code as "order_product_ean_code",
                 order_product.mpn as "order_product_mpn",
-                order_product.quantity as "order_product_quantity",
+                ROUND(order_product.quantity, '.QuantityScale::MAXIMUM_DECIMALS.') as "order_product_quantity",
+                order_product.unit_code as "order_product_unit_code",
                 CASE
                     WHEN `order`.id <= :text_promo_price_pivot THEN CAST(ROUND('.self::UNIT_PRICE_AS_TEXT.', 2) AS DECIMAL(16,2))
                     ELSE ROUND('.self::UNIT_PRICE.', 2)

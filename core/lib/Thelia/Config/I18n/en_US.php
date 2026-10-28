@@ -1201,4 +1201,5 @@ return [
     'The quantity was brought down to %quantity.' => 'The quantity was brought down to %quantity.',
     'Quantities of your cart were adjusted to what the products are sold in. Check your cart before ordering.' => 'Quantities of your cart were adjusted to what the products are sold in. Check your cart before ordering.',
     'This product is sold by measure: order it from its product page.' => 'This product is sold by measure: order it from its product page.',
+    'The stock %stock of the product sale element id %id cannot be kept: %reason' => 'The stock %stock of the product sale element id %id cannot be kept: %reason',
 ];

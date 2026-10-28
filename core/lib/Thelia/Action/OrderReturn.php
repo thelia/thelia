@@ -166,13 +166,15 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             }
 
             $refunds = $this->composer->priceRequestedLines($order, $customer, $requested);
-            $total = 0.0;
 
             foreach ($lines as $index => [$line, $orderProduct]) {
                 $line->setProductSaleElementsId($orderProduct->getProductSaleElementsId());
                 $line->setRefundAmount(number_format($refunds[$index], 6, '.', ''));
-                $total += $refunds[$index];
             }
+
+            // Each line is rounded to the cent, the return as a whole is not the sum of
+            // these: the order rounded the sum of its lines, and that is what was paid.
+            $total = $this->refundCalculator->linesRefund($order, $requested);
 
             $reason = $return->getOrderReturnReason();
 

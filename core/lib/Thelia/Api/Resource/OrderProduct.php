@@ -356,6 +356,34 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public ?\DateTime $restockDate = null;
 
+    /**
+     * The unit of measure the combination was sold in, frozen when the order was placed
+     * ("kg"); null for a line sold without a unit, and for every line placed before.
+     */
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?string $unitCode = null;
+
+    /**
+     * The decimals the quantity was sold with, frozen when the order was placed: 2 writes
+     * 1.25 kg as "1,25 kg", 0 sells by the piece, as every line placed before.
+     */
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ,
+        OrderShipment::GROUP_ADMIN_READ_SINGLE,
+        OrderShipment::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public int $quantityDecimals = 0;
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -711,6 +739,30 @@ class OrderProduct implements PropelResourceInterface
     public function setMpn(?string $mpn): self
     {
         $this->mpn = $mpn;
+
+        return $this;
+    }
+
+    public function getUnitCode(): ?string
+    {
+        return $this->unitCode;
+    }
+
+    public function setUnitCode(?string $unitCode): self
+    {
+        $this->unitCode = $unitCode;
+
+        return $this;
+    }
+
+    public function getQuantityDecimals(): int
+    {
+        return $this->quantityDecimals;
+    }
+
+    public function setQuantityDecimals(?int $quantityDecimals): self
+    {
+        $this->quantityDecimals = $quantityDecimals ?? 0;
 
         return $this;
     }

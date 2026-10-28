@@ -803,7 +803,9 @@ class ProductSaleElements implements PropelResourceInterface
 
     /**
      * A step or a minimum is a quantity: it cannot carry more decimals than the quantities
-     * of the combination, or no quantity would ever be a multiple of it.
+     * of the combination, or no quantity would ever be a multiple of it. The stock neither:
+     * 12.5 of a combination sold by the piece is a unit it does not sell in. The stock is
+     * held to no minimum nor step, and may be zero or below.
      */
     #[Callback(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
     public function validateQuantityRules(ExecutionContextInterface $context): void
@@ -819,6 +821,13 @@ class ProductSaleElements implements PropelResourceInterface
                     ->atPath($property)
                     ->addViolation();
             }
+        }
+
+        if (isset($this->quantity) && !QuantityScale::fits($this->quantity, $this->quantityDecimals)) {
+            $context->buildViolation('The stock cannot carry more decimals than quantityDecimals ({{ decimals }}).')
+                ->setParameter('{{ decimals }}', (string) $this->quantityDecimals)
+                ->atPath('quantity')
+                ->addViolation();
         }
     }
 

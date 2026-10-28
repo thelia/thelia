@@ -221,7 +221,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         bool $isDefault,
         bool $isPromo = false,
         bool $isNew = false,
-        int $quantity = 0,
+        float $quantity = 0,
         string $eanCode = '',
         bool|string $ref = false,
     ): ProductSaleElements {

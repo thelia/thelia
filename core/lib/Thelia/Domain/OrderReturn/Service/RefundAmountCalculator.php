@@ -67,7 +67,9 @@ final readonly class RefundAmountCalculator
     }
 
     /**
-     * The refundable amount for the given quantity of an order product line.
+     * The refundable amount for the given quantity of an order product line,
+     * rounded half up to the cent as the order charged it: 1.25 kg at 14.82 is
+     * a line of 18.525, charged and refunded 18.53.
      */
     public function lineRefundForProduct(OrderProduct $orderProduct, float $quantity): float
     {
@@ -75,14 +77,10 @@ final readonly class RefundAmountCalculator
             return 0.0;
         }
 
-        $lineTotal = $this->unitTaxedPrice($orderProduct) * $quantity;
+        $order = $orderProduct->getOrder();
+        $lineTotal = $this->roundedLikeTheOrder($order, $this->lineTotal($orderProduct, $quantity));
 
-        if ($this->isRoundingOfSums($orderProduct)) {
-            // Rounding of sums: only the line total is rounded.
-            $lineTotal = round($lineTotal, 2);
-        }
-
-        return $lineTotal - $this->discountShareOf($orderProduct, $lineTotal);
+        return $lineTotal - $this->discountShareOf($order, $lineTotal);
     }
 
     /**
@@ -93,23 +91,79 @@ final readonly class RefundAmountCalculator
      */
     public function compute(OrderReturn $return, bool $useReceivedQuantity = false): float
     {
-        $total = 0.0;
+        $order = $return->getOrder();
+        $lines = [];
 
         foreach ($return->getOrderReturnLines() as $line) {
-            $quantity = $useReceivedQuantity
-                ? (float) $line->getQuantityReceived()
-                : (float) $line->getQuantity();
-
-            $total += $this->lineRefund($line, $quantity);
+            $lines[] = [
+                'order_product' => $line->getOrderProduct(),
+                'quantity' => $useReceivedQuantity ? (float) $line->getQuantityReceived() : (float) $line->getQuantity(),
+            ];
         }
 
+        $total = $this->linesRefund($order, $lines);
+
         if ($return->getIncludePostage()) {
-            $order = $return->getOrder();
             // Stored tax included, like the postage of a cart.
             $total += (float) $order->getPostage();
         }
 
         return $total;
+    }
+
+    /**
+     * The refundable amount for several lines of an order returned together,
+     * the postage left out.
+     *
+     * The lines are added up before being rounded, the way Order::getTotalAmount()
+     * adds up the lines it charges: two lines of 18.525 were charged 37.05, and
+     * returning both refunds 37.05, not the 37.06 of the two rounded lines.
+     *
+     * @param iterable<array{order_product: OrderProduct, quantity: float}> $lines
+     */
+    public function linesRefund(?Order $order, iterable $lines): float
+    {
+        $linesTotal = 0.0;
+
+        foreach ($lines as $line) {
+            if ($line['quantity'] > 0) {
+                $linesTotal += $this->lineTotal($line['order_product'], $line['quantity']);
+            }
+        }
+
+        $linesTotal = $this->roundedLikeTheOrder($order, $linesTotal);
+
+        return $linesTotal - $this->discountShareOf($order, $linesTotal);
+    }
+
+    /**
+     * The taxed total of the given quantity of a line, before the discount, in
+     * the rounding mode of its order.
+     */
+    private function lineTotal(OrderProduct $orderProduct, float $quantity): float
+    {
+        $lineTotal = $this->unitTaxedPrice($orderProduct) * $quantity;
+
+        if ($this->isRoundingOfSums($orderProduct)) {
+            // Rounding of sums: only the line total is rounded.
+            $lineTotal = round($lineTotal, 2);
+        }
+
+        return $lineTotal;
+    }
+
+    /**
+     * Rounds an amount to the cent, as Order::getTotalAmount() rounds the lines
+     * it charges. An order frozen by the 2.4 upgrade was totalled without any
+     * rounding (Order::getTotalAmountLegacy()), and keeps its amounts as they are.
+     */
+    private function roundedLikeTheOrder(?Order $order, float $amount): float
+    {
+        if (null !== $order && ConfigQuery::isOrderWithLegacyRounding((int) $order->getId())) {
+            return $amount;
+        }
+
+        return round($amount, 2);
     }
 
     /**
@@ -127,10 +181,8 @@ final readonly class RefundAmountCalculator
      * there is no separate tax total for the untaxed share of the discount
      * (Calculator::computeUntaxedOrderDiscount) to be taken off.
      */
-    private function discountShareOf(OrderProduct $orderProduct, float $lineTotal): float
+    private function discountShareOf(?Order $order, float $lineTotal): float
     {
-        $order = $orderProduct->getOrder();
-
         if (null === $order || $lineTotal <= 0.0) {
             return 0.0;
         }

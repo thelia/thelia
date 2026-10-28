@@ -169,6 +169,10 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 // them. A picking list leaves the services out, an invoice states them.
                 ->set('LINE_TYPE', $orderProduct->getLineType())
                 ->set('QUANTITY', $quantity)
+                // What a document needs to write the quantity as it was sold ("1,25 kg"):
+                // frozen on the line, 0 and empty on a line placed before they existed.
+                ->set('QUANTITY_DECIMALS', $orderProduct->getQuantityDecimals() ?? 0)
+                ->set('UNIT_CODE', $orderProduct->getUnitCode())
 
                 ->set('PRICE', $orderProduct->getPrice())
                 ->set('PRICE_TAX', $tax)
