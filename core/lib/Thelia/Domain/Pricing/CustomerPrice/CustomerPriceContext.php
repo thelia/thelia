@@ -240,9 +240,9 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
             );
         }
 
-        $isPromo = true === $basePrices?->isPromo;
+        $isPromo = true === $basePrices->isPromo;
         $discountedPrice = $catalogPrice * $groupFactor;
-        $promoPrice = $basePrices?->promoIn($currencyId);
+        $promoPrice = $basePrices->promoIn($currencyId);
 
         // A promo price of the catalog is the customer's as it stands: the discount of the
         // group goes to the base price only. A promo price equal to the price is no promotion.

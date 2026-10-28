@@ -55,12 +55,15 @@ final readonly class CustomerGroupResolvedListener implements EventSubscriberInt
             return;
         }
 
-        $resource->setCustomerGroup($this->transformer->modelToResource(
+        /** @var CustomerGroupResource $groupResource */
+        $groupResource = $this->transformer->modelToResource(
             CustomerGroupResource::class,
             $group,
             $context,
             withRelation: false,
-        ));
+        );
+
+        $resource->setCustomerGroup($groupResource);
     }
 
     /**

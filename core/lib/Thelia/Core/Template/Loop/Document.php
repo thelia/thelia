@@ -205,13 +205,13 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
         // The documents of a category closed to the customer's group are hidden with it on
         // the front, whichever way the category is named; the back office lists them all.
-        if ('category' === strtolower((string) $object_type) && null !== $search && !$this->getBackendContext()) {
+        if ('category' === strtolower((string) $object_type) && !$this->getBackendContext()) {
             $this->categoryVisibility->applyTo($search, CategoryDocumentTableMap::COL_CATEGORY_ID);
         }
 
         // Likewise the documents of a product the visitor may not see (a private drop, a category
         // closed to the group, a rule of a module).
-        if ('product' === strtolower((string) $object_type) && null !== $search && !$this->getBackendContext()) {
+        if ('product' === strtolower((string) $object_type) && !$this->getBackendContext()) {
             $this->productVisibility->applyTo($search, ProductDocumentTableMap::COL_PRODUCT_ID);
         }
 
