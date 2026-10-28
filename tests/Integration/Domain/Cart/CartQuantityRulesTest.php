@@ -237,6 +237,25 @@ final class CartQuantityRulesTest extends ActionIntegrationTestCase
         self::assertSame([1.0], $this->quantities());
     }
 
+    /**
+     * The gift of a free product coupon is an ordinary line, priced at zero by the
+     * discount: only the session of the buyer knows it is the gift. Read back against the
+     * rules of its combination, one gift sold by six would be removed.
+     */
+    public function testTheGiftOfAFreeProductCouponIsLeftToItsPromotion(): void
+    {
+        $gift = $this->line(1);
+        $this->getService(RequestStack::class)->getMainRequest()?->getSession()->set(
+            'coupon.free_product.cart_items.FREE-GIFT',
+            [$this->product->getId() => (int) $gift->getId()],
+        );
+
+        $this->getService(CartStepProvider::class)->check($this->cart);
+
+        self::assertSame([1.0], $this->quantities());
+        self::assertSame([], $this->adjustments);
+    }
+
     public function testTheCheckoutSendsTheBuyerBackToACartItHadToAdjust(): void
     {
         $this->line(7);

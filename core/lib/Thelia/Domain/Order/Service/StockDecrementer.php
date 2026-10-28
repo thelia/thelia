@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\Service;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Domain\Catalog\Stock\PreorderRule;
 use Thelia\Domain\Catalog\Stock\SellableStock;
@@ -170,8 +171,8 @@ readonly class StockDecrementer
 
         $onSaleUnitStock = $this->movesSaleUnitStock($saleUnitId, $productSaleElementsId);
         $sql = $onSaleUnitStock
-            ? 'UPDATE `'.self::SALE_UNIT_TABLE.'` SET `quantity` = `quantity` + :quantity WHERE `sale_unit_id` = :saleUnitId AND `product_sale_elements_id` = :id'
-            : 'UPDATE `product_sale_elements` SET `quantity` = `quantity` + :quantity WHERE `id` = :id';
+            ? 'UPDATE `'.self::SALE_UNIT_TABLE.'` SET `quantity` = '.self::onTheFinestDecimal('`quantity` + :quantity').' WHERE `sale_unit_id` = :saleUnitId AND `product_sale_elements_id` = :id'
+            : 'UPDATE `product_sale_elements` SET `quantity` = '.self::onTheFinestDecimal('`quantity` + :quantity').' WHERE `id` = :id';
 
         $statement = $connection->prepare($sql);
         $statement->bindValue(':quantity', $quantity);
@@ -182,6 +183,17 @@ readonly class StockDecrementer
         }
 
         $statement->execute();
+    }
+
+    /**
+     * A stock kept on the finest decimal a quantity is sold with. The national counter is
+     * a single precision FLOAT: it keeps 0.7 as 0.69999998, so the last 0.7 kg would fail
+     * a comparison with the 0.7 kg ordered, and every movement would add its error to the
+     * one before (ten orders of 10 g taken from 10 tonnes left 9999.902 kg).
+     */
+    private static function onTheFinestDecimal(string $expression): string
+    {
+        return 'ROUND('.$expression.', '.QuantityScale::MAXIMUM_DECIMALS.')';
     }
 
     /**
@@ -205,7 +217,8 @@ readonly class StockDecrementer
         $guarded = $take->guardAvailability && !$allowNegativeStock;
         $stock = $onSaleUnitStock ? '`own`.`quantity`' : '`pse`.`quantity`';
 
-        $set = $allowNegativeStock || $guarded ? "$stock = $stock - :quantity" : "$stock = GREATEST($stock - :quantity, 0)";
+        $remaining = self::onTheFinestDecimal("$stock - :quantity");
+        $set = $allowNegativeStock || $guarded ? "$stock = $remaining" : "$stock = GREATEST($remaining, 0)";
 
         // The row of the sale element is joined only when the guard reads its sale mode.
         $table = match (true) {
@@ -221,7 +234,7 @@ readonly class StockDecrementer
             // What other carts hold is theirs: only a reservation that is there changes the statement.
             $reserved = $take->reservedByOtherCarts > 0 ? ' - :reserved' : '';
             $where .= ' AND (`pse`.`out_of_stock_policy` = '.OutOfStockPolicy::Unlimited->value
-                ." OR $stock + ".SellableStock::allowedBelowZeroSql('`pse`')."$reserved >= :quantity)";
+                .' OR '.self::onTheFinestDecimal("$stock + ".SellableStock::allowedBelowZeroSql('`pse`').$reserved).' >= :quantity)';
         }
 
         $statement = $connection->prepare("UPDATE $table SET $set WHERE $where");

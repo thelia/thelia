@@ -18,6 +18,10 @@ use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\DataTransfer\Import\AbstractImport;
 use Thelia\Model\ProductSaleElementsQuery;
 
@@ -83,10 +87,21 @@ class ProductStockImport extends AbstractImport
             );
         }
 
+        // A stock holds the decimals its combination is sold with: 12.5 of a combination
+        // sold by the piece is a unit the combination does not sell in.
+        try {
+            $stock = (new QuantityPolicy())->assertStockFits((float) $data['stock'], $pse);
+        } catch (QuantityRefusedException|UnreadableQuantityException|InvalidQuantityRuleException $refusal) {
+            return Translator::getInstance()->trans(
+                'The stock %stock of the product sale element id %id cannot be kept: %reason',
+                ['%stock' => self::cellText($data['stock']), '%id' => self::cellText($data['id']), '%reason' => $refusal->getMessage()],
+            );
+        }
+
         // Read from the table, not from the instance: a pooled one may be older than the row.
         $stockBefore = $this->stockBefore[(int) $pse->getId()] ?? $this->storedStockOf((int) $pse->getId());
 
-        $pse->setQuantity((float) $data['stock']);
+        $pse->setQuantity($stock);
 
         if (isset($data['ean']) && !empty($data['ean'])) {
             $pse->setEanCode((string) $data['ean']);

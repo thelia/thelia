@@ -27,6 +27,7 @@ use Thelia\Domain\Catalog\Product\DTO\PSECreateDTO;
 use Thelia\Domain\Catalog\Product\DTO\PSEUpdateDTO;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\PSENotFoundException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
@@ -182,7 +183,8 @@ final readonly class PSEFacade
         }
 
         $before = (float) $pse->getQuantity();
-        $pse->setQuantity($quantity)->save();
+        // A stock holds the decimals the combination is sold with.
+        $pse->setQuantity((new QuantityPolicy())->assertStockFits($quantity, $pse))->save();
         $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
 
@@ -195,7 +197,7 @@ final readonly class PSEFacade
         }
 
         $before = (float) $pse->getQuantity();
-        $newQuantity = max(0, $pse->getQuantity() - $quantity);
+        $newQuantity = max(0, $pse->getQuantity() - (new QuantityPolicy())->assertStockFits($quantity, $pse));
         $pse->setQuantity($newQuantity)->save();
         $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
@@ -209,7 +211,7 @@ final readonly class PSEFacade
         }
 
         $before = (float) $pse->getQuantity();
-        $pse->setQuantity($pse->getQuantity() + $quantity)->save();
+        $pse->setQuantity($pse->getQuantity() + (new QuantityPolicy())->assertStockFits($quantity, $pse))->save();
         $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
 

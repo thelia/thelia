@@ -90,6 +90,30 @@ final readonly class QuantityPolicy
     }
 
     /**
+     * A stock written by hand, an import or the admin API: neither a minimum nor a step
+     * holds there, zero and below are a stock too, but a stock with more decimals than
+     * the combination is sold with (12.5 of a combination sold by the piece) is a unit
+     * the combination does not sell in.
+     *
+     * @throws QuantityRefusedException    when the stock carries more decimals than the rule
+     * @throws UnreadableQuantityException when the stock is not a number or is beyond any stock
+     */
+    public function assertStockFits(float $stock, ProductSaleElements|QuantityRule $rule): float
+    {
+        $rule = self::ruleOf($rule);
+
+        if (is_nan($stock) || abs($stock) > self::LARGEST_QUANTITY) {
+            throw new UnreadableQuantityException((string) $stock);
+        }
+
+        if (!QuantityScale::fits($stock, $rule->decimals)) {
+            throw new QuantityRefusedException(new QuantityDecision($stock, null, QuantityAdjustment::TooManyDecimals, $rule));
+        }
+
+        return $stock;
+    }
+
+    /**
      * Reads a typed quantity, "1,25" as well as "1.25". A separator followed by three
      * digits after one to three others ("1.250", "1,250") reads as a thousand two hundred
      * and fifty in one language and as one and a quarter in another: it is refused unless

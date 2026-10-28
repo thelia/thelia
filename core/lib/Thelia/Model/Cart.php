@@ -323,7 +323,7 @@ class Cart extends BaseCart
         $cartTaxCalculator = $this->createCartTaxCalculator($this);
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getTotalRealTaxedPrice($country, $state, $cartTaxCalculator);
+            $total += $cartItem->getSummedTotalRealTaxedPrice($country, $state, $cartTaxCalculator);
         }
 
         if ($withDiscount) {
@@ -364,7 +364,7 @@ class Cart extends BaseCart
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getTotalRealPrice();
+            $total += $cartItem->getSummedTotalRealPrice();
         }
 
         if ($withDiscount) {

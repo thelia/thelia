@@ -689,7 +689,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     private function quantityReconciler(): CartQuantityReconciler
     {
-        return $this->cartQuantityReconciler ?? new CartQuantityReconciler($this->quantityPolicy ?? new QuantityPolicy());
+        return $this->cartQuantityReconciler ?? new CartQuantityReconciler($this->quantityPolicy ?? new QuantityPolicy(), $this->requestStack);
     }
 
     /**

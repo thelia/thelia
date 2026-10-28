@@ -329,7 +329,7 @@ class CouponManager implements ResetInterface
 
         foreach ($cart->getCartItems() as $cartItem) {
             if (1 === (int) $cartItem->getIsOffered()) {
-                $total += $cartItem->getTotalRealTaxedPrice($country);
+                $total += $cartItem->getSummedTotalRealTaxedPrice($country);
             }
         }
 

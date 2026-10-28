@@ -1242,4 +1242,5 @@ return [
     'The quantity was brought down to %quantity.' => 'La quantité a été ramenée à %quantity.',
     'Quantities of your cart were adjusted to what the products are sold in. Check your cart before ordering.' => 'Des quantités de votre panier ont été ajustées aux conditionnements des produits. Vérifiez votre panier avant de commander.',
     'This product is sold by measure: order it from its product page.' => 'Ce produit est vendu à la mesure : commandez-le depuis sa fiche produit.',
+    'The stock %stock of the product sale element id %id cannot be kept: %reason' => 'Le stock %stock de la déclinaison n° %id ne peut pas être enregistré : %reason',
 ];

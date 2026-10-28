@@ -226,7 +226,11 @@ readonly class OrderProductFactory
             ->setWasNew($productSaleElements->getNewness() ?? 0)
             ->setWeight($productSaleElements->getWeight() !== null ? (string) $productSaleElements->getWeight() : null)
             ->setEanCode($productSaleElements->getEanCode())
-            ->setMpn($productSaleElements->getMpn());
+            ->setMpn($productSaleElements->getMpn())
+            // The unit and the decimals sold, frozen like the codes: the documents of the
+            // order still write "1,25 kg" once the combination is sold otherwise.
+            ->setUnitCode($productSaleElements->getUnitCode())
+            ->setQuantityDecimals($productSaleElements->getQuantityDecimals() ?? 0);
     }
 
     /**

@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
@@ -285,8 +286,11 @@ class Order extends BaseOrder
             self::$totalsCache[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
-        $total = (float) self::$totalsCache[$id]->total_taxed_price;
-        $tax = $total - (float) self::$totalsCache[$id]->total_untaxed_price;
+        // The order is charged in cents, as Cart::getTaxedAmount() and Cart::getTotalAmount()
+        // round the cart. A line sold by measure is where it shows: 1.25 kg at 14.82 is a
+        // line of 18.525, charged 18.53, and the tax is the gap between the two rounded totals.
+        $total = round((float) self::$totalsCache[$id]->total_taxed_price, 2);
+        $tax = $total - round((float) self::$totalsCache[$id]->total_untaxed_price, 2);
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
@@ -373,8 +377,8 @@ class Order extends BaseOrder
             WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
         )';
 
-        $taxedLineTotal = OrderProductTableMap::COL_QUANTITY.' * ('.$unitPrice.' + '.$unitTaxes.')';
-        $untaxedLineTotal = OrderProductTableMap::COL_QUANTITY.' * '.$unitPrice;
+        $taxedLineTotal = self::storedQuantity().' * ('.$unitPrice.' + '.$unitTaxes.')';
+        $untaxedLineTotal = self::storedQuantity().' * '.$unitPrice;
 
         if ($roundingOfSums) {
             $taxedLineTotal = 'ROUND('.$taxedLineTotal.', 2)';
@@ -388,6 +392,17 @@ class Order extends BaseOrder
             FROM '.OrderProductTableMap::TABLE_NAME.'
             WHERE '.OrderProductTableMap::COL_ORDER_ID.' = :order_id
         ';
+    }
+
+    /**
+     * The quantity of a line as it was sold. The column is a single precision FLOAT, which
+     * keeps 0.7 kg as 0.69999998: multiplied as it is, a line of 0.7 at 0.75 would come to
+     * 0.52499998 and be rounded down where the cart rounded 0.525 up. A quantity carries
+     * three decimals at most, so rounding it there gives back the quantity sold.
+     */
+    private static function storedQuantity(): string
+    {
+        return 'ROUND('.OrderProductTableMap::COL_QUANTITY.', '.QuantityScale::MAXIMUM_DECIMALS.')';
     }
 
     private function promoPriceOperand(bool $textPromoPrice): string

@@ -162,6 +162,30 @@ final class OrderExportTest extends IntegrationTestCase
     }
 
     /**
+     * 1.25 kg at 12.35 plus 2.47 of tax is a line of 18.525: the order is charged 18.53,
+     * of which 3.09 of tax, and the export states the same amounts.
+     */
+    public function testAWeighedOrderIsExportedWithTheAmountsItWasChargedInCents(): void
+    {
+        $order = $this->weighedOrder(1.25, '12.350000', '2.470000');
+
+        self::assertEqualsWithDelta(18.53, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * The quantity column keeps 1234.565 as 1234.5649: 1234.565 kg at 1.00 is charged
+     * 1234.57, and exported so, not 1234.56.
+     */
+    public function testAQuantityTheColumnCannotKeepExactlyIsExportedAsSold(): void
+    {
+        $order = $this->weighedOrder(1234.565, '1.000000', '0.000000');
+
+        self::assertEqualsWithDelta(1234.57, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
      * The pivot a shop writes when it opts in: the orders it had already
      * invoiced keep the rule they were charged with, and so does their line in
      * the export.
@@ -356,6 +380,25 @@ final class OrderExportTest extends IntegrationTestCase
         $tax = 0.0;
 
         return $order->getTotalAmount($tax, false, false);
+    }
+
+    private function weighedOrder(float $kilograms, string $pricePerKilogram, string $taxPerKilogram): Order
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+
+        $line = $this->factory->orderProduct($order, ['price' => $pricePerKilogram, 'quantity' => $kilograms]);
+        $line->setUnitCode('kg')->setQuantityDecimals(2)->save($this->getPropelConnection());
+
+        (new OrderProductTax())
+            ->setOrderProductId($line->getId())
+            ->setTitle('VAT')
+            ->setDescription('')
+            ->setAmount($taxPerKilogram)
+            ->save($this->getPropelConnection());
+
+        return $order;
     }
 
     private function optIn(): void
