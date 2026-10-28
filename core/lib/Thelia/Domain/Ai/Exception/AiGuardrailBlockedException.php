@@ -19,12 +19,13 @@ use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
 
 /**
  * A guardrail in block mode refused the request (input stage) or the answer (output stage). The verdict
- * says which one and why; the reason is meant for the log, not for a visitor.
+ * says which one and why; the reason is meant for the log, not for a visitor. $logId is the row of the log
+ * when the call was already paid and logged (an output blocked after the answer), null before the call.
  */
 #[Exclude]
 final class AiGuardrailBlockedException extends \RuntimeException implements AiExceptionInterface
 {
-    public function __construct(public readonly GuardrailVerdict $verdict)
+    public function __construct(public readonly GuardrailVerdict $verdict, public readonly ?int $logId = null)
     {
         parent::__construct(\sprintf('The AI guardrail "%s" blocked the %s.', $verdict->guardrail, $verdict->stage->value));
     }
