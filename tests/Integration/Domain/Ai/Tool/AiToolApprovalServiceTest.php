@@ -175,6 +175,49 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         self::assertFalse($this->guard->isRunning());
     }
 
+    public function testAToolApplyingAChangeCannotDecideOnAnotherProposal(): void
+    {
+        $id = $this->propose();
+        $other = $this->propose(8, 'other');
+        $this->logInAsAdmin($this->approver);
+        $outcome = null;
+        ProbeToolState::$onApply = function () use ($other, &$outcome): void {
+            try {
+                $this->approvals->approve($other);
+            } catch (AiToolApprovalException $refusal) {
+                $outcome = $refusal->reason;
+            }
+        };
+
+        $this->approvals->approve($id);
+
+        self::assertSame(AiToolApprovalFailure::Reentrant, $outcome);
+        self::assertSame(1, ProbeToolState::$applyCalls);
+        self::assertSame('pending', AiToolApprovalQuery::create()->findPk($other)?->getStatus());
+        self::assertFalse($this->guard->isRunning());
+    }
+
+    public function testAToolRebuildingAnAmendedProposalCannotDecideOnAnotherProposal(): void
+    {
+        $id = $this->propose();
+        $other = $this->propose(8, 'other');
+        $this->logInAsAdmin($this->approver);
+        $outcome = null;
+        ProbeToolState::$onPropose = function () use ($other, &$outcome): void {
+            try {
+                $this->approvals->reject($other);
+            } catch (AiToolApprovalException $refusal) {
+                $outcome = $refusal->reason;
+            }
+        };
+
+        $this->approvals->approve($id, ['id' => 7, 'value' => 'amended']);
+
+        self::assertSame(AiToolApprovalFailure::Reentrant, $outcome);
+        self::assertSame('pending', AiToolApprovalQuery::create()->findPk($other)?->getStatus());
+        self::assertFalse($this->guard->isRunning());
+    }
+
     public function testAnApproverWhoLostTheRightIsRefused(): void
     {
         $id = $this->propose();

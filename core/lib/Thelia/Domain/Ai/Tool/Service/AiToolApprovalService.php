@@ -224,7 +224,7 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         }
 
         $context = AiToolContext::forBackOffice(AiActor::admin($approver->getId()), $row->getUsageId(), $row->getCorrelationId(), $approver->getLocale());
-        $proposal = $tool->propose($amendedArguments, $context);
+        $proposal = $this->guard->run(static fn () => $tool->propose($amendedArguments, $context));
 
         if ($proposal->target !== $row->getTarget()) {
             throw new InvalidAiArgumentException('The amended arguments change what the proposal touches: reject it and ask for another one.');
@@ -256,7 +256,7 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         $connection->beginTransaction();
 
         try {
-            $tool->apply($change);
+            $this->guard->run(static fn () => $tool->apply($change));
             $connection->commit();
 
             return null;
