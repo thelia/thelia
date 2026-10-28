@@ -31,6 +31,11 @@ use Thelia\Domain\Ai\Stream\StreamEvent;
  * the catalogue, budget reconciled, output guardrails, one row in `ai_usage_log`. Every refusal is logged
  * too, with the status `rejected` or `blocked`.
  *
+ * Cost: when the provider announces what a call cost (`usage.cost` with OpenRouter), the log keeps that
+ * amount; otherwise it is computed from the tokens and the prices of the model catalogue. The adapter puts
+ * by default a cache breakpoint at the end of `system` and on the last message, for the providers that
+ * support one, so that the next turns of a tool loop read the start of the conversation from the cache.
+ *
  * The gateway never runs a tool and never retries on its own: a retryable failure is the caller's to retry.
  */
 interface AiGatewayInterface

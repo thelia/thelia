@@ -30,7 +30,8 @@ final readonly class AiExternalCost
     /**
      * @param string $provider  the service paid, lower case, 32 characters at most: `typesafe`, `dataforseo`
      * @param string $operation what was bought: a model, an endpoint, like `jev-latest`
-     * @param string $cost      decimal string in $currency, like `0.00009870`
+     * @param string $cost      decimal string in $currency, like `0.00009870`; print a float with sprintf('%.8F', $amount),
+     *                          `(string) 1.2E-7` is not a decimal and is refused
      */
     public function __construct(
         public string $usageId,
