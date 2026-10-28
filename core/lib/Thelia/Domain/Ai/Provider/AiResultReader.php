@@ -40,7 +40,7 @@ final readonly class AiResultReader
     /**
      * The answer of a call that is not streamed.
      */
-    public function fromDeferred(DeferredResult $deferred, AiTarget $target, bool $expectsData, ?string $announcedCost = null): AiProviderResult
+    public function fromDeferred(DeferredResult $deferred, AiTarget $target, bool $expectsData, ?string $announcedCost = null, ?string $requestId = null): AiProviderResult
     {
         $result = $deferred->getResult();
         $parts = $result instanceof MultiPartResult ? $result->getContent() : [$result];
@@ -74,6 +74,7 @@ final readonly class AiResultReader
             $expectsData,
             $announcedCost,
             true,
+            $requestId,
         );
     }
 
@@ -82,7 +83,7 @@ final readonly class AiResultReader
      * limit of output tokens (a tool call cut in two): the text of the answer is read from the body of the
      * response, the tool call is dropped, and the reason is MaxTokens.
      */
-    public function fromTruncated(DeferredResult $deferred, AiTarget $target, bool $expectsData, ?string $announcedCost = null): AiProviderResult
+    public function fromTruncated(DeferredResult $deferred, AiTarget $target, bool $expectsData, ?string $announcedCost = null, ?string $requestId = null): AiProviderResult
     {
         $raw = $deferred->getRawResult();
 
@@ -94,7 +95,27 @@ final readonly class AiResultReader
 
         $usage = $deferred->getResultConverter()->getTokenUsageExtractor()?->extract($raw, []);
 
-        return $this->build($target, self::textOf($data), [], [], $usage, AiFinishReason::MaxTokens, $expectsData, $announcedCost, true);
+        return $this->build($target, self::textOf($data), [], [], $usage, AiFinishReason::MaxTokens, $expectsData, $announcedCost, true, $requestId);
+    }
+
+    /**
+     * The answer of a call that is not streamed and that the provider refused (HTTP 200): no text, the tokens it counted,
+     * the reason ContentFilter, and the category and the detail it gives. What the model wrote before refusing is dropped:
+     * Anthropic says to treat it as incomplete.
+     */
+    public function fromRefusal(DeferredResult $deferred, AiTarget $target, AiProviderRefusal $refusal, ?string $requestId = null, ?string $announcedCost = null): AiProviderResult
+    {
+        $raw = $deferred->getRawResult();
+
+        try {
+            $usage = $deferred->getResultConverter()->getTokenUsageExtractor()?->extract($raw, []);
+        } catch (\Throwable) {
+            $usage = null;
+        }
+
+        $result = $this->build($target, '', [], [], $usage, AiFinishReason::ContentFilter, false, $announcedCost, true, $requestId);
+
+        return new AiProviderResult($result->text, null, [], $result->tokenUsage, $result->finishReason, $result->model, $announcedCost, [], true, $requestId, $refusal->category, $refusal->detail);
     }
 
     /**
@@ -123,6 +144,7 @@ final readonly class AiResultReader
             $progress->expectsData,
             null,
             $progress->complete,
+            $progress->requestId,
         );
     }
 
@@ -142,7 +164,7 @@ final readonly class AiResultReader
      * @param list<AiToolCall>                       $toolCalls
      * @param list<array{0: string, 1: string|null}> $thinking  content and signature of the thinking blocks
      */
-    private function build(AiTarget $target, string $text, array $toolCalls, array $thinking, ?TokenUsageInterface $usage, AiFinishReason $reason, bool $expectsData, ?string $announcedCost, bool $complete): AiProviderResult
+    private function build(AiTarget $target, string $text, array $toolCalls, array $thinking, ?TokenUsageInterface $usage, AiFinishReason $reason, bool $expectsData, ?string $announcedCost, bool $complete, ?string $requestId = null): AiProviderResult
     {
         if ([] !== $toolCalls) {
             $reason = AiFinishReason::ToolCalls;
@@ -160,6 +182,7 @@ final readonly class AiResultReader
             $announcedCost,
             self::providerState($target->provider, $thinking),
             $complete,
+            $requestId,
         );
     }
 

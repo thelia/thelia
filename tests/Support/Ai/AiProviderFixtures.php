@@ -25,19 +25,25 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  */
 final class AiProviderFixtures
 {
+    /** The example of the header `request-id` of the documentation of Anthropic. */
+    public const string ANTHROPIC_REQUEST_ID = 'req_018EeWyXxfu5pfWkrYcMdjWG';
+
+    /** The header `x-request-id` is the one the debugging guide of OpenAI names; the value is invented, in the shape of the ids of OpenAI. */
+    public const string OPENAI_REQUEST_ID = 'req_f5d9ca9c9d0d4d6d9cba1c0a4d3f2b1e';
+
     // --- chat completions (Mistral, Scaleway, OVHcloud, Albert, compatible endpoints) ---
 
     /**
      * @param list<array<string, mixed>>|null $toolCalls
      * @param array<string, mixed>            $usageExtra
      */
-    public static function chat(string $content, ?array $toolCalls = null, int $promptTokens = 21, int $completionTokens = 20, int $cachedTokens = 0, array $usageExtra = [], string $finish = 'stop'): MockResponse
+    public static function chat(string $content, ?array $toolCalls = null, int $promptTokens = 21, int $completionTokens = 20, int $cachedTokens = 0, array $usageExtra = [], string $finish = 'stop', array $headers = [], array $messageExtra = []): MockResponse
     {
         return self::json([
             'id' => 'abc', 'object' => 'chat.completion', 'created' => 1786820845, 'model' => 'probe-model-2026',
             'usage' => ['prompt_tokens' => $promptTokens, 'total_tokens' => $promptTokens + $completionTokens, 'completion_tokens' => $completionTokens, 'prompt_tokens_details' => ['cached_tokens' => $cachedTokens]] + $usageExtra,
-            'choices' => [['index' => 0, 'finish_reason' => null === $toolCalls || 'stop' !== $finish ? $finish : 'tool_calls', 'message' => ['role' => 'assistant', 'content' => $content, 'tool_calls' => $toolCalls]]],
-        ]);
+            'choices' => [['index' => 0, 'finish_reason' => null === $toolCalls || 'stop' !== $finish ? $finish : 'tool_calls', 'message' => ['role' => 'assistant', 'content' => $content, 'tool_calls' => $toolCalls] + $messageExtra]],
+        ], 200, $headers);
     }
 
     /**
@@ -51,7 +57,7 @@ final class AiProviderFixtures
     /**
      * @param list<string> $chunks
      */
-    public static function chatStream(array $chunks = ['Bon', 'jour'], int $promptTokens = 10, int $completionTokens = 10, int $cachedTokens = 0): MockResponse
+    public static function chatStream(array $chunks = ['Bon', 'jour'], int $promptTokens = 10, int $completionTokens = 10, int $cachedTokens = 0, array $headers = [], string $finish = 'stop'): MockResponse
     {
         $chunk = static fn (array $delta, ?string $finish = null, ?array $usage = null): string => 'data: '.json_encode(array_filter([
             'id' => 'cmpl-1', 'object' => 'chat.completion.chunk', 'created' => 1786820845, 'model' => 'probe-model-2026',
@@ -63,10 +69,10 @@ final class AiProviderFixtures
 
         foreach ($chunks as $index => $text) {
             $last = $index === \count($chunks) - 1;
-            $body .= $chunk(['content' => $text], $last ? 'stop' : null, $last ? ['prompt_tokens' => $promptTokens, 'total_tokens' => $promptTokens + $completionTokens, 'completion_tokens' => $completionTokens, 'prompt_tokens_details' => ['cached_tokens' => $cachedTokens]] : null);
+            $body .= $chunk(['content' => $text], $last ? $finish : null, $last ? ['prompt_tokens' => $promptTokens, 'total_tokens' => $promptTokens + $completionTokens, 'completion_tokens' => $completionTokens, 'prompt_tokens_details' => ['cached_tokens' => $cachedTokens]] : null);
         }
 
-        return self::sse($body."data: [DONE]\n\n");
+        return self::sse($body."data: [DONE]\n\n", $headers);
     }
 
     public static function chatToolStream(string $name = 'list_categories', string $id = 'call_1'): MockResponse
@@ -91,13 +97,27 @@ final class AiProviderFixtures
     /**
      * @param list<array<string, mixed>> $content
      * @param array<string, int>         $usage
+     * @param array<string, string>      $headers
      */
-    public static function anthropic(array $content, string $stop = 'end_turn', array $usage = ['input_tokens' => 12, 'output_tokens' => 7]): MockResponse
+    public static function anthropic(array $content, string $stop = 'end_turn', array $usage = ['input_tokens' => 12, 'output_tokens' => 7], array $headers = []): MockResponse
     {
-        return self::json(['id' => 'msg_01', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-probe-2026', 'content' => $content, 'stop_reason' => $stop, 'stop_sequence' => null, 'usage' => $usage]);
+        return self::json(['id' => 'msg_01', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-probe-2026', 'content' => $content, 'stop_reason' => $stop, 'stop_sequence' => null, 'usage' => $usage], 200, $headers);
     }
 
-    public static function anthropicStream(int $inputTokens = 25, int $outputTokens = 15, int $cacheRead = 0, int $cacheWrite = 0, string $stop = 'end_turn'): MockResponse
+    /**
+     * The refusal of the documentation of Anthropic ("What a refusal looks like", Refusals and fallback,
+     * https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback): an HTTP 200, an empty content, a
+     * stop reason `refusal` and a `stop_details` with its category. The request-id header is the example of
+     * https://platform.claude.com/docs/en/api/errors#request-id.
+     *
+     * @param array<string, mixed>|null $details
+     */
+    public static function anthropicRefusal(?array $details = ['type' => 'refusal', 'category' => 'cyber', 'explanation' => 'This request was declined because it could enable cyber harm.']): MockResponse
+    {
+        return self::json(['id' => 'msg_01XFUDYJgAACzvnptvVoYEL', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-fable-5', 'content' => [], 'stop_reason' => 'refusal', 'stop_details' => $details, 'usage' => ['input_tokens' => 412, 'output_tokens' => 0]], 200, ['request-id' => self::ANTHROPIC_REQUEST_ID]);
+    }
+
+    public static function anthropicStream(int $inputTokens = 25, int $outputTokens = 15, int $cacheRead = 0, int $cacheWrite = 0, string $stop = 'end_turn', array $headers = []): MockResponse
     {
         return self::sse(self::events([
             ['message_start', ['type' => 'message_start', 'message' => ['id' => 'msg_01', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-probe-2026', 'content' => [], 'stop_reason' => null, 'stop_sequence' => null, 'usage' => ['input_tokens' => $inputTokens, 'cache_read_input_tokens' => $cacheRead, 'cache_creation_input_tokens' => $cacheWrite, 'output_tokens' => 1]]]],
@@ -107,7 +127,7 @@ final class AiProviderFixtures
             ['content_block_stop', ['type' => 'content_block_stop', 'index' => 0]],
             ['message_delta', ['type' => 'message_delta', 'delta' => ['stop_reason' => $stop, 'stop_sequence' => null], 'usage' => ['output_tokens' => $outputTokens]]],
             ['message_stop', ['type' => 'message_stop']],
-        ]));
+        ]), $headers);
     }
 
     /**
@@ -144,14 +164,14 @@ final class AiProviderFixtures
     /**
      * @param list<array<string, mixed>> $output
      */
-    public static function responses(array $output, int $inputTokens = 120, int $outputTokens = 9, int $cachedTokens = 0, string $status = 'completed', ?string $incompleteReason = null): MockResponse
+    public static function responses(array $output, int $inputTokens = 120, int $outputTokens = 9, int $cachedTokens = 0, string $status = 'completed', ?string $incompleteReason = null, array $headers = []): MockResponse
     {
         return self::json(array_filter([
             'id' => 'resp_1', 'object' => 'response', 'status' => $status, 'model' => 'gpt-probe-2026',
             'incomplete_details' => null === $incompleteReason ? null : ['reason' => $incompleteReason],
             'output' => $output,
             'usage' => ['input_tokens' => $inputTokens, 'input_tokens_details' => ['cached_tokens' => $cachedTokens], 'output_tokens' => $outputTokens, 'total_tokens' => $inputTokens + $outputTokens],
-        ], static fn (mixed $value): bool => null !== $value));
+        ], static fn (mixed $value): bool => null !== $value), 200, $headers);
     }
 
     /**
@@ -206,16 +226,20 @@ final class AiProviderFixtures
     // --- transport ---
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<string, mixed>  $data
+     * @param array<string, string> $headers
      */
-    public static function json(array $data, int $status = 200): MockResponse
+    public static function json(array $data, int $status = 200, array $headers = []): MockResponse
     {
-        return new MockResponse(json_encode($data, \JSON_THROW_ON_ERROR), ['http_code' => $status, 'response_headers' => ['content-type' => 'application/json']]);
+        return new MockResponse(json_encode($data, \JSON_THROW_ON_ERROR), ['http_code' => $status, 'response_headers' => ['content-type' => 'application/json', ...$headers]]);
     }
 
-    public static function sse(string $body): MockResponse
+    /**
+     * @param array<string, string> $headers
+     */
+    public static function sse(string $body, array $headers = []): MockResponse
     {
-        return new MockResponse($body, ['http_code' => 200, 'response_headers' => ['content-type' => 'text/event-stream']]);
+        return new MockResponse($body, ['http_code' => 200, 'response_headers' => ['content-type' => 'text/event-stream', ...$headers]]);
     }
 
     /**

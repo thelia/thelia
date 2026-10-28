@@ -58,4 +58,9 @@ final class OpenAiAdapter extends AbstractPlatformAdapter
     {
         return new Gpt($target->model->name, $capabilities);
     }
+
+    protected function refusal(array $body): ?AiProviderRefusal
+    {
+        return AiProviderRefusal::fromResponses($body);
+    }
 }

@@ -33,6 +33,8 @@ final readonly class AiUsageLogWriter
 {
     private const int ERROR_LENGTH = 255;
 
+    private const int REQUEST_ID_LENGTH = 128;
+
     public function __construct(private AiBudgetLedger $ledger)
     {
     }
@@ -67,6 +69,7 @@ final readonly class AiUsageLogWriter
                 ->setStatus($entry->status->value)
                 ->setError(null === $entry->error ? null : mb_strimwidth($entry->error, 0, self::ERROR_LENGTH))
                 ->setFinishReason($entry->finishReason?->value)
+                ->setProviderRequestId(null === $entry->providerRequestId ? null : mb_strimwidth($entry->providerRequestId, 0, self::REQUEST_ID_LENGTH))
                 ->setLatencyMs($entry->latencyMilliseconds)
                 ->setGuardrailVerdicts([] === $entry->verdicts ? null : json_encode(array_map(static fn (GuardrailVerdict $verdict): array => $verdict->toArray(), $entry->verdicts), \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES))
                 ->setCorrelationId($entry->correlationId)

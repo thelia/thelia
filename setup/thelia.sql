@@ -1728,6 +1728,7 @@ CREATE TABLE `ai_usage_log`
     `latency_ms` INTEGER,
     `guardrail_verdicts` TEXT COMMENT 'JSON list of the guardrail verdicts',
     `correlation_id` VARCHAR(64) COMMENT 'groups the turns of one task, like the steps of a tool loop',
+    `provider_request_id` VARCHAR(128) COMMENT 'the identifier the provider gave to the call, what its support asks for',
     `prompt` LONGTEXT COMMENT 'the request as sent, only when the usage stores prompts',
     `prompt_expires_at` DATETIME COMMENT 'when the maintenance purge empties the prompt',
     `created_at` DATETIME,

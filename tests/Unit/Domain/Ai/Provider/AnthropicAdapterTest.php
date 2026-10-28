@@ -253,4 +253,77 @@ final class AnthropicAdapterTest extends AiProviderTestCase
     {
         return new AiResponse($result->text, $result->data, $result->toolCalls, $result->tokenUsage, '0', $result->model, 'probe-connection', $result->finishReason, [], 1, null, 'USD', $result->providerState);
     }
+
+    public function testTheRequestIdIsTheHeaderOfTheProvider(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']], headers: ['request-id' => Wire::ANTHROPIC_REQUEST_ID])));
+
+        self::assertSame(Wire::ANTHROPIC_REQUEST_ID, $adapter->complete($this->request(), $this->target(AiProvider::Anthropic))->requestId);
+    }
+
+    public function testWithoutTheHeaderTheRequestIdIsTheIdOfTheMessage(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        self::assertSame('msg_01', $adapter->complete($this->request(), $this->target(AiProvider::Anthropic))->requestId);
+    }
+
+    public function testTheRequestIdOfAStreamIsTheHeaderOfTheProvider(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicStream(headers: ['request-id' => Wire::ANTHROPIC_REQUEST_ID])));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::Anthropic));
+
+        foreach ($stream as $_) {
+        }
+
+        self::assertSame(Wire::ANTHROPIC_REQUEST_ID, $stream->result()->requestId);
+    }
+
+    public function testARefusalIsAContentFilterAnswerWithItsCategoryAndItsTokens(): void
+    {
+        // The documented refusal has an empty content: the library alone fails on it ("Response does not contain any content").
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicRefusal()));
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::Anthropic));
+
+        self::assertSame(AiFinishReason::ContentFilter, $result->finishReason);
+        self::assertSame('', $result->text);
+        self::assertSame('cyber', $result->refusalCategory);
+        self::assertSame('This request was declined because it could enable cyber harm.', $result->refusalDetail);
+        self::assertSame(Wire::ANTHROPIC_REQUEST_ID, $result->requestId);
+        self::assertEquals(new AiTokenUsage(412, 0), $result->tokenUsage);
+        self::assertSame('claude-fable-5', $result->model);
+    }
+
+    public function testARefusalWithoutCategoryKeepsNullAsTheDocumentationSays(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicRefusal(['type' => 'refusal', 'category' => null, 'explanation' => null])));
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::Anthropic));
+
+        self::assertSame(AiFinishReason::ContentFilter, $result->finishReason);
+        self::assertNull($result->refusalCategory);
+        self::assertNull($result->refusalDetail);
+    }
+
+    public function testAnAnswerThatIsNotARefusalCarriesNoRefusalField(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::Anthropic));
+
+        self::assertNull($result->refusalCategory);
+        self::assertNull($result->refusalDetail);
+    }
+
+    public function testAStreamThatEndsOnARefusalIsAContentFilterAnswer(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicStream(stop: 'refusal')));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::Anthropic));
+
+        foreach ($stream as $_) {
+        }
+
+        self::assertSame(AiFinishReason::ContentFilter, $stream->result()->finishReason);
+    }
 }

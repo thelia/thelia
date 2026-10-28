@@ -20,6 +20,7 @@ use Symfony\AI\Platform\Model;
 use Symfony\AI\Platform\Platform;
 use Symfony\AI\Platform\PlatformOptions;
 use Symfony\AI\Platform\Result\DeferredResult;
+use Symfony\AI\Platform\Result\RawHttpResult;
 use Symfony\AI\Platform\Result\Stream\Delta\TextDelta as LibraryTextDelta;
 use Symfony\AI\Platform\Result\Stream\Delta\ToolCallComplete;
 use Symfony\AI\Platform\Result\StreamResult;
@@ -66,11 +67,20 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
             $deferred = $this->invoke($request, $target, false);
             $this->assertSuccessful($deferred, $target);
 
+            $body = self::bodyOf($deferred);
+            $requestId = self::requestId($deferred, $body);
+            $refusal = $this->refusal($body);
+
+            if (null !== $refusal) {
+                // The library throws or returns plain text for a refusal: the body says what it is.
+                return $this->results->fromRefusal($deferred, $target, $refusal, $requestId, $this->announcedCost($deferred));
+            }
+
             try {
-                return $this->results->fromDeferred($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred));
+                return $this->results->fromDeferred($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred), $requestId);
             } catch (MaxOutputTokensException) {
                 // A tool call cut at the limit of the output: not a failure of the provider, an answer that stopped short.
-                return $this->results->fromTruncated($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred));
+                return $this->results->fromTruncated($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred), $requestId);
             }
         } catch (\Throwable $error) {
             throw $this->errors->translate($error, $target) ?? $error;
@@ -131,6 +141,17 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
     }
 
     /**
+     * The refusal the provider announces in the body of its answer, for a family that documents one the library does
+     * not return as a stop reason (it throws, or turns the refusal into the text of the answer).
+     *
+     * @param array<string, mixed> $body
+     */
+    protected function refusal(array $body): ?AiProviderRefusal
+    {
+        return null;
+    }
+
+    /**
      * What the provider announces the call cost, when it does.
      */
     protected function announcedCost(DeferredResult $deferred): ?string
@@ -152,6 +173,7 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
         }
 
         $progress->stream = $result;
+        $progress->requestId = self::requestId($deferred, []);
 
         try {
             foreach ($deferred->asStream() as $delta) {
@@ -178,6 +200,49 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
         }
 
         $progress->complete = true;
+    }
+
+    /**
+     * The identifier the provider gives to the call: its request header (`request-id` for Anthropic, `x-request-id`
+     * for OpenAI), else the id of the message or of the completion in the body when the body is read.
+     *
+     * @param array<string, mixed> $body
+     */
+    private static function requestId(DeferredResult $deferred, array $body): ?string
+    {
+        $raw = $deferred->getRawResult();
+
+        if ($raw instanceof RawHttpResult) {
+            try {
+                $headers = $raw->getObject()->getHeaders(false);
+            } catch (\Throwable) {
+                $headers = [];
+            }
+
+            foreach (['request-id', 'x-request-id'] as $name) {
+                $value = $headers[$name][0] ?? null;
+
+                if (\is_string($value) && '' !== trim($value)) {
+                    return trim($value);
+                }
+            }
+        }
+
+        $id = $body['id'] ?? null;
+
+        return \is_string($id) && '' !== trim($id) ? trim($id) : null;
+    }
+
+    /**
+     * @return array<string, mixed> empty when the body is not a JSON object
+     */
+    private static function bodyOf(DeferredResult $deferred): array
+    {
+        try {
+            return $deferred->getRawResult()->getData();
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     private function invoke(AiRequest $request, AiTarget $target, bool $stream): DeferredResult

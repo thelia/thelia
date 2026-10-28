@@ -35,6 +35,9 @@ final class AiStreamProgress
 
     public bool $complete = false;
 
+    /** The identifier the provider gave to the call, read from its response headers. */
+    public ?string $requestId = null;
+
     /** The provider cut the answer at the limit of output tokens: what came before is kept, the reason is MaxTokens. */
     public bool $truncated = false;
 

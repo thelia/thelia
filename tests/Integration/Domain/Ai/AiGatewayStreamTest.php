@@ -62,6 +62,18 @@ final class AiGatewayStreamTest extends AiGatewayTestCase
         self::assertSame('0.03200900', $this->sent[0]['held']);
     }
 
+    public function testTheRequestIdOfTheProviderIsOnTheCompletedResponseAndOnTheRow(): void
+    {
+        $gateway = $this->gatewayAnswering([Wire::chatStream(['Bon', 'jour'], headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID])]);
+
+        $events = iterator_to_array($gateway->stream($this->request('aiprobe.drafts')), false);
+        $completed = $events[array_key_last($events)];
+
+        self::assertInstanceOf(StreamCompleted::class, $completed);
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $completed->response->providerRequestId);
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $this->lastLog()->getProviderRequestId());
+    }
+
     public function testTheChecksRunWhenTheIterationStartsNotBefore(): void
     {
         $gateway = $this->gatewayAnswering([]);

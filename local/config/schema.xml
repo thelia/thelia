@@ -3510,6 +3510,7 @@
     <column name="latency_ms" type="INTEGER" />
     <column description="JSON list of the guardrail verdicts" name="guardrail_verdicts" type="LONGVARCHAR" />
     <column description="groups the turns of one task, like the steps of a tool loop" name="correlation_id" size="64" type="VARCHAR" />
+    <column description="the identifier the provider gave to the call, what its support asks for" name="provider_request_id" size="128" type="VARCHAR" />
     <column description="the request as sent, only when the usage stores prompts" name="prompt" type="CLOB" />
     <column description="when the maintenance purge empties the prompt" name="prompt_expires_at" type="TIMESTAMP" />
     <index name="idx_ai_usage_log_usage_created">

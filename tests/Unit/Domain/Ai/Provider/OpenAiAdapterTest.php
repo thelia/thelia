@@ -108,4 +108,37 @@ final class OpenAiAdapterTest extends AiProviderTestCase
         $adapter->complete($this->request(outputSchema: new AiOutputSchema('page', ['type' => 'object', 'properties' => ['a' => ['type' => 'string']]])), $target);
         self::assertFalse($this->lastBody()['text']['format']['strict']);
     }
+
+    public function testTheRequestIdIsTheHeaderOfTheProviderElseTheIdOfTheResponse(): void
+    {
+        $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('ok')], headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID]), Wire::responses([Wire::responsesMessage('ok')])]), self::PINNED);
+        $target = $this->target(AiProvider::OpenAi, null);
+
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $adapter->complete($this->request(), $target)->requestId);
+        self::assertSame('resp_1', $adapter->complete($this->request(), $target)->requestId);
+    }
+
+    public function testARefusalPartOfTheMessageIsAContentFilterAnswerNotATextAnswer(): void
+    {
+        // Content part of type "refusal" (guide Structured outputs of OpenAI): the library would return its text as the answer.
+        $refusal = ['type' => 'message', 'id' => 'msg_1', 'status' => 'completed', 'role' => 'assistant', 'content' => [['type' => 'refusal', 'refusal' => "I'm sorry, I cannot assist with that request."]]];
+        $adapter = $this->adapter(OpenAiAdapter::class, $this->transport(Wire::responses([$refusal])), self::PINNED);
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::OpenAi, null));
+
+        self::assertSame(AiFinishReason::ContentFilter, $result->finishReason);
+        self::assertSame('', $result->text);
+        self::assertSame("I'm sorry, I cannot assist with that request.", $result->refusalDetail);
+        self::assertNull($result->refusalCategory);
+    }
+
+    public function testAnIncompleteResponseStoppedByTheContentFilterIsAContentFilterAnswer(): void
+    {
+        $adapter = $this->adapter(OpenAiAdapter::class, $this->transport(Wire::responses([], 5, 0, 0, 'incomplete', 'content_filter')), self::PINNED);
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::OpenAi, null));
+
+        self::assertSame(AiFinishReason::ContentFilter, $result->finishReason);
+        self::assertSame(5, $result->tokenUsage->inputTokens);
+    }
 }
