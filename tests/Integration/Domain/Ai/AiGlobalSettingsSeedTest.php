@@ -43,4 +43,27 @@ final class AiGlobalSettingsSeedTest extends IntegrationTestCase
             ConfigQuery::write('ai_eu_only', $original);
         }
     }
+
+    public function testTheMasterSwitchAndTheMonthlyCapAreWrittenAndReadBack(): void
+    {
+        $settings = new AiSettings();
+        $enabled = ConfigQuery::read('ai_enabled', '1');
+        $cap = ConfigQuery::read('ai_monthly_cap', '0');
+
+        try {
+            $settings->setEnabled(false);
+            self::assertFalse($settings->isEnabled());
+            $settings->setEnabled(true);
+            self::assertTrue($settings->isEnabled());
+
+            $settings->setMonthlyCap(' 25.50 ');
+            self::assertSame('25.50', $settings->monthlyCap());
+
+            $this->expectException(\Thelia\Domain\Ai\Exception\InvalidAiArgumentException::class);
+            $settings->setMonthlyCap('-1');
+        } finally {
+            ConfigQuery::write('ai_enabled', $enabled);
+            ConfigQuery::write('ai_monthly_cap', $cap);
+        }
+    }
 }

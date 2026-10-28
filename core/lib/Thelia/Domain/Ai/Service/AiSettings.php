@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Service;
 
+use Thelia\Domain\Ai\Internal\AiAssert;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -59,5 +60,23 @@ class AiSettings
     public function setEuropeanUnionOnly(bool $europeanUnionOnly): void
     {
         ConfigQuery::write('ai_eu_only', $europeanUnionOnly ? '1' : '0');
+    }
+
+    public function setEnabled(bool $enabled): void
+    {
+        ConfigQuery::write('ai_enabled', $enabled ? '1' : '0');
+    }
+
+    /**
+     * @param string $cap a non-negative decimal like "25.00", '0' for no global cap
+     *
+     * @throws \Thelia\Domain\Ai\Exception\InvalidAiArgumentException when it is not a decimal
+     */
+    public function setMonthlyCap(string $cap): void
+    {
+        $cap = trim($cap);
+        AiAssert::decimal($cap, 'The monthly cap');
+
+        ConfigQuery::write('ai_monthly_cap', $cap);
     }
 }
