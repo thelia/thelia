@@ -27,6 +27,10 @@ class AiSettings
 {
     public const int DEFAULT_LOG_RETENTION_DAYS = 400;
 
+    public const int DEFAULT_TOOL_APPROVAL_TTL_HOURS = 24;
+
+    public const int DEFAULT_TOOL_TOKEN_MAX_DAYS = 365;
+
     public function isEnabled(): bool
     {
         return '0' !== trim((string) ConfigQuery::read('ai_enabled', '1'));
@@ -78,5 +82,33 @@ class AiSettings
         AiAssert::decimal($cap, 'The monthly cap');
 
         ConfigQuery::write('ai_monthly_cap', $cap);
+    }
+
+    /**
+     * Whether the MCP server of the core answers: off until the merchant turns it on (the master switch also cuts it).
+     */
+    public function mcpEnabled(): bool
+    {
+        return '1' === trim((string) ConfigQuery::read('ai_mcp_enabled', '0'));
+    }
+
+    /**
+     * @return int hours a proposal of a write tool waits for an administrator, 24 when the setting is missing or is not a positive number
+     */
+    public function toolApprovalTtlHours(): int
+    {
+        $hours = trim((string) ConfigQuery::read('ai_tool_approval_ttl_hours', (string) self::DEFAULT_TOOL_APPROVAL_TTL_HOURS));
+
+        return 1 === preg_match('/^[1-9]\d{0,4}$/', $hours) ? (int) $hours : self::DEFAULT_TOOL_APPROVAL_TTL_HOURS;
+    }
+
+    /**
+     * @return int the longest life, in days, of an MCP token, 365 when the setting is missing or is not a positive number
+     */
+    public function toolTokenMaxDays(): int
+    {
+        $days = trim((string) ConfigQuery::read('ai_tool_token_max_days', (string) self::DEFAULT_TOOL_TOKEN_MAX_DAYS));
+
+        return 1 === preg_match('/^[1-9]\d{0,4}$/', $days) ? (int) $days : self::DEFAULT_TOOL_TOKEN_MAX_DAYS;
     }
 }

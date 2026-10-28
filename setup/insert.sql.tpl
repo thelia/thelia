@@ -118,7 +118,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (107, 'ai_enabled', '1', 0, 0, NOW(), NOW()),
 (108, 'ai_monthly_cap', '0', 0, 0, NOW(), NOW()),
 (109, 'ai_eu_only', '0', 0, 0, NOW(), NOW()),
-(110, 'ai_log_retention_days', '400', 0, 0, NOW(), NOW())
+(110, 'ai_log_retention_days', '400', 0, 0, NOW(), NOW()),
+(111, 'ai_mcp_enabled', '0', 0, 0, NOW(), NOW()),
+(112, 'ai_tool_approval_ttl_hours', '24', 0, 0, NOW(), NOW()),
+(113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2248,7 +2251,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (62, 'admin.configuration.background-jobs', NOW(), NOW()),
 (63, 'admin.customer.payment-method', NOW(), NOW()),
 (64, 'admin.configuration.webhook', NOW(), NOW()),
-(65, 'admin.configuration.ai', NOW(), NOW())
+(65, 'admin.configuration.ai', NOW(), NOW()),
+(66, 'admin.configuration.ai-mcp', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -4068,7 +4072,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, '{{ locale }}', {{ intl('Configuration background jobs', locale) }}, NULL, NULL, NULL),
     (63, '{{ locale }}', {{ intl('Saved payment methods', locale) }}, NULL, NULL, NULL),
     (64, '{{ locale }}', {{ intl('Configuration webhooks', locale) }}, NULL, NULL, NULL),
-    (65, '{{ locale }}', {{ intl('Configuration AI', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (65, '{{ locale }}', {{ intl('Configuration AI', locale) }}, NULL, NULL, NULL),
+    (66, '{{ locale }}', {{ intl('Configuration AI MCP tokens', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

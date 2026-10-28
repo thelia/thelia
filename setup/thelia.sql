@@ -1762,6 +1762,155 @@ CREATE TABLE `ai_budget_reservation`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- ai_tool_token
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_tool_token`;
+
+CREATE TABLE `ai_tool_token`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `admin_id` INTEGER NOT NULL COMMENT 'the administrator the token acts for: his rights, read at each request, bound the token',
+    `label` VARCHAR(64) NOT NULL COMMENT 'what the administrator calls this token',
+    `token_hash` CHAR(64) NOT NULL COMMENT 'SHA-256 of the token, which is a 256-bit secret shown once: the token itself is never stored',
+    `token_prefix` VARCHAR(16) NOT NULL COMMENT 'the first characters of the token, to recognise it in the lists and in the log',
+    `all_rights` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '1 gives the token every right of its administrator; 0 limits it to the scopes',
+    `scopes` TEXT COMMENT 'JSON list of {resource|module, access}, required and not empty unless all_rights is 1',
+    `expires_at` DATETIME NOT NULL,
+    `last_used_at` DATETIME,
+    `revoked_at` DATETIME COMMENT 'a revoked token is refused at the next request',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ai_tool_token_token_hash_UNIQUE` (`token_hash`),
+    INDEX `idx_ai_tool_token_admin_id` (`admin_id`),
+    CONSTRAINT `fk_ai_tool_token_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_tool_approval
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_tool_approval`;
+
+CREATE TABLE `ai_tool_approval`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tool_name` VARCHAR(64) NOT NULL,
+    `module` VARCHAR(55) NOT NULL COMMENT 'the module that declares the tool, in lower case',
+    `acl_resource` VARCHAR(255) COMMENT 'the right the tool declared when it proposed: the approver must hold it today and the tool must still declare it',
+    `acl_module` VARCHAR(55),
+    `acl_access` VARCHAR(8) NOT NULL,
+    `target` VARCHAR(128) NOT NULL COMMENT 'what the change touches, like product_sale_elements:42',
+    `summary` VARCHAR(512) NOT NULL COMMENT 'written by the tool from a request of the model: untrusted text, always shown escaped',
+    `original_arguments` TEXT NOT NULL COMMENT 'JSON: what the model asked',
+    `arguments` TEXT NOT NULL COMMENT 'JSON: what applies, those of the approver when he amended them',
+    `before_state` TEXT NOT NULL COMMENT 'JSON',
+    `after_state` TEXT NOT NULL COMMENT 'JSON',
+    `amended` TINYINT(1) DEFAULT 0 NOT NULL,
+    `status` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'pending, applying, applied, rejected, failed or expired',
+    `channel` VARCHAR(16) NOT NULL COMMENT 'gateway or mcp',
+    `usage_id` VARCHAR(128),
+    `correlation_id` VARCHAR(64),
+    `proposed_by_type` VARCHAR(16) NOT NULL COMMENT 'admin, customer, visitor or system',
+    `proposed_by_hash` VARCHAR(64) NOT NULL COMMENT 'HMAC-SHA256 of the actor with the application secret',
+    `proposed_by_admin_id` INTEGER COMMENT 'only for an administrator; empty once he is deleted, proposed_by_admin_login keeps the trace',
+    `proposed_by_admin_login` VARCHAR(255),
+    `token_id` INTEGER,
+    `token_prefix` VARCHAR(16),
+    `expires_at` DATETIME NOT NULL,
+    `decided_by_admin_id` INTEGER,
+    `decided_by_admin_login` VARCHAR(255),
+    `decided_at` DATETIME,
+    `decision_note` VARCHAR(255),
+    `error` VARCHAR(255) COMMENT 'why applying failed, never an argument',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_ai_tool_approval_status_expires` (`status`, `expires_at`),
+    INDEX `idx_ai_tool_approval_tool_status` (`tool_name`, `status`),
+    INDEX `idx_ai_tool_approval_proposed_by_admin_id` (`proposed_by_admin_id`),
+    INDEX `idx_ai_tool_approval_token_id` (`token_id`),
+    INDEX `idx_ai_tool_approval_decided_by_admin_id` (`decided_by_admin_id`),
+    INDEX `idx_ai_tool_approval_correlation_id` (`correlation_id`),
+    CONSTRAINT `fk_ai_tool_approval_proposed_by_admin_id`
+        FOREIGN KEY (`proposed_by_admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_ai_tool_approval_token_id`
+        FOREIGN KEY (`token_id`)
+        REFERENCES `ai_tool_token` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_ai_tool_approval_decided_by_admin_id`
+        FOREIGN KEY (`decided_by_admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- ai_tool_call_log
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ai_tool_call_log`;
+
+CREATE TABLE `ai_tool_call_log`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tool_name` VARCHAR(64) NOT NULL,
+    `module` VARCHAR(55) NOT NULL COMMENT 'the module that declares the tool in lower case, empty for an unknown name',
+    `effect` VARCHAR(8) NOT NULL COMMENT 'read, write or unknown',
+    `channel` VARCHAR(16) NOT NULL COMMENT 'gateway or mcp',
+    `status` VARCHAR(24) NOT NULL COMMENT 'succeeded, pending_approval, invalid_arguments, unknown_tool, denied, limited, result_too_large or failed',
+    `error` VARCHAR(255) COMMENT 'why the call failed or was refused, never an argument',
+    `usage_id` VARCHAR(128),
+    `correlation_id` VARCHAR(64) COMMENT 'joins the calls of one task to the turns of ai_usage_log',
+    `actor_type` VARCHAR(16) NOT NULL COMMENT 'admin, customer, visitor or system',
+    `actor_hash` VARCHAR(64) NOT NULL COMMENT 'HMAC-SHA256 of the actor with the application secret',
+    `admin_id` INTEGER COMMENT 'in clear for an administrator only; customers and visitors are known by their hash',
+    `admin_login` VARCHAR(255),
+    `token_id` INTEGER,
+    `token_prefix` VARCHAR(16),
+    `approval_id` INTEGER,
+    `arguments` TEXT COMMENT 'JSON of at most 4096 bytes, marked when cut; emptied by the maintenance purge after 30 days',
+    `arguments_expires_at` DATETIME COMMENT 'when the maintenance purge empties the arguments',
+    `result_bytes` INTEGER,
+    `latency_ms` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_ai_tool_call_log_tool_created` (`tool_name`, `created_at`),
+    INDEX `idx_ai_tool_call_log_status_created` (`status`, `created_at`),
+    INDEX `idx_ai_tool_call_log_admin_created` (`admin_id`, `created_at`),
+    INDEX `idx_ai_tool_call_log_token_id` (`token_id`),
+    INDEX `idx_ai_tool_call_log_approval_id` (`approval_id`),
+    INDEX `idx_ai_tool_call_log_correlation_id` (`correlation_id`),
+    INDEX `idx_ai_tool_call_log_arguments_expires_at` (`arguments_expires_at`),
+    INDEX `idx_ai_tool_call_log_created` (`created_at`),
+    CONSTRAINT `fk_ai_tool_call_log_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_ai_tool_call_log_token_id`
+        FOREIGN KEY (`token_id`)
+        REFERENCES `ai_tool_token` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_ai_tool_call_log_approval_id`
+        FOREIGN KEY (`approval_id`)
+        REFERENCES `ai_tool_approval` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- profile_resource
 -- ---------------------------------------------------------------------
 
