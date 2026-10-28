@@ -193,6 +193,14 @@ final class ApiContractExampleTest extends TestCase
         self::assertSame(1742, $final->tokenUsage->total());
     }
 
+    public function testAUsageCanDeclareItsInputSizeAsTheDefaultOfTheMerchantSetting(): void
+    {
+        $usage = new AsAiUsage('commerceagents.shopping_assistant', 'p', AiAudience::Public, AiTier::Fast, maxInputCharacters: 2000);
+
+        self::assertSame(2000, $usage->maxInputCharacters);
+        self::assertNull((new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast))->maxInputCharacters);
+    }
+
     public function testTheContractHasNoToolRunByTheProvider(): void
     {
         foreach ([AsAiUsage::class, AiRequest::class] as $class) {
@@ -323,6 +331,7 @@ final class ApiContractExampleTest extends TestCase
         yield 'usage without purpose' => [static fn () => new AsAiUsage('theliacms.page', ' ', AiAudience::Admin, AiTier::Fast)];
         yield 'usage repeating a capability' => [static fn () => new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast, [AiCapability::Tools, AiCapability::Tools])];
         yield 'usage listing a core guardrail' => [static fn () => new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast, guardrails: [CoreGuardrail::Budget->value => GuardrailMode::Block])];
+        yield 'usage with no room for input' => [static fn () => new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast, maxInputCharacters: 0)];
         yield 'request without message' => [static fn () => new AiRequest('theliacms.page', [])];
         yield 'request ending on the model' => [static fn () => new AiRequest('theliacms.page', [$user, AiMessage::assistant('Hi')])];
         yield 'tool result answering no call' => [static fn () => new AiRequest('theliacms.page', [$user, AiMessage::toolResult('toolu_99', [])])];
