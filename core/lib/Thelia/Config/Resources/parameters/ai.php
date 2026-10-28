@@ -19,5 +19,8 @@ return static function (ContainerConfigurator $container): void {
         // Seconds a provider may stay silent before the call is given up: a model thinks for a while before its first token.
         ->set('thelia.ai.http_timeout', 60)
         // Seconds a whole call may last, a streamed answer included.
-        ->set('thelia.ai.http_max_duration', 300);
+        ->set('thelia.ai.http_max_duration', 300)
+        // The models of the moderation guardrails (docs.mistral.ai/capabilities/guardrailing, developers.openai.com/api/docs/guides/moderation).
+        ->set('thelia.ai.moderation.mistral_model', 'mistral-moderation-2603')
+        ->set('thelia.ai.moderation.openai_model', 'omni-moderation-latest');
 };
