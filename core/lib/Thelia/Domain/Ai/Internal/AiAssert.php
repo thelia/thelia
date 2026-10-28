@@ -35,7 +35,7 @@ final class AiAssert
     /** A name a provider accepts for a tool or a schema. */
     private const string NAME_PATTERN = '/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/';
 
-    /** A correlation identifier or a provider tool name: no space, no PII by construction. */
+    /** A correlation identifier or a guardrail name: no space, no PII by construction. */
     private const string TOKEN_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/';
 
     private function __construct()
@@ -130,28 +130,6 @@ final class AiAssert
             if (!\is_string($provider) || null === AiProvider::tryFrom($provider) || !\is_array($providerOptions)) {
                 throw new InvalidAiArgumentException(\sprintf('Provider options are keyed by an AiProvider value ("anthropic", "mistral"...) and hold an array, "%s" given.', $provider));
             }
-        }
-    }
-
-    /**
-     * @param array<mixed> $values
-     */
-    public static function listOfTokens(array $values, string $field): void
-    {
-        if (!array_is_list($values)) {
-            throw new InvalidAiArgumentException(\sprintf('%s must be a list.', $field));
-        }
-
-        foreach ($values as $value) {
-            if (!\is_string($value)) {
-                throw new InvalidAiArgumentException(\sprintf('%s must hold strings only, %s given.', $field, get_debug_type($value)));
-            }
-
-            self::token($value, $field);
-        }
-
-        if (\count($values) !== \count(array_unique($values))) {
-            throw new InvalidAiArgumentException(\sprintf('%s must not repeat a value.', $field));
         }
     }
 

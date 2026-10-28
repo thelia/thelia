@@ -45,7 +45,6 @@ final readonly class AsAiUsage
      * @param string                       $id           `<module>.<purpose>` in lower case, unique in the shop
      * @param string                       $purpose      what the usage does, in one sentence, for the register of AI usages
      * @param list<AiCapability>           $capabilities what the model must be able to do
-     * @param list<string>                 $serverTools  tools run by the provider itself that a request may ask for, like `web_fetch`
      * @param array<string, GuardrailMode> $guardrails   optional guardrails (classifiers) by name, with their default mode; the
      *                                                   deterministic ones of CoreGuardrail always apply and are not listed here
      */
@@ -56,7 +55,6 @@ final readonly class AsAiUsage
         public AiTier $tier,
         public array $capabilities = [],
         public AiTransparency $transparency = AiTransparency::None,
-        public array $serverTools = [],
         public array $guardrails = [],
     ) {
         AiAssert::usageId($id);
@@ -67,8 +65,6 @@ final readonly class AsAiUsage
         if (\count($capabilities) !== \count(array_unique(array_map(static fn (AiCapability $capability): string => $capability->value, $capabilities)))) {
             throw new InvalidAiArgumentException(\sprintf('The usage "%s" repeats a capability.', $id));
         }
-
-        AiAssert::listOfTokens($serverTools, 'The server tools of a usage');
 
         AiAssert::mapOf($guardrails, GuardrailMode::class, 'The guardrails of a usage');
 

@@ -19,8 +19,8 @@ use Thelia\Domain\Ai\AiJurisdiction;
 
 /**
  * Raised only when the merchant turned on the optional setting "EU only" (off by default): it then refuses
- * a connection, a provider tool the request asks for, or an external service
- * (AiCostRecorderInterface::authorize()) that processes data outside the European Union.
+ * a connection or an external service (AiCostRecorderInterface::authorize()) that processes data outside
+ * the European Union.
  */
 #[Exclude]
 final class AiJurisdictionRefusedException extends \RuntimeException implements AiExceptionInterface

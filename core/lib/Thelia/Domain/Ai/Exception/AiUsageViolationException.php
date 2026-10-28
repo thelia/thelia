@@ -17,7 +17,7 @@ namespace Thelia\Domain\Ai\Exception;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 
 /**
- * The request asks for something its usage did not declare: tools, a schema, a stream, a provider tool.
+ * The request asks for something its usage did not declare: tools, a schema, a stream.
  */
 #[Exclude]
 final class AiUsageViolationException extends \LogicException implements AiExceptionInterface
