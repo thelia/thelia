@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Ai\Tool;
 
+use Psr\Log\AbstractLogger;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Ai\AiActor;
@@ -95,6 +96,46 @@ final class AiToolBuiltinToolsTest extends AiToolTestCase
 
         self::assertSame(2, $this->call('thelia_search_products', ['query' => 'MUG-', 'limit' => 2])->content['count']);
         self::assertSame(AiToolCallStatus::InvalidArguments, $this->call('thelia_search_products', ['query' => 'MUG-', 'limit' => 21])->status);
+    }
+
+    public function testTheSearchByTitleNeverLoadsMoreThanItsLimit(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $currency = CurrencyQuery::create()->filterByByDefault(true)->findOne() ?? $factory->currency();
+
+        foreach (['A', 'B', 'C', 'D'] as $suffix) {
+            $factory->product($factory->category(), $factory->taxRule(), $currency, ['ref' => 'REF-'.$suffix, 'title' => 'Kettle '.$suffix]);
+        }
+
+        $connection = $this->getPropelConnection();
+        $previous = $connection->getLogger();
+        $statements = new class extends AbstractLogger {
+            /** @var list<string> */
+            public array $lines = [];
+
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                $this->lines[] = (string) $message;
+            }
+        };
+        $connection->setLogger($statements);
+        $connection->useDebug(true);
+
+        try {
+            $result = $this->call('thelia_search_products', ['query' => 'kettle', 'limit' => 2]);
+        } finally {
+            $connection->useDebug(false);
+            $connection->setLogger($previous);
+        }
+
+        $titleQueries = array_filter($statements->lines, static fn (string $line): bool => str_contains($line, 'product_i18n') && str_contains($line, 'LIKE'));
+
+        self::assertSame(['REF-A', 'REF-B'], array_column($result->content['products'], 'ref'));
+        self::assertNotSame([], $titleQueries);
+
+        foreach ($titleQueries as $query) {
+            self::assertStringContainsString('LIMIT 2', $query);
+        }
     }
 
     public function testThePriceChangesOnlyOnceAnAdministratorApproves(): void

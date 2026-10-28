@@ -64,6 +64,10 @@ final readonly class SearchProductsTool implements AiReadToolInterface
         $byTitle = ProductI18nQuery::create()
             ->filterByLocale($context->locale)
             ->filterByTitle($pattern, Criteria::LIKE)
+            ->useProductQuery()
+                ->orderByRef()
+            ->endUse()
+            ->limit($limit)
             ->select('Id')
             ->find()
             ->toArray();
