@@ -55,6 +55,19 @@ final readonly class AiActor
     }
 
     /**
+     * An actor already reduced to its HMAC, as the log keeps it: what a guardrail that may call a third party
+     * receives in place of the real actor. The gateway builds it; a module has no use for it.
+     *
+     * @internal
+     *
+     * @param string $hash the HMAC-SHA256 of `<type>:<identifier>` (AiActorHasher)
+     */
+    public static function pseudonymous(AiActorType $type, string $hash): self
+    {
+        return new self($type, $hash);
+    }
+
+    /**
      * @param string $process the command or the job, like `pricewatch:collect`
      */
     public static function system(string $process = 'cli'): self

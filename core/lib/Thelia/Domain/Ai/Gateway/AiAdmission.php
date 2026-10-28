@@ -103,8 +103,8 @@ final readonly class AiAdmission
         $actor = $request->actor ?? $this->actors->resolve();
         $actorHash = $this->hasher->hash($actor);
         $effective = self::withLimits($request, $request->actor, $this->outputLimit($request, $setting?->getMaxOutputTokens(), $target));
-        // A guardrail may call a third party: it gets the actor as the log keeps it, never in clear.
-        $guarded = self::withLimits($effective, AiActor::visitor($actorHash), $effective->maxOutputTokens);
+        // A guardrail may call a third party: it gets the real type of the actor and its hash, never the identifier.
+        $guarded = self::withLimits($effective, AiActor::pseudonymous($actor->type, $actorHash), $effective->maxOutputTokens);
 
         /** @param list<GuardrailVerdict> $verdicts */
         $refuse = function (AiUsageLogStatus $status, string $reason, array $verdicts) use ($kind, $usage, $target, $actor, $actorHash, $request, $startedAt): void {
