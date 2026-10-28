@@ -24,6 +24,7 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
+use Thelia\Tests\Api\RateLimit\RateLimitTestEnvironment;
 use Thelia\Tests\Api\Trait\RegistersGuestCustomers;
 
 /**
@@ -32,6 +33,7 @@ use Thelia\Tests\Api\Trait\RegistersGuestCustomers;
  */
 final class CustomerRegistrationApiTest extends ApiTestCase
 {
+    use RateLimitTestEnvironment;
     use RegistersGuestCustomers;
 
     private const string NEUTRAL_MESSAGE = 'This registration link is not valid.';
@@ -48,6 +50,8 @@ final class CustomerRegistrationApiTest extends ApiTestCase
         $this->registration = $this->getService(CustomerGroupRegistration::class);
         $this->previousEmailConfirmation = (string) ConfigQuery::read('customer_email_confirmation', '0');
         ConfigQuery::write('customer_email_confirmation', '0');
+        // The registration budget outlives the run: start every test with a full one.
+        $this->clearRateLimiterCounters();
     }
 
     protected function tearDown(): void
@@ -72,6 +76,19 @@ final class CustomerRegistrationApiTest extends ApiTestCase
         self::assertSame(CustomerGroupQuery::findDefault()->getId(), $stored->getCustomerGroupId());
         self::assertTrue($stored->checkPassword('secret123'), 'The password is stored hashed and verifies.');
         self::assertNotSame('secret123', $stored->getPassword());
+    }
+
+    public function testAnAddressOverItsBudgetIsRefusedWithTheDelayToWait(): void
+    {
+        for ($attempt = 1; $attempt <= 5; ++$attempt) {
+            self::assertNotSame(Response::HTTP_TOO_MANY_REQUESTS, $this->register(['email' => 'budget@test.com'])->getStatusCode());
+        }
+
+        $refused = $this->register(['email' => 'budget@test.com']);
+
+        self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $refused->getStatusCode(), (string) $refused->getContent());
+        self::assertGreaterThan(0, (int) $refused->headers->get('Retry-After'));
+        self::assertLessThanOrEqual(3600, (int) $refused->headers->get('Retry-After'), 'The window of the budget is an hour.');
     }
 
     public function testTheTokenOfALinkPutsTheNewAccountInItsGroupAndTheLifeOfTheToken(): void
