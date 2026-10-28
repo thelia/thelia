@@ -64,4 +64,9 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
 
         return $native;
     }
+
+    protected function refusal(array $body): ?AiProviderRefusal
+    {
+        return AiProviderRefusal::fromAnthropic($body);
+    }
 }

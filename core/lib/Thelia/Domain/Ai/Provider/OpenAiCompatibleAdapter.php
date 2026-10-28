@@ -68,4 +68,9 @@ final class OpenAiCompatibleAdapter extends AbstractPlatformAdapter
 
         return (float) $cost > 0 ? \sprintf('%.8F', (float) $cost) : null;
     }
+
+    protected function refusal(array $body): ?AiProviderRefusal
+    {
+        return AiProviderRefusal::fromChatCompletion($body);
+    }
 }

@@ -83,6 +83,9 @@ final readonly class AiCoreOutputGuardrails
                 $result->announcedCost,
                 $result->providerState,
                 $result->complete,
+                $result->requestId,
+                $result->refusalCategory,
+                $result->refusalDetail,
             ),
             $verdicts,
         );

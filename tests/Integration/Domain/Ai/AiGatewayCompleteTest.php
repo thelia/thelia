@@ -46,6 +46,29 @@ use Thelia\Tests\Unit\Domain\Ai\Guardrail\RecordingGuardrail;
 
 final class AiGatewayCompleteTest extends AiGatewayTestCase
 {
+    public function testTheRequestIdOfTheProviderIsOnTheResponseAndOnTheRow(): void
+    {
+        $gateway = $this->gatewayAnswering([Wire::chat('Bonjour', headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID])]);
+
+        $response = $gateway->complete($this->request());
+
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $response->providerRequestId);
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $this->lastLog()->getProviderRequestId());
+    }
+
+    public function testARefusalOfTheProviderIsAnAnswerThatSaysSoNotAFailure(): void
+    {
+        $gateway = $this->gatewayAnswering([Wire::chat('', messageExtra: ['refusal' => 'I cannot help with that.'], headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID])]);
+
+        $response = $gateway->complete($this->request());
+
+        self::assertSame(AiFinishReason::ContentFilter, $response->finishReason);
+        self::assertSame('I cannot help with that.', $response->refusalDetail);
+        self::assertNull($response->refusalCategory);
+        self::assertSame('content_filter', $this->lastLog()->getFinishReason());
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $this->lastLog()->getProviderRequestId());
+    }
+
     public function testACallReturnsTheAnswerItsCostAndTheRowItWrote(): void
     {
         $gateway = $this->gatewayAnswering([Wire::chat('Bonjour', promptTokens: 21, completionTokens: 20)]);

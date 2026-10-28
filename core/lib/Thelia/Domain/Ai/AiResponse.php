@@ -38,6 +38,12 @@ final readonly class AiResponse
      * @param AiProvenance|null         $provenance        set when the usage is generative (AI Act, article 50(2))
      * @param array<string, mixed>      $providerState     opaque, do not read: what the provider needs back on the next turn (signed
      *                                                     thinking blocks, container identifiers). AiMessage::fromResponse() carries it
+     * @param string|null               $providerRequestId the identifier the provider gave to the call (its request header, else the id of
+     *                                                     the message or completion): what its support asks for; null when it gave none
+     * @param string|null               $refusalCategory   the policy area the provider names when it refuses (Anthropic `stop_details.category`,
+     *                                                     like `cyber`); null for any other answer or a refusal without category
+     * @param string|null               $refusalDetail     what the provider says about the refusal (Anthropic `stop_details.explanation`,
+     *                                                     the `refusal` text of OpenAI); provider wording, not translated
      */
     public function __construct(
         public string $text,
@@ -53,6 +59,9 @@ final readonly class AiResponse
         public ?AiProvenance $provenance = null,
         public string $currency = 'USD',
         public array $providerState = [],
+        public ?string $providerRequestId = null,
+        public ?string $refusalCategory = null,
+        public ?string $refusalDetail = null,
     ) {
         AiAssert::listOf($toolCalls, AiToolCall::class, 'The tool calls');
         AiAssert::listOf($guardrailVerdicts, GuardrailVerdict::class, 'The guardrail verdicts');

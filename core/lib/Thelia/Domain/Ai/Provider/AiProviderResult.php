@@ -29,18 +29,21 @@ use Thelia\Domain\Ai\AiToolCall;
 final readonly class AiProviderResult
 {
     /**
-     * @param string                    $text          the text of the answer, empty when the model only called tools; the JSON
-     *                                                 text itself when a schema was asked for
-     * @param array<string, mixed>|null $data          the JSON object of the answer when a schema was asked for and the answer
-     *                                                 is a valid JSON object, null otherwise (an answer that is not JSON is for
-     *                                                 the `output_schema` guardrail to refuse)
+     * @param string                    $text            the text of the answer, empty when the model only called tools; the JSON
+     *                                                   text itself when a schema was asked for
+     * @param array<string, mixed>|null $data            the JSON object of the answer when a schema was asked for and the answer
+     *                                                   is a valid JSON object, null otherwise (an answer that is not JSON is for
+     *                                                   the `output_schema` guardrail to refuse)
      * @param list<AiToolCall>          $toolCalls
-     * @param string                    $model         the model that answered, as the provider names it (a snapshot of the
-     *                                                 model asked for, often)
-     * @param string|null               $announcedCost what the provider says the call cost, decimal string, when it says it
-     * @param array<string, mixed>      $providerState opaque: AiResponse::$providerState
-     * @param bool                      $complete      false for the snapshot of a stream that was not read to its end: the
-     *                                                 tokens are those known at that moment
+     * @param string                    $model           the model that answered, as the provider names it (a snapshot of the
+     *                                                   model asked for, often)
+     * @param string|null               $announcedCost   what the provider says the call cost, decimal string, when it says it
+     * @param array<string, mixed>      $providerState   opaque: AiResponse::$providerState
+     * @param bool                      $complete        false for the snapshot of a stream that was not read to its end: the
+     *                                                   tokens are those known at that moment
+     * @param string|null               $requestId       AiResponse::$providerRequestId
+     * @param string|null               $refusalCategory AiResponse::$refusalCategory
+     * @param string|null               $refusalDetail   AiResponse::$refusalDetail
      */
     public function __construct(
         public string $text,
@@ -52,6 +55,9 @@ final readonly class AiProviderResult
         public ?string $announcedCost = null,
         public array $providerState = [],
         public bool $complete = true,
+        public ?string $requestId = null,
+        public ?string $refusalCategory = null,
+        public ?string $refusalDetail = null,
     ) {
     }
 }

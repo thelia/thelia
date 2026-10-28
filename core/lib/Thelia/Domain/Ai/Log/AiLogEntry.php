@@ -55,6 +55,7 @@ final readonly class AiLogEntry
         public ?string $prompt = null,
         public ?\DateTimeImmutable $promptExpiresAt = null,
         public string $currency = 'USD',
+        public ?string $providerRequestId = null,
     ) {
     }
 }

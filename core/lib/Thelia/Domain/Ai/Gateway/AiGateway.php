@@ -250,6 +250,7 @@ final class AiGateway implements AiGatewayInterface
                 tokens: $tokens,
                 model: '' !== $result->model ? $result->model : $call->target->model->name,
                 finishReason: $result->finishReason,
+                providerRequestId: $result->requestId,
                 error: $blocking?->reason,
                 verdicts: $verdicts,
             ),
@@ -279,13 +280,16 @@ final class AiGateway implements AiGatewayInterface
             $marked ? new AiProvenance($call->usage->id, $model, new \DateTimeImmutable(), $settlement->logId) : null,
             'USD',
             $result->providerState,
+            $result->requestId,
+            $result->refusalCategory,
+            $result->refusalDetail,
         );
     }
 
     /**
      * @param list<GuardrailVerdict> $verdicts
      */
-    private function entry(AiAdmittedCall $call, AiUsageLogStatus $status, string $cost = '0', ?AiTokenUsage $tokens = null, ?string $model = null, ?AiFinishReason $finishReason = null, ?string $error = null, array $verdicts = []): AiLogEntry
+    private function entry(AiAdmittedCall $call, AiUsageLogStatus $status, string $cost = '0', ?AiTokenUsage $tokens = null, ?string $model = null, ?AiFinishReason $finishReason = null, ?string $error = null, array $verdicts = [], ?string $providerRequestId = null): AiLogEntry
     {
         $storePrompt = (bool) $call->setting?->getStorePrompt();
 
@@ -303,6 +307,7 @@ final class AiGateway implements AiGatewayInterface
             jurisdiction: $call->target->jurisdiction,
             error: $error,
             finishReason: $finishReason,
+            providerRequestId: $providerRequestId,
             latencyMilliseconds: $call->latencyMilliseconds(),
             verdicts: $verdicts,
             correlationId: $call->request->correlationId,

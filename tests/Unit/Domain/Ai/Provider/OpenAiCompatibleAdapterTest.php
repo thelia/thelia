@@ -107,8 +107,8 @@ final class OpenAiCompatibleAdapterTest extends AiProviderTestCase
     }
 
     /**
-     * The generic bridge of Symfony AI only knows stop and length for a text answer: any other word is a failure of
-     * the call (never retried: the same request would end the same way), not a silent answer.
+     * The generic bridge of Symfony AI only knows stop, length and tool calls (and the content filter, which the adapter
+     * reads itself): any other word is a failure of the call (never retried: the same request would end the same way), not a silent answer.
      */
     #[DataProvider('unsupportedReasons')]
     public function testAFinishReasonTheBridgeDoesNotKnowIsAFailureThatIsNotRetried(string $reason): void
@@ -127,7 +127,61 @@ final class OpenAiCompatibleAdapterTest extends AiProviderTestCase
     /** @return iterable<string, array{string}> */
     public static function unsupportedReasons(): iterable
     {
-        yield 'content filter' => ['content_filter'];
         yield 'a word of the future' => ['something_new'];
+    }
+
+    public function testTheRequestIdIsTheHeaderOfTheProviderElseTheIdOfTheCompletion(): void
+    {
+        $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport([Wire::chat('ok', headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID]), Wire::chat('ok')]));
+        $target = $this->target(AiProvider::OpenAiCompatible);
+
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $adapter->complete($this->request(), $target)->requestId);
+        self::assertSame('abc', $adapter->complete($this->request(), $target)->requestId);
+    }
+
+    public function testTheRequestIdOfAStreamIsTheHeaderOfTheProvider(): void
+    {
+        $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport(Wire::chatStream(headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID])));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::OpenAiCompatible));
+
+        foreach ($stream as $_) {
+        }
+
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $stream->result()->requestId);
+    }
+
+    public function testAContentFilterAnswerIsRangedAsContentFilterWithoutFailing(): void
+    {
+        $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport(Wire::chat('', finish: 'content_filter', headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID])));
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::OpenAiCompatible));
+
+        self::assertSame(AiFinishReason::ContentFilter, $result->finishReason);
+        self::assertSame('', $result->text);
+        self::assertNull($result->refusalCategory);
+        self::assertSame(Wire::OPENAI_REQUEST_ID, $result->requestId);
+        self::assertSame(21, $result->tokenUsage->inputTokens);
+    }
+
+    public function testTheRefusalTextOfTheMessageIsTheDetail(): void
+    {
+        // The field `message.refusal` of the chat completions of OpenAI (guide Structured outputs, "Refusals").
+        $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport(Wire::chat('', messageExtra: ['refusal' => "I'm sorry, I cannot assist with that request."])));
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::OpenAiCompatible));
+
+        self::assertSame(AiFinishReason::ContentFilter, $result->finishReason);
+        self::assertSame("I'm sorry, I cannot assist with that request.", $result->refusalDetail);
+    }
+
+    public function testAStreamThatEndsOnAContentFilterIsAContentFilterAnswer(): void
+    {
+        $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport(Wire::chatStream(['Bon'], finish: 'content_filter')));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::OpenAiCompatible));
+
+        foreach ($stream as $_) {
+        }
+
+        self::assertSame(AiFinishReason::ContentFilter, $stream->result()->finishReason);
     }
 }

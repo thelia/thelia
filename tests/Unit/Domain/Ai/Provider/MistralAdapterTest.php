@@ -77,4 +77,21 @@ final class MistralAdapterTest extends AiProviderTestCase
         self::assertStringContainsString('<untrusted_content', $messages[1]['content']);
         self::assertSame(1, substr_count($messages[1]['content'], "\n</untrusted_content>"), 'the injected closing tag is neutralised');
     }
+
+    public function testTheRequestIdIsTheIdOfTheCompletionWhenTheProviderSendsNoHeader(): void
+    {
+        $adapter = $this->adapter(MistralAdapter::class, $this->transport(Wire::chat('ok')), self::PINNED);
+
+        self::assertSame('abc', $adapter->complete($this->request(), $this->target(AiProvider::Mistral, null))->requestId);
+    }
+
+    public function testARecordedAnswerOfMistralCarriesTheIdOfItsCompletion(): void
+    {
+        // RECORDED by symfony/ai against api.mistral.ai: the id of the body is the only identifier the cassette keeps.
+        $adapter = $this->adapter(MistralAdapter::class, $this->transport(Wire::cassette('text_response')), self::PINNED);
+
+        $id = json_decode((string) file_get_contents(\dirname(__DIR__, 4).'/fixtures/ai/text_response.json'), true)['interactions'][0]['response']['body'];
+
+        self::assertSame(json_decode($id, true)['id'], $adapter->complete($this->request(), $this->target(AiProvider::Mistral, null))->requestId);
+    }
 }
