@@ -143,14 +143,10 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
     public function markFailed(int $approvalId, string $note): AiToolApprovalView
     {
         $approver = $this->approver();
-        $row = $this->approvals->find($approvalId) ?? throw new AiToolApprovalException(AiToolApprovalFailure::NotFound, 'This proposal does not exist.');
+        $row = $this->visibleRow($approvalId, $approver);
 
         if (AiToolApprovalStatus::Applying->value !== $row->getStatus()) {
             throw new AiToolApprovalException(AiToolApprovalFailure::NotPending, 'Only a change left in the state "applying" is closed this way.');
-        }
-
-        if (!$this->accessChecker->adminHoldsRight($approver, $row->getAclResource(), $row->getAclModule(), $row->getAclAccess())) {
-            throw new AiToolApprovalException(AiToolApprovalFailure::Forbidden, 'You do not hold the right this change needs.');
         }
 
         if (!$this->approvals->closeApplying($approvalId, $note, new \DateTimeImmutable())) {
@@ -183,14 +179,30 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
     }
 
     /**
-     * Steps 1 to 3 of a decision: the row is pending and not expired, the tool still declares the right stored on
-     * the row, the approver holds it today.
+     * The row of a proposal for an administrator who holds the right stored on it. Without that right the answer is
+     * the one for an id that does not exist, and nothing has been changed yet: a forged id tells nothing about the
+     * state of a proposal he may not see, and moves none (no expiry, no rejection).
+     */
+    private function visibleRow(int $approvalId, Admin $approver): AiToolApproval
+    {
+        $row = $this->approvals->find($approvalId);
+
+        if (!$row instanceof AiToolApproval || !$this->accessChecker->adminHoldsRight($approver, $row->getAclResource(), $row->getAclModule(), $row->getAclAccess())) {
+            throw new AiToolApprovalException(AiToolApprovalFailure::NotFound, 'This proposal does not exist.');
+        }
+
+        return $row;
+    }
+
+    /**
+     * Steps 1 to 3 of a decision: the approver holds the right stored on the row (else the proposal does not exist
+     * for him), the row is pending and not expired, the tool still declares that right.
      *
      * @return array{AiToolApproval, AiToolDeclaration}
      */
     private function decidable(int $approvalId, Admin $approver): array
     {
-        $row = $this->approvals->find($approvalId) ?? throw new AiToolApprovalException(AiToolApprovalFailure::NotFound, 'This proposal does not exist.');
+        $row = $this->visibleRow($approvalId, $approver);
 
         if (AiToolApprovalStatus::Pending->value !== $row->getStatus()) {
             throw new AiToolApprovalException(AiToolApprovalFailure::NotPending, 'This proposal is no longer pending.');
@@ -215,10 +227,6 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
 
         if (null === $declaration || AiToolEffect::Write !== $declaration->effect || $attribute?->resource !== $row->getAclResource() || $attribute?->module !== $row->getAclModule() || $attribute?->access !== $row->getAclAccess()) {
             throw new AiToolApprovalException(AiToolApprovalFailure::ToolGone, 'The tool that made this proposal is gone or now asks for another right.');
-        }
-
-        if (!$this->accessChecker->adminHoldsRight($approver, $row->getAclResource(), $row->getAclModule(), $row->getAclAccess())) {
-            throw new AiToolApprovalException(AiToolApprovalFailure::Forbidden, 'You do not hold the right this change needs.');
         }
 
         return [$row, $declaration];
