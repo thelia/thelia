@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Domain\Ai;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thelia\Core\Security\Resource\AdminResources;
 
 /**
  * The tables of the AI layer are declared in three places a fresh install and an update read separately:
@@ -28,7 +29,7 @@ final class AiSchemaParityTest extends TestCase
      */
     public static function tables(): iterable
     {
-        foreach (['ai_connection', 'ai_model', 'ai_tier_assignment', 'ai_usage_setting', 'ai_usage_log', 'ai_budget_reservation'] as $table) {
+        foreach (['ai_connection', 'ai_model', 'ai_tier_assignment', 'ai_usage_setting', 'ai_usage_log', 'ai_budget_reservation', 'ai_tool_token', 'ai_tool_approval', 'ai_tool_call_log'] as $table) {
             yield $table => [$table];
         }
     }
@@ -71,6 +72,9 @@ final class AiSchemaParityTest extends TestCase
         yield 'no global cap' => ['ai_monthly_cap', '0'];
         yield 'EU only off' => ['ai_eu_only', '0'];
         yield 'usage log kept 400 days' => ['ai_log_retention_days', '400'];
+        yield 'MCP server closed' => ['ai_mcp_enabled', '0'];
+        yield 'proposals wait 24 hours' => ['ai_tool_approval_ttl_hours', '24'];
+        yield 'MCP tokens live 365 days at most' => ['ai_tool_token_max_days', '365'];
     }
 
     #[DataProvider('globalSettings')]
@@ -81,6 +85,17 @@ final class AiSchemaParityTest extends TestCase
 
         foreach (['setup/insert.sql.tpl', 'setup/insert.sql', 'setup/update/sql/3.3.0.sql'] as $file) {
             self::assertStringContainsString($row, (string) file_get_contents($root.'/'.$file), $file);
+        }
+    }
+
+    public function testTheResourceOfTheMcpTokensIsSeededOnInstallAndUpdate(): void
+    {
+        $root = \dirname(__DIR__, 4);
+
+        self::assertSame('admin.configuration.ai-mcp', AdminResources::AI_MCP);
+
+        foreach (['setup/insert.sql.tpl', 'setup/insert.sql', 'setup/update/sql/3.3.0.sql'] as $file) {
+            self::assertStringContainsString("'admin.configuration.ai-mcp'", (string) file_get_contents($root.'/'.$file), $file);
         }
     }
 }

@@ -118,7 +118,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (107, 'ai_enabled', '1', 0, 0, NOW(), NOW()),
 (108, 'ai_monthly_cap', '0', 0, 0, NOW(), NOW()),
 (109, 'ai_eu_only', '0', 0, 0, NOW(), NOW()),
-(110, 'ai_log_retention_days', '400', 0, 0, NOW(), NOW())
+(110, 'ai_log_retention_days', '400', 0, 0, NOW(), NOW()),
+(111, 'ai_mcp_enabled', '0', 0, 0, NOW(), NOW()),
+(112, 'ai_tool_approval_ttl_hours', '24', 0, 0, NOW(), NOW()),
+(113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2248,7 +2251,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (62, 'admin.configuration.background-jobs', NOW(), NOW()),
 (63, 'admin.customer.payment-method', NOW(), NOW()),
 (64, 'admin.configuration.webhook', NOW(), NOW()),
-(65, 'admin.configuration.ai', NOW(), NOW())
+(65, 'admin.configuration.ai', NOW(), NOW()),
+(66, 'admin.configuration.ai-mcp', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -15541,6 +15545,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'cs_CZ', NULL, NULL, NULL, NULL),
     (64, 'cs_CZ', NULL, NULL, NULL, NULL),
     (65, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (66, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15605,6 +15610,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'de_DE', 'Gespeicherte Zahlungsmethoden', NULL, NULL, NULL),
     (64, 'de_DE', NULL, NULL, NULL, NULL),
     (65, 'de_DE', NULL, NULL, NULL, NULL),
+    (66, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15669,6 +15675,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'en_US', 'Saved payment methods', NULL, NULL, NULL),
     (64, 'en_US', 'Configuration webhooks', NULL, NULL, NULL),
     (65, 'en_US', 'Configuration AI', NULL, NULL, NULL),
+    (66, 'en_US', 'Configuration AI MCP tokens', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -15733,6 +15740,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'es_ES', 'Métodos de pago guardados', NULL, NULL, NULL),
     (64, 'es_ES', NULL, NULL, NULL, NULL),
     (65, 'es_ES', NULL, NULL, NULL, NULL),
+    (66, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -15797,6 +15805,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'fr_FR', 'Moyens de paiement enregistrés', NULL, NULL, NULL),
     (64, 'fr_FR', 'Configuration des webhooks', NULL, NULL, NULL),
     (65, 'fr_FR', 'Configuration de l\'IA', NULL, NULL, NULL),
+    (66, 'fr_FR', 'Configuration des jetons MCP de l\'IA', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -15861,6 +15870,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'it_IT', 'Metodi di pagamento salvati', NULL, NULL, NULL),
     (64, 'it_IT', NULL, NULL, NULL, NULL),
     (65, 'it_IT', NULL, NULL, NULL, NULL),
+    (66, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -15925,6 +15935,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (63, 'nl_NL', 'Opgeslagen betaalmethoden', NULL, NULL, NULL),
     (64, 'nl_NL', NULL, NULL, NULL, NULL),
     (65, 'nl_NL', NULL, NULL, NULL, NULL),
+    (66, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -15988,7 +15999,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (62, 'ru_RU', 'Настройка фоновых задач', NULL, NULL, NULL),
     (63, 'ru_RU', 'Сохранённые способы оплаты', NULL, NULL, NULL),
     (64, 'ru_RU', NULL, NULL, NULL, NULL),
-    (65, 'ru_RU', NULL, NULL, NULL, NULL)
+    (65, 'ru_RU', NULL, NULL, NULL, NULL),
+    (66, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 

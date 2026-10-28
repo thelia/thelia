@@ -1678,6 +1678,7 @@ return [
     'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)' => 'Number of days a VAT number verification stays valid for the VAT exemption (0 or less falls back to 90)',
     'Configuration webhooks' => 'Configuration webhooks',
     'Configuration AI' => 'Configuration AI',
+    'Configuration AI MCP tokens' => 'Configuration AI MCP tokens',
     'Shipping notice sent to the customer' => 'Shipping notice sent to the customer',
     'Your order {{ order_ref }} has been shipped' => 'Your order {{ order_ref }} has been shipped',
     'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)' => 'Send the customer an e-mail when their order is shipped (1 = yes, 0 = no)',
