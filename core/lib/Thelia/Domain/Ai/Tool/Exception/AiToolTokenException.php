@@ -21,6 +21,14 @@ use Thelia\Domain\Ai\Exception\AiExceptionInterface;
  */
 final class AiToolTokenException extends \RuntimeException implements AiExceptionInterface
 {
+    /** The code of the refusal of a token that asks for all the rights of its administrator and for scopes at once. */
+    public const int ALL_RIGHTS_WITH_SCOPES = 1;
+
+    public static function allRightsWithScopes(): self
+    {
+        return new self('A token with all the rights of its administrator has no scopes.', self::ALL_RIGHTS_WITH_SCOPES);
+    }
+
     public static function forbidden(string $right): self
     {
         return new self(\sprintf('The administrator does not hold the right "%s".', $right));
