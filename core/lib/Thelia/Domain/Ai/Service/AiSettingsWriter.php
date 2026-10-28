@@ -21,6 +21,7 @@ use Thelia\Domain\Ai\AiTier;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
 use Thelia\Domain\Ai\Exception\AiExceptionInterface;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
+use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Guardrail\CoreGuardrail;
 use Thelia\Domain\Ai\Guardrail\GuardrailMode;
 use Thelia\Domain\Ai\Internal\AiAssert;
@@ -295,7 +296,8 @@ final readonly class AiSettingsWriter
 
     /**
      * A tier, a pinned usage or a model bound to the connection names a model of its current provider: under
-     * another provider the connection would no longer serve it, and the usages on it would turn inactive.
+     * another provider the connection would no longer serve it, and the usages on it would turn inactive. A usage
+     * pinned to the connection without a model of its own runs the model of its tier there.
      *
      * @throws InvalidAiArgumentException
      */
@@ -307,16 +309,32 @@ final readonly class AiSettingsWriter
             $modelIds[] = $assignment->getModelId();
         }
 
-        foreach (AiUsageSettingQuery::create()->filterByPinnedConnectionId($connection->getId())->filterByPinnedModelId(null, Criteria::ISNOTNULL)->find() as $setting) {
-            $modelIds[] = $setting->getPinnedModelId();
+        foreach (AiUsageSettingQuery::create()->filterByPinnedConnectionId($connection->getId())->find() as $setting) {
+            $modelIds[] = $setting->getPinnedModelId() ?? $this->tierModelIdOf($setting);
         }
 
+        $modelIds = array_filter($modelIds, static fn (?int $modelId): bool => null !== $modelId);
         $boundModels = AiModelQuery::create()->filterByConnectionId($connection->getId())->filterByProvider($provider->value, Criteria::NOT_EQUAL)->count();
         $usedModels = [] === $modelIds ? 0 : AiModelQuery::create()->filterById(array_values(array_unique($modelIds)), Criteria::IN)->filterByProvider($provider->value, Criteria::NOT_EQUAL)->count();
 
         if ($boundModels + $usedModels > 0) {
             throw new InvalidAiArgumentException('Tiers, usages or models rely on the provider of this connection: move them to another connection before changing its provider.');
         }
+    }
+
+    /**
+     * The model of the tier a usage runs at: the tier chosen for it, else the one its module declares (only the
+     * chosen one when the module is not installed).
+     */
+    private function tierModelIdOf(AiUsageSetting $setting): ?int
+    {
+        try {
+            $tier = $setting->effectiveTier($this->usages->get((string) $setting->getUsageId())->tier);
+        } catch (UnknownAiUsageException) {
+            $tier = AiTier::tryFrom((string) $setting->getTier());
+        }
+
+        return null === $tier ? null : AiTierAssignmentQuery::create()->filterByTier($tier->value)->findOne()?->getModelId();
     }
 
     public function setEnabled(bool $enabled): void
