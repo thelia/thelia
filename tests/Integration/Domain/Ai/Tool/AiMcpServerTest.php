@@ -265,6 +265,23 @@ final class AiMcpServerTest extends ApiTestCase
         self::assertSame(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
     }
 
+    public function testTheMethodsTheCoreDoesNotServeAreMethodsThatDoNotExist(): void
+    {
+        $session = $this->session($this->token($this->reader, [['resource' => 'admin.product', 'access' => 'VIEW']]));
+        $methods = [
+            'completion/complete' => ['ref' => ['type' => 'ref/prompt', 'name' => 'any'], 'argument' => ['name' => 'a', 'value' => 'b']],
+            'resources/subscribe' => ['uri' => 'file:///any'],
+            'resources/unsubscribe' => ['uri' => 'file:///any'],
+            'logging/setLevel' => ['level' => 'debug'],
+        ];
+
+        foreach (array_keys($methods) as $position => $method) {
+            $response = $this->decode($this->call($session, $method, $methods[$method], 20 + $position));
+
+            self::assertSame(-32601, $response['error']['code'], $method);
+        }
+    }
+
     /**
      * @param list<array<string, string>> $scopes
      */

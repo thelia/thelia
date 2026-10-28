@@ -496,7 +496,6 @@ class TheliaKernel extends Kernel
         // Prepended once the config/packages of the shop have been read, so
         // that what the shop wrote about logging is what the shop gets.
         LoggingDefaults::prependTo($container);
-        McpServerConfiguration::applyTo($container);
 
         $this->loadAutoConfigureInterfaces($container);
         $this->loadUtilsXmlConfiguration($container);
@@ -505,6 +504,10 @@ class TheliaKernel extends Kernel
         $activatedModules = \defined('THELIA_INSTALL_MODE') ? [] : ModuleQuery::getActivated();
 
         $this->loadModulesConfiguration($container, $activatedModules);
+
+        // Last, so that nothing a module wrote about the `mcp` extension can place a server of its own in front
+        // of the one the core serves behind its token firewall (McpServerPass refuses the other HTTP servers).
+        McpServerConfiguration::applyTo($container);
 
         $container->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
         $container->set('thelia.propel.init', $this->propelInitService);
