@@ -83,6 +83,13 @@ final readonly class AiFailureExplainer
         'The limit per minute', 'The limit per day', 'The output limit', 'The input limit', 'The prompt retention', 'The monthly budget', 'A guardrail name',
     ];
 
+    /** What AiConnectionTester stores in the column `check_error` when the test fails before or after the provider answered. */
+    public const string CHECK_PROVIDER_UNSUPPORTED = 'The provider of this connection is not supported.';
+    public const string CHECK_NO_MODEL = 'No model is known for this connection: add one first.';
+    private const array CHECK_ERRORS = [self::CHECK_PROVIDER_UNSUPPORTED, self::CHECK_NO_MODEL];
+
+    private const string CHECK_ERROR_PROVIDER = 'The AI connection "%connection%" failed: %details%';
+
     private const string BUDGET = 'The monthly budget of this usage is used up.';
     private const string BUDGET_GLOBAL = 'The monthly cap of the whole AI layer is reached.';
     private const string INPUT_BLOCKED = 'A safety check blocked this request.';
@@ -122,6 +129,25 @@ final readonly class AiFailureExplainer
     }
 
     /**
+     * The error AiConnectionTester stored for a connection, told in the language asked for. The column keeps the
+     * English text, so the API and the existing rows do not change; a text this class does not know comes back as stored.
+     * The details a provider wrote after the name of the connection are kept as they are: the test shows them to the
+     * administrator who has to fix the connection, and they never hold the key.
+     */
+    public function explainCheckError(string $stored, ?string $locale = null): string
+    {
+        if (\in_array($stored, self::CHECK_ERRORS, true)) {
+            return $this->translator->trans($stored, [], $locale);
+        }
+
+        if (1 === preg_match('/^The AI connection "(?<connection>[^"]*)" failed: (?<details>.*)$/s', $stored, $matches)) {
+            return $this->translator->trans(self::CHECK_ERROR_PROVIDER, ['%connection%' => $matches['connection'], '%details%' => $matches['details']], $locale);
+        }
+
+        return $stored;
+    }
+
+    /**
      * @return array{string, array<string, string>}|null
      */
     private function variableSentence(string $message, ?string $locale): ?array
@@ -154,6 +180,8 @@ final readonly class AiFailureExplainer
             ...self::FIXED_SENTENCES,
             ...array_values(self::VARIABLE_SENTENCES),
             ...self::FIELDS,
+            ...self::CHECK_ERRORS,
+            self::CHECK_ERROR_PROVIDER,
             self::BUDGET, self::BUDGET_GLOBAL, self::INPUT_BLOCKED, self::OUTPUT_BLOCKED, self::JURISDICTION, self::KEY_UNREADABLE,
             self::PROVIDER_RETRYABLE, self::PROVIDER_REFUSED, self::RATE_LIMIT, self::USAGE_VIOLATION, self::USAGE_INACTIVE, self::USAGE_UNKNOWN,
         ]));
