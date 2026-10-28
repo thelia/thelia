@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Thelia\Domain\Ai\Service\AiUsageRegister;
+use Thelia\Domain\Ai\Service\AiUsageRegisterExport;
 
 /**
  * The register of the AI usages of the shop: module, purpose, audience, range, transparency duty, notice and mark
@@ -32,9 +33,7 @@ class AiUsagesCommand extends ContainerAwareCommand
 {
     public const array FORMATS = ['table', 'json', 'csv'];
 
-    private const array COLUMNS = ['id', 'module', 'purpose', 'audience', 'tier', 'transparency', 'notice_enabled', 'provenance_mark_enabled', 'active', 'compliance', 'jurisdiction'];
-
-    public function __construct(private readonly AiUsageRegister $register)
+    public function __construct(private readonly AiUsageRegister $register, private readonly AiUsageRegisterExport $export = new AiUsageRegisterExport())
     {
         parent::__construct();
     }
@@ -61,8 +60,8 @@ class AiUsagesCommand extends ContainerAwareCommand
         $rows = $this->register->rows(\is_string($locale) && '' !== $locale ? $locale : null);
 
         match ($format) {
-            'json' => $output->writeln(json_encode($rows, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES)),
-            'csv' => $output->write($this->csv($rows)),
+            'json' => $output->writeln($this->export->json($rows)),
+            'csv' => $output->write($this->export->csv($rows)),
             default => $this->table($io, $rows),
         };
 
@@ -74,61 +73,6 @@ class AiUsagesCommand extends ContainerAwareCommand
      */
     private function table(SymfonyStyle $io, array $rows): void
     {
-        $io->table(self::COLUMNS, array_map(fn (array $row): array => array_map(self::cell(...), $this->line($row)), $rows));
-    }
-
-    /**
-     * One line per usage; the explanation of what is not met comes last, in its own column.
-     *
-     * @param list<array<string, mixed>> $rows
-     */
-    private function csv(array $rows): string
-    {
-        $stream = fopen('php://temp', 'r+');
-        \assert(false !== $stream);
-
-        fputcsv($stream, [...self::COLUMNS, 'compliance_explanation'], ',', '"', '');
-
-        foreach ($rows as $row) {
-            $explanations = array_map(
-                static fn (array $detail): string => $detail['message'],
-                array_filter($row['compliance_details'], static fn (array $detail): bool => 'met' !== $detail['state']),
-            );
-
-            fputcsv($stream, array_map(self::spreadsheetSafe(...), [...array_map(self::cell(...), $this->line($row)), implode(' ', $explanations)]), ',', '"', '');
-        }
-
-        rewind($stream);
-
-        return (string) stream_get_contents($stream);
-    }
-
-    /**
-     * @param array<string, mixed> $row
-     *
-     * @return list<mixed>
-     */
-    private function line(array $row): array
-    {
-        return array_map(static fn (string $column): mixed => $row[$column], self::COLUMNS);
-    }
-
-    private static function cell(mixed $value): string
-    {
-        return match (true) {
-            true === $value => 'yes',
-            false === $value => 'no',
-            null === $value => '',
-            default => (string) $value,
-        };
-    }
-
-    /**
-     * A cell that starts with =, +, - or @ is read as a formula by a spreadsheet: the purpose of a usage comes
-     * from a module, so it is neutralised.
-     */
-    private static function spreadsheetSafe(string $cell): string
-    {
-        return 1 === preg_match('/^[=+\-@\t\r]/', $cell) ? "'".$cell : $cell;
+        $io->table(AiUsageRegisterExport::COLUMNS, array_map($this->export->cells(...), $rows));
     }
 }
