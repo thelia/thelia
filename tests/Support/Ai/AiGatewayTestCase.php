@@ -31,8 +31,11 @@ use Thelia\Domain\Ai\Gateway\AiAdmission;
 use Thelia\Domain\Ai\Gateway\AiGateway;
 use Thelia\Domain\Ai\Gateway\AiPromptSnapshot;
 use Thelia\Domain\Ai\Gateway\AiRequestMeasure;
+use Thelia\Domain\Ai\Guardrail\AiCoreOutputGuardrails;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailInterface;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
+use Thelia\Domain\Ai\Guardrail\AiHtmlSanitizer;
+use Thelia\Domain\Ai\Guardrail\AiSchemaValidator;
 use Thelia\Domain\Ai\Log\AiUsageLogWriter;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
 use Thelia\Domain\Ai\Provider\AiHttpClientFactory;
@@ -182,7 +185,7 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
         }
 
         $registry = new AiUsageRegistry(
-            ['aiprobe.pages' => $probe, 'aiprobe.assistant' => $probe, 'aiprobe.scoring' => $probe, 'aiprobe.drafts' => $probe], // @phpstan-ignore argument.type (the fixture class is not known to the analysis)
+            ['aiprobe.pages' => $probe, 'aiprobe.assistant' => $probe, 'aiprobe.scoring' => $probe, 'aiprobe.drafts' => $probe, 'aiprobe.live_pages' => $probe], // @phpstan-ignore argument.type (the fixture class is not known to the analysis)
             $settings,
             $globalSettings,
         );
@@ -205,7 +208,7 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
             $writer,
         );
 
-        return $this->gateway = new AiGateway($admission, new AiProviderAdapters([$adapter]), $writer, $this->ledger, $calculator, $guardrails, new AiPromptSnapshot(), $retryDelayMicroseconds);
+        return $this->gateway = new AiGateway($admission, new AiProviderAdapters([$adapter]), $writer, $this->ledger, $calculator, $guardrails, new AiCoreOutputGuardrails(new AiSchemaValidator(), new AiHtmlSanitizer()), new AiPromptSnapshot(), $retryDelayMicroseconds);
     }
 
     protected function setting(string $usageId, ?string $budget = null, mixed ...$fields): AiUsageSetting

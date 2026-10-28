@@ -23,12 +23,13 @@ use Thelia\Domain\Ai\Guardrail\GuardrailMode;
 
 /**
  * The usages the tests of the gateway run through: an administrator tool that generates content, a public
- * assistant that streams, a job with nobody behind it, and an administrator stream.
+ * assistant that streams, a job with nobody behind it, an administrator stream, and a stream that also asks for a schema.
  */
 #[AsAiUsage(id: 'aiprobe.pages', purpose: 'Writes pages.', audience: AiAudience::Admin, tier: AiTier::Fast, capabilities: [AiCapability::StructuredOutput, AiCapability::Tools], transparency: AiTransparency::Generative, maxInputCharacters: 1000)]
 #[AsAiUsage(id: 'aiprobe.assistant', purpose: 'Answers the visitors.', audience: AiAudience::Public, tier: AiTier::Fast, capabilities: [AiCapability::Tools, AiCapability::Streaming], transparency: AiTransparency::Interactive, guardrails: ['probe_moderation' => GuardrailMode::Block], maxInputCharacters: 500)]
 #[AsAiUsage(id: 'aiprobe.scoring', purpose: 'Scores offers.', audience: AiAudience::System, tier: AiTier::Fast)]
 #[AsAiUsage(id: 'aiprobe.drafts', purpose: 'Streams drafts.', audience: AiAudience::Admin, tier: AiTier::Fast, capabilities: [AiCapability::Streaming], transparency: AiTransparency::Generative)]
+#[AsAiUsage(id: 'aiprobe.live_pages', purpose: 'Streams structured pages.', audience: AiAudience::Admin, tier: AiTier::Fast, capabilities: [AiCapability::StructuredOutput, AiCapability::Streaming], transparency: AiTransparency::Generative)]
 final class ProbeGateway
 {
 }
