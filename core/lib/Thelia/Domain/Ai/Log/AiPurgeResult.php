@@ -28,6 +28,10 @@ final readonly class AiPurgeResult
         public int $logRows,
         public int $storedPrompts,
         public int $expiredReservations,
+        public int $toolLogRows = 0,
+        public int $toolArguments = 0,
+        public int $expiredApprovals = 0,
+        public int $decidedApprovals = 0,
     ) {
     }
 }

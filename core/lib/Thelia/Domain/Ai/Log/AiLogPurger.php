@@ -37,16 +37,27 @@ final readonly class AiLogPurger
         $current = $now->format('Y-m-d H:i:s');
         $connection = Propel::getConnection('TheliaMain');
 
+        $pendingExpired = ' FROM `ai_tool_approval` WHERE `status` = \'pending\' AND `expires_at` < :now';
+        $decided = ' FROM `ai_tool_approval` WHERE `created_at` < :cutoff AND `status` NOT IN (\'pending\', \'applying\')';
+
         return $dryRun
             ? new AiPurgeResult(
                 $this->count($connection, 'SELECT COUNT(*) FROM `ai_usage_log` WHERE `created_at` < :cutoff', [':cutoff' => $cutoff]),
                 $this->count($connection, 'SELECT COUNT(*) FROM `ai_usage_log` WHERE `prompt` IS NOT NULL AND `prompt_expires_at` < :now AND `created_at` >= :cutoff', [':now' => $current, ':cutoff' => $cutoff]),
                 $this->count($connection, 'SELECT COUNT(*) FROM `ai_budget_reservation` WHERE `expires_at` < :now', [':now' => $current]),
+                $this->count($connection, 'SELECT COUNT(*) FROM `ai_tool_call_log` WHERE `created_at` < :cutoff', [':cutoff' => $cutoff]),
+                $this->count($connection, 'SELECT COUNT(*) FROM `ai_tool_call_log` WHERE `arguments` IS NOT NULL AND `arguments_expires_at` < :now AND `created_at` >= :cutoff', [':now' => $current, ':cutoff' => $cutoff]),
+                $this->count($connection, 'SELECT COUNT(*)'.$pendingExpired, [':now' => $current]),
+                $this->count($connection, 'SELECT COUNT(*)'.$decided, [':cutoff' => $cutoff]),
             )
             : new AiPurgeResult(
                 $this->inBatches($connection, 'DELETE FROM `ai_usage_log` WHERE `created_at` < :cutoff', [':cutoff' => $cutoff]),
                 $this->inBatches($connection, 'UPDATE `ai_usage_log` SET `prompt` = NULL WHERE `prompt` IS NOT NULL AND `prompt_expires_at` < :now', [':now' => $current]),
                 $this->inBatches($connection, 'DELETE FROM `ai_budget_reservation` WHERE `expires_at` < :now', [':now' => $current]),
+                $this->inBatches($connection, 'DELETE FROM `ai_tool_call_log` WHERE `created_at` < :cutoff', [':cutoff' => $cutoff]),
+                $this->inBatches($connection, 'UPDATE `ai_tool_call_log` SET `arguments` = NULL WHERE `arguments` IS NOT NULL AND `arguments_expires_at` < :now', [':now' => $current]),
+                $this->inBatches($connection, 'UPDATE `ai_tool_approval` SET `status` = \'expired\' WHERE `status` = \'pending\' AND `expires_at` < :now', [':now' => $current]),
+                $this->inBatches($connection, 'DELETE'.$decided, [':cutoff' => $cutoff]),
             );
     }
 

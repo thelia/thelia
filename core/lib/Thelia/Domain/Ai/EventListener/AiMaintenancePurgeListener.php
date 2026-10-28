@@ -43,5 +43,9 @@ final readonly class AiMaintenancePurgeListener
         $event->addResult(\sprintf('<comment>AI usage log (>%d days):</comment> <info>%d %s</info>', $days, $purged->logRows, $verb));
         $event->addResult(\sprintf('<comment>AI stored prompts (expired):</comment> <info>%d %s</info>', $purged->storedPrompts, $dryRun ? 'to empty' : 'emptied'));
         $event->addResult(\sprintf('<comment>AI budget reservations (expired):</comment> <info>%d %s</info>', $purged->expiredReservations, $verb));
+        $event->addResult(\sprintf('<comment>AI tool call log (>%d days):</comment> <info>%d %s</info>', $days, $purged->toolLogRows, $verb));
+        $event->addResult(\sprintf('<comment>AI tool call arguments (older than 30 days):</comment> <info>%d %s</info>', $purged->toolArguments, $dryRun ? 'to empty' : 'emptied'));
+        $event->addResult(\sprintf('<comment>AI tool approvals (pending, expired):</comment> <info>%d %s</info>', $purged->expiredApprovals, $dryRun ? 'to mark expired' : 'marked expired'));
+        $event->addResult(\sprintf('<comment>AI tool approvals (decided, >%d days):</comment> <info>%d %s</info>', $days, $purged->decidedApprovals, $verb));
     }
 }
