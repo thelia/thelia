@@ -64,9 +64,23 @@ final class McpToolContextFactoryTest extends TestCase
         self::assertSame('42', $context->actor->identifier);
     }
 
+    public function testTheContextSpeaksTheLanguageOfTheAdministratorOfTheToken(): void
+    {
+        $context = $this->create($this->administrator()->setLocale('fr_FR'), [AiToolTokenAuthenticator::TOKEN_ID_ATTRIBUTE => 7]);
+
+        self::assertSame('fr_FR', $context?->locale);
+    }
+
+    public function testAnAdministratorWithoutALocaleGetsEnglish(): void
+    {
+        $context = $this->create($this->administrator()->setLocale(''), [AiToolTokenAuthenticator::TOKEN_ID_ATTRIBUTE => 7]);
+
+        self::assertSame('en_US', $context?->locale);
+    }
+
     private function administrator(): Admin
     {
-        return (new Admin())->setId(42)->setLogin('marie');
+        return (new Admin())->setId(42)->setLogin('marie')->setLocale('en_US');
     }
 
     /**

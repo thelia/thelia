@@ -31,7 +31,7 @@ use Thelia\Domain\Ai\Tool\Service\AiToolTokenService;
 use Thelia\Model\Admin;
 
 /**
- * Authenticates a request to the MCP endpoint (`^/api/mcp`) with `Authorization: Bearer <token>`.
+ * Authenticates a request to the MCP endpoint (`^/api/mcp`) with `Authorization: Bearer <token>` (the scheme is read whatever its case, RFC 7235).
  *
  * The token is a dedicated one (never the JWT of an administrator): it is looked up by its fingerprint, and the
  * request is turned away with a 401 when it is unknown, revoked or expired, or when its administrator is gone.
@@ -67,7 +67,7 @@ final class AiToolTokenAuthenticator extends AbstractAuthenticator implements Au
 
         $header = (string) $request->headers->get('Authorization', '');
 
-        if (1 !== preg_match('/^Bearer (\S+)$/D', $header, $matches)) {
+        if (1 !== preg_match('/^Bearer (\S+)$/Di', $header, $matches)) {
             throw AiToolTokenAuthenticationException::rejected();
         }
 
