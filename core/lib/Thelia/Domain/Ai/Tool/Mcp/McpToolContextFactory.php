@@ -22,7 +22,7 @@ use Thelia\Model\Admin;
 
 /**
  * The context of a call that came in through the MCP endpoint, built from what the token firewall authenticated:
- * the administrator the MCP token belongs to and the id of that token. Null when the request carries neither,
+ * the administrator the MCP token belongs to (in the language of that administrator) and the id of that token. Null when the request carries neither,
  * so that a handler reached outside the firewall answers nothing.
  *
  * @internal
@@ -48,6 +48,8 @@ final readonly class McpToolContextFactory
             return null;
         }
 
-        return AiToolContext::forMcp(AiActor::admin($admin->getId()), $tokenId);
+        $locale = trim($admin->getLocale());
+
+        return AiToolContext::forMcp(AiActor::admin($admin->getId()), $tokenId, '' === $locale ? 'en_US' : $locale);
     }
 }

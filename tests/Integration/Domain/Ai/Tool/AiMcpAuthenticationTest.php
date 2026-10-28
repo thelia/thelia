@@ -71,6 +71,15 @@ final class AiMcpAuthenticationTest extends ApiTestCase
         self::assertStringNotContainsString($token->token, (string) $response->getContent());
     }
 
+    public function testTheBearerSchemeIsReadWhateverItsCase(): void
+    {
+        $token = $this->createToken([['resource' => 'admin.product', 'access' => 'VIEW']]);
+
+        foreach (['bearer', 'BEARER', 'bEaReR'] as $scheme) {
+            self::assertSame(Response::HTTP_OK, $this->probe(null, $scheme.' '.$token->token)->getStatusCode(), $scheme);
+        }
+    }
+
     public function testNoHeaderOrAWrongSchemeOrAnUnknownTokenIs401WithoutDetail(): void
     {
         $unknown = 'thelia_mcp_'.str_repeat('Q', 43);
