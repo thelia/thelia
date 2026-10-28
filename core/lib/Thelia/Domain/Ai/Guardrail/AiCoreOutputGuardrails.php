@@ -41,7 +41,8 @@ final readonly class AiCoreOutputGuardrails
     {
         $schema = $request->outputSchema?->schema;
 
-        if (null === $schema || [] !== $result->toolCalls) {
+        // A refusal of the provider is not a broken answer: the module reads it from the finish reason.
+        if (null === $schema || [] !== $result->toolCalls || AiFinishReason::ContentFilter === $result->finishReason) {
             return new AiCoreOutputCheck($result, []);
         }
 
