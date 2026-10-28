@@ -47,5 +47,6 @@ final readonly class AiMaintenancePurgeListener
         $event->addResult(\sprintf('<comment>AI tool call arguments (older than 30 days):</comment> <info>%d %s</info>', $purged->toolArguments, $dryRun ? 'to empty' : 'emptied'));
         $event->addResult(\sprintf('<comment>AI tool approvals (pending, expired):</comment> <info>%d %s</info>', $purged->expiredApprovals, $dryRun ? 'to mark expired' : 'marked expired'));
         $event->addResult(\sprintf('<comment>AI tool approvals (decided, >%d days):</comment> <info>%d %s</info>', $days, $purged->decidedApprovals, $verb));
+        $event->addResult(\sprintf('<comment>AI tool approval arguments (decided, older than 30 days):</comment> <info>%d %s</info>', $purged->approvalArguments, $dryRun ? 'to empty' : 'emptied'));
     }
 }

@@ -16,6 +16,7 @@ namespace Thelia\Domain\Ai\Log;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Thelia\Domain\Ai\Tool\Log\AiToolCallLogWriter;
 
 /**
  * The maintenance of the AI tables: rows of the usage log older than the retention of the shop, prompts whose
@@ -35,10 +36,14 @@ final readonly class AiLogPurger
         $now ??= new \DateTimeImmutable();
         $cutoff = $now->modify(\sprintf('-%d days', max(1, $retentionDays)))->format('Y-m-d H:i:s');
         $current = $now->format('Y-m-d H:i:s');
+        $argumentsCutoff = $now->modify(\sprintf('-%d days', AiToolCallLogWriter::ARGUMENT_RETENTION_DAYS))->format('Y-m-d H:i:s');
         $connection = Propel::getConnection('TheliaMain');
 
         $pendingExpired = ' FROM `ai_tool_approval` WHERE `status` = \'pending\' AND `expires_at` < :now';
         $decided = ' FROM `ai_tool_approval` WHERE `created_at` < :cutoff AND `status` NOT IN (\'pending\', \'applying\')';
+
+        // The columns are NOT NULL: a decided proposal keeps its row and loses what the model or the approver typed.
+        $emptiable = ' FROM `ai_tool_approval` WHERE `created_at` < :cutoff AND `status` NOT IN (\'pending\', \'applying\') AND (`arguments` <> \'{}\' OR `original_arguments` <> \'{}\')';
 
         return $dryRun
             ? new AiPurgeResult(
@@ -49,6 +54,7 @@ final readonly class AiLogPurger
                 $this->count($connection, 'SELECT COUNT(*) FROM `ai_tool_call_log` WHERE `arguments` IS NOT NULL AND `arguments_expires_at` < :now AND `created_at` >= :cutoff', [':now' => $current, ':cutoff' => $cutoff]),
                 $this->count($connection, 'SELECT COUNT(*)'.$pendingExpired, [':now' => $current]),
                 $this->count($connection, 'SELECT COUNT(*)'.$decided, [':cutoff' => $cutoff]),
+                $this->count($connection, 'SELECT COUNT(*)'.$emptiable, [':cutoff' => $argumentsCutoff]),
             )
             : new AiPurgeResult(
                 $this->inBatches($connection, 'DELETE FROM `ai_usage_log` WHERE `created_at` < :cutoff', [':cutoff' => $cutoff]),
@@ -58,6 +64,7 @@ final readonly class AiLogPurger
                 $this->inBatches($connection, 'UPDATE `ai_tool_call_log` SET `arguments` = NULL WHERE `arguments` IS NOT NULL AND `arguments_expires_at` < :now', [':now' => $current]),
                 $this->inBatches($connection, 'UPDATE `ai_tool_approval` SET `status` = \'expired\' WHERE `status` = \'pending\' AND `expires_at` < :now', [':now' => $current]),
                 $this->inBatches($connection, 'DELETE'.$decided, [':cutoff' => $cutoff]),
+                $this->inBatches($connection, 'UPDATE `ai_tool_approval` SET `arguments` = \'{}\', `original_arguments` = \'{}\' WHERE `created_at` < :cutoff AND `status` NOT IN (\'pending\', \'applying\') AND (`arguments` <> \'{}\' OR `original_arguments` <> \'{}\')', [':cutoff' => $argumentsCutoff]),
             );
     }
 
