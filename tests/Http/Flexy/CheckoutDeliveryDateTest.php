@@ -140,7 +140,7 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
         $crawler = $this->requestTheDeliveryStep();
         self::assertStringContainsString('Choose a delivery date to continue.', (string) $this->client->getResponse()->getContent(), 'The step cannot be left without a day.');
 
-        $this->callLiveAction($crawler->filter(\sprintf('[data-testid="delivery-date-day-%s"]', $this->day(3))), 'chooseDay', ['date' => $this->day(3)]);
+        $this->callLiveAction($this->dayButton($crawler, $this->day(3)), 'chooseDay', ['date' => $this->day(3)]);
         self::assertSame($this->day(3), $this->reread($cart)->getDeliveryDay());
 
         $crawler = $this->requestTheDeliveryStep();
@@ -236,7 +236,7 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
         $address = AddressQuery::create()->filterByCustomerId($cart->getCustomerId())->findOne($this->getPropelConnection()) ?? self::fail('No address.');
 
         $crawler = $this->requestTheDeliveryStep();
-        $this->callLiveAction($crawler->filter(\sprintf('[data-testid="delivery-date-day-%s"]', $this->day(3))), 'chooseDay', ['date' => $this->day(3)]);
+        $this->callLiveAction($this->dayButton($crawler, $this->day(3)), 'chooseDay', ['date' => $this->day(3)]);
 
         $step = $this->requestTheDeliveryStep()->filter('[data-live-name-value="Organisms:Delivery:Base"]');
         $this->callLiveAction($step->children()->first(), 'selectDeliveryAddress', ['addressId' => (int) $address->getId()]);
@@ -267,6 +267,23 @@ final class CheckoutDeliveryDateTest extends GuestCheckoutTestCase
         self::assertSame(200, $this->client->getResponse()->getStatusCode(), 'The delivery step must be served, or nothing below proves anything.');
 
         return $crawler;
+    }
+
+    /**
+     * The button of a day, turning the months of the picker until it shows: the picker opens on
+     * the month of the first day it offers, so near the end of a month a later day sits on the
+     * next page.
+     */
+    private function dayButton(Crawler $page, string $day): Crawler
+    {
+        $selector = \sprintf('[data-testid="delivery-date-day-%s"]', $day);
+
+        for ($monthPage = 1; 0 === $page->filter($selector)->count() && $monthPage <= 2; ++$monthPage) {
+            $this->callLiveAction($page->filter('button[data-live-action-param="showMonth"]')->last(), 'showMonth', ['page' => $monthPage]);
+            $page = new Crawler((string) $this->client->getResponse()->getContent());
+        }
+
+        return $page->filter($selector);
     }
 
     /**
