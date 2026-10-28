@@ -78,7 +78,7 @@ final readonly class AiToolTokenService
         }
 
         if ($allRights && [] !== $scopes) {
-            throw AiToolTokenException::invalid('A token with all the rights of its administrator has no scopes.');
+            throw AiToolTokenException::allRightsWithScopes();
         }
 
         $scopes = $allRights ? [] : $this->normalizeScopes($scopes);

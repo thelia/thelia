@@ -131,6 +131,7 @@ final class AiToolTokenServiceTest extends AiToolTestCase
     public function testAllRightsAndScopesAreNotMixed(): void
     {
         $this->expectException(AiToolTokenException::class);
+        $this->expectExceptionCode(AiToolTokenException::ALL_RIGHTS_WITH_SCOPES);
 
         $this->tokens->create($this->owner->getId(), 'x', [['resource' => 'admin.product', 'access' => 'VIEW']], true);
     }
