@@ -5,8 +5,8 @@ and see prices without taxes, a trade partner who has a price of its own on a ra
 is offered, a closed catalog only some customers can browse. Every customer belongs to exactly one group; a visitor, a
 console command and a guest account are served as members of the default group.
 
-This document is the map for developers who work on the feature or build a module on top of it. The behavior itself is
-specified by the test suites named at the end.
+It is written for developers who work on the feature or build a module on top of it. The behavior itself is specified by
+the test suites named at the end.
 
 ## The model
 
@@ -144,6 +144,11 @@ the server from the token and is never a field of the registration data.
   `/customer/register`.
 - On the storefront, `/register/<token>` is the standard registration form and the account created joins the group. The
   token is read from the URL only.
+- Registration is rate limited, on the API and on both storefront forms: 5 attempts per address and 20 per client and per
+  hour, consumed before the address is looked up (`CustomerRegistrationLimiter`). The API answers 429 with `Retry-After`.
+  Behind a proxy or a CDN, declare it in `framework.trusted_proxies` (`TRUSTED_PROXIES`): without it every visitor shares
+  the address of the proxy, and the limit per client becomes the limit of the whole shop. Whoever exhausts the budget of
+  an address blocks it for an hour, the owner included: the limit cannot tell them apart.
 
 No administrator validates the accounts that register through a link: whoever holds the link joins the group, so a link
 is shared with the people it is meant for and regenerated when it leaks. Regenerating invalidates every link already
@@ -221,14 +226,14 @@ that still holds one (`CartLineUnavailableException`). See [product-visibility.m
 
 Inject `CustomerPriceContextInterface`. `resolve($productSaleElementsIds, $currency,
 $customer)` gives the prices, `customerGroupOf($customer)` the group (the default group for a visitor or a guest) and
-`displaysTaxedPrices($customer)` the display. A module that builds a merchant feed or an export prices through it, and
-never reads `customer.discount` or the catalog price on its own.
+`displaysTaxedPrices($customer)` the display. A module that builds a merchant feed or an export prices through it and
+reads neither `customer.discount` nor the catalog price on its own.
 
 ### Know the group of a customer
 
 `Thelia\Domain\Customer\Service\CustomerGroupResolver::groupIdOf()` and `groupOf()`. A
-signed-in customer is read back from the database, once per request, and not from the object the session holds: that one
-is serialized at sign-in, and a move made by an administrator would only reach it at the next sign-in.
+signed-in customer is read back from the database, once per request. The object the session holds is serialized at
+sign-in, so a move made by an administrator would only reach it at the next sign-in.
 
 ### React to a move
 
@@ -283,11 +288,7 @@ of anonymous visitors, who all belong to the default group, whatever the groups 
 
 ## Known limits
 
-- Sorts and filters on the price use the public price. `untaxed_price_order` on the API and the price orders,
-  `min_price` and `max_price` of the `product` loop are made in SQL on the public catalog price. What a customer alone is
-  owed (the price of their group, a rule, a reserved operation, a discount) is resolved per customer in PHP and is not in
-  the database, so a customer sees a listing ordered by the public prices, whose cards may show other ones. Sorting the
-  whole catalog by what each customer pays would resolve every product for every sorted request.
+- Sorts and filters on the price. `untaxed_price_order` on the front API sorts on the untaxed price the visitor pays (group price, promotion, rules, reserved sales, sale unit, group and customer discounts), in the currency browsed, and paginates on the whole narrowed collection. It sorts in SQL on the public price (promotion and public rule included) while nothing prices the catalog differently for the visitor's own group or for them, and in PHP through `VisitorPriceReader` otherwise, up to `THELIA_API_PRODUCT_PRICE_SORT_MAX_PRODUCTS` products (5000 by default): past that, the collection ranks on the public price. The sort is on untaxed prices: with mixed tax rates, the order of the taxed prices of the cards can differ. The price facet (`tfilters[price]`) draws and narrows on the same prices. The price orders and `min_price` / `max_price` of the `product` loop, and the raw `RangeFilter` on `productSaleElements.productPrices.price`, stay on the public catalog price.
 - A coupon code typed in a session is invisible to a payment through the API without a session. The checkout API
   prices the cart without the session that holds the code the buyer typed: the discount of the automatic promotions is
   computed (`CouponManager::discountOfCartWithoutSession()`), a code only the session knows is not, nor a promotion that keeps its gifts in the session.
