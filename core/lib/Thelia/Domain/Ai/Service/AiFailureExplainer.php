@@ -47,7 +47,7 @@ final readonly class AiFailureExplainer
         'Another connection already has this code.',
         'The title is required.',
         'The jurisdiction ("eu" or "non_eu") is required for this provider.',
-        'The environment variable name is letters, digits and underscores.',
+        'The environment variable that holds an API key must end with "_KEY" or "_TOKEN" and must not be one of the application (APP_, DATABASE_, JWT_).',
         'The name of the environment variable that holds an API key must be letters, digits and underscores.',
         'The connection does not exist.',
         'The model does not exist.',

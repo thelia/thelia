@@ -1069,7 +1069,7 @@ return [
     'Another connection already has this code.' => 'Une autre connexion porte déjà ce code.',
     'The title is required.' => 'Le titre est obligatoire.',
     'The jurisdiction ("eu" or "non_eu") is required for this provider.' => 'La juridiction (« eu » ou « non_eu ») est obligatoire pour ce fournisseur.',
-    'The environment variable name is letters, digits and underscores.' => 'Le nom de la variable d\'environnement se compose de lettres, de chiffres et de tirets bas.',
+    'The environment variable that holds an API key must end with "_KEY" or "_TOKEN" and must not be one of the application (APP_, DATABASE_, JWT_).' => 'La variable d\'environnement qui contient une clé d\'API doit finir par « _KEY » ou « _TOKEN » et ne doit pas être une variable de l\'application (APP_, DATABASE_, JWT_).',
     'The name of the environment variable that holds an API key must be letters, digits and underscores.' => 'Le nom de la variable d\'environnement qui contient une clé d\'API se compose de lettres, de chiffres et de tirets bas.',
     'The connection does not exist.' => 'La connexion n\'existe pas.',
     'The model does not exist.' => 'Le modèle n\'existe pas.',
