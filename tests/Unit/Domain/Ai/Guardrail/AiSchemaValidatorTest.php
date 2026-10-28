@@ -35,6 +35,17 @@ final class AiSchemaValidatorTest extends TestCase
         ],
     ];
 
+    public function testASchemaDecodedToObjectsIsReadLikeOneDecodedToArrays(): void
+    {
+        $schema = self::PAGE;
+        $schema['properties'] = (object) $schema['properties'];
+        $schema['$defs'] = (object) ['block' => (object) ['type' => 'object', 'required' => ['kind'], 'properties' => (object) ['kind' => (object) ['const' => 'text']]]];
+        $answer = ['title' => 'Our story', 'blocks' => [['kind' => 'text']]];
+
+        self::assertSame([], (new AiSchemaValidator())->validate($schema, $answer));
+        self::assertNotSame([], (new AiSchemaValidator())->validate($schema, $answer + ['extra' => 1]));
+    }
+
     public function testAnAnswerThatMatchesTheSchemaHasNoError(): void
     {
         $data = ['title' => 'Our story', 'status' => 'draft', 'rating' => 5, 'blocks' => [['kind' => 'text', 'body' => null], ['kind' => 'text', 'body' => 'Hello']]];

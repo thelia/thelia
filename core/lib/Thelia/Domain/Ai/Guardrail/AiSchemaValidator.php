@@ -44,10 +44,24 @@ final readonly class AiSchemaValidator
      */
     public function validate(array $schema, mixed $data): array
     {
+        $schema = self::asArrays($schema);
         $errors = [];
         $this->check($schema, $schema, $data, '', 0, $errors);
 
         return $errors;
+    }
+
+    /**
+     * A schema decoded with `json_decode($json)` holds `stdClass` objects where one decoded with `true` holds arrays:
+     * both are the same schema, so objects become arrays before anything reads them.
+     */
+    private static function asArrays(mixed $value): mixed
+    {
+        if (\is_object($value)) {
+            $value = get_object_vars($value);
+        }
+
+        return \is_array($value) ? array_map(self::asArrays(...), $value) : $value;
     }
 
     /**
