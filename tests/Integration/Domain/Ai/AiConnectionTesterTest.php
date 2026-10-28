@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Ai;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Domain\Ai\Catalog\AiModelCatalog;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
 use Thelia\Domain\Ai\Provider\AiHttpClientFactory;
@@ -27,6 +28,8 @@ use Thelia\Domain\Ai\Provider\AiResultReader;
 use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\Provider\UntrustedContentDelimiter;
 use Thelia\Domain\Ai\Service\AiConnectionTester;
+use Thelia\Domain\Ai\Service\AiFailureExplainer;
+use Thelia\Domain\Ai\Service\AiTextTranslator;
 use Thelia\Domain\Ai\Vault\AiKeyCipher;
 use Thelia\Domain\Ai\Vault\AiKeyVault;
 use Thelia\Domain\Webhook\WebhookUrlValidator;
@@ -87,6 +90,20 @@ final class AiConnectionTesterTest extends IntegrationTestCase
 
         self::assertStringContainsString('No model', (string) $error);
         self::assertSame([], $this->sent);
+    }
+
+    public function testTheStoredErrorIsToldInFrenchAndInEnglishWhenShown(): void
+    {
+        $explainer = new AiFailureExplainer(new AiTextTranslator(new RequestStack()));
+        $noModel = $this->tester([])->test($this->connection('openai_compatible'));
+        $refused = $this->tester([new MockResponse(json_encode(['message' => 'Unauthorized']), ['http_code' => 401, 'response_headers' => ['content-type: application/json']])])->test($this->connection());
+
+        self::assertSame('Aucun modèle n\'est connu pour cette connexion : ajoutez-en un d\'abord.', $explainer->explainCheckError((string) $noModel, 'fr_FR'));
+        self::assertSame('No model is known for this connection: add one first.', $explainer->explainCheckError((string) $noModel, 'en_US'));
+        self::assertStringStartsWith('La connexion IA « tester-mistral » a échoué : ', $explainer->explainCheckError((string) $refused, 'fr_FR'));
+        self::assertStringStartsWith('The AI connection "tester-mistral" failed: ', $explainer->explainCheckError((string) $refused, 'en_US'));
+        self::assertSame('something else', $explainer->explainCheckError('something else', 'fr_FR'), 'an unknown text comes back as stored');
+        self::assertSame((string) $noModel, 'No model is known for this connection: add one first.', 'the column keeps the English text');
     }
 
     private function connection(string $provider = 'mistral'): AiConnection

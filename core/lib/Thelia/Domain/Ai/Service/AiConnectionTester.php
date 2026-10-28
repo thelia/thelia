@@ -73,7 +73,7 @@ final readonly class AiConnectionTester
         $provider = AiProvider::tryFrom((string) $connection->getProvider());
 
         if (null === $provider) {
-            return 'The provider of this connection is not supported.';
+            return AiFailureExplainer::CHECK_PROVIDER_UNSUPPORTED;
         }
 
         $apiKey = $this->vault->resolve($connection);
@@ -82,7 +82,7 @@ final readonly class AiConnectionTester
         $model = reset($models);
 
         if (false === $model) {
-            return 'No model is known for this connection: add one first.';
+            return AiFailureExplainer::CHECK_NO_MODEL;
         }
 
         $target = new AiTarget(
