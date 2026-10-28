@@ -43,7 +43,7 @@ final class AiUsageApiTest extends ApiTestCase
         self::assertContains(self::USAGE, $ids);
         $usage = $members[array_search(self::USAGE, $ids, true)];
         self::assertSame('core', $usage['module']);
-        self::assertSame('fast', $usage['tier']);
+        self::assertSame(['fast', 'fast'], [$usage['tier'], $usage['declaredTier']]);
         self::assertIsBool($usage['active']);
         self::assertArrayHasKey('complianceDetails', $usage);
     }
@@ -63,7 +63,7 @@ final class AiUsageApiTest extends ApiTestCase
     {
         $token = $this->authenticateAsAdmin();
 
-        $created = $this->jsonRequest('POST', self::SETTINGS, ['usageId' => self::USAGE, 'monthlyBudget' => '12.500000', 'requestsPerMinute' => 30, 'guardrails' => ['probe_moderation' => 'annotate'], 'storePrompt' => true, 'promptRetentionDays' => 7], $token);
+        $created = $this->jsonRequest('POST', self::SETTINGS, ['usageId' => self::USAGE, 'monthlyBudget' => '12.500000', 'requestsPerMinute' => 30, 'guardrails' => ['probe_moderation' => 'annotate'], 'storePrompt' => true, 'promptRetentionDays' => 7, 'tier' => 'advanced'], $token);
 
         self::assertSame(201, $created->getStatusCode(), (string) $created->getContent());
         $data = json_decode((string) $created->getContent(), true);
@@ -71,6 +71,7 @@ final class AiUsageApiTest extends ApiTestCase
         self::assertSame(['probe_moderation' => 'annotate'], $data['guardrails']);
         self::assertTrue($data['enabled']);
         self::assertTrue($data['transparencyNotice']);
+        self::assertSame('advanced', $data['tier']);
 
         $updated = $this->jsonRequest('PATCH', self::SETTINGS.'/'.$data['id'], ['enabled' => false], $token, 'merge-patch+json');
         self::assertSame(200, $updated->getStatusCode(), (string) $updated->getContent());
@@ -78,6 +79,7 @@ final class AiUsageApiTest extends ApiTestCase
         self::assertFalse($stored->getEnabled());
         self::assertSame('12.500000', $stored->getMonthlyBudget());
         self::assertSame(30, $stored->getRequestsPerMinute());
+        self::assertSame('advanced', $stored->getTier());
         self::assertSame(['probe_moderation' => 'annotate'], $stored->getGuardrailMap());
 
         self::assertSame(204, $this->jsonRequest('DELETE', self::SETTINGS.'/'.$data['id'], token: $token)->getStatusCode());
@@ -93,6 +95,7 @@ final class AiUsageApiTest extends ApiTestCase
         foreach ([
             ['usageId' => 'nobody.declared'],
             ['monthlyBudget' => 'a lot'],
+            ['tier' => 'turbo'],
             ['currency' => 'dollars'],
             ['requestsPerDay' => 0],
             ['pinnedConnectionId' => 999999],

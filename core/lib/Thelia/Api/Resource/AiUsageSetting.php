@@ -29,7 +29,7 @@ use Thelia\Api\State\Processor\AiUsageSettingWriteProcessor;
 use Thelia\Model\Map\AiUsageSettingTableMap;
 
 /**
- * What the merchant decided for one usage a module declared: switch, budget, limits, pinned model, guardrails,
+ * What the merchant decided for one usage a module declared: switch, range (`tier`, empty: the one the module declared), budget, limits, pinned model, guardrails,
  * transparency and prompt retention. One row per usage; a usage without a row runs on the defaults of its
  * declaration. Administration only, under the right `admin.configuration.ai`.
  *
@@ -83,6 +83,9 @@ class AiUsageSetting implements PropelResourceInterface
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?bool $enabled = null;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    public ?string $tier = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $monthlyBudget = null;
@@ -165,6 +168,18 @@ class AiUsageSetting implements PropelResourceInterface
     public function setEnabled(?bool $enabled): self
     {
         $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getTier(): ?string
+    {
+        return $this->tier;
+    }
+
+    public function setTier(?string $tier): self
+    {
+        $this->tier = $tier;
 
         return $this;
     }
