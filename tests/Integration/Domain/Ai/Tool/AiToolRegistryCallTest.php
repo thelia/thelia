@@ -210,7 +210,8 @@ final class AiToolRegistryCallTest extends AiToolTestCase
         self::assertSame('{"echo":"mug","locale":"fr_FR"}', $messages[7]->content);
         self::assertSame('{"error":"limited","message":"Too many tool calls for this task, try again later."}', $messages[8]->content);
         self::assertSame('{"error":"limited","message":"Too many tool calls for this task, try again later."}', $messages[9]->content);
-        self::assertSame(2, AiToolCallLogQuery::create()->filterByStatus('limited')->count());
+        self::assertSame(1, AiToolCallLogQuery::create()->filterByStatus('limited')->count());
+        self::assertSame('answer_limit: 2 calls', AiToolCallLogQuery::create()->filterByStatus('limited')->findOne()?->getError());
     }
 
     public function testAnAnswerToANameTheModelMadeUpStillGetsItsMessage(): void
