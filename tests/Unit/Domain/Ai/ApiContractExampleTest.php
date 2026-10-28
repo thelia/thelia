@@ -339,6 +339,7 @@ final class ApiContractExampleTest extends TestCase
         yield 'blank user message' => [static fn () => AiMessage::user('')];
         yield 'empty assistant message' => [static fn () => AiMessage::assistant('')];
         yield 'negative tokens' => [static fn () => new AiTokenUsage(-1, 0)];
+        yield 'provider longer than the column of the log' => [static fn () => new AiExternalCost('pricewatch.offer_judgement', str_repeat('a', 33), 'jev-latest', '0.0001')];
         yield 'cost with a comma' => [static fn () => new AiExternalCost('pricewatch.offer_judgement', 'typesafe', 'jev-latest', '0,0001')];
         yield 'negative cost' => [static fn () => new AiExternalCost('pricewatch.offer_judgement', 'typesafe', 'jev-latest', '-1')];
         yield 'currency in lower case' => [static fn () => new AiExternalCost('pricewatch.offer_judgement', 'typesafe', 'jev-latest', '1', 'usd')];

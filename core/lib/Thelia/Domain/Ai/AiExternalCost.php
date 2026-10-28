@@ -24,8 +24,11 @@ use Thelia\Domain\Ai\Internal\AiAssert;
 #[Exclude]
 final readonly class AiExternalCost
 {
+    /** The size of the column `ai_usage_log.provider`. */
+    public const int PROVIDER_MAXIMUM_LENGTH = 32;
+
     /**
-     * @param string $provider  the service paid, lower case: `typesafe`, `dataforseo`
+     * @param string $provider  the service paid, lower case, 32 characters at most: `typesafe`, `dataforseo`
      * @param string $operation what was bought: a model, an endpoint, like `jev-latest`
      * @param string $cost      decimal string in $currency, like `0.00009870`
      */
@@ -43,6 +46,11 @@ final readonly class AiExternalCost
     ) {
         AiAssert::usageId($usageId);
         AiAssert::token($provider, 'The provider of an external cost');
+
+        if (mb_strlen($provider) > self::PROVIDER_MAXIMUM_LENGTH) {
+            throw new Exception\InvalidAiArgumentException(\sprintf('The provider of an external cost holds at most %d characters.', self::PROVIDER_MAXIMUM_LENGTH));
+        }
+
         AiAssert::notBlank($operation, 'The operation of an external cost');
         AiAssert::decimal($cost, 'The cost');
         AiAssert::currency($currency);

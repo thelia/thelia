@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 /**
  * The provider did not answer, or answered an error. Retry later when $retryable is true (timeout, rate
  * limit or overload of the provider, 5xx); never when it is false (refused key, unknown model, bad request).
+ * $logId is the row of the log when the call was already paid and logged (a stream cut after the first tokens).
  */
 #[Exclude]
 final class AiProviderUnavailableException extends \RuntimeException implements AiExceptionInterface
@@ -28,6 +29,7 @@ final class AiProviderUnavailableException extends \RuntimeException implements 
         public readonly bool $retryable,
         string $message = '',
         ?\Throwable $previous = null,
+        public readonly ?int $logId = null,
     ) {
         parent::__construct('' !== $message ? $message : \sprintf('The AI connection "%s" is unavailable.', $connection), 0, $previous);
     }
