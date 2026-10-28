@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Domain\Pricing;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CatalogActivity;
 use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Pricing\EffectivePrice;
@@ -149,7 +150,7 @@ final class EffectivePriceCatalogTest extends TestCase
         $probe = $this->createStub(CatalogActivityProbe::class);
         $probe->method('read')->willReturn(new CatalogActivity($publicRule, $namedRule, $reservedSale, false, false, false, 1));
 
-        return new PricingActivityChecker($probe, new LoadedCustomerDiscountRate());
+        return new PricingActivityChecker($probe, new LoadedCustomerDiscountRate(), new CustomerGroupResolver($probe));
     }
 
     private function currency(int $id): Currency

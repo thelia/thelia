@@ -332,7 +332,9 @@ final class ResourceCacheTest extends TestCase
 
     private function checker(CatalogActivity $activity): PricingActivityChecker
     {
-        return new PricingActivityChecker($this->probe($activity), new LoadedCustomerDiscountRate());
+        $probe = $this->probe($activity);
+
+        return new PricingActivityChecker($probe, new LoadedCustomerDiscountRate(), new CustomerGroupResolver($probe));
     }
 
     private function groupResolver(): CustomerGroupResolver

@@ -51,7 +51,10 @@ use Thelia\Model\TaxRule;
  * Taxes depend on the product (a tax can read a feature of it), so prices are computed product
  * by product rather than in SQL, and kept for the request. Narrowing the listing adds a
  * condition on the product ids and joins nothing: the order the listing is sorted in is left
- * as it was.
+ * as it was. Only the products the query holds when the filter is applied are priced, not the
+ * whole catalogue: the filters applied after this one can only narrow that set further, so a
+ * product left out of it could not have been in the listing. What the resolver priced stays
+ * known for the request, so the price order of the same listing reads it without pricing again.
  */
 final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface, ResetInterface
 {
@@ -61,7 +64,7 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
 
     public const UPPER_BOUND = 2;
 
-    /** @var array<string, array<int, float>> displayed prices of every product, per currency, country and customer */
+    /** @var array<string, array<int, float|null>> displayed price of each product priced so far (null: none to show), per currency, country and customer */
     private array $catalogue = [];
 
     public function __construct(
@@ -92,7 +95,7 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
         [$min, $max] = $bounds;
         $productIds = [];
 
-        foreach ($this->displayedPrices(null) as $productId => $price) {
+        foreach ($this->displayedPrices($this->idsOf($query)) as $productId => $price) {
             if (($min === null || $price >= $min) && ($max === null || $price <= $max)) {
                 $productIds[] = $productId;
             }
@@ -191,48 +194,71 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
     }
 
     /**
+     * The products the query holds at this point, which the filters applied after this one can
+     * only narrow. Only their id is read: the query of a collection may eager load columns of
+     * the relations it serializes. The order is dropped with them: it does not change which
+     * products are held, and it may be written on a virtual column of the query (withColumn())
+     * that this read no longer selects.
+     *
+     * @return list<int>
+     */
+    private function idsOf(ModelCriteria $query): array
+    {
+        return array_values(array_unique(array_map('intval', (clone $query)->clearSelectColumns()->clearOrderByColumns()->select('Id')->find()->getData())));
+    }
+
+    /**
      * The price each product shows on its card, rounded to the cent. A product without a
      * default combination, or whose combination has no price in either the visitor's currency
      * or the default one, has no price to show and is left out.
      *
-     * @param list<int>|null $productIds null for every product
+     * @param list<int> $productIds
      *
      * @return array<int, float>
      */
-    private function displayedPrices(?array $productIds): array
+    private function displayedPrices(array $productIds): array
     {
         $currency = $this->currencyResolver->currentCurrency();
         $country = $this->taxEngine->getDeliveryCountry();
         $customer = $this->visitorPriceReader->currentCustomer();
         $key = $currency->getId().'-'.$country->getId().'-'.($customer?->getId() ?? 0);
 
-        if (isset($this->catalogue[$key])) {
-            return $productIds === null
-                ? $this->catalogue[$key]
-                : array_intersect_key($this->catalogue[$key], array_flip($productIds));
+        $missing = array_values(array_filter(
+            $productIds,
+            fn (int $productId): bool => !\array_key_exists($productId, $this->catalogue[$key] ?? []),
+        ));
+
+        if ($missing !== []) {
+            $computed = $this->computeDisplayedPrices($missing, $currency, $country);
+
+            foreach ($missing as $productId) {
+                $this->catalogue[$key][$productId] = $computed[$productId] ?? null;
+            }
         }
 
-        $prices = $this->computeDisplayedPrices($productIds, $currency, $country);
+        $prices = [];
 
-        if ($productIds === null) {
-            $this->catalogue[$key] = $prices;
+        foreach ($productIds as $productId) {
+            $price = $this->catalogue[$key][$productId] ?? null;
+
+            if ($price !== null) {
+                $prices[$productId] = $price;
+            }
         }
 
         return $prices;
     }
 
     /**
-     * @param list<int>|null $productIds
+     * @param list<int> $productIds
      *
      * @return array<int, float>
      */
-    private function computeDisplayedPrices(?array $productIds, Currency $currency, Country $country): array
+    private function computeDisplayedPrices(array $productIds, Currency $currency, Country $country): array
     {
-        $saleElements = ProductSaleElementsQuery::create()->filterByIsDefault(true);
-
-        if ($productIds !== null) {
-            $saleElements->filterByProductId($productIds, Criteria::IN);
-        }
+        $saleElements = ProductSaleElementsQuery::create()
+            ->filterByIsDefault(true)
+            ->filterByProductId($productIds, Criteria::IN);
 
         /** @var array<int, array{Id: int, ProductId: int}> $rows */
         $rows = $saleElements->select(['Id', 'ProductId'])->find()->getData();
