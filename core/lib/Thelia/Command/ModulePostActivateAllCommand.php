@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
-#[AsCommand(name: 'module:post-activate-all', description: 'Run postActivation() for all active modules')]
+#[AsCommand(name: 'module:post-activate-all', description: 'Run postActivation() and register the hooks of all active modules')]
 class ModulePostActivateAllCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,6 +47,9 @@ class ModulePostActivateAllCommand extends Command
 
                 $instance->setContainer($this->getApplication()->getKernel()->getContainer());
                 $instance->postActivation($con);
+                // As BaseModule::activate() does: the install writes the module
+                // rows itself, so nothing else creates the hooks a module declares.
+                $instance->registerHooks();
                 ++$count;
             } catch (\Throwable $e) {
                 $failedModuleCodes[] = $code;
