@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Support\Ai;
 
-use AiProbeModule\ProbeGateway;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -176,8 +175,14 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
 
         $settings = new AiUsageSettingRepository();
         $globalSettings = new AiSettings();
+        $probe = 'AiProbeModule\\ProbeGateway';
+
+        if (!class_exists($probe)) {
+            throw new \LogicException('The fixture of the probe usages is loaded by setUpBeforeClass().');
+        }
+
         $registry = new AiUsageRegistry(
-            ['aiprobe.pages' => ProbeGateway::class, 'aiprobe.assistant' => ProbeGateway::class, 'aiprobe.scoring' => ProbeGateway::class, 'aiprobe.drafts' => ProbeGateway::class],
+            ['aiprobe.pages' => $probe, 'aiprobe.assistant' => $probe, 'aiprobe.scoring' => $probe, 'aiprobe.drafts' => $probe], // @phpstan-ignore argument.type (the fixture class is not known to the analysis)
             $settings,
             $globalSettings,
         );

@@ -34,6 +34,9 @@ use Thelia\Domain\Ai\Log\AiLogKind;
 use Thelia\Domain\Ai\Log\AiUsageLogWriter;
 use Thelia\Domain\Ai\Provider\AiProviderAdapters;
 use Thelia\Domain\Ai\Provider\AiProviderResult;
+use Thelia\Domain\Ai\Provider\AiProviderStream;
+use Thelia\Domain\Ai\Stream\StreamCompleted;
+use Thelia\Domain\Ai\Stream\TextDelta;
 
 /**
  * The single way to call a model (AiGatewayInterface): admission (AiAdmission), one call to the adapter of the
@@ -89,7 +92,58 @@ final class AiGateway implements AiGatewayInterface
 
     public function stream(AiRequest $request): iterable
     {
-        throw new \LogicException('Not yet.');
+        $call = $this->admission->admit($request, AiLogKind::Stream);
+        $stream = null;
+        $eventsSeen = false;
+        $receivedCharacters = 0;
+        $logged = false;
+
+        try {
+            $adapter = $this->adapters->for($call->target->provider);
+
+            for ($attempt = 0;; ++$attempt) {
+                $stream = $adapter->stream($call->request, $call->target);
+
+                try {
+                    foreach ($stream as $event) {
+                        $eventsSeen = true;
+
+                        if ($event instanceof TextDelta) {
+                            $receivedCharacters += mb_strlen($event->text);
+                        }
+
+                        yield $event;
+                    }
+
+                    break;
+                } catch (AiProviderUnavailableException $unavailable) {
+                    // Retried only while nothing reached the caller: a delta that was sent cannot be taken back.
+                    if ($eventsSeen || !$unavailable->retryable || $attempt >= 1) {
+                        throw $unavailable;
+                    }
+
+                    $this->pause();
+                }
+            }
+
+            $result = $stream->result();
+            $settlement = $this->settle($call, $result, $result->tokenUsage, annotateOnly: true);
+            $logged = true;
+
+            yield new StreamCompleted($this->response($call, $result, $settlement));
+        } catch (AiProviderUnavailableException $unavailable) {
+            $logId = $this->closeUnfinished($call, $stream, $receivedCharacters, $eventsSeen, $unavailable);
+            $logged = true;
+
+            throw new AiProviderUnavailableException($unavailable->connection, $unavailable->retryable, $unavailable->getMessage(), $unavailable->getPrevious(), $logId);
+        } finally {
+            // The caller stopped reading (the generator is destroyed) or something unexpected came out: the row says aborted.
+            if (!$logged) {
+                $this->closeUnfinished($call, $stream, $receivedCharacters, $eventsSeen, null);
+            }
+
+            $this->ledger->release($call->hold);
+        }
     }
 
     private function completeWithOneRetry(AiAdmittedCall $call): AiProviderResult
@@ -125,6 +179,40 @@ final class AiGateway implements AiGatewayInterface
         $logId = $this->log->write($this->entry($call, AiUsageLogStatus::Failed, error: $unavailable->retryable ? 'provider_unavailable_retryable' : 'provider_unavailable', verdicts: $call->verdicts()), $call->hold);
 
         return new AiProviderUnavailableException($unavailable->connection, $unavailable->retryable, $unavailable->getMessage(), $unavailable->getPrevious(), $logId);
+    }
+
+    /**
+     * Writes the row of a stream that did not reach its end, and returns its identifier.
+     *
+     * When the provider failed before sending anything, the call is `failed` and costs nothing. Otherwise it is
+     * `aborted` and costs what is known: the tokens the provider reported so far; when it reported none of the
+     * input, the input estimated from the characters of the request (three per token); and for the output, the
+     * higher of the tokens reported and those estimated from the characters of the deltas received. The
+     * amount is never below what was received.
+     */
+    private function closeUnfinished(AiAdmittedCall $call, ?AiProviderStream $stream, int $receivedCharacters, bool $eventsSeen, ?AiProviderUnavailableException $failure): int
+    {
+        if (null === $stream || (null !== $failure && !$eventsSeen)) {
+            return $this->log->write($this->entry($call, AiUsageLogStatus::Failed, error: null === $failure ? 'not_started' : ($failure->retryable ? 'provider_unavailable_retryable' : 'provider_unavailable'), verdicts: $call->verdicts()), $call->hold);
+        }
+
+        $known = $stream->result();
+        $usage = $known->tokenUsage;
+        $input = $usage->inputTokens + $usage->cacheReadTokens + $usage->cacheWriteTokens > 0 ? $usage->inputTokens : $call->estimatedInputTokens;
+        $tokens = new AiTokenUsage($input, max($usage->outputTokens, AiCostCalculator::tokensOf($receivedCharacters)), $usage->cacheReadTokens, $usage->cacheWriteTokens);
+
+        return $this->log->write(
+            $this->entry(
+                $call,
+                AiUsageLogStatus::Aborted,
+                cost: $this->calculator->cost($call->target->model, $tokens, $known->announcedCost),
+                tokens: $tokens,
+                model: '' !== $known->model ? $known->model : null,
+                error: null === $failure ? 'consumer_stopped' : ($failure->retryable ? 'provider_unavailable_retryable' : 'provider_unavailable'),
+                verdicts: $call->verdicts(),
+            ),
+            $call->hold,
+        );
     }
 
     /**
