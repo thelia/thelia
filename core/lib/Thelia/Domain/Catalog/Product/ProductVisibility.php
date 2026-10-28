@@ -86,8 +86,8 @@ final readonly class ProductVisibility
      * The rule of {@see visibleProductClause()} for a visitor of the default customer group:
      * for what is cached once for everybody and crawled anonymously (the sitemap), whoever
      * triggers its generation. The categories and the module rules are asked of nobody (null
-     * customer), never of the member who happens to regenerate the file; the private drops
-     * keep the rule they have.
+     * customer), never of the member who happens to regenerate the file; so are the private drops
+     * (a customer named on one does not add its products for everybody).
      *
      * @return string|null null when nothing is hidden from the visitor
      */
@@ -99,7 +99,7 @@ final readonly class ProductVisibility
     private function clauseFor(string $productIdColumn, bool $defaultVisitor): ?string
     {
         $clauses = [];
-        $reservedSaleClause = $this->reservedSaleRule->visibleProductClause($productIdColumn);
+        $reservedSaleClause = $this->reservedSaleRule->visibleProductClause($productIdColumn, $defaultVisitor);
 
         if (null !== $reservedSaleClause) {
             $clauses[] = $reservedSaleClause;
