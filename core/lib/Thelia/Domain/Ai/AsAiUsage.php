@@ -42,13 +42,13 @@ use Thelia\Domain\Ai\Internal\AiAssert;
 final readonly class AsAiUsage
 {
     /**
-     * @param string                       $id           `<module>.<purpose>` in lower case, unique in the shop
-     * @param string                       $purpose      what the usage does, in one sentence, for the register of AI usages
-     * @param list<AiCapability>           $capabilities what the model must be able to do
-     * @param array<string, GuardrailMode> $guardrails   optional guardrails (classifiers) by name, with their default mode; the
-     *                                                   deterministic ones of CoreGuardrail always apply and are not listed here
+     * @param string                       $id                 `<module>.<purpose>` in lower case, unique in the shop
+     * @param string                       $purpose            what the usage does, in one sentence, for the register of AI usages
+     * @param list<AiCapability>           $capabilities       what the model must be able to do
+     * @param array<string, GuardrailMode> $guardrails         optional guardrails (classifiers) by name, with their default mode; the
+     *                                                         deterministic ones of CoreGuardrail always apply and are not listed here
      * @param int|null                     $maxInputCharacters the default size limit of what a person types (the last user message), in
-     *                                                   characters; the merchant can change it in the settings of the usage; null: no limit of its own
+     *                                                         characters; the merchant can change it in the settings of the usage; null: no limit of its own
      */
     public function __construct(
         public string $id,

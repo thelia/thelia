@@ -203,7 +203,7 @@ final class ApiContractExampleTest extends TestCase
 
     public function testAFloatAmountPrintedInScientificNotationIsRefused(): void
     {
-        $this->expectException(\Thelia\Domain\Ai\Exception\InvalidAiArgumentException::class);
+        $this->expectException(InvalidAiArgumentException::class);
 
         new AiExternalCost('pricewatch.offer_judgement', 'typesafe', 'jev-latest', (string) 0.00000012);
     }
@@ -270,7 +270,7 @@ final class ApiContractExampleTest extends TestCase
             usageId: 'pricewatch.offer_judgement',
             provider: 'typesafe',
             operation: 'jev-latest',
-            cost: sprintf('%.8F', 2350 * 0.042 / 1_000_000), // a float printed with %.8F: `1.2E-7` would be refused
+            cost: \sprintf('%.8F', 2350 * 0.042 / 1_000_000), // a float printed with %.8F: `1.2E-7` would be refused
             tokenUsage: new AiTokenUsage(2350, 0),
             latencyMilliseconds: 840,
             correlationId: 'pricewatch.collect.118',
