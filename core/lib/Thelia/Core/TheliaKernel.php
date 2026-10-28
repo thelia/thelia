@@ -31,6 +31,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -60,6 +61,7 @@ use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\Cache\ConfigCacheService;
+use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\DependencyInjection\LoggingDefaults;
 use Thelia\Core\DependencyInjection\TheliaContainer;
@@ -80,6 +82,7 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Template\TemplateService;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Ai\AsAiUsage;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
@@ -682,6 +685,15 @@ class TheliaKernel extends Kernel
             ->setPublic(true)
             ->setShared(false)
             ->addTag('thelia.form');
+
+        // A service that carries #[AsAiUsage] declares a usage of the AI layer (RegisterAiUsagePass reads it);
+        // a module gets this through the autoconfigure(true) of its skeleton.
+        $container->registerAttributeForAutoconfiguration(
+            AsAiUsage::class,
+            static function (ChildDefinition $definition): void {
+                $definition->addTag(RegisterAiUsagePass::TAG);
+            },
+        );
 
         // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
         $container->registerForAutoconfiguration(BaseHookInterface::class)
