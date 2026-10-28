@@ -83,6 +83,8 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Template\TemplateService;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Ai\AsAiUsage;
+use Thelia\Domain\Ai\Guardrail\AiGuardrailInterface;
+use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
@@ -694,6 +696,10 @@ class TheliaKernel extends Kernel
                 $definition->addTag(RegisterAiUsagePass::TAG);
             },
         );
+
+        // The optional guardrails of the AI layer: a module only implements the interface (AiGuardrailRunner reads the tag).
+        $container->registerForAutoconfiguration(AiGuardrailInterface::class)
+            ->addTag(AiGuardrailRunner::TAG);
 
         // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
         $container->registerForAutoconfiguration(BaseHookInterface::class)
