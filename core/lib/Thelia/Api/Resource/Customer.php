@@ -259,7 +259,6 @@ class Customer implements PropelResourceInterface
     public ?string $rememberMeSerial = null;
     public ?bool $enable = null;
 
-    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?string $confirmationToken = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
