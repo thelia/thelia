@@ -31,6 +31,9 @@ final class McpServerConfiguration
 {
     public const string ALIAS = 'mcp';
 
+    /** The path of the endpoint, the one the `mcp` firewall guards. */
+    public const string PATH = '/api/mcp';
+
     /**
      * @return array<string, mixed>
      */
@@ -40,7 +43,7 @@ final class McpServerConfiguration
             'name' => 'thelia',
             'registry' => '*',
             'http' => [
-                'path' => '/api/mcp',
+                'path' => self::PATH,
             ],
             'session' => [
                 'store' => 'cache',
