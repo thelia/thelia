@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use AiProbeModule\ProbeWriter;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
 use Thelia\Domain\Ai\Compliance\AiActObligation;
 use Thelia\Domain\Ai\Compliance\ComplianceState;
@@ -25,6 +26,7 @@ use Thelia\Domain\Ai\Service\AiUsageRegistry;
 use Thelia\Model\AiUsageSetting;
 use Thelia\Model\AiUsageSettingQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 use Thelia\Test\IntegrationTestCase;
 
 final class AiUsageRegistryTest extends IntegrationTestCase
@@ -115,12 +117,48 @@ final class AiUsageRegistryTest extends IntegrationTestCase
 
     public function testTheNoticeOfAnInteractiveUsageIsTranslatedAndFollowsTheSetting(): void
     {
+        $this->setting('aiprobe.chat', budget: '5');
+
         self::assertSame('You are talking with an AI assistant. Its answers can contain mistakes.', $this->registry->transparencyNotice('aiprobe.chat', 'en_US'));
         self::assertSame('Vous échangez avec un assistant IA. Ses réponses peuvent comporter des erreurs.', $this->registry->transparencyNotice('aiprobe.chat', 'fr_FR'));
 
-        $this->setting('aiprobe.chat', notice: false);
+        $this->setting('aiprobe.chat', budget: '5', notice: false);
 
         self::assertNull($this->registry->transparencyNotice('aiprobe.chat', 'en_US'));
+    }
+
+    public function testTheNoticeWithoutLocaleIsInTheDefaultLanguageOfTheShopWhenNoRequestRuns(): void
+    {
+        $this->setting('aiprobe.chat', budget: '5');
+        $expected = Lang::getDefaultLanguage()->getLocale();
+
+        self::assertSame($this->registry->transparencyNotice('aiprobe.chat', $expected), $this->registry->transparencyNotice('aiprobe.chat'));
+    }
+
+    public function testAnInactiveUsageHasNoNotice(): void
+    {
+        $this->setting('aiprobe.chat', budget: '5');
+        self::assertNotNull($this->registry->transparencyNotice('aiprobe.chat', 'en_US'));
+
+        $this->setting('aiprobe.chat', budget: '0.000000');
+        self::assertNull($this->registry->transparencyNotice('aiprobe.chat', 'en_US'), 'a public usage without budget is inactive');
+
+        $this->setting('aiprobe.chat', enabled: false, budget: '5');
+        self::assertNull($this->registry->transparencyNotice('aiprobe.chat', 'en_US'), 'turned off by the merchant');
+    }
+
+    public function testAUsageWithoutNoticeStaysActiveAndSaysWhyItDoesNotComply(): void
+    {
+        $this->setting('aiprobe.chat', budget: '5', notice: false);
+
+        self::assertTrue($this->registry->isActive('aiprobe.chat'), 'the core never blocks');
+
+        $status = $this->registry->compliance('aiprobe.chat')[0];
+        self::assertSame(ComplianceState::NotMet, $status->state);
+        self::assertSame('notice_turned_off', $status->reason);
+        self::assertStringContainsString('does not comply with article 50', $status->message);
+        self::assertStringContainsString('Cet usage ne respecte pas l\'article 50', $status->translate(Translator::getInstance(), 'fr_FR'));
+        self::assertStringContainsString('aiprobe.chat', $status->translate(Translator::getInstance(), 'fr_FR'), 'the placeholder is filled');
     }
 
     public function testAUsageThatIsNotInteractiveHasNoNotice(): void
