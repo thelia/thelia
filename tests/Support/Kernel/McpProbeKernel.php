@@ -20,14 +20,14 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Thelia\Tests\Support\Ai\McpProbeController;
 
 /**
- * The application kernel plus a route at /api/mcp, the endpoint the bundle of lot 5b2 will serve, so the
- * firewall of the MCP tokens is exercised end to end.
+ * The application kernel plus a stand-in route under /api/mcp, behind the same firewall as the MCP endpoint, so the
+ * firewall of the MCP tokens is exercised on its own.
  *
  * It compiles into a cache directory of its own: the extra route never reaches the other tests.
  */
 final class McpProbeKernel extends Kernel
 {
-    public const string ROUTE_PATH = '/api/mcp';
+    public const string ROUTE_PATH = '/api/mcp/probe';
 
     public function getCacheDir(): string
     {
