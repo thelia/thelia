@@ -22,7 +22,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Turns away, before the SDK reads it, the body the MCP endpoint (`POST /api/mcp`) does not serve: a JSON-RPC batch.
+ * Turns away, before the SDK reads them, the bodies the MCP endpoint (`POST /api/mcp`) does not serve: a JSON-RPC
+ * batch, and a body over {@see self::MAX_BODY_BYTES}.
  *
  * A request carries one message. The rate limiter of the token counts requests, so a batch of a hundred calls
  * would run a hundred times its limit (the batching of JSON-RPC left MCP with the 2025-06-18 revision, which the
@@ -36,6 +37,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 final class McpRequestGuardListener
 {
     public const string PATH = '/api/mcp';
+
+    /** What an `initialize` or a tool call needs, with room to spare: the SDK keeps what `initialize` sends in the session. */
+    public const int MAX_BODY_BYTES = 262144;
 
     private const int INVALID_REQUEST = -32600;
 
@@ -58,6 +62,10 @@ final class McpRequestGuardListener
     private function refusal(Request $request): ?Response
     {
         $body = $request->getContent();
+
+        if (\strlen($body) > self::MAX_BODY_BYTES) {
+            return $this->error(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, 'The request is too large.');
+        }
 
         if (str_starts_with(ltrim($body, " \t\r\n"), '[')) {
             return $this->error(Response::HTTP_BAD_REQUEST, 'Batch requests are not supported: send one message per request.');
