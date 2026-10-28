@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Catalog;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiModelQuery;
 
@@ -63,6 +64,46 @@ class AiModelCatalog
         ksort($models);
 
         return $models;
+    }
+
+    /**
+     * The row of a model of the provider (no connection), made from the embedded list when it has none yet: a
+     * tier is assigned to a row, and the list alone gives a model no row. Returns null for a name the list does
+     * not know. A row that already exists is returned untouched, hidden or not.
+     */
+    public function import(string $provider, string $name): ?AiModel
+    {
+        $row = AiModelQuery::create()->filterByProvider($provider)->filterByName($name)->filterByConnectionId(null, Criteria::ISNULL)->findOne();
+
+        if (null !== $row) {
+            return $row;
+        }
+
+        $specification = $this->embedded()[$provider][$name] ?? null;
+
+        if (null === $specification) {
+            return null;
+        }
+
+        $row = (new AiModel())
+            ->setProvider($provider)
+            ->setName($name)
+            ->setInputPrice($specification->inputPrice)
+            ->setOutputPrice($specification->outputPrice)
+            ->setCacheReadPrice($specification->cacheReadPrice)
+            ->setCacheWritePrice($specification->cacheWritePrice)
+            ->setCurrency($specification->currency)
+            ->setContextWindow($specification->contextWindow)
+            ->setMaxOutputTokens($specification->maxOutputTokens)
+            ->setSupportsStructuredOutput((int) $specification->supportsStructuredOutput)
+            ->setSupportsTools((int) $specification->supportsTools)
+            ->setSupportsVision((int) $specification->supportsVision)
+            ->setSupportsStreaming((int) $specification->supportsStreaming)
+            ->setSource(AiModelSpecification::SOURCE_CATALOG)
+            ->setActive(1);
+        $row->save();
+
+        return $row;
     }
 
     /**

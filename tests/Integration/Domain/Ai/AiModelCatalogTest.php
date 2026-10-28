@@ -111,6 +111,35 @@ final class AiModelCatalogTest extends IntegrationTestCase
         self::assertSame('1.000000', $this->catalog()->find('openai', 'gpt-5.1-mini-probe')?->inputPrice);
     }
 
+    public function testImportCopiesAModelOfTheListIntoARowOnce(): void
+    {
+        $row = $this->catalog()->import('anthropic', 'claude-haiku-4-5');
+
+        self::assertNotNull($row);
+        self::assertSame('1.00', $row->getInputPrice());
+        self::assertSame('1.25', $row->getCacheWritePrice());
+        self::assertSame(AiModelSpecification::SOURCE_CATALOG, $row->getSource());
+        self::assertNull($row->getConnectionId());
+        self::assertTrue((bool) $row->getActive());
+        self::assertSame($row->getId(), $this->catalog()->import('anthropic', 'claude-haiku-4-5')?->getId());
+        self::assertSame(1, AiModelQuery::create()->count());
+        self::assertSame(AiModelSpecification::SOURCE_CATALOG, $this->catalog()->find('anthropic', 'claude-haiku-4-5')?->source);
+    }
+
+    public function testImportKeepsTheRowTheMerchantAlreadyEdited(): void
+    {
+        $this->row('anthropic', 'claude-haiku-4-5', input: '0.500000');
+
+        self::assertSame('0.500000', $this->catalog()->import('anthropic', 'claude-haiku-4-5')?->getInputPrice());
+        self::assertSame(1, AiModelQuery::create()->count());
+    }
+
+    public function testImportOfAnUnknownModelCreatesNothing(): void
+    {
+        self::assertNull($this->catalog()->import('mistral', 'not-a-model'));
+        self::assertSame(0, AiModelQuery::create()->count());
+    }
+
     private function catalog(): AiModelCatalog
     {
         return new AiModelCatalog();

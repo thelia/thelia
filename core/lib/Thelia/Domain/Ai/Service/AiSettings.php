@@ -55,4 +55,9 @@ class AiSettings
     {
         return '1' === trim((string) ConfigQuery::read('ai_eu_only', '0'));
     }
+
+    public function setEuropeanUnionOnly(bool $europeanUnionOnly): void
+    {
+        ConfigQuery::write('ai_eu_only', $europeanUnionOnly ? '1' : '0');
+    }
 }
