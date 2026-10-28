@@ -1898,6 +1898,7 @@ CREATE TABLE IF NOT EXISTS `ai_model`
     `provider` VARCHAR(32) NOT NULL COMMENT 'the provider that serves the model, as in ai_connection.provider',
     `name` VARCHAR(128) NOT NULL COMMENT 'the identifier the provider gives the model',
     `title` VARCHAR(255),
+    `connection_id` INTEGER COMMENT 'the connection this model belongs to (a self-hosted or compatible endpoint), empty for the catalogue of the provider',
     `input_price` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'price of a million input tokens, in currency',
     `output_price` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'price of a million output tokens, in currency',
     `cache_read_price` DECIMAL(16,6) COMMENT 'price of a million input tokens read from the cache, empty when the provider has no cache',
@@ -1914,7 +1915,13 @@ CREATE TABLE IF NOT EXISTS `ai_model`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `ai_model_provider_name_UNIQUE` (`provider`, `name`)
+    UNIQUE INDEX `ai_model_provider_name_connection_UNIQUE` (`provider`, `name`, `connection_id`),
+    INDEX `idx_ai_model_connection_id` (`connection_id`),
+    CONSTRAINT `fk_ai_model_connection_id`
+        FOREIGN KEY (`connection_id`)
+        REFERENCES `ai_connection` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE IF NOT EXISTS `ai_tier_assignment`
