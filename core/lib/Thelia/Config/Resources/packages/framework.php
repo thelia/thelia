@@ -53,6 +53,13 @@ return static function (ContainerConfigurator $container): void {
                 'thelia.cache.security' => [
                     'adapter' => 'cache.app',
                 ],
+                // The sessions of the MCP server (symfony/mcp-bundle). Out of reach of cache:clear, like the
+                // pool above: a client opens its session once and keeps the identifier, so a deployment
+                // that emptied the pool would answer every connected client with a 404. A session holds no
+                // right: identity and scopes are read from the token of each request.
+                'thelia.cache.mcp_session' => [
+                    'adapter' => 'cache.app',
+                ],
                 // The mails a worker handed to the mail server, by the identifier
                 // MailerFactory gives them: a job handed out twice by the queue is
                 // not mailed twice. A cache clear leaves it in place; each item

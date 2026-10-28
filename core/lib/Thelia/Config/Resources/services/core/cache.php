@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Thelia\Core\Cache\ApplicationCacheAdapter;
 use Thelia\Core\Cache\CacheAdapterFactory;
 use Thelia\Core\Cache\ConfigCacheService;
@@ -42,6 +43,10 @@ return static function (ContainerConfigurator $container): void {
         ->call('setLogger', [service('logger')->ignoreOnInvalid()])
         ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])
         ->tag('monolog.logger', ['channel' => 'cache']);
+
+    // The PSR-16 face of the pool that keeps the sessions of the MCP server.
+    $services->set('thelia.mcp.session_cache', Psr16Cache::class)
+        ->args([service('thelia.cache.mcp_session')]);
 
     // Feed cache, deliberately tied to the container cache directory: it is
     // meant to go away with cache:clear. Each item carries its own lifetime,
