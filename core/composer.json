@@ -22,6 +22,7 @@
         "api-platform/symfony": "^4.3",
         "lexik/jwt-authentication-bundle": "^3.0",
         "nelmio/cors-bundle": "^2.2",
+        "nyholm/psr7": "^1.8",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.30 || ^2.1",
 
@@ -64,6 +65,7 @@
         "symfony/lock": "7.4.*",
         "symfony/mailer": "7.4.*",
         "symfony/messenger": "7.4.*",
+        "symfony/mcp-bundle": "^0.15",
         "symfony/mime": "7.4.*",
         "symfony/monolog-bundle": "3.*",
 
