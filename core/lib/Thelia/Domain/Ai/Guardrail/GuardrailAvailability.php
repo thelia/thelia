@@ -37,6 +37,9 @@ final readonly class GuardrailAvailability
     /** The tier it needs has no model assigned, or the model cannot do what it needs. */
     public const string NO_MODEL = 'no_model';
 
+    /** The merchant switched the usage the guardrail relies on off, or the whole AI layer. */
+    public const string INACTIVE = 'inactive';
+
     private function __construct(
         public bool $usable,
         public ?string $reason,

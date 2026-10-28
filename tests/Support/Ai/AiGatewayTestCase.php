@@ -36,6 +36,7 @@ use Thelia\Domain\Ai\Guardrail\AiGuardrailInterface;
 use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
 use Thelia\Domain\Ai\Guardrail\AiHtmlSanitizer;
 use Thelia\Domain\Ai\Guardrail\AiSchemaValidator;
+use Thelia\Domain\Ai\Guardrail\TopicGuardrail;
 use Thelia\Domain\Ai\Log\AiUsageLogWriter;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
 use Thelia\Domain\Ai\Provider\AiHttpClientFactory;
@@ -185,7 +186,7 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
         }
 
         $registry = new AiUsageRegistry(
-            ['aiprobe.pages' => $probe, 'aiprobe.assistant' => $probe, 'aiprobe.scoring' => $probe, 'aiprobe.drafts' => $probe, 'aiprobe.live_pages' => $probe], // @phpstan-ignore argument.type (the fixture class is not known to the analysis)
+            ['aiprobe.pages' => $probe, 'aiprobe.assistant' => $probe, 'aiprobe.scoring' => $probe, 'aiprobe.drafts' => $probe, 'aiprobe.live_pages' => $probe, TopicGuardrail::USAGE => TopicGuardrail::class], // @phpstan-ignore argument.type (the fixture class is not known to the analysis)
             $settings,
             $globalSettings,
         );
