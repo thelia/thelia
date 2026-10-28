@@ -12,11 +12,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Unit\BackOfficeDefaultTwig\Form;
+namespace Thelia\Tests\Integration\BackOffice\Form;
 
 use BackOfficeDefaultTwigBundle\Form\Sale\SaleType;
+use BackOfficeDefaultTwigBundle\Repository\CustomerGroupRepository;
+use BackOfficeDefaultTwigBundle\Service\CustomerGroup\PostedCustomerGroupIds;
 use BackOfficeDefaultTwigBundle\Service\Sale\SaleCustomerIdsReader;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
@@ -24,10 +25,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Validation;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\Sale;
+use Thelia\Test\IntegrationTestCase;
 
-final class SaleTypeTest extends TestCase
+final class SaleTypeTest extends IntegrationTestCase
 {
+    protected function setUp(): void
+    {
+        // The core and the back-office theme ship in separate releases: a checkout of the
+        // core runs with a theme that may not carry the customer group audience yet.
+        if (!class_exists(PostedCustomerGroupIds::class)) {
+            self::markTestSkipped('The back-office theme installed predates the customer groups.');
+        }
+
+        parent::setUp();
+    }
+
     /** A submission that saves a plain public sale with no countdown. */
     private const VALID_SUBMISSION = [
         'id' => '7',
@@ -55,25 +69,65 @@ final class SaleTypeTest extends TestCase
         $this->assertTrue($form->has('countdown_mode'));
     }
 
-    public function testCustomerGroupsIsNotAnOfferedAudience(): void
+    public function testCustomerGroupsIsAnOfferedAudience(): void
     {
         $choices = $this->createForm()->get('audience_mode')->getConfig()->getOption('choices');
 
-        $this->assertNotContains(
+        $this->assertContains(
             Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
             array_values((array) $choices),
-            'customer groups are US #122: the mode must not be offered in the back office yet',
+            'a sale can be reserved for customer groups',
         );
     }
 
-    public function testAnAudienceOutsideTheOfferedChoicesIsRefused(): void
+    public function testASaleReservedForGroupsWithoutAnySelectedGroupIsRefused(): void
     {
         $form = $this->createForm();
         $form->submit(array_merge(self::VALID_SUBMISSION, [
             'audience_mode' => (string) Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
         ]));
 
-        $this->assertFalse($form->isValid(), 'posting the customer-groups mode must not go through');
+        $this->assertFalse($form->isValid(), 'a sale reserved for no group would be open to nobody');
+        $this->assertStringContainsString('at least one group', (string) $form->getErrors(true, true)->current()->getMessage());
+    }
+
+    public function testASaleReservedForGroupsWithSelectedGroupsIsAccepted(): void
+    {
+        $first = $this->createFixtureFactory()->customerGroup()->getId();
+        $second = $this->createFixtureFactory()->customerGroup()->getId();
+        $form = $this->createForm(null, [], ['sale_customer_groups' => [(string) $first, (string) $first, (string) $second]]);
+        $form->submit(array_merge(self::VALID_SUBMISSION, [
+            'audience_mode' => (string) Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            'hide_products' => '1',
+        ]));
+
+        $this->assertTrue($form->isValid(), (string) $form->getErrors(true, false));
+
+        $data = (array) $form->getData();
+        $this->assertSame(Sale::AUDIENCE_MODE_CUSTOMER_GROUPS, $data['audience_mode']);
+        $this->assertTrue($data['hide_products'], 'hiding the products holds for a sale reserved for groups too');
+    }
+
+    public function testASaleReservedForGroupsThatDoNotExistIsRefusedAsWithoutAnyGroup(): void
+    {
+        $missing = (int) CustomerGroupQuery::create()->orderById('DESC')->findOne()?->getId() + 1000;
+        $form = $this->createForm(null, [], ['sale_customer_groups' => [(string) $missing, (string) ($missing + 1)]]);
+        $form->submit(array_merge(self::VALID_SUBMISSION, [
+            'audience_mode' => (string) Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+        ]));
+
+        $this->assertFalse($form->isValid(), 'groups deleted since the page was drawn name no group at all');
+        $this->assertStringContainsString('at least one group', (string) $form->getErrors(true, true)->current()->getMessage());
+    }
+
+    public function testAnAudienceOutsideTheOfferedChoicesIsRefused(): void
+    {
+        $form = $this->createForm();
+        $form->submit(array_merge(self::VALID_SUBMISSION, [
+            'audience_mode' => '3',
+        ]));
+
+        $this->assertFalse($form->isValid(), 'an audience mode the core does not know must not go through');
     }
 
     public function testLeadHoursFieldIsOnlyBuiltForTheLeadHoursMode(): void
@@ -242,7 +296,11 @@ final class SaleTypeTest extends TestCase
 
         $factory = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))
-            ->addType(new SaleType(new IdentityTranslator(), new SaleCustomerIdsReader($requestStack)))
+            ->addType(new SaleType(
+                new IdentityTranslator(),
+                new SaleCustomerIdsReader($requestStack),
+                new PostedCustomerGroupIds($requestStack, new CustomerGroupRepository()),
+            ))
             ->getFormFactory();
 
         return $factory->createNamed('thelia_sale', SaleType::class, $data, $options);

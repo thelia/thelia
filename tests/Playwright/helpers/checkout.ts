@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { ddevMysql } from './db';
 
 export async function gotoCheckoutDelivery(page: Page): Promise<void> {
   await page.goto('/checkout/delivery');
@@ -98,4 +99,50 @@ export async function selectFirstInvoiceAddress(page: Page): Promise<void> {
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(800);
   }
+}
+
+/** Walks a signed-in customer with a filled cart from /checkout/cart to the payment step (delivery picked, invoice address set). */
+export async function goToPaymentStep(page: Page): Promise<void> {
+  await page.goto('/checkout/cart');
+  await clickNextOrder(page, /\/checkout\/delivery/);
+  await selectFirstDeliveryMethod(page);
+  await clickNextOrder(page, /\/checkout\/payment/);
+  await selectFirstInvoiceAddress(page);
+}
+
+/**
+ * Walks a signed-in customer with a filled cart from /checkout/cart to a placed order paid by
+ * Cheque (the demo payment module that needs no gateway), and returns the order reference read
+ * back from the database.
+ *
+ * `clickNextOrder` is not used for the last step on purpose: its `/checkout/(pay|confirm|invoice)`
+ * pattern also matches `/checkout/payment`, so it would return before the order exists. The wait
+ * here is on leaving the payment step, then on the order row itself.
+ */
+export async function placeOrderWithCheque(page: Page, customerEmail: string): Promise<string> {
+  await goToPaymentStep(page);
+  await selectPaymentByLabel(page, /cheque|check/i);
+  await acceptMandatoryConsents(page);
+
+  let orderLink = page.locator('a:has-text("Order")').last();
+  try {
+    await expect(orderLink).toBeVisible({ timeout: 8_000 });
+  } catch {
+    await page.reload();
+    orderLink = page.locator('a:has-text("Order")').last();
+    await expect(orderLink).toBeVisible({ timeout: 12_000 });
+  }
+  await Promise.all([
+    page.waitForURL((url) => !/\/checkout\/payment/.test(url.pathname), { timeout: 30_000 }),
+    orderLink.click(),
+  ]);
+
+  const email = customerEmail.replace(/'/g, "''");
+  await expect
+    .poll(
+      async () => ddevMysql(`SELECT o.ref FROM \`order\` o JOIN customer c ON c.id = o.customer_id WHERE c.email = '${email}' ORDER BY o.id DESC LIMIT 1`),
+      { timeout: 15_000, message: 'the order must exist in the database' },
+    )
+    .not.toBe('');
+  return ddevMysql(`SELECT o.ref FROM \`order\` o JOIN customer c ON c.id = o.customer_id WHERE c.email = '${email}' ORDER BY o.id DESC LIMIT 1`);
 }

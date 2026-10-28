@@ -34,12 +34,13 @@ use Thelia\Model\Customer;
  *
  * What is read by the id of a product or of a sale element is not narrowed:
  * images, documents, prices, features, attribute combinations, categories and
- * associated contents. The cart is narrowed on one path only: an addition through
- * the front API (POST /api/front/cart_items) reads the sale element the way the
- * catalog shows it, so one a rule hides answers 422. An addition by id through
- * CartFacade::addItem(), the way a theme adds, is not narrowed: a module that
- * forbids buying a product also listens to TheliaEvents::CART_ADDITEM with a
- * priority above 128 (Thelia\Action\Cart::addItem).
+ * associated contents. The cart is narrowed too: an addition of a sale element of a product
+ * a rule hides is refused, whatever path it takes (the front API, CartFacade::addItem(), a
+ * module dispatching TheliaEvents::CART_ADDITEM), with a Thelia\Domain\Cart\Exception\ProductNotAvailableException
+ * (an InvalidCartException: 422 on the front API); the lines a visitor already holds that a
+ * rule hides from them are taken out when they sign in, and the checkout refuses them
+ * (CheckoutViolationCode::CartLineUnavailable). The lines a promotion offered are the
+ * shop's gift and are not judged.
  *
  * Only front readers ask: the back office and the admin API are never narrowed.
  * A rule that memoises what it reads per request implements ResetInterface, so

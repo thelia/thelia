@@ -23,6 +23,7 @@ use Thelia\Api\Resource\ModuleI18n;
 use Thelia\Api\Resource\PaymentModule;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Model\Cart;
 use Thelia\Model\Lang;
 use Thelia\Model\Module;
@@ -35,6 +36,7 @@ readonly class PaymentModuleService
         private RequestStack $requestStack,
         private EventDispatcherInterface $dispatcher,
         private ContainerInterface $container,
+        private CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
     ) {
     }
 
@@ -57,13 +59,20 @@ readonly class PaymentModuleService
             $moduleQuery->filterById($moduleId);
         }
 
-        $modules = $moduleQuery->find();
+        $customer = $cart->getCustomer();
+
+        // A module the customer's group is shut out of is not offered at all, whatever
+        // the listeners of the event would answer.
+        $modules = array_filter(
+            iterator_to_array($moduleQuery->find()),
+            fn (Module $module): bool => $this->customerGroupPaymentPolicy->isAllowed((int) $module->getId(), $customer),
+        );
 
         // Return formatted valid payment
         return
             array_map(
                 fn ($module): PaymentModule => $this->getPaymentModule($dispatcher, $module, $cart, $lang),
-                iterator_to_array($modules),
+                array_values($modules),
             );
     }
 

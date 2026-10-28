@@ -198,6 +198,30 @@ final class ReferenceResolverTest extends IntegrationTestCase
         self::assertEqualsWithDelta(18.0, $this->resolveOne((string) $saleElements->getRef())->untaxedUnitPrice, 0.0001);
     }
 
+    public function testTheDiscountOfTheGroupComesBeforeTheOneOfTheCustomer(): void
+    {
+        $saleElements = $this->defaultSaleElementsOf($this->product(['basePrice' => 20.0]));
+        $group = $this->factory->customerGroup('pro', 15.0);
+        $this->factory->assignCustomerGroup($this->customer, $group);
+        $this->customer->setDiscount('10')->save($this->getPropelConnection());
+
+        // 20, less 15 % for the group, less 10 % for the customer.
+        self::assertEqualsWithDelta(15.3, $this->resolveOne((string) $saleElements->getRef())->untaxedUnitPrice, 0.0000001);
+    }
+
+    public function testThePriceTheGroupHasOfItsOwnReplacesTheCatalogPrice(): void
+    {
+        $saleElements = $this->defaultSaleElementsOf($this->product(['basePrice' => 20.0]));
+        $group = $this->factory->customerGroup('pro', 15.0);
+        $this->factory->assignCustomerGroup($this->customer, $group);
+        $this->factory->customerGroupProductPrice($group, $saleElements, $this->currency, 12.0);
+
+        $line = $this->resolveOne((string) $saleElements->getRef());
+
+        self::assertEqualsWithDelta(12.0, $line->untaxedUnitPrice, 0.0000001);
+        self::assertFalse($line->promo, 'A price of the group is not a promotion.');
+    }
+
     public function testTheLinesComeBackInTheOrderTheyWereGiven(): void
     {
         $first = $this->defaultSaleElementsOf($this->product());

@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\Flexy;
 
 use Thelia\Model\Category;
+use Thelia\Model\Currency;
+use Thelia\Model\Customer;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\WebIntegrationTestCase;
 
@@ -29,6 +31,10 @@ use Thelia\Test\WebIntegrationTestCase;
 final class ProductListingSortTest extends WebIntegrationTestCase
 {
     private const CATEGORY_URL = 'flexy-sort-test-category.html';
+
+    private const GROUP_MEMBER_PASSWORD = 'member-password-1';
+
+    private ?Customer $member = null;
 
     public function testTheNewestSortListsTheMostRecentProductFirst(): void
     {
@@ -110,6 +116,25 @@ final class ProductListingSortTest extends WebIntegrationTestCase
         self::assertStringContainsString('Sort product 31', $secondPage);
     }
 
+    /**
+     * The price sorts rank on what the visitor pays: a member whose group has a price of its own
+     * for a product reads the listing in the order of their prices, a visitor in the order of the
+     * public ones.
+     */
+    public function testThePriceSortsFollowWhatTheMemberPays(): void
+    {
+        $this->categoryWithPricesForAGroup();
+
+        self::assertSame(['Bravo 80', 'Alpha 100', 'Charlie 120'], $this->orderOfPricedTitles($this->renderListing('?sort=asc')));
+        self::assertSame(['Charlie 120', 'Alpha 100', 'Bravo 80'], $this->orderOfPricedTitles($this->renderListing('?sort=desc')));
+
+        $this->signInAsAMemberOfTheGroup();
+
+        // 50 for the group, against 80 and 100.
+        self::assertSame(['Charlie 120', 'Bravo 80', 'Alpha 100'], $this->orderOfPricedTitles($this->renderListing('?sort=asc')));
+        self::assertSame(['Alpha 100', 'Bravo 80', 'Charlie 120'], $this->orderOfPricedTitles($this->renderListing('?sort=desc')));
+    }
+
     private function render(string $query): string
     {
         $this->assertPageRenders('/'.self::CATEGORY_URL.$query);
@@ -121,6 +146,66 @@ final class ProductListingSortTest extends WebIntegrationTestCase
         }
 
         return $content;
+    }
+
+    private function renderListing(string $query): string
+    {
+        $this->assertPageRenders('/'.self::CATEGORY_URL.$query);
+
+        return (string) $this->client->getResponse()->getContent();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function orderOfPricedTitles(string $content): array
+    {
+        $titles = ['Alpha 100', 'Bravo 80', 'Charlie 120'];
+
+        foreach ($titles as $title) {
+            self::assertStringContainsString($title, $content);
+        }
+
+        usort($titles, static fn (string $a, string $b): int => strpos($content, $a) <=> strpos($content, $b));
+
+        return $titles;
+    }
+
+    private function categoryWithPricesForAGroup(): void
+    {
+        $factory = $this->factory();
+        $category = $this->category($factory);
+        $taxRule = $factory->taxRule();
+        $currency = Currency::getDefaultCurrency();
+        $group = $factory->customerGroup();
+        $products = [];
+
+        foreach (['Alpha 100' => 100.0, 'Bravo 80' => 80.0, 'Charlie 120' => 120.0] as $title => $price) {
+            $products[$title] = $factory->product($category, $taxRule, $currency, ['ref' => 'PRICED-'.strtoupper(substr($title, 0, 1)), 'title' => $title, 'basePrice' => $price]);
+        }
+
+        $factory->customerGroupProductPrice($group, $products['Charlie 120']->getDefaultSaleElements(), $currency, 50.0);
+        $this->member = $factory->customer($factory->customerTitle(), ['customerGroup' => $group, 'password' => self::GROUP_MEMBER_PASSWORD]);
+        // Fixtures come out disabled, and an unconfirmed account is sent to the activation page.
+        $this->member->setEnable(1)->save($this->getPropelConnection());
+    }
+
+    /**
+     * Through the login form of the theme, as a member does.
+     */
+    private function signInAsAMemberOfTheGroup(): void
+    {
+        $crawler = $this->client->request('GET', '/customer/login');
+        $form = $crawler->filter('form[name="thelia_customer_login"]')->form();
+
+        $form['thelia_customer_login[email]'] = (string) $this->member?->getEmail();
+        $form['thelia_customer_login[password]'] = self::GROUP_MEMBER_PASSWORD;
+        $form['thelia_customer_login[account]'] = '1';
+
+        $this->client->submit($form);
+        $this->client->request('GET', '/account');
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode(), 'The sign-in must go through, or the listing below proves nothing.');
     }
 
     /**

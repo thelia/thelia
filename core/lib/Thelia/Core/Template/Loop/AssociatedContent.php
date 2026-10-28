@@ -19,7 +19,10 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
+use Thelia\Domain\CMS\Publication\ContentFolderPublicationRule;
 use Thelia\Model\CategoryAssociatedContentQuery;
+use Thelia\Model\Map\CategoryAssociatedContentTableMap;
 use Thelia\Model\ProductAssociatedContentQuery;
 
 /**
@@ -38,6 +41,13 @@ class AssociatedContent extends Content
 {
     protected $contentId;
     protected $contentPosition;
+
+    public function __construct(
+        private readonly CategoryVisibility $categoryVisibility,
+        ?ContentFolderPublicationRule $folderPublicationRule = null,
+    ) {
+        parent::__construct($folderPublicationRule);
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -76,6 +86,12 @@ class AssociatedContent extends Content
             $search = CategoryAssociatedContentQuery::create();
 
             $search->filterByCategoryId($category, Criteria::EQUAL);
+
+            // The contents associated with a category closed to the customer's group are
+            // hidden with it on the front; the back office lists them all.
+            if (!$this->getBackendContext()) {
+                $this->categoryVisibility->applyTo($search, CategoryAssociatedContentTableMap::COL_CATEGORY_ID);
+            }
         }
 
         $excludeProduct = $this->getExcludeProduct();

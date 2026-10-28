@@ -16,13 +16,16 @@ namespace Thelia\Tests\Unit\Domain\Pricing;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Thelia\Domain\Customer\Service\CustomerGroupResolver;
+use Thelia\Domain\Pricing\CatalogActivity;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
-use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
+use Thelia\Tests\Support\Pricing\LoadedCustomerDiscountRate;
 
 final class EffectivePriceCatalogTest extends TestCase
 {
@@ -43,7 +46,7 @@ final class EffectivePriceCatalogTest extends TestCase
         $catalog = $this->catalogPricing([5 => 50.0], publicRule: false, namedRule: false, reservedSale: false);
 
         self::assertSame([], $catalog->warm([5], $this->currency(1), $this->customer(42)));
-        self::assertNull($catalog->priceFor(5, $this->currency(1), $this->customer(42)));
+        self::assertSame([], $catalog->warm([5], $this->currency(1), null));
         self::assertSame([], $this->resolutions);
     }
 
@@ -57,7 +60,7 @@ final class EffectivePriceCatalogTest extends TestCase
 
         self::assertSame([[[1, 3], 0, 1], [[2], 0, 1]], $this->resolutions);
         self::assertSame([1, 2], array_keys($prices));
-        self::assertSame(20.0, $catalog->priceFor(2, $currency, null)?->untaxedPromoPrice);
+        self::assertSame(20.0, $catalog->warm([2], $currency, null)[2]->untaxedPromoPrice);
         self::assertCount(2, $this->resolutions);
     }
 
@@ -109,9 +112,9 @@ final class EffectivePriceCatalogTest extends TestCase
     #[DataProvider('visitors')]
     public function testWhetherAnythingPricesForTheVisitor(bool $publicRule, bool $signedIn, bool $namedRule, bool $reservedSale, bool $expected): void
     {
-        $catalog = $this->catalogPricing([], $publicRule, $namedRule, $reservedSale);
+        $checker = $this->activityChecker($publicRule, $namedRule, $reservedSale);
 
-        self::assertSame($expected, $catalog->pricesAnythingFor($signedIn ? $this->customer(42) : null));
+        self::assertSame($expected, $checker->mayResolveEffectivePriceFor($signedIn ? $this->customer(42) : null));
     }
 
     /**
@@ -139,14 +142,15 @@ final class EffectivePriceCatalogTest extends TestCase
             },
         );
 
-        $activityChecker = $this->createStub(PricingActivityChecker::class);
-        $activityChecker->method('hasActivePublicRule')->willReturn($publicRule);
-        $activityChecker->method('hasActiveNamedRule')->willReturn($namedRule);
+        return new EffectivePriceCatalog($resolver, $this->activityChecker($publicRule, $namedRule, $reservedSale));
+    }
 
-        $saleAudienceChecker = $this->createStub(SaleAudienceChecker::class);
-        $saleAudienceChecker->method('hasActiveReservedSale')->willReturn($reservedSale);
+    private function activityChecker(bool $publicRule, bool $namedRule, bool $reservedSale): PricingActivityChecker
+    {
+        $probe = $this->createStub(CatalogActivityProbe::class);
+        $probe->method('read')->willReturn(new CatalogActivity($publicRule, $namedRule, $reservedSale, false, false, false, 1));
 
-        return new EffectivePriceCatalog($resolver, $activityChecker, $saleAudienceChecker);
+        return new PricingActivityChecker($probe, new LoadedCustomerDiscountRate(), new CustomerGroupResolver($probe));
     }
 
     private function currency(int $id): Currency

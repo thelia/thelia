@@ -30,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
@@ -78,6 +79,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         protected URL $urlManager,
         protected OrderStatusTransitionGuard $transitionGuard,
         protected PaymentCartContext $paymentCartContext,
+        protected CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
         protected ?StockDecrementer $stockDecrementer = null,
     ) {
     }
@@ -179,6 +181,13 @@ class Order extends BaseAction implements EventSubscriberInterface
         }
 
         $cart = $this->resolveCart($order, $session, $dispatcher);
+
+        // The lowest point every placement goes through, the front API and the theme
+        // included: the checkout guards refuse a module closed to the customer's group
+        // earlier, this holds for a caller that raises ORDER_PAY without them.
+        if (null !== $order->getPaymentModuleId()) {
+            $this->customerGroupPaymentPolicy->refuseUnlessAllowedForCart((int) $order->getPaymentModuleId(), $cart);
+        }
 
         $placedOrder = $this->orderFacade->createOrder(
             $dispatcher,

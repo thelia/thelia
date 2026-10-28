@@ -23,6 +23,7 @@ use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNotReleaseException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Exception\InactiveCouponException;
+use Thelia\Domain\Promotion\Coupon\Service\CartDiscountScope;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
@@ -114,6 +115,10 @@ class CouponFactory
      */
     private function cartBeingCheckedOut(): ?int
     {
+        if (null !== $scopedCart = CartDiscountScope::cart()) {
+            return $scopedCart->getId();
+        }
+
         $request = $this->container->get('request_stack')->getMainRequest();
 
         if (null === $request || !$request->hasSession()) {

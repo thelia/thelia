@@ -20,9 +20,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Domain\Promotion\Coupon\Service\CartDiscountScope;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -64,7 +66,16 @@ class BaseFacade implements FacadeInterface
      */
     public function getCart(): ?Cart
     {
-        return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
+        $scopedCart = CartDiscountScope::cart();
+
+        if (null !== $scopedCart) {
+            return $scopedCart;
+        }
+
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        return $session->getSessionCart($this->getDispatcher());
     }
 
     /**
@@ -74,10 +85,8 @@ class BaseFacade implements FacadeInterface
     {
         try {
             return AddressQuery::create()->findPk(
-                $this->getRequest()
-                    ->getSession()
-                    ->getSessionCart($this->eventDispatcher)
-                    ->getCartAddressRelatedByAddressDeliveryId()
+                $this->getCart()
+                    ?->getCartAddressRelatedByAddressDeliveryId()
                     ?->getAddressId()
             );
         } catch (\Exception $exception) {
@@ -90,6 +99,10 @@ class BaseFacade implements FacadeInterface
      */
     public function getCustomer(): ?Customer
     {
+        if (null !== CartDiscountScope::cart()) {
+            return CartDiscountScope::buyer();
+        }
+
         return $this->securityContext->getCustomerUser();
     }
 
@@ -98,6 +111,10 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutTotalPrice(): float
     {
+        if (null !== $scopedCart = CartDiscountScope::cart()) {
+            return $this->getCartTotalPrice() + (float) $scopedCart->getPostage();
+        }
+
         return $this->getRequest()->getSession()->getOrder()->getTotalAmount();
     }
 
@@ -106,6 +123,10 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutPostagePrice(): float
     {
+        if (null !== $scopedCart = CartDiscountScope::cart()) {
+            return (float) $scopedCart->getPostage();
+        }
+
         return (float) $this->getRequest()->getSession()->getOrder()->getPostage();
     }
 
@@ -122,7 +143,7 @@ class BaseFacade implements FacadeInterface
     {
         $total = 0;
 
-        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
+        $cartItems = $this->getCart()?->getCartItems() ?? [];
 
         foreach ($cartItems as $cartItem) {
             if (1 === (int) $cartItem->getIsOffered()) {
@@ -144,8 +165,8 @@ class BaseFacade implements FacadeInterface
      */
     public function getCartTotalTaxPrice(bool $withItemsInPromo = true): float
     {
-        $taxCountry = $this->taxEngine->getDeliveryCountry();
-        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [];
+        $taxCountry = $this->getDeliveryCountry();
+        $cartItems = $this->getCart()?->getCartItems() ?? [];
 
         $total = 0;
 
@@ -167,6 +188,14 @@ class BaseFacade implements FacadeInterface
      */
     public function getDeliveryCountry(): Country
     {
+        if (null !== $scopedCart = CartDiscountScope::cart()) {
+            // The country the cart ships to, else the one of the buyer, else the shop's: the order
+            // the tax engine follows for a session.
+            return $scopedCart->getCartAddressRelatedByAddressDeliveryId()?->getCountry()
+                ?? CartDiscountScope::buyer()?->getDefaultAddress()?->getCountry()
+                ?? Country::getDefaultCountry();
+        }
+
         return $this->taxEngine->getDeliveryCountry();
     }
 
@@ -175,7 +204,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutCurrency(): string
     {
-        return $this->getRequest()->getSession()->getCurrency()->getCode();
+        return $this->getMainCurrency()->getCode();
     }
 
     /**
@@ -189,7 +218,7 @@ class BaseFacade implements FacadeInterface
     {
         $count = 0;
 
-        foreach ($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())?->getCartItems() ?? [] as $cartItem) {
+        foreach ($this->getCart()?->getCartItems() ?? [] as $cartItem) {
             if (1 !== (int) $cartItem->getIsOffered()) {
                 ++$count;
             }
@@ -244,6 +273,10 @@ class BaseFacade implements FacadeInterface
      */
     public function getMainCurrency(): Currency
     {
+        if (null !== $scopedCart = CartDiscountScope::cart()) {
+            return $scopedCart->getCurrency() ?? Currency::getDefaultCurrency();
+        }
+
         return $this->getRequest()->getSession()->getCurrency();
     }
 

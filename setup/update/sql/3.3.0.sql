@@ -1843,4 +1843,336 @@ CREATE TABLE IF NOT EXISTS `webhook_delivery`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- Customer groups
+--
+-- A group carries a discount rate, how the prices are shown (with or without
+-- taxes), its own prices per sale element and currency, the payment modules
+-- and the categories it is restricted to. Every customer belongs to exactly
+-- one group, the default one until an administrator moves the account, and
+-- the group of the buyer is frozen on the order.
+--
+-- Replayable: each table is created only when missing, each column, index and
+-- foreign key is added only when missing, and the default group is seeded
+-- only while no group is the default.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `customer_group`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'stable machine name a deployment references a customer group by; read by the front through the customer group API, not meant as a label',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `is_default` TINYINT DEFAULT 0 NOT NULL COMMENT 'the group a new account and a visitor belong to; exactly one',
+    `discount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the discount rate of the group, as a percentage, applied before the discount of the customer',
+    `display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'whether the prices are shown with taxes (1) or without taxes (0) to the members of the group',
+    `restricts_categories` TINYINT DEFAULT 0 NOT NULL COMMENT '1 when the group may browse only the categories it lists (customer_group_category), an empty list included; 0 opens the whole catalog; set by the writer of the list alone, never by the deletion of a listed category',
+    `restricts_payment_modules` TINYINT DEFAULT 0 NOT NULL COMMENT '1 when the group may pay only with the modules it lists (customer_group_payment_module), an empty list included; 0 opens every module; set by the writer of the list alone, never by the deletion of a listed module',
+    `registration_token` VARCHAR(64) COMMENT 'secret token of the registration link of the group: a visitor who registers through it joins the group; NULL when the link is closed; never read by the front, never written by a client',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `customer_group_code_unique` (`code`),
+    UNIQUE INDEX `customer_group_registration_token_unique` (`registration_token`),
+    INDEX `idx_customer_group_is_default` (`is_default`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `customer_group_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `customer_group_i18n_fk_6a2a90`
+        FOREIGN KEY (`id`)
+        REFERENCES `customer_group` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- What a group pays for a sale element in a currency, when it does not pay the
+-- base price less its discount. A NULL price or promotional price means the
+-- group has no price of its own for it.
+CREATE TABLE IF NOT EXISTS `customer_group_product_price`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_group_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) COMMENT 'the price without taxes the group pays, NULL when the group has no price of its own',
+    `promo_price` DECIMAL(16,6) COMMENT 'the promotional price without taxes the group pays, NULL when the group has no promotional price of its own',
+    `from_default_currency` TINYINT DEFAULT 0 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `customer_group_product_price_unique` (`customer_group_id`, `product_sale_elements_id`, `currency_id`),
+    INDEX `idx_customer_group_product_price_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_customer_group_product_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_customer_group_product_price_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_product_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The payment modules and the categories a group is restricted to. The list is
+-- read only when the group says it is restricted (customer_group.restricts_*):
+-- then the rows are the only ones open, and none when the list is empty, which
+-- is what deleting the one category or module listed leaves.
+CREATE TABLE IF NOT EXISTS `customer_group_payment_module`
+(
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a payment module the customer group may pay with, read only when customer_group.restricts_payment_modules is 1: then the modules listed are the only ones, and none when the list is empty',
+    `module_id` INTEGER NOT NULL,
+    PRIMARY KEY (`customer_group_id`,`module_id`),
+    INDEX `idx_customer_group_payment_module_module_id` (`module_id`),
+    CONSTRAINT `fk_customer_group_payment_module_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_payment_module_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `customer_group_category`
+(
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a category the customer group may browse, read only when customer_group.restricts_categories is 1: then the categories listed are the only ones open, and none when the list is empty',
+    `category_id` INTEGER NOT NULL,
+    PRIMARY KEY (`customer_group_id`,`category_id`),
+    INDEX `idx_customer_group_category_category_id` (`category_id`),
+    CONSTRAINT `fk_customer_group_category_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_category_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- The groups a sale, and a catalog price rule, are reserved for when their
+-- audience mode is the customer groups one (2).
+CREATE TABLE IF NOT EXISTS `sale_customer_group`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_id` INTEGER NOT NULL,
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a customer group the operation is reserved for, read when audience_mode is 2',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_sale_customer_group_sales_id_group_id` (`sale_id`, `customer_group_id`),
+    INDEX `fk_sale_customer_group_group_idx` (`customer_group_id`),
+    CONSTRAINT `fk_sale_customer_group_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_customer_group_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `catalog_price_rule_customer_group`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `catalog_price_rule_id` INTEGER NOT NULL,
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a customer group the rule prices for, read when audience_mode is 2',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_catalog_price_rule_customer_group_rule_id_group_id` (`catalog_price_rule_id`, `customer_group_id`),
+    INDEX `fk_catalog_price_rule_customer_group_group_idx` (`customer_group_id`),
+    CONSTRAINT `fk_catalog_price_rule_customer_group_rule_id`
+        FOREIGN KEY (`catalog_price_rule_id`)
+        REFERENCES `catalog_price_rule` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_price_rule_customer_group_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- Whether a group is restricted. A group that lists categories or payment modules
+-- on a database that already has the lists is restricted to them: the flag is
+-- derived from the lists once, when the column is added, and never again, so that
+-- a replay does not reopen a group whose list was emptied by the deletion of the
+-- category or the module it listed.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_group' AND `COLUMN_NAME` = 'restricts_categories');
+SET @statement := IF(@add_column, CONCAT('ALTER TABLE `customer_group` ADD COLUMN `restricts_categories` TINYINT DEFAULT 0 NOT NULL COMMENT ', QUOTE('1 when the group may browse only the categories it lists (customer_group_category), an empty list included; 0 opens the whole catalog; set by the writer of the list alone, never by the deletion of a listed category'), ' AFTER `display_taxed_price`'), 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+UPDATE `customer_group` SET `restricts_categories` = EXISTS (SELECT 1 FROM `customer_group_category` WHERE `customer_group_category`.`customer_group_id` = `customer_group`.`id`) WHERE @add_column;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_group' AND `COLUMN_NAME` = 'restricts_payment_modules');
+SET @statement := IF(@add_column, CONCAT('ALTER TABLE `customer_group` ADD COLUMN `restricts_payment_modules` TINYINT DEFAULT 0 NOT NULL COMMENT ', QUOTE('1 when the group may pay only with the modules it lists (customer_group_payment_module), an empty list included; 0 opens every module; set by the writer of the list alone, never by the deletion of a listed module'), ' AFTER `restricts_categories`'), 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+UPDATE `customer_group` SET `restricts_payment_modules` = EXISTS (SELECT 1 FROM `customer_group_payment_module` WHERE `customer_group_payment_module`.`customer_group_id` = `customer_group`.`id`) WHERE @add_column;
+
+-- The registration link of a group. A database that has the table without the column
+-- gets both the column and its unique index; a replay finds them and does nothing.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_group' AND `COLUMN_NAME` = 'registration_token');
+SET @statement := IF(@add_column, CONCAT('ALTER TABLE `customer_group` ADD COLUMN `registration_token` VARCHAR(64) NULL COMMENT ', QUOTE('secret token of the registration link of the group: a visitor who registers through it joins the group; NULL when the link is closed; never read by the front, never written by a client'), ' AFTER `restricts_payment_modules`'), 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_group' AND `INDEX_NAME` = 'customer_group_registration_token_unique');
+SET @statement := IF(@add_index, 'ALTER TABLE `customer_group` ADD UNIQUE INDEX `customer_group_registration_token_unique` (`registration_token`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+-- The default group, which every existing customer joins below. Seeded before
+-- the customer column exists, and only while no group is the default.
+INSERT IGNORE INTO `customer_group` (`code`, `position`, `is_default`, `discount`, `display_taxed_price`, `created_at`, `updated_at`)
+    SELECT 'default', 1, 1, 0.000000, 1, NOW(), NOW() FROM DUAL
+    WHERE NOT EXISTS (SELECT 1 FROM `customer_group` WHERE `is_default` = 1);
+
+-- One row per language the fresh install seeds, so the back office falls back
+-- on the default language instead of showing a group with no name.
+SET @default_customer_group_id := (SELECT `id` FROM `customer_group` WHERE `is_default` = 1 ORDER BY `id` LIMIT 1);
+
+INSERT IGNORE INTO `customer_group_i18n` (`id`, `locale`, `title`, `description`) VALUES
+    (@default_customer_group_id, 'cs_CZ', NULL, NULL),
+    (@default_customer_group_id, 'de_DE', 'Standard-Kundengruppe', NULL),
+    (@default_customer_group_id, 'en_US', 'Default customer group', NULL),
+    (@default_customer_group_id, 'es_ES', 'Grupo de clientes por defecto', NULL),
+    (@default_customer_group_id, 'fr_FR', 'Groupe de clients par défaut', NULL),
+    (@default_customer_group_id, 'it_IT', 'Gruppo di clienti predefinito', NULL),
+    (@default_customer_group_id, 'nl_NL', 'Standaard klantgroep', NULL),
+    (@default_customer_group_id, 'ru_RU', 'Группа клиентов по умолчанию', NULL);
+
+-- The group of a customer. NOT NULL, so it goes in three steps: the column
+-- nullable, every existing customer put in the default group, then the column
+-- made required. `customer` is versionable: the column is mirrored on
+-- `customer_version`, whose rows go through the same three steps.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer' AND `COLUMN_NAME` = 'customer_group_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `customer` ADD COLUMN `customer_group_id` INTEGER NULL COMMENT ''the customer group the account belongs to, the default group until an administrator moves it'' AFTER `is_guest`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+UPDATE `customer` SET `customer_group_id` = @default_customer_group_id WHERE `customer_group_id` IS NULL;
+
+SET @make_required := (SELECT COUNT(*) > 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer' AND `COLUMN_NAME` = 'customer_group_id' AND `IS_NULLABLE` = 'YES');
+SET @statement := IF(@make_required, 'ALTER TABLE `customer` MODIFY `customer_group_id` INTEGER NOT NULL COMMENT ''the customer group the account belongs to, the default group until an administrator moves it''', 'DO 0');
+PREPARE make_required_statement FROM @statement;
+EXECUTE make_required_statement;
+DEALLOCATE PREPARE make_required_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer' AND `INDEX_NAME` = 'idx_customer_customer_group_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `customer` ADD INDEX `idx_customer_customer_group_id` (`customer_group_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer' AND `CONSTRAINT_NAME` = 'fk_customer_customer_group_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `customer` ADD CONSTRAINT `fk_customer_customer_group_id` FOREIGN KEY (`customer_group_id`) REFERENCES `customer_group` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_version' AND `COLUMN_NAME` = 'customer_group_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `customer_version` ADD COLUMN `customer_group_id` INTEGER NULL COMMENT ''the customer group the account belongs to, the default group until an administrator moves it'' AFTER `is_guest`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+UPDATE `customer_version` SET `customer_group_id` = @default_customer_group_id WHERE `customer_group_id` IS NULL;
+
+SET @make_required := (SELECT COUNT(*) > 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'customer_version' AND `COLUMN_NAME` = 'customer_group_id' AND `IS_NULLABLE` = 'YES');
+SET @statement := IF(@make_required, 'ALTER TABLE `customer_version` MODIFY `customer_group_id` INTEGER NOT NULL COMMENT ''the customer group the account belongs to, the default group until an administrator moves it''', 'DO 0');
+PREPARE make_required_statement FROM @statement;
+EXECUTE make_required_statement;
+DEALLOCATE PREPARE make_required_statement;
+
+-- The group the buyer belonged to, and the discount rate it gave, frozen on the
+-- order like the customer discount rate beside it. NULL group for an order that
+-- predates the groups, so an existing shop is untouched. `order` is versionable:
+-- the columns are mirrored on `order_version`.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'customer_group_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `customer_group_id` INTEGER NULL DEFAULT NULL COMMENT ''the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted'' AFTER `sale_unit_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'customer_group_discount_rate');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `customer_group_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT ''the customer group discount rate, as a percentage, already included in the order products prices'' AFTER `customer_group_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'customer_group_display_taxed_price');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT ''the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices'' AFTER `customer_group_discount_rate`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'fi_order_customer_group_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD INDEX `fi_order_customer_group_id` (`customer_group_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `CONSTRAINT_NAME` = 'fk_order_customer_group_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `order` ADD CONSTRAINT `fk_order_customer_group_id` FOREIGN KEY (`customer_group_id`) REFERENCES `customer_group` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'customer_group_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `customer_group_id` INTEGER NULL DEFAULT NULL COMMENT ''the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted'' AFTER `sale_unit_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'customer_group_discount_rate');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `customer_group_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT ''the customer group discount rate, as a percentage, already included in the order products prices'' AFTER `customer_group_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'customer_group_display_taxed_price');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT ''the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices'' AFTER `customer_group_discount_rate`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.customer.group', NOW(), NOW());
+
+-- One row per language the fresh install seeds, so the profile screen falls
+-- back on the default language instead of showing no row at all.
+SET @customer_group_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.customer.group');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@customer_group_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@customer_group_resource_id, 'de_DE', 'Kundengruppen', NULL, NULL, NULL),
+    (@customer_group_resource_id, 'en_US', 'Customer groups', NULL, NULL, NULL),
+    (@customer_group_resource_id, 'es_ES', 'Grupos de clientes', NULL, NULL, NULL),
+    (@customer_group_resource_id, 'fr_FR', 'Groupes de clients', NULL, NULL, NULL),
+    (@customer_group_resource_id, 'it_IT', 'Gruppi di clienti', NULL, NULL, NULL),
+    (@customer_group_resource_id, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
+    (@customer_group_resource_id, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

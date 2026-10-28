@@ -17,6 +17,7 @@ namespace Thelia\Api\Bridge\Propel\Extension;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Api\Security\CartOwnership;
 use Thelia\Model\CartItemQuery;
@@ -57,7 +58,7 @@ final readonly class CartItemOwnershipExtension implements QueryCollectionExtens
             return;
         }
 
-        if (!str_starts_with((string) $operation?->getUriTemplate(), '/front/')) {
+        if (!FrontOperation::isFront($operation)) {
             return;
         }
 

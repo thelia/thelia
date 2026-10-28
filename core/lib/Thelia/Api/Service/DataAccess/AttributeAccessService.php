@@ -16,6 +16,7 @@ namespace Thelia\Api\Service\DataAccess;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,9 +34,11 @@ use Thelia\Domain\Promotion\Coupon\Type\BuyXGetY;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Domain\Taxation\Service\VatExemptionResolver;
+use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Base\BrandQuery;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ContentQuery;
@@ -44,6 +47,11 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Product;
+use Thelia\Model\ProductI18n;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -51,6 +59,8 @@ use Thelia\Tools\DateTimeFormat;
 
 class AttributeAccessService
 {
+    use TaxCalculatorResolverTrait;
+
     /**
      * The object each attr() family resolves to, held for the duration of one request: a page
      * asks for a dozen attributes of the same object and every one of them would replay the
@@ -454,25 +464,59 @@ class AttributeAccessService
     }
 
     /**
-     * The cart lines with what no column carries: `offered_taxed_discount`, the
-     * taxed discount THIS line carries when a promotion offered it, 0.0 for any
-     * other line. It is what lets a cart page strike the gift's own price
-     * instead of showing one anonymous total.
+     * The cart lines with what no column carries, so that a theme prints a line without
+     * working a figure out of two others, in the display the buyer is shown:
      *
-     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float}>
+     * - `offered_taxed_discount` and `offered_discount`, the taxed and the untaxed discount THIS
+     *   line carries when a promotion offered it, 0.0 for any other line: what lets a cart page
+     *   strike the gift's own price instead of showing one anonymous total. Raw, as the
+     *   promotion grants it;
+     * - `offered_effective_taxed` and `offered_effective_untaxed`, the same discount bounded by
+     *   what the line is worth: a promotion configured to take off more than the line takes the
+     *   line, and the buyer is never shown a negative price;
+     * - `line_total_taxed` and `line_total_untaxed`, what the line is worth for its whole
+     *   quantity, at the price it is charged (the promotional one when it is on promotion);
+     * - `line_total_after_discount_taxed` and `line_total_after_discount_untaxed`, the same
+     *   once `offered_effective_*` is taken off: what the buyer pays for the line.
+     *
+     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float, offered_discount: float, offered_effective_taxed: float, offered_effective_untaxed: float, line_total_taxed: float, line_total_untaxed: float, line_total_after_discount_taxed: float, line_total_after_discount_untaxed: float}>
      */
     private function cartItems(Cart $cart, Country $taxCountry, ?State $taxState): array
     {
-        $offeredDiscounts = $this->offeredTaxedDiscounts($cart, $taxCountry, $taxState);
+        $offeredDiscounts = $this->offeredDiscounts($cart, $taxCountry, $taxState);
+
+        $cartItems = $cart->getCartItems();
+        $this->preloadProductsOf($cartItems);
+
+        // One calculator for the whole cart, as Cart::getTaxedAmount() does: the line neither
+        // reads its cart again nor resolves a calculator of its own.
+        $cartTaxCalculator = $this->createCartTaxCalculator($cart);
 
         $items = [];
 
-        foreach ($cart->getCartItems() as $cartItem) {
+        foreach ($cartItems as $cartItem) {
+            $offeredTaxedDiscount = $offeredDiscounts[(int) $cartItem->getId()]['taxed'] ?? 0.0;
+            $offeredUntaxedDiscount = $offeredDiscounts[(int) $cartItem->getId()]['untaxed'] ?? 0.0;
+
+            $lineTotalTaxed = round($cartItem->getTotalRealTaxedPrice($taxCountry, $taxState, $cartTaxCalculator), 2);
+            $lineTotalUntaxed = round($cartItem->getTotalRealPrice(), 2);
+
+            // A discount worth more than the line is a discount worth the line.
+            $effectiveTaxedDiscount = min(max($offeredTaxedDiscount, 0.0), $lineTotalTaxed);
+            $effectiveUntaxedDiscount = min(max($offeredUntaxedDiscount, 0.0), $lineTotalUntaxed);
+
             $items[] = [
                 'id' => (int) $cartItem->getId(),
                 'product_id' => (int) $cartItem->getProductId(),
                 'is_offered' => (int) $cartItem->getIsOffered(),
-                'offered_taxed_discount' => $offeredDiscounts[(int) $cartItem->getId()] ?? 0.0,
+                'offered_taxed_discount' => $offeredTaxedDiscount,
+                'offered_discount' => $offeredUntaxedDiscount,
+                'offered_effective_taxed' => $effectiveTaxedDiscount,
+                'offered_effective_untaxed' => $effectiveUntaxedDiscount,
+                'line_total_taxed' => $lineTotalTaxed,
+                'line_total_untaxed' => $lineTotalUntaxed,
+                'line_total_after_discount_taxed' => round($lineTotalTaxed - $effectiveTaxedDiscount, 2),
+                'line_total_after_discount_untaxed' => round($lineTotalUntaxed - $effectiveUntaxedDiscount, 2),
             ];
         }
 
@@ -480,15 +524,103 @@ class AttributeAccessService
     }
 
     /**
-     * The taxed discount each OFFERED cart line carries, keyed by cart item id,
-     * prorated by the same factor as the 'discounts' attribute: what the owning
-     * promotion grants on that very line, scaled onto the stored cart discount.
-     * A cart item missing from the map carries no offered discount (0.0) — a
-     * regular line, or an offered line whose promotion prices nothing.
+     * Hands each line its product, tax rule and title included, read for all the lines at once:
+     * left to itself a line reads its product, then its title, one line after the other.
      *
-     * @return array<int, float>
+     * @param iterable<CartItem> $cartItems
      */
-    private function offeredTaxedDiscounts(Cart $cart, Country $taxCountry, ?State $taxState): array
+    private function preloadProductsOf(iterable $cartItems): void
+    {
+        $productIds = [];
+
+        foreach ($cartItems as $cartItem) {
+            $productIds[(int) $cartItem->getProductId()] = (int) $cartItem->getProductId();
+        }
+
+        if ([] === $productIds) {
+            return;
+        }
+
+        // A product already held by the instance pool is the one every other read of the request
+        // shares: it is taken as it is, its tax rule and its title come from the pool too, and
+        // reading it again would cost a query the pool exists to save (and seed a second copy of
+        // its translation). Only the others are read, all in one query.
+        $products = [];
+        $unpooledIds = [];
+
+        foreach ($productIds as $productId) {
+            $pooled = ProductTableMap::getInstanceFromPool((string) $productId);
+
+            if ($pooled instanceof Product) {
+                $products[$productId] = $pooled;
+
+                continue;
+            }
+
+            $unpooledIds[] = $productId;
+        }
+
+        if ([] !== $unpooledIds) {
+            // LEFT, as a product with no tax rule must still be handed over, not dropped.
+            /** @var ObjectCollection $fetchedProducts */
+            $fetchedProducts = ProductQuery::create()
+                ->joinWithTaxRule(Criteria::LEFT_JOIN)
+                ->filterById($unpooledIds, Criteria::IN)
+                ->find();
+            $fetched = $fetchedProducts->getArrayCopy('Id');
+
+            $this->seedTitles($fetched);
+            $products += $fetched;
+        }
+
+        foreach ($cartItems as $cartItem) {
+            $product = $products[(int) $cartItem->getProductId()] ?? null;
+
+            if ($product instanceof Product) {
+                $cartItem->setProduct($product);
+            }
+        }
+    }
+
+    /**
+     * Seeds on each product the title in the locale CartItem::getProduct() reads it in, for all
+     * of them at once: a product asked for its title otherwise reads it on its own. A product
+     * with no row in that locale is seeded with an empty, unsaved one, as Propel's own
+     * getTranslation() would attach it, or it would still go and look for it.
+     *
+     * @param array<int, Product> $products freshly read, not yet holding any translation
+     */
+    private function seedTitles(array $products): void
+    {
+        $locale = Lang::getDefaultLanguage()->getLocale();
+        $untitledProductIds = array_keys($products);
+
+        $titles = ProductI18nQuery::create()
+            ->filterById($untitledProductIds, Criteria::IN)
+            ->filterByLocale($locale)
+            ->find();
+
+        foreach ($titles as $title) {
+            $products[$title->getId()]->addProductI18n($title);
+            unset($untitledProductIds[array_search($title->getId(), $untitledProductIds, true)]);
+        }
+
+        foreach ($untitledProductIds as $untitledProductId) {
+            $products[$untitledProductId]->addProductI18n((new ProductI18n())->setLocale($locale));
+        }
+    }
+
+    /**
+     * The discount each OFFERED cart line carries, taxed and untaxed, keyed by
+     * cart item id, prorated by the same factor as the 'discounts' attribute:
+     * what the owning promotion grants on that very line, scaled onto the
+     * stored cart discount. A cart item missing from the map carries no
+     * offered discount (0.0) — a regular line, or an offered line whose
+     * promotion prices nothing.
+     *
+     * @return array<int, array{taxed: float, untaxed: float}>
+     */
+    private function offeredDiscounts(Cart $cart, Country $taxCountry, ?State $taxState): array
     {
         $storedTaxedDiscount = round($cart->getCalculatedDiscount(true, $taxCountry, $taxState), 2);
 
@@ -522,16 +654,21 @@ class AttributeAccessService
                 continue;
             }
 
-            $rawLineDiscount = 0.0;
+            $rawTaxedDiscount = 0.0;
+            $rawUntaxedDiscount = 0.0;
 
             foreach ($couponsKept as $coupon) {
                 if ($coupon instanceof BuyXGetY) {
-                    $rawLineDiscount += $coupon->taxedDiscountOnOfferedLine($cartItem);
+                    $rawTaxedDiscount += $coupon->taxedDiscountOnOfferedLine($cartItem);
+                    $rawUntaxedDiscount += $coupon->untaxedDiscountOnOfferedLine($cartItem);
                 }
             }
 
-            if ($rawLineDiscount > 0.0) {
-                $map[(int) $cartItem->getId()] = round($rawLineDiscount * $factor, 2);
+            if ($rawTaxedDiscount > 0.0) {
+                $map[(int) $cartItem->getId()] = [
+                    'taxed' => round($rawTaxedDiscount * $factor, 2),
+                    'untaxed' => round($rawUntaxedDiscount * $factor, 2),
+                ];
             }
         }
 

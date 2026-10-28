@@ -437,7 +437,7 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         );
     }
 
-    public function testAddingAProductNoGroupHoldsCostsOneQueryWhileAnotherGroupIsActive(): void
+    public function testAddingAProductNoGroupHoldsCostsTwoQueriesWhileAnotherGroupIsActive(): void
     {
         $this->group('absinthe', DestinationRestriction::MODE_DENY, [$this->refused], [$this->product('Absinthe')]);
         $plain = $this->product('Plain chair');
@@ -446,11 +446,33 @@ final class DestinationRestrictionTest extends IntegrationTestCase
         $cart = CartQuery::create()->findPk($this->cartOf($customer, [])->getId());
         self::assertNotNull($cart);
         $this->checker()->hasActiveGroup();
-        $event = (new CartEvent($cart))->setProductId((int) $plain->getId());
+        $event = (new CartEvent($cart))
+            ->setProductId((int) $plain->getId())
+            ->setProductSaleElementsId((int) $plain->getDefaultSaleElements()->getId());
 
         $statements = $this->recordSqlQueries(fn () => $this->getService(CartAdditionDestinationGuard::class)->refuseARestrictedProduct($event));
 
-        self::assertCount(1, $statements, implode("\n", $statements));
+        // The product of the sale element, then the groups that hold it.
+        self::assertCount(2, $statements, implode("\n", $statements));
+    }
+
+    public function testTheProductIsTheOneOfTheSaleElementAndNotTheOneTheRequestNames(): void
+    {
+        // A forged addition: the id of a product no group holds, the sale element of one a group
+        // refuses for the address of the cart. The line is written for the sale element.
+        $absinthe = $this->product('Absinthe');
+        $this->group('absinthe', DestinationRestriction::MODE_DENY, [$this->refused], [$absinthe], 'Absinthe ban');
+        $plain = $this->product('Plain chair');
+        $cart = $this->cartOf($this->customerLivingIn($this->refused), []);
+
+        try {
+            $this->getService(CartFacade::class)->addItem(new CartItemAddDTO($cart, (int) $plain->getId(), (int) $absinthe->getDefaultSaleElements()->getId()));
+            self::fail('The product of the sale element does not ship where the customer lives.');
+        } catch (InvalidCartException $refusal) {
+            self::assertStringContainsString('Absinthe (Absinthe ban)', $refusal->getMessage());
+        }
+
+        self::assertSame(0, $cart->countCartItems(null, true));
     }
 
     /**

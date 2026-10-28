@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Localization\VisitorCountry\VisitorCountryMode;
-use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Model\ConfigQuery;
 
 final readonly class SharedCachePolicy
@@ -75,7 +75,7 @@ final readonly class SharedCachePolicy
      * @param iterable<SharedCacheContributorInterface> $contributors        the modules that add views of their own to {@see self::SHAREABLE_VIEWS}
      */
     public function __construct(
-        private PricingActivityChecker $pricingActivityChecker,
+        private CatalogActivityProbe $catalogActivityProbe,
         private SharedCacheKeyCollector $keyCollector,
         #[Autowire(param: 'thelia.shared_cache.never_shared_prefixes')]
         private array $neverSharedPrefixes = self::SENSITIVE_PREFIXES,
@@ -137,7 +137,7 @@ final readonly class SharedCachePolicy
             return false;
         }
 
-        return !$this->pricingActivityChecker->hasVisitorDependentPricing();
+        return !$this->anonymousPricesMayVary();
     }
 
     public static function ttl(): int
@@ -145,6 +145,21 @@ final readonly class SharedCachePolicy
         $ttl = (int) ConfigQuery::read(self::TTL_CONFIG_KEY, (string) self::DEFAULT_TTL);
 
         return $ttl < 1 || $ttl > self::MAX_TTL ? self::DEFAULT_TTL : $ttl;
+    }
+
+    /**
+     * A request with no cookie and no token is a visitor with no account, who belongs to
+     * the default customer group whatever the page: the page that was built for them is
+     * the page of every other such visitor, and a customer group that has prices or a
+     * discount of its own changes nothing to it. A page is kept apart only where the
+     * rules and the operations reserved for named customers or groups are running, as
+     * before the groups existed.
+     */
+    private function anonymousPricesMayVary(): bool
+    {
+        $activity = $this->catalogActivityProbe->read();
+
+        return $activity->hasActiveNamedRule || $activity->hasActiveReservedSale;
     }
 
     private function isSensitivePath(string $path): bool

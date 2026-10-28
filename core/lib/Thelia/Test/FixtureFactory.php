@@ -16,6 +16,7 @@ namespace Thelia\Test;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Domain\Customer\Service\CustomerGroupRegistration;
 use Thelia\Domain\Media\Video\VideoProvider;
 use Thelia\Domain\Taxation\TaxEngine\TaxType\PricePercentTaxType;
 use Thelia\Model\Accessory;
@@ -32,6 +33,7 @@ use Thelia\Model\CartItem;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\CatalogPriceRuleCriterion;
 use Thelia\Model\CatalogPriceRuleCustomer;
+use Thelia\Model\CatalogPriceRuleCustomerGroup;
 use Thelia\Model\CatalogPriceRuleEffectCurrency;
 use Thelia\Model\Category;
 use Thelia\Model\Content;
@@ -41,6 +43,10 @@ use Thelia\Model\Coupon;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerGroup;
+use Thelia\Model\CustomerGroupCategory;
+use Thelia\Model\CustomerGroupPaymentModule;
+use Thelia\Model\CustomerGroupProductPrice;
 use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\Feature;
@@ -49,6 +55,7 @@ use Thelia\Model\FeatureProduct;
 use Thelia\Model\Folder;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
@@ -70,6 +77,7 @@ use Thelia\Model\Resource;
 use Thelia\Model\ResourceQuery;
 use Thelia\Model\Sale;
 use Thelia\Model\SaleCustomer;
+use Thelia\Model\SaleCustomerGroup;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleUnit;
@@ -81,6 +89,7 @@ use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\Template;
+use Thelia\Module\BaseModule;
 
 /**
  * Creates test entities with sensible defaults.
@@ -319,6 +328,10 @@ final class FixtureFactory
         return $type;
     }
 
+    /**
+     * @param array<string, mixed> $overrides firstname, lastname, email, password, and customerGroup (a CustomerGroup,
+     *                                        the default group when absent)
+     */
     public function customer(
         CustomerTitle $title,
         array $overrides = [],
@@ -327,6 +340,11 @@ final class FixtureFactory
 
         $customer = new Customer();
         $customer->setTitleId($title->getId());
+
+        if (($overrides['customerGroup'] ?? null) instanceof CustomerGroup) {
+            $customer->setCustomerGroupId($overrides['customerGroup']->getId());
+        }
+
         $customer->setFirstname($overrides['firstname'] ?? 'John');
         $customer->setLastname($overrides['lastname'] ?? 'Doe');
         $customer->setEmail($overrides['email'] ?? 'customer-'.$n.'@test.com');
@@ -334,6 +352,114 @@ final class FixtureFactory
         $customer->save($this->connection);
 
         return $customer;
+    }
+
+    /**
+     * A customer group, with the payment modules and the categories it is restricted to: a
+     * non-empty list flags the group restricted, as the writer of the lists does.
+     *
+     * The default group is the one the install seeds: ask for another one by leaving
+     * $isDefault false, or make this one the default, which releases the seeded one.
+     *
+     * @param float     $discount         the group discount rate, as a percentage
+     * @param list<int> $paymentModuleIds modules the group is restricted to
+     * @param list<int> $categoryIds      categories the group is allowed to see
+     * @param bool      $openRegistration whether the registration link of the group is open: its token is on the returned group
+     */
+    public function customerGroup(
+        ?string $code = null,
+        float $discount = 0.0,
+        bool $displayTaxedPrice = true,
+        bool $isDefault = false,
+        ?string $title = null,
+        array $paymentModuleIds = [],
+        array $categoryIds = [],
+        bool $openRegistration = false,
+    ): CustomerGroup {
+        $n = $this->next();
+
+        $group = new CustomerGroup();
+        $group->setCode($code ?? 'group-'.$n);
+        $group->setPosition($n);
+        $group->setIsDefault($isDefault ? 1 : 0);
+        $group->setDiscount((string) $discount);
+        $group->setDisplayTaxedPrice($displayTaxedPrice ? 1 : 0);
+        $group->setRestrictsCategories([] !== $categoryIds ? 1 : 0);
+        $group->setRestrictsPaymentModules([] !== $paymentModuleIds ? 1 : 0);
+        $group->setRegistrationToken($openRegistration && !$isDefault ? bin2hex(random_bytes(CustomerGroupRegistration::TOKEN_LENGTH / 2)) : null);
+        $group->setLocale('en_US');
+        $group->setTitle($title ?? 'Group '.$n);
+        $group->save($this->connection);
+
+        foreach ($paymentModuleIds as $moduleId) {
+            $link = new CustomerGroupPaymentModule();
+            $link->setCustomerGroupId($group->getId());
+            $link->setModuleId($moduleId);
+            $link->save($this->connection);
+        }
+
+        foreach ($categoryIds as $categoryId) {
+            $link = new CustomerGroupCategory();
+            $link->setCustomerGroupId($group->getId());
+            $link->setCategoryId($categoryId);
+            $link->save($this->connection);
+        }
+
+        return $group;
+    }
+
+    /**
+     * An active payment module that is only a row: it has no class to load, so it can be
+     * listed by a customer group and deleted again.
+     */
+    public function paymentModule(?string $code = null): Module
+    {
+        $n = $this->next();
+
+        $module = (new Module())
+            ->setCode($code ?? 'FixturePayment'.$n)
+            ->setFullNamespace('Fixture\\Payment'.$n.'\\Payment'.$n)
+            ->setVersion('1.0.0')
+            ->setType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->setCategory('payment')
+            ->setActivate(BaseModule::IS_ACTIVATED);
+        $module->save($this->connection);
+
+        return $module;
+    }
+
+    /**
+     * Moves an existing customer to a group.
+     */
+    public function assignCustomerGroup(Customer $customer, CustomerGroup $group): Customer
+    {
+        $customer->setCustomerGroupId($group->getId());
+        $customer->save($this->connection);
+
+        return $customer;
+    }
+
+    /**
+     * What a group pays for a sale element in a currency. A null price or promo price
+     * means the group has no price of its own for it.
+     */
+    public function customerGroupProductPrice(
+        CustomerGroup $group,
+        ProductSaleElements $productSaleElements,
+        Currency $currency,
+        ?float $price = null,
+        ?float $promoPrice = null,
+    ): CustomerGroupProductPrice {
+        $groupPrice = new CustomerGroupProductPrice();
+        $groupPrice->setCustomerGroupId($group->getId());
+        $groupPrice->setProductSaleElementsId($productSaleElements->getId());
+        $groupPrice->setCurrencyId($currency->getId());
+        $groupPrice->setPrice(null === $price ? null : (string) $price);
+        $groupPrice->setPromoPrice(null === $promoPrice ? null : (string) $promoPrice);
+        $groupPrice->setFromDefaultCurrency(0);
+        $groupPrice->save($this->connection);
+
+        return $groupPrice;
     }
 
     /**
@@ -889,6 +1015,20 @@ final class FixtureFactory
     }
 
     /**
+     * Names a customer group a reserved operation is open to. Only read when the
+     * operation's audience mode is Sale::AUDIENCE_MODE_CUSTOMER_GROUPS.
+     */
+    public function saleCustomerGroup(Sale $sale, CustomerGroup $group): SaleCustomerGroup
+    {
+        $saleCustomerGroup = new SaleCustomerGroup();
+        $saleCustomerGroup->setSaleId($sale->getId());
+        $saleCustomerGroup->setCustomerGroupId($group->getId());
+        $saleCustomerGroup->save($this->connection);
+
+        return $saleCustomerGroup;
+    }
+
+    /**
      * The discount the operation gives in one currency: an amount or a percentage,
      * depending on the operation's own price offset type.
      */
@@ -1189,6 +1329,20 @@ final class FixtureFactory
         $ruleCustomer->save($this->connection);
 
         return $ruleCustomer;
+    }
+
+    /**
+     * Names a customer group a reserved rule prices for. Only read when the rule's
+     * audience mode is CatalogPriceRule::AUDIENCE_MODE_CUSTOMER_GROUPS.
+     */
+    public function catalogPriceRuleCustomerGroup(CatalogPriceRule $rule, CustomerGroup $group): CatalogPriceRuleCustomerGroup
+    {
+        $ruleCustomerGroup = new CatalogPriceRuleCustomerGroup();
+        $ruleCustomerGroup->setCatalogPriceRuleId($rule->getId());
+        $ruleCustomerGroup->setCustomerGroupId($group->getId());
+        $ruleCustomerGroup->save($this->connection);
+
+        return $ruleCustomerGroup;
     }
 
     /**

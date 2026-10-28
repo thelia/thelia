@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderPaymentPartEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
+use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\Service\OrderHistoryRecorder;
@@ -77,6 +79,7 @@ final readonly class OrderPaymentPartSettlement
         private ContainerInterface $container,
         private EventDispatcherInterface $dispatcher,
         private OrderHistoryRecorder $orderHistoryRecorder,
+        private CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
     ) {
     }
 
@@ -116,6 +119,8 @@ final readonly class OrderPaymentPartSettlement
         if (!$this->hasParts($order)) {
             return;
         }
+
+        $this->refuseAPartOfAModuleTheCustomerIsShutOutOf($order);
 
         $connection = Propel::getWriteConnection(OrderPaymentPartTableMap::DATABASE_NAME);
         $connection->beginTransaction();
@@ -169,6 +174,27 @@ final readonly class OrderPaymentPartSettlement
 
         foreach ($settled as $part) {
             $this->dispatcher->dispatch(new OrderPaymentPartEvent($part), TheliaEvents::ORDER_PAYMENT_PART_SETTLE);
+        }
+    }
+
+    /**
+     * Before the transaction, like hasParts(): a part is written once, with the order, so
+     * its module does not change under us, and the policy reads its own table, which the
+     * locks of the settlement are not about. Nothing is settled for an order one of whose
+     * pending instant parts belongs to a module the group of its customer was shut out of
+     * since the order was placed (or whose part was written with the order by another path
+     * than the composer): all or none, like the settlement itself.
+     *
+     * @throws InvalidPaymentException
+     */
+    private function refuseAPartOfAModuleTheCustomerIsShutOutOf(Order $order): void
+    {
+        $customer = $order->getCustomer();
+
+        foreach ($this->partsOf($order) as $part) {
+            if (OrderPaymentPartState::PENDING->value === $part->getState() && $this->isInstant($part)) {
+                $this->customerGroupPaymentPolicy->refuseUnlessAllowed((int) $part->getPaymentModuleId(), $customer);
+            }
         }
     }
 

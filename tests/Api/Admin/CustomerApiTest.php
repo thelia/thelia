@@ -66,6 +66,40 @@ final class CustomerApiTest extends ApiTestCase
     }
 
     /**
+     * The discount of a customer is a percentage, as the one of a group: a rate outside 0..100
+     * is a violation, and nothing is written.
+     */
+    public function testADiscountOutsideZeroToOneHundredIsRefusedOnEveryWrite(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $factory = $this->createFixtureFactory();
+        $title = $factory->customerTitle();
+        $customer = $factory->customer($title);
+        $creation = [
+            'customerTitle' => '/api/admin/customer_titles/'.$title->getId(),
+            'firstname' => 'Jane',
+            'lastname' => 'Doe',
+            'password' => 'Password1!',
+        ];
+
+        foreach ([140.0, -5.0] as $refused) {
+            $created = $this->jsonRequest('POST', '/api/admin/customers', $creation + ['email' => 'discount-'.abs((int) $refused).'@example.com', 'discount' => $refused], $token);
+            self::assertSame(422, $created->getStatusCode(), 'POST '.$refused.' '.$created->getContent());
+
+            $patched = $this->jsonRequest('PATCH', '/api/admin/customers/'.$customer->getId(), ['discount' => $refused], $token, 'merge-patch+json');
+            self::assertSame(422, $patched->getStatusCode(), 'PATCH '.$refused.' '.$patched->getContent());
+        }
+
+        self::assertNull(CustomerQuery::create()->findOneByEmail('discount-140@example.com'));
+        self::assertSame(0.0, (float) CustomerQuery::create()->findPk($customer->getId())?->getDiscount());
+
+        foreach ([0.0, 100.0, 12.5] as $accepted) {
+            $patched = $this->jsonRequest('PATCH', '/api/admin/customers/'.$customer->getId(), ['discount' => $accepted], $token, 'merge-patch+json');
+            self::assertSame(200, $patched->getStatusCode(), 'PATCH '.$accepted.' '.$patched->getContent());
+        }
+    }
+
+    /**
      * The addresses posted with a customer are validated one by one while they
      * are turned into models. A violation found there must name the address it
      * comes from, otherwise the client reads "label" on a customer, which has

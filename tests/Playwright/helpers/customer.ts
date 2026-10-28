@@ -34,8 +34,12 @@ export function newCustomer(overrides: Partial<Customer> = {}): Customer {
   };
 }
 
-export async function registerCustomer(page: Page, customer: Customer): Promise<void> {
-  await page.goto('/customer/register');
+/**
+ * Registers through the public form. `registerPath` is the page the form is served from: the
+ * standard `/customer/register`, or `/register/<token>` for the link of a customer group.
+ */
+export async function registerCustomer(page: Page, customer: Customer, registerPath = '/customer/register'): Promise<void> {
+  await page.goto(registerPath);
   await page.fill('#flexybundle_form_customer_register_form_firstname', customer.firstname);
   await page.fill('#flexybundle_form_customer_register_form_lastname', customer.lastname);
   await page.fill('#flexybundle_form_customer_register_form_email', customer.email);

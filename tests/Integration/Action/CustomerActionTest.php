@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Action;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
@@ -22,6 +23,7 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Customer\Exception\InvalidCustomerDiscountException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -92,6 +94,56 @@ final class CustomerActionTest extends IntegrationTestCase
         self::assertNotNull($customer);
         self::assertEqualsWithDelta(15.5, (float) $customer->getDiscount(), 0.01);
         self::assertTrue((bool) $customer->getReseller());
+    }
+
+    /**
+     * @return iterable<string, array{float}>
+     */
+    public static function discountsOutsideAPercentage(): iterable
+    {
+        yield 'above 100' => [100.01];
+        yield 'negative' => [-0.5];
+    }
+
+    #[DataProvider('discountsOutsideAPercentage')]
+    public function testADiscountOutsideZeroToOneHundredIsRefusedBeforeAnythingIsWritten(float $discount): void
+    {
+        $title = $this->factory->customerTitle();
+        $customerCount = CustomerQuery::create()->count();
+
+        $minimal = (new CustomerCreateOrUpdateMinimalEvent())
+            ->setTitle($title->getId())
+            ->setFirstname('John')
+            ->setLastname('Generous')
+            ->setEmail('generous@test.com')
+            ->setPassword('password')
+            ->setDiscount($discount);
+
+        try {
+            $this->dispatcher->dispatch($minimal, TheliaEvents::CREATE_CUSTOMER_MINIMAL);
+            self::fail('A discount of '.$discount.' was accepted at the registration.');
+        } catch (InvalidCustomerDiscountException) {
+        }
+
+        $customer = $this->factory->customer($title);
+        $update = (new CustomerCreateOrUpdateEvent(
+            title: $title->getId(),
+            firstname: 'Changed',
+            lastname: 'Name',
+            discount: $discount,
+        ))->setCustomer($customer);
+
+        foreach ([TheliaEvents::CUSTOMER_UPDATEACCOUNT, TheliaEvents::CUSTOMER_UPDATEPROFILE] as $eventName) {
+            try {
+                $this->dispatcher->dispatch($update, $eventName);
+                self::fail('A discount of '.$discount.' was accepted by '.$eventName.'.');
+            } catch (InvalidCustomerDiscountException) {
+            }
+        }
+
+        self::assertSame($customerCount + 1, CustomerQuery::create()->count(), 'only the fixture customer exists');
+        self::assertSame('John', CustomerQuery::create()->findPk($customer->getId())?->getFirstname(), 'the account is left as it was');
+        self::assertSame(0.0, (float) CustomerQuery::create()->findPk($customer->getId())?->getDiscount());
     }
 
     public function testAccountConfirmationEmailCarriesTheActivationCode(): void

@@ -16,8 +16,6 @@ namespace Thelia\Domain\Pricing;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\Service\ResetInterface;
-use Thelia\Domain\Sale\SaleAudienceChecker;
-use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
@@ -34,7 +32,7 @@ use Thelia\Model\ProductSaleElementsQuery;
  * miss included, so the same absent price is never looked up twice.
  *
  * Nothing at all is asked of the database while no rule and no reserved operation
- * is running.
+ * is running: {@see PricingActivityChecker::mayResolveEffectivePriceFor()} says so.
  */
 class EffectivePriceCatalog implements ResetInterface
 {
@@ -44,8 +42,6 @@ class EffectivePriceCatalog implements ResetInterface
     public function __construct(
         private readonly EffectivePriceResolver $resolver,
         private readonly PricingActivityChecker $activityChecker,
-        private readonly SaleAudienceChecker $saleAudienceChecker,
-        private readonly ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
         private readonly ?SaleUnitContext $saleUnitContext = null,
     ) {
     }
@@ -61,7 +57,7 @@ class EffectivePriceCatalog implements ResetInterface
     {
         $productSaleElementsIds = array_values(array_unique(array_map('intval', $productSaleElementsIds)));
 
-        if ([] === $productSaleElementsIds || !$this->pricesAnythingFor($customer)) {
+        if ([] === $productSaleElementsIds || !$this->activityChecker->mayResolveEffectivePriceFor($customer)) {
             return [];
         }
 
@@ -92,6 +88,11 @@ class EffectivePriceCatalog implements ResetInterface
         return $prices;
     }
 
+    /**
+     * @deprecated since 3.3.0, to be removed in 4.0: resolve through
+     *             {@see CustomerPrice\CustomerPriceContextInterface::resolve()},
+     *             which adds the price of the customer group and the discounts
+     */
     public function priceFor(int $productSaleElementsId, Currency $currency, ?Customer $customer): ?EffectivePrice
     {
         return $this->warm([$productSaleElementsId], $currency, $customer)[$productSaleElementsId] ?? null;
@@ -104,12 +105,16 @@ class EffectivePriceCatalog implements ResetInterface
      * @param list<int> $productIds
      *
      * @return array<int, EffectivePrice> keyed by product id, absent when no sale element of it is priced
+     *
+     * @deprecated since 3.3.0, to be removed in 4.0: resolve the sale elements through
+     *             {@see CustomerPrice\CustomerPriceContextInterface::resolve()}
+     *             and keep the lowest {@see CustomerPrice\ResolvedPrice::chargedPrice()}
      */
     public function lowestForProducts(array $productIds, Currency $currency, ?Customer $customer): array
     {
         $productIds = array_values(array_unique(array_map('intval', $productIds)));
 
-        if ([] === $productIds || !$this->pricesAnythingFor($customer)) {
+        if ([] === $productIds || !$this->activityChecker->mayResolveEffectivePriceFor($customer)) {
             return [];
         }
 
@@ -142,14 +147,16 @@ class EffectivePriceCatalog implements ResetInterface
     }
 
     /**
-     * Whether anything at all may price for this visitor beyond the catalog columns:
-     * what a caller checks before spending a query on gathering what to warm.
+     * Whether a rule, a reserved operation or the sale unit may price for this visitor
+     * beyond the catalog columns.
+     *
+     * @deprecated since 3.3.0, to be removed in 4.0: ask {@see PricingActivityChecker::mayResolveEffectivePriceFor()},
+     *             or {@see PricingActivityChecker::mayPriceBeyondCatalog()} to count the customer groups and
+     *             the discounts in
      */
     public function pricesAnythingFor(?Customer $customer): bool
     {
-        return $this->activityChecker->hasActivePublicRule()
-            || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
-            || (null !== $customer && ($this->activityChecker->hasActiveNamedRule() || $this->saleAudienceChecker->hasActiveReservedSale()));
+        return $this->activityChecker->mayResolveEffectivePriceFor($customer);
     }
 
     private function keyOf(Currency $currency, ?Customer $customer): string

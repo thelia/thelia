@@ -33,8 +33,10 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartContext;
 use Thelia\Domain\Cart\Service\CartRetriever;
 use Thelia\Domain\Customer\Exception\CustomerException;
+use Thelia\Domain\Customer\Exception\InvalidCustomerDiscountException;
 use Thelia\Domain\Customer\Exception\InvalidPasswordResetTokenException;
 use Thelia\Domain\Customer\Service\CustomerCodeManager;
+use Thelia\Domain\Customer\Service\CustomerGroupAssignment;
 use Thelia\Domain\Customer\Service\CustomerGuestConversionService;
 use Thelia\Domain\Customer\Service\CustomerTitleService;
 use Thelia\Domain\Customer\Service\PasswordResetService;
@@ -70,6 +72,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected CustomerCodeManager $customerCodeManager,
         protected CustomerGuestConversionService $customerGuestConversionService,
         protected CustomerPaymentMethodService $customerPaymentMethodService,
+        protected CustomerGroupAssignment $customerGroupAssignment,
     ) {
     }
 
@@ -107,8 +110,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function createMinimal(CustomerCreateOrUpdateMinimalEvent $event): void
     {
+        $this->assertDiscountIsAPercentage($event->getDiscount());
+
         $guestRecord = $this->guestRecordOn((string) $event->getEmail());
 
+        // A record completed here keeps its group, whatever group the event names: nothing proves yet
+        // that the person who signs up owns the address, and the orders of the record hang off it.
         if ($guestRecord instanceof CustomerModel) {
             $this->completeGuestRecord($guestRecord, $event);
             $event->setCustomer($guestRecord);
@@ -130,7 +137,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             sponsor: $event->getSponsor(),
             discount: $event->getDiscount(),
             ref: $event->getRef(),
-            enabled: $event->isEnabled()
+            enabled: $event->isEnabled(),
+            customerGroupId: $event->getCustomerGroupId(),
         );
 
         $this->dispatcher->dispatch(
@@ -280,6 +288,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function updateProfile(CustomerCreateOrUpdateEvent $event): void
     {
+        $this->assertDiscountIsAPercentage($event->getDiscount());
+
         $customer = $event->getCustomer();
 
         if (null !== $event->getTitle()) {
@@ -362,6 +372,20 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * The discount of a customer is a percentage, refused before anything is written. The front
+     * forms do not carry it: it comes from the back office and the admin API, which validates
+     * it too.
+     *
+     * @throws InvalidCustomerDiscountException
+     */
+    private function assertDiscountIsAPercentage(?float $discount): void
+    {
+        if (null !== $discount && !($discount >= 0.0 && $discount <= 100.0)) {
+            throw InvalidCustomerDiscountException::outsideTheRange($discount);
+        }
+    }
+
+    /**
      * @throws PropelException
      */
     private function createOrUpdateCustomer(
@@ -371,7 +395,22 @@ class Customer extends BaseAction implements EventSubscriberInterface
         if (null === $customer) {
             $customer = new CustomerModel();
         }
-        $customer?->createOrUpdate(
+
+        $this->assertDiscountIsAPercentage($event->getDiscount());
+
+        // Checked before anything is written: a group the shop does not have is a refusal, not
+        // a foreign key error after the profile was saved.
+        $customerGroupId = $event->getCustomerGroupId();
+
+        if (null !== $customerGroupId) {
+            $this->customerGroupAssignment->assertGroupExists($customerGroupId);
+        }
+
+        // A customer already stored is moved through the assignment, once its profile is
+        // written, so that the move is announced; a new one is created in its group.
+        $isNew = $customer->isNew();
+
+        $customer->createOrUpdate(
             $event->getTitle() ?? $this->customerTitleService->getDefaultCustomerTitle()?->getId(),
             $event->getFirstname(),
             $event->getLastname(),
@@ -395,7 +434,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getState(),
             siret: $event->getSiret(),
             vatNumber: $event->getVatNumber(),
+            customerGroupId: $isNew ? $customerGroupId : null,
         );
+
+        if (!$isNew && null !== $customerGroupId) {
+            $this->customerGroupAssignment->assign($customer, $customerGroupId);
+        }
 
         $event->setCustomer($customer);
     }

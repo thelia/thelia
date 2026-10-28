@@ -20,6 +20,8 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContext;
+use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
@@ -196,6 +198,11 @@ final class ReservedSaleCartActionTest extends ActionIntegrationTestCase
 
     private function changeQuantity(Cart $cart, \Thelia\Model\CartItem $cartItem, int $quantity): \Thelia\Model\CartItem
     {
+        // Entitlements change between two requests, never in the middle of one: what
+        // the previous request resolved is not remembered by the next.
+        $this->getService(CustomerPriceContext::class)->reset();
+        $this->getService(EffectivePriceCatalog::class)->reset();
+
         $event = new CartEvent($cart);
         $event
             ->setCartItemId($cartItem->getId())
@@ -247,6 +254,11 @@ final class ReservedSaleCartActionTest extends ActionIntegrationTestCase
      */
     private function restoreCartAsCustomer(Cart $cart, Customer $customer): \Thelia\Model\CartItem
     {
+        // Entitlements change between two requests, never in the middle of one: what
+        // the previous request resolved is not remembered by the next.
+        $this->getService(CustomerPriceContext::class)->reset();
+        $this->getService(EffectivePriceCatalog::class)->reset();
+
         $this->mainRequest()->cookies->set(
             ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
             $cart->getToken(),

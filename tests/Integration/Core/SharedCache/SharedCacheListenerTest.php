@@ -33,7 +33,8 @@ use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Core\SharedCache\SharedCacheListener;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePolicy;
-use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\Pricing\CatalogActivity;
+use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -400,15 +401,13 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         self::assertSame($before, $this->snapshot($response));
     }
 
-    public function testAPriceThatDependsOnTheVisitorKeepsThePageApart(): void
+    public function testARuleReservedForNamedCustomersKeepsThePageApart(): void
     {
         $this->mode(SharedCacheMode::ENABLED);
-        $checker = $this->createStub(PricingActivityChecker::class);
-        $checker->method('hasVisitorDependentPricing')->willReturn(true);
         $response = $this->sessionResponse();
         $before = $this->snapshot($response);
 
-        $this->handle($this->request('/horatio.html', 'product'), $response, $checker);
+        $this->handle($this->request('/horatio.html', 'product'), $response, $this->probeOf(hasActiveNamedRule: true));
 
         self::assertSame($before, $this->snapshot($response));
     }
@@ -707,10 +706,7 @@ final class SharedCacheListenerTest extends IntegrationTestCase
      */
     private function handleWith(Request $request, Response $response, SharedCacheKeyCollector $collector, array $contributors): void
     {
-        $checker = $this->createStub(PricingActivityChecker::class);
-        $checker->method('hasVisitorDependentPricing')->willReturn(false);
-
-        (new SharedCacheListener(new SharedCachePolicy($checker, $collector, SharedCachePolicy::SENSITIVE_PREFIXES, $contributors), $collector, 'souin'))
+        (new SharedCacheListener(new SharedCachePolicy($this->probeOf(), $collector, SharedCachePolicy::SENSITIVE_PREFIXES, $contributors), $collector, 'souin'))
             ->onKernelResponse(new ResponseEvent(self::$kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
     }
 
@@ -785,23 +781,35 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         return $response;
     }
 
+    private function probeOf(bool $hasActiveNamedRule = false, bool $hasActiveReservedSale = false): CatalogActivityProbe
+    {
+        $probe = $this->createStub(CatalogActivityProbe::class);
+        $probe->method('read')->willReturn(new CatalogActivity(
+            hasActivePublicRule: false,
+            hasActiveNamedRule: $hasActiveNamedRule,
+            hasActiveReservedSale: $hasActiveReservedSale,
+            hasCustomerGroupPrices: false,
+            hasDiscountedCustomerGroup: false,
+            hasCategoryRestrictions: false,
+            defaultCustomerGroupId: null,
+        ));
+
+        return $probe;
+    }
+
     private function handle(
         Request $request,
         Response $response,
-        ?PricingActivityChecker $checker = null,
+        ?CatalogActivityProbe $probe = null,
         int $requestType = HttpKernelInterface::MAIN_REQUEST,
         ?SharedCacheKeyCollector $collector = null,
         string $driver = '',
         array $neverSharedPrefixes = SharedCachePolicy::SENSITIVE_PREFIXES,
     ): void {
-        if (null === $checker) {
-            $checker = $this->createStub(PricingActivityChecker::class);
-            $checker->method('hasVisitorDependentPricing')->willReturn(false);
-        }
-
+        $probe ??= $this->probeOf();
         $collector ??= new SharedCacheKeyCollector(SharedCacheKeyCollector::READABLE_PREFIXES);
 
-        (new SharedCacheListener(new SharedCachePolicy($checker, $collector, $neverSharedPrefixes), $collector, $driver))
+        (new SharedCacheListener(new SharedCachePolicy($probe, $collector, $neverSharedPrefixes), $collector, $driver))
             ->onKernelResponse(new ResponseEvent(self::$kernel, $request, $requestType, $response));
     }
 

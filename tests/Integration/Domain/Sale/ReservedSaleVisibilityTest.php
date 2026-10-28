@@ -19,7 +19,6 @@ use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Sale\ReservedSaleProductRule;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
-use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\Category;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
@@ -334,7 +333,7 @@ final class ReservedSaleVisibilityTest extends IntegrationTestCase
      */
     private function forgetMemoisedAudience(): void
     {
-        $this->getService(SaleAudienceChecker::class)->reset();
+        $this->getService('services_resetter')->reset();
         $this->visibility->reset();
     }
 }

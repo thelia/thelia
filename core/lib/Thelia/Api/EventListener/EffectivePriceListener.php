@@ -18,24 +18,29 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Api\Bridge\Propel\Event\ModelToResourceEvent;
 use Thelia\Api\Resource\ProductPrice as ProductPriceResource;
 use Thelia\Api\Resource\ProductSaleElements as ProductSaleElementsResource;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
-use Thelia\Domain\Pricing\PricingActivityChecker;
-use Thelia\Domain\Sale\CurrentCustomerProvider;
-use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
+use Thelia\Domain\Catalog\Product\ProductTaxedPriceResolver;
+use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Model\ProductSaleElements;
 
 /**
- * Serves the price a catalog price rule or a reserved operation gives the caller, on
- * the front read of a sale element.
+ * Serves what the caller pays for a sale element on the front read of it: the price of
+ * the group they belong to, the catalog price rules and the reserved operations that
+ * price it for them, then the discount of their group and their own - the same price the
+ * cart charges.
  *
- * Neither writes anything in the catalog - no `promo` flag, no `promo_price` -
- * because those two are what every visitor reads. Their price is therefore added
- * here, to the caller's own read. The page was warmed by
- * {@see EffectivePriceCollectionWarmer} when the read is a collection, so this costs
- * nothing per member; an item read resolves its one sale element.
+ * None of it is written in the catalog - no `promo` flag, no `promo_price` - because
+ * those are what every visitor reads. It is therefore added here, to the caller's own
+ * read: the customer is the one the request authenticated as (the token of an API call,
+ * the session of the front office calling it in-process), and a visitor reads the public
+ * prices. The page was warmed by {@see EffectivePriceCollectionWarmer} when the read is a
+ * collection, so this costs nothing per member; an item read resolves its one sale
+ * element.
  *
  * It runs after {@see ProductPriceCurrencyListener} has picked the price row of the
- * currency being browsed: the effective price is resolved in that same currency, so
- * the two have to be the same row.
+ * currency being browsed: the price is resolved in that same currency, so the two have
+ * to be the same row. `price` is the price the promotion is shown against, `promoPrice`
+ * what is charged while `promo` is true.
  *
  * Admin reads are left alone: the back office edits the catalog, which these prices
  * are deliberately not part of.
@@ -43,11 +48,9 @@ use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 class EffectivePriceListener implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EffectivePriceCatalog $effectivePriceCatalog,
-        private readonly CurrentCustomerProvider $currentCustomerProvider,
+        private readonly VisitorPriceReader $visitorPriceReader,
         private readonly ProductPriceCurrencyListener $productPriceCurrencyListener,
-        private readonly PricingActivityChecker $activityChecker,
-        private readonly SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker,
+        private readonly ProductTaxedPriceResolver $productTaxedPriceResolver,
     ) {
     }
 
@@ -66,37 +69,58 @@ class EffectivePriceListener implements EventSubscriberInterface
             return;
         }
 
-        // Asked before the visitor is looked up: reading the customer may open the
-        // session, and an API request in a shop where nothing prices beyond the
-        // catalog must stay stateless.
-        if (!$this->activityChecker->hasActivePublicRule()
-            && !$this->activityChecker->hasVisitorDependentPricing()
-            && !$this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()) {
-            return;
-        }
-
-        $effectivePrice = $this->effectivePriceCatalog->priceFor(
-            $saleElementsId,
+        $resolvedPrice = $this->visitorPriceReader->resolve(
+            [$saleElementsId],
             $this->productPriceCurrencyListener->currentCurrency(),
-            $this->currentCustomerProvider->getCurrentCustomer(),
-        );
+        )[$saleElementsId] ?? null;
 
-        if (null === $effectivePrice) {
-            return;
-        }
-
-        foreach ($prices as $price) {
-            if (!$price instanceof ProductPriceResource) {
-                continue;
+        if ($resolvedPrice instanceof ResolvedPrice) {
+            foreach ($prices as $price) {
+                if ($price instanceof ProductPriceResource) {
+                    $price
+                        ->setPrice($resolvedPrice->untaxedPrice)
+                        ->setPromoPrice($resolvedPrice->untaxedPromoPrice);
+                }
             }
 
-            $price->setPromoPrice($effectivePrice->untaxedPromoPrice);
+            // The flag the theme reads to strike the catalog price through says what the
+            // visitor pays, whatever the catalog says. Whether the strike shows is the call of
+            // the catalog while it prices alone (a null the theme reads as its default), and
+            // of what priced the sale element otherwise.
+            $resource->setPromo($resolvedPrice->isPromo);
+
+            if (ResolvedPrice::SOURCE_BASE !== $resolvedPrice->source) {
+                $resource->setDisplayInitialPrice($resolvedPrice->displayInitialPrice);
+            }
         }
 
-        // The flag the theme reads to strike the catalog price through is now true
-        // whatever the catalog says, and the rule decides whether the strike shows.
-        $resource->setPromo(true);
-        $resource->setDisplayInitialPrice($effectivePrice->displayInitialPrice);
+        // The sale element itself, not the model the read started from: the event of a sale
+        // element embedded in a product carries the product.
+        $this->publishTaxedPrices($resource->getPropelModel(), $prices);
+    }
+
+    /**
+     * The prices with their taxes, read once the price the visitor pays is settled: the card
+     * of a product and its page show the same taxed figure whatever priced the sale element.
+     * The products of a page were preloaded by {@see EffectivePriceCollectionWarmer}.
+     *
+     * @param array<mixed> $prices
+     */
+    private function publishTaxedPrices(?object $model, array $prices): void
+    {
+        if (!$model instanceof ProductSaleElements) {
+            return;
+        }
+
+        $productId = (int) $model->getProductId();
+
+        foreach ($prices as $price) {
+            if ($price instanceof ProductPriceResource) {
+                $price
+                    ->setTaxedPrice($this->productTaxedPriceResolver->taxedPrice($productId, $price->getPrice()))
+                    ->setTaxedPromoPrice($this->productTaxedPriceResolver->taxedPrice($productId, $price->getPromoPrice()));
+            }
+        }
     }
 
     public static function getSubscribedEvents(): array

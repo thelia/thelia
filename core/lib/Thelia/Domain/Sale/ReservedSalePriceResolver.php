@@ -16,6 +16,7 @@ namespace Thelia\Domain\Sale;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
+use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Model\Country;
@@ -46,6 +47,8 @@ class ReservedSalePriceResolver
     public function __construct(
         private readonly SaleDiscountCalculator $saleDiscountCalculator,
         private readonly TaxCalculatorFactoryInterface $taxCalculatorFactory,
+        private readonly CurrencyConverter $currencyConverter,
+        private readonly SaleAudienceChecker $saleAudienceChecker,
     ) {
     }
 
@@ -79,13 +82,11 @@ class ReservedSalePriceResolver
         }
 
         $taxCalculators = $this->loadTaxCalculators($rows);
-        $defaultCurrency = Currency::getDefaultCurrency();
-        $conversionRate = $currency->getRate() / $defaultCurrency->getRate();
 
         $resolved = [];
 
         foreach ($rows as $row) {
-            $prices = $this->basePricesOf($row, $conversionRate);
+            $prices = $this->basePricesOf($row, $currency);
 
             if (null === $prices) {
                 continue;
@@ -140,7 +141,8 @@ class ReservedSalePriceResolver
 
     /**
      * Every (sale element, reserved operation) pair the customer is entitled to,
-     * in one statement.
+     * in one statement: the operations naming the customer, and the ones reserved
+     * for the customer group the customer belongs to.
      *
      * The date window is evaluated here rather than trusted to `sale.active`: the
      * flag is only as fresh as the last run of the scheduled command, and an
@@ -162,6 +164,9 @@ class ReservedSalePriceResolver
             ':publicAudienceMode' => Sale::AUDIENCE_MODE_PUBLIC,
             ':now' => $now->format('Y-m-d H:i:s'),
             ':customerId' => $customer->getId(),
+            ':groupsAudienceMode' => Sale::AUDIENCE_MODE_CUSTOMER_GROUPS,
+            // The audience rule of the operations reserved for groups: none for a guest.
+            ':customerGroupId' => $this->saleAudienceChecker->audienceGroupIdOf($customer),
             ':currencyId' => $currency->getId(),
             ':defaultCurrencyId' => Currency::getDefaultCurrency()->getId(),
         ];
@@ -208,9 +213,23 @@ class ReservedSalePriceResolver
                    AND s.audience_mode <> :publicAudienceMode
                    AND (s.start_date IS NULL OR s.start_date <= :now)
                    AND (s.end_date IS NULL OR s.end_date >= :now)
-            INNER JOIN sale_customer sc
-                    ON sc.sale_id = s.id
-                   AND sc.customer_id = :customerId
+                   AND (
+                        EXISTS (
+                            SELECT 1
+                            FROM sale_customer sc
+                            WHERE sc.sale_id = s.id
+                              AND sc.customer_id = :customerId
+                        )
+                        OR (
+                            s.audience_mode = :groupsAudienceMode
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sale_customer_group scg
+                                WHERE scg.sale_id = s.id
+                                  AND scg.customer_group_id = :customerGroupId
+                            )
+                        )
+                   )
             INNER JOIN sale_offset_currency soc
                     ON soc.sale_id = s.id
                    AND soc.currency_id = :currencyId
@@ -247,7 +266,7 @@ class ReservedSalePriceResolver
      *
      * @return array{0: float, 1: float}|null
      */
-    private function basePricesOf(array $row, float $conversionRate): ?array
+    private function basePricesOf(array $row, Currency $currency): ?array
     {
         if (null !== $row['currency_price'] && !$row['from_default_currency']) {
             return [(float) $row['currency_price'], (float) $row['currency_promo_price']];
@@ -257,10 +276,10 @@ class ReservedSalePriceResolver
             return null;
         }
 
-        return [
-            (float) $row['default_price'] * $conversionRate,
-            (float) $row['default_promo_price'] * $conversionRate,
-        ];
+        $price = $this->currencyConverter->fromDefaultCurrency((float) $row['default_price'], $currency);
+        $promoPrice = $this->currencyConverter->fromDefaultCurrency((float) $row['default_promo_price'], $currency);
+
+        return null === $price || null === $promoPrice ? null : [$price, $promoPrice];
     }
 
     /**

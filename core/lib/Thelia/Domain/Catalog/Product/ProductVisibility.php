@@ -27,7 +27,9 @@ use Thelia\Domain\Sale\ReservedSaleProductRule;
  * Two kinds of rules, joined with AND: the private drops of the reserved
  * operations, then every rule a module declares through
  * ProductVisibilityRuleInterface. A product is visible when each of them lets it
- * through.
+ * through. The categories the customer group of the visitor is restricted to
+ * (ClosedCategoryProductRule) are one more of them, asked first and only while
+ * some group has a list of categories.
  *
  * Enforced in the query rather than on the way out, so that a collection, an item
  * read and a count all agree on what the catalog holds: a product left reachable
@@ -47,6 +49,7 @@ final readonly class ProductVisibility
         private CurrentCustomerProvider $currentCustomerProvider,
         #[AutowireIterator(ProductVisibilityRuleInterface::TAG)]
         private iterable $moduleRules = [],
+        private ?ClosedCategoryProductRule $closedCategoryRule = null,
     ) {
     }
 
@@ -76,17 +79,50 @@ final readonly class ProductVisibility
      */
     public function visibleProductClause(string $productIdColumn): ?string
     {
+        return $this->clauseFor($productIdColumn, false);
+    }
+
+    /**
+     * The rule of {@see visibleProductClause()} for a visitor of the default customer group:
+     * for what is cached once for everybody and crawled anonymously (the sitemap), whoever
+     * triggers its generation. The categories and the module rules are asked of nobody (null
+     * customer), never of the member who happens to regenerate the file; so are the private drops
+     * (a customer named on one does not add its products for everybody).
+     *
+     * @return string|null null when nothing is hidden from the visitor
+     */
+    public function visibleProductClauseForDefaultVisitor(string $productIdColumn): ?string
+    {
+        return $this->clauseFor($productIdColumn, true);
+    }
+
+    private function clauseFor(string $productIdColumn, bool $defaultVisitor): ?string
+    {
         $clauses = [];
-        $reservedSaleClause = $this->reservedSaleRule->visibleProductClause($productIdColumn);
+        $reservedSaleClause = $this->reservedSaleRule->visibleProductClause($productIdColumn, $defaultVisitor);
 
         if (null !== $reservedSaleClause) {
             $clauses[] = $reservedSaleClause;
         }
 
-        // Read once, and only when a module rule is there to be given it: the rules
+        // Read once, and only when a rule is there to be given it: the rules
         // see the visitor the reserved operations see.
         $customer = null;
-        $customerIsRead = false;
+        $customerIsRead = $defaultVisitor;
+
+        // The categories a customer group is restricted to: asked only once a group has a
+        // list, so that a shop with none reads no visitor for it.
+        if (true === $this->closedCategoryRule?->isActive()) {
+            if (!$defaultVisitor) {
+                $customer = $this->currentCustomerProvider->getCurrentCustomer();
+            }
+            $customerIsRead = true;
+            $closedCategoryClause = $this->closedCategoryRule->visibleProductClause($productIdColumn, $customer);
+
+            if (null !== $closedCategoryClause) {
+                $clauses[] = \sprintf('(%s)', $closedCategoryClause);
+            }
+        }
 
         foreach ($this->moduleRules as $rule) {
             if (!$customerIsRead) {
@@ -122,8 +158,10 @@ final readonly class ProductVisibility
     }
 
     /**
-     * Whether a module declared a rule of its own: the catalog may then differ from
-     * one visitor to the next even when no reserved operation runs.
+     * Whether a module declared a rule of its own. The categories closed to a customer
+     * group are not one of them: what they hide follows the group of the visitor, which
+     * the data access cache keys its answers on, while the rule of a module may look at
+     * anything of the visitor and can only be left out of the cache.
      */
     public function hasModuleRules(): bool
     {

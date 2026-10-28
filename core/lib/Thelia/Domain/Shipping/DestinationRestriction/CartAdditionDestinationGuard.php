@@ -19,6 +19,7 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
+use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Refuses to add a product to a cart whose known destination the product cannot ship
@@ -41,12 +42,30 @@ final readonly class CartAdditionDestinationGuard implements EventSubscriberInte
 
     public function refuseARestrictedProduct(CartEvent $event): void
     {
-        // The addresses of the cart are only resolved for a product a group holds: adding
-        // anything else costs one query, and none in a shop without active group.
-        if (null === ($productId = $event->getProductId()) || !$this->checker->isRestricted($productId)) {
+        // A shop with no active group refuses nothing: no query.
+        if (!$this->checker->hasActiveGroup()) {
             return;
         }
 
+        // The product is the one of the sale element the cart writes the line for, as
+        // Action\Cart::addItem reads it: the product id of the request is the caller's, and
+        // a forged one (a product of the page, the sale element of another) would be judged
+        // in place of the product that is shipped. A sale element that does not exist is left
+        // to the addition to answer.
+        $productSaleElementsId = $event->getProductSaleElementsId();
+        /** @var int|string|null $productId */
+        $productId = null === $productSaleElementsId
+            ? null
+            : ProductSaleElementsQuery::create()->filterById($productSaleElementsId)->select('ProductId')->findOne();
+
+        // The addresses of the cart are only resolved for a product a group holds: adding
+        // anything else costs two queries (the product of the sale element, the groups that
+        // hold it), and none in a shop without active group.
+        if (null === $productId || !$this->checker->isRestricted((int) $productId)) {
+            return;
+        }
+
+        $productId = (int) $productId;
         $cart = $event->getCart();
         $locale = Translator::getInstance()->getLocale() ?: Lang::getDefaultLanguage()->getLocale();
 

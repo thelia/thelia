@@ -52,11 +52,15 @@ class ReservedSaleProductRule implements ResetInterface
      * one of them is, and a customer named on one of two overlapping operations reads
      * their catalog through the one they are part of.
      *
+     * @param bool $defaultVisitor read the rule for a visitor named on nothing (null customer), whoever
+     *                             is signed in: for what is cached once for everybody, like the sitemap
+     *
      * @return string|null null when no running operation hides anything from the visitor
      */
-    public function visibleProductClause(string $productIdColumn): ?string
+    public function visibleProductClause(string $productIdColumn, bool $defaultVisitor = false): ?string
     {
-        $hiddenSaleIds = $this->hiddenSaleIds();
+        $hidingSaleIds = $this->hidingSaleIds($defaultVisitor);
+        $hiddenSaleIds = $hidingSaleIds['hidden'];
 
         if ([] === $hiddenSaleIds) {
             return null;
@@ -67,7 +71,7 @@ class ReservedSaleProductRule implements ResetInterface
             $this->coveredByAnyOfClause($productIdColumn, $hiddenSaleIds),
         );
 
-        $entitledHidingSaleIds = $this->entitledHidingSaleIds();
+        $entitledHidingSaleIds = $hidingSaleIds['entitled'];
 
         if ([] !== $entitledHidingSaleIds) {
             $clause = \sprintf(
@@ -118,13 +122,13 @@ class ReservedSaleProductRule implements ResetInterface
      *
      * @return array{hidden: list<int>, entitled: list<int>}
      */
-    private function hidingSaleIds(): array
+    private function hidingSaleIds(bool $defaultVisitor = false): array
     {
         if (!$this->saleAudienceChecker->hasActiveReservedSale()) {
             return ['hidden' => [], 'entitled' => []];
         }
 
-        $customer = $this->currentCustomerProvider->getCurrentCustomer();
+        $customer = $defaultVisitor ? null : $this->currentCustomerProvider->getCurrentCustomer();
         $customerId = (int) ($customer?->getId() ?? 0);
 
         if (isset($this->hidingSaleIdsByCustomer[$customerId])) {

@@ -29,16 +29,20 @@ use Thelia\Core\Event\Sale\SaleProductsQueryEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Sale\Exception\InvalidSaleException;
 use Thelia\Domain\Sale\SaleDiscountCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Model\Country as CountryModel;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale as SaleModel;
 use Thelia\Model\SaleCustomer;
+use Thelia\Model\SaleCustomerGroup;
+use Thelia\Model\SaleCustomerGroupQuery;
 use Thelia\Model\SaleCustomerQuery;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleOffsetCurrencyQuery;
@@ -261,6 +265,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
      */
     public function create(SaleCreateEvent $event): void
     {
+        $this->assertGroupAudienceNamesKnownGroups($event);
+
         $sale = new SaleModel();
 
         $sale
@@ -274,6 +280,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $this->syncTargetedCustomers($sale, $event->getAudienceMode(), $event->getCustomerIds());
+        $this->syncTargetedCustomerGroups($sale, $event->getAudienceMode(), $event->getCustomerGroupIds());
 
         $event->setSale($sale);
     }
@@ -309,6 +316,56 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * An operation reserved for customer groups with no group would be open to nobody, and one
+     * naming a group that does not exist would fail on the foreign key: both are refused before
+     * anything is written, like the rule that says the same.
+     *
+     * @throws InvalidSaleException
+     */
+    private function assertGroupAudienceNamesKnownGroups(SaleCreateEvent $event): void
+    {
+        if (SaleModel::AUDIENCE_MODE_CUSTOMER_GROUPS !== $event->getAudienceMode()) {
+            return;
+        }
+
+        if ([] === $event->getCustomerGroupIds()) {
+            throw new InvalidSaleException('An operation reserved for customer groups needs at least one customer group.');
+        }
+
+        $unknownIds = CustomerGroupQuery::findUnknownIds($event->getCustomerGroupIds());
+
+        if ([] !== $unknownIds) {
+            throw new InvalidSaleException(\sprintf('No customer group has the id "%s".', implode('", "', $unknownIds)));
+        }
+    }
+
+    /**
+     * `sale_customer_group` follows the same rule as `sale_customer`: rows only
+     * while the operation is reserved for customer groups.
+     *
+     * @param list<int> $customerGroupIds
+     */
+    private function syncTargetedCustomerGroups(
+        SaleModel $sale,
+        int $audienceMode,
+        array $customerGroupIds,
+        ?ConnectionInterface $con = null,
+    ): void {
+        SaleCustomerGroupQuery::create()->filterBySaleId($sale->getId())->delete($con);
+
+        if (SaleModel::AUDIENCE_MODE_CUSTOMER_GROUPS !== $audienceMode) {
+            return;
+        }
+
+        foreach ($customerGroupIds as $customerGroupId) {
+            (new SaleCustomerGroup())
+                ->setSaleId($sale->getId())
+                ->setCustomerGroupId($customerGroupId)
+                ->save($con);
+        }
+    }
+
+    /**
      * Process update sale.
      *
      * @throws PropelException
@@ -316,6 +373,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
     public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
+            $this->assertGroupAudienceNamesKnownGroups($event);
+
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
 
             $con->beginTransaction();
@@ -365,6 +424,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
                 // Update the audience the operation is reserved for
                 $this->syncTargetedCustomers($sale, $event->getAudienceMode(), $event->getCustomerIds(), $con);
+                $this->syncTargetedCustomerGroups($sale, $event->getAudienceMode(), $event->getCustomerGroupIds(), $con);
 
                 // Update products
                 SaleProductQuery::create()->filterBySaleId($sale->getId())->delete($con);

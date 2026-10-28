@@ -27,6 +27,7 @@ use Thelia\Api\Resource\CheckoutPlacementInput;
 use Thelia\Api\Resource\CheckoutPlacementOutput;
 use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
+use Thelia\Domain\Cart\Exception\CartPricesChangedException;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
@@ -100,6 +101,12 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
             throw new ConflictHttpException($inProgress->getMessage(), $inProgress);
         } catch (GuestCheckoutNotAllowedException $refusal) {
             throw new AccessDeniedHttpException($refusal->getMessage(), $refusal);
+        } catch (CartPricesChangedException $pricesChanged) {
+            // The lines were priced again before the refusal: the cart now reads the prices
+            // the buyer will pay, and the same request, posted again, is placed on them. A
+            // conflict with the state of the cart rather than a malformed request, like the
+            // stock below; the message is the core's own, with no amount in it.
+            throw new ConflictHttpException($pricesChanged->getMessage(), $pricesChanged);
         } catch (StockShortageException $shortage) {
             // The shop cannot sell what it no longer holds. It is a conflict with the
             // state of the stock rather than a bad request: the same request posted a

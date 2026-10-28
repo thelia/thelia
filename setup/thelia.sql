@@ -507,6 +507,7 @@ CREATE TABLE `customer`
     `confirmation_token_expires_at` DATETIME NULL,
     `anonymized_at` DATETIME COMMENT 'when the identifying data of the account was erased, NULL as long as the account carries an identity',
     `is_guest` TINYINT DEFAULT 0 NOT NULL COMMENT 'the customer ordered without creating an account and carries no password, until the account is completed',
+    `customer_group_id` INTEGER NOT NULL COMMENT 'the customer group the account belongs to, the default group until an administrator moves it',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -518,6 +519,7 @@ CREATE TABLE `customer`
     INDEX `idx_customer_lang_id` (`lang_id`),
     INDEX `idx_email` (`email`),
     INDEX `idx_customer_anonymized_at` (`anonymized_at`),
+    INDEX `idx_customer_customer_group_id` (`customer_group_id`),
     CONSTRAINT `fk_customer_customer_title_id`
         FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
@@ -527,7 +529,12 @@ CREATE TABLE `customer`
         FOREIGN KEY (`lang_id`)
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_customer_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -602,6 +609,117 @@ CREATE TABLE `customer_title`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- customer_group
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_group`;
+
+CREATE TABLE `customer_group`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'stable machine name a deployment references a customer group by; read by the front through the customer group API, not meant as a label',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `is_default` TINYINT DEFAULT 0 NOT NULL COMMENT 'the group a new account and a visitor belong to; exactly one',
+    `discount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the discount rate of the group, as a percentage, applied before the discount of the customer',
+    `display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'whether the prices are shown with taxes (1) or without taxes (0) to the members of the group',
+    `restricts_categories` TINYINT DEFAULT 0 NOT NULL COMMENT '1 when the group may browse only the categories it lists (customer_group_category), an empty list included; 0 opens the whole catalog; set by the writer of the list alone, never by the deletion of a listed category',
+    `restricts_payment_modules` TINYINT DEFAULT 0 NOT NULL COMMENT '1 when the group may pay only with the modules it lists (customer_group_payment_module), an empty list included; 0 opens every module; set by the writer of the list alone, never by the deletion of a listed module',
+    `registration_token` VARCHAR(64) COMMENT 'secret token of the registration link of the group: a visitor who registers through it joins the group; NULL when the link is closed; never read by the front, never written by a client',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `customer_group_code_unique` (`code`),
+    UNIQUE INDEX `customer_group_registration_token_unique` (`registration_token`),
+    INDEX `idx_customer_group_is_default` (`is_default`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- customer_group_product_price
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_group_product_price`;
+
+CREATE TABLE `customer_group_product_price`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_group_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) COMMENT 'the price without taxes the group pays, NULL when the group has no price of its own',
+    `promo_price` DECIMAL(16,6) COMMENT 'the promotional price without taxes the group pays, NULL when the group has no promotional price of its own',
+    `from_default_currency` TINYINT DEFAULT 0 NOT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `customer_group_product_price_unique` (`customer_group_id`, `product_sale_elements_id`, `currency_id`),
+    INDEX `idx_customer_group_product_price_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_customer_group_product_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_customer_group_product_price_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_product_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- customer_group_payment_module
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_group_payment_module`;
+
+CREATE TABLE `customer_group_payment_module`
+(
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a payment module the customer group may pay with, read only when customer_group.restricts_payment_modules is 1: then the modules listed are the only ones, and none when the list is empty',
+    `module_id` INTEGER NOT NULL,
+    PRIMARY KEY (`customer_group_id`,`module_id`),
+    INDEX `idx_customer_group_payment_module_module_id` (`module_id`),
+    CONSTRAINT `fk_customer_group_payment_module_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_payment_module_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- customer_group_category
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_group_category`;
+
+CREATE TABLE `customer_group_category`
+(
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a category the customer group may browse, read only when customer_group.restricts_categories is 1: then the categories listed are the only ones open, and none when the list is empty',
+    `category_id` INTEGER NOT NULL,
+    PRIMARY KEY (`customer_group_id`,`category_id`),
+    INDEX `idx_customer_group_category_category_id` (`category_id`),
+    CONSTRAINT `fk_customer_group_category_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_group_category_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -801,6 +919,9 @@ CREATE TABLE `order`
     `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
     `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
     `sale_unit_id` INTEGER COMMENT 'the sale unit this order was placed on, NULL for a national (single-shop) order',
+    `customer_group_id` INTEGER COMMENT 'the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted',
+    `customer_group_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the customer group discount rate, as a percentage, already included in the order products prices',
+    `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -820,6 +941,7 @@ CREATE TABLE `order`
     INDEX `idx_order_cart_fk` (`cart_id`),
     INDEX `idx_order_delivery_slot_id` (`delivery_slot_id`),
     INDEX `fi_order_sale_unit_id` (`sale_unit_id`),
+    INDEX `fi_order_customer_group_id` (`customer_group_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
@@ -830,6 +952,11 @@ CREATE TABLE `order`
         REFERENCES `sale_unit` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
     CONSTRAINT `fk_order_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -2947,6 +3074,32 @@ CREATE TABLE `sale_customer`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- sale_customer_group
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_customer_group`;
+
+CREATE TABLE `sale_customer_group`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sale_id` INTEGER NOT NULL,
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a customer group the operation is reserved for, read when audience_mode is 2',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_sale_customer_group_sales_id_group_id` (`sale_id`, `customer_group_id`),
+    INDEX `fk_sale_customer_group_group_idx` (`customer_group_id`),
+    CONSTRAINT `fk_sale_customer_group_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_customer_group_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- catalog_price_rule
 -- ---------------------------------------------------------------------
 
@@ -3044,6 +3197,32 @@ CREATE TABLE `catalog_price_rule_customer`
     CONSTRAINT `fk_catalog_price_rule_customer_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- catalog_price_rule_customer_group
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `catalog_price_rule_customer_group`;
+
+CREATE TABLE `catalog_price_rule_customer_group`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `catalog_price_rule_id` INTEGER NOT NULL,
+    `customer_group_id` INTEGER NOT NULL COMMENT 'a customer group the rule prices for, read when audience_mode is 2',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_catalog_price_rule_customer_group_rule_id_group_id` (`catalog_price_rule_id`, `customer_group_id`),
+    INDEX `fk_catalog_price_rule_customer_group_group_idx` (`customer_group_id`),
+    CONSTRAINT `fk_catalog_price_rule_customer_group_rule_id`
+        FOREIGN KEY (`catalog_price_rule_id`)
+        REFERENCES `catalog_price_rule` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_price_rule_customer_group_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -3751,6 +3930,25 @@ CREATE TABLE `customer_title_i18n`
     CONSTRAINT `customer_title_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `customer_title` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- customer_group_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_group_i18n`;
+
+CREATE TABLE `customer_group_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `customer_group_i18n_fk_6a2a90`
+        FOREIGN KEY (`id`)
+        REFERENCES `customer_group` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
@@ -4561,6 +4759,7 @@ CREATE TABLE `customer_version`
     `confirmation_token_expires_at` DATETIME NULL,
     `anonymized_at` DATETIME COMMENT 'when the identifying data of the account was erased, NULL as long as the account carries an identity',
     `is_guest` TINYINT DEFAULT 0 NOT NULL COMMENT 'the customer ordered without creating an account and carries no password, until the account is completed',
+    `customer_group_id` INTEGER NOT NULL COMMENT 'the customer group the account belongs to, the default group until an administrator moves it',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -4666,6 +4865,9 @@ CREATE TABLE `order_version`
     `delivery_slot_start` TIME COMMENT 'the local hour the picked slot started at, copied off the slot',
     `delivery_slot_end` TIME COMMENT 'the local hour the picked slot ended at, copied off the slot',
     `sale_unit_id` INTEGER COMMENT 'the sale unit this order was placed on, NULL for a national (single-shop) order',
+    `customer_group_id` INTEGER COMMENT 'the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted',
+    `customer_group_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the customer group discount rate, as a percentage, already included in the order products prices',
+    `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

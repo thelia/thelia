@@ -39,6 +39,9 @@ class Order extends BaseOrder
 
     private static int $writeGeneration = 0;
 
+    /** @var array{untaxed: float, taxed: float}|null */
+    private ?array $serviceLinesTotals = null;
+
     protected ?int $choosenDeliveryAddress = null;
 
     protected ?int $choosenInvoiceAddress = null;
@@ -258,7 +261,7 @@ class Order extends BaseOrder
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
-            $tax -= $this->getDiscount() - $this->createTaxCalculator()->computeUntaxedOrderDiscount($this);
+            $tax -= $this->getDiscount() - $this->getUntaxedDiscount();
 
             if ($total < 0) {
                 $total = 0;
@@ -420,6 +423,231 @@ class Order extends BaseOrder
             : (float) $this->getPostage();
     }
 
+    /**
+     * The part of the discount that is not tax. One reading for the order loop (DISCOUNT_WITHOUT_TAX)
+     * and the API (amountDiscountWithoutTaxes), so that they cannot drift apart.
+     *
+     * @throws PropelException
+     */
+    public function getUntaxedDiscount(): float
+    {
+        // Legacy orders have no discount tax calculation: their discount is read untaxed as it is stored.
+        if (ConfigQuery::isOrderWithLegacyRounding((int) $this->getId())) {
+            return (float) $this->getDiscount();
+        }
+
+        return (float) $this->createTaxCalculator()->computeUntaxedOrderDiscount($this);
+    }
+
+    /**
+     * The order total without tax, the way getTotalAmount() builds it: the tax it reports
+     * is taken out of the total it reports, so the two always add up.
+     *
+     * @throws PropelException
+     */
+    public function getUntaxedTotalAmount(bool $includePostage = true, bool $includeDiscount = true): float
+    {
+        $tax = 0;
+        $total = $this->getTotalAmount($tax, $includePostage, $includeDiscount);
+
+        return $total - $tax;
+    }
+
+    /**
+     * What the buyer pays for the goods once the discount is taken off and the postage left out,
+     * to the cent: the API's totalAmountWithTaxesAfterDiscount. The one reading of it, so that a
+     * theme which holds the model and the API resource cannot show two figures.
+     *
+     * @throws PropelException
+     */
+    public function getTotalAmountWithTaxesAfterDiscount(): float
+    {
+        return round(round($this->getTotalAmount(), 2) - round((float) $this->getPostage(), 2), 2);
+    }
+
+    /**
+     * The goods of the order without tax, before the discount and without the postage, to the
+     * cent: the API's totalAmountWithoutTaxes, which the order loop publishes uncut as
+     * TOTAL_ITEMS_AMOUNT.
+     *
+     * @throws PropelException
+     */
+    public function getTotalAmountWithoutTaxes(): float
+    {
+        return round($this->getUntaxedTotalAmount(false, false), 2);
+    }
+
+    /**
+     * The articles of the order without tax, before the discount and without the postage, to the
+     * cent, the service lines (a gift wrapping) left out: the API's totalGoodsWithoutTaxes and
+     * the order loop's TOTAL_GOODS_AMOUNT. totalAmountWithoutTaxes counts those lines in.
+     *
+     * @throws PropelException
+     */
+    public function getTotalGoodsWithoutTaxes(): float
+    {
+        return round($this->getTotalAmountWithoutTaxes() - $this->serviceLinesTotal('untaxed'), 2);
+    }
+
+    /**
+     * The same articles with their tax: the API's totalGoodsWithTaxes and the order loop's
+     * TOTAL_TAXED_GOODS_AMOUNT.
+     *
+     * @throws PropelException
+     */
+    public function getTotalGoodsWithTaxes(): float
+    {
+        $tax = 0;
+
+        return round(round($this->getTotalAmount($tax, false, false), 2) - $this->serviceLinesTotal('taxed'), 2);
+    }
+
+    /**
+     * What the service lines of the order were charged, for their whole quantity, read once for
+     * the two figures: both goods totals ask for it, and a collection of orders prints both for
+     * each of its orders, which made two queries an order. Held by the instance and forgotten when
+     * its lines move (reload, addOrderProduct, clearOrderProducts).
+     *
+     * @param 'untaxed'|'taxed' $kind
+     *
+     * @throws PropelException
+     */
+    private function serviceLinesTotal(string $kind): float
+    {
+        if (null === $this->serviceLinesTotals) {
+            $totals = ['untaxed' => 0.0, 'taxed' => 0.0];
+
+            foreach (OrderProductQuery::create()->filterByOrderId($this->getId())->filterByLineType(OrderProduct::LINE_TYPE_SERVICE)->find() as $serviceLine) {
+                $charged = $serviceLine->getChargedLineTotals();
+                $totals['untaxed'] += $charged['untaxed'];
+                $totals['taxed'] += $charged['taxed'];
+            }
+
+            $this->serviceLinesTotals = $totals;
+        }
+
+        return $this->serviceLinesTotals[$kind];
+    }
+
+    public function reload(bool $deep = false, ?ConnectionInterface $con = null): void
+    {
+        $this->serviceLinesTotals = null;
+
+        parent::reload($deep, $con);
+    }
+
+    public function addOrderProduct(OrderProduct $l): static
+    {
+        $this->serviceLinesTotals = null;
+
+        return parent::addOrderProduct($l);
+    }
+
+    public function clearOrderProducts(): static
+    {
+        $this->serviceLinesTotals = null;
+
+        return parent::clearOrderProducts();
+    }
+
+    /**
+     * The goods of the order without tax, discount taken off, postage left out, to the cent:
+     * the API's totalAmountWithoutTaxesAfterDiscount.
+     *
+     * @throws PropelException
+     */
+    public function getTotalAmountWithoutTaxesAfterDiscount(): float
+    {
+        return round($this->getUntaxedTotalAmount(false), 2);
+    }
+
+    /**
+     * The postage without its tax, to the cent: the API's totalShippingWithoutTaxes.
+     */
+    public function getTotalShippingWithoutTaxes(): float
+    {
+        return round((float) $this->getUntaxedPostage(), 2);
+    }
+
+    /**
+     * The discount without its tax, to the cent: the API's amountDiscountWithoutTaxes.
+     *
+     * @throws PropelException
+     */
+    public function getAmountDiscountWithoutTaxes(): float
+    {
+        return round($this->getUntaxedDiscount(), 2);
+    }
+
+    /**
+     * What the buyer pays, tax included: the goods, the postage, the discount taken off, to the cent.
+     * The API's totalAmount, and the sum of the two figures a recap prints above it
+     * (getTotalAmountWithTaxesAfterDiscount() and getTotalShippingWithTaxes()).
+     *
+     * @throws PropelException
+     */
+    public function getTotalAmountWithTaxesWithShipping(): float
+    {
+        return round($this->getTotalAmount(), 2);
+    }
+
+    /**
+     * The discount, tax included, to the cent: the API's amountDiscountWithTaxes. Its untaxed part
+     * is getAmountDiscountWithoutTaxes().
+     */
+    public function getAmountDiscountWithTaxes(): float
+    {
+        return round((float) $this->getDiscount(), 2);
+    }
+
+    /**
+     * The postage, tax included, to the cent: the API's totalShippingWithTaxes. Its untaxed part is
+     * getTotalShippingWithoutTaxes().
+     */
+    public function getTotalShippingWithTaxes(): float
+    {
+        return round((float) $this->getPostage(), 2);
+    }
+
+    /**
+     * The tax of the postage, to the cent: the API's postageTax.
+     */
+    public function getTotalShippingTaxAmount(): float
+    {
+        return round((float) $this->getPostageTax(), 2);
+    }
+
+    /**
+     * What the order is worth without tax, postage included and discount taken off, to the
+     * cent: the API's totalAmountWithoutTaxesWithShipping and the order loop's TOTAL_AMOUNT.
+     * It is the sum of the two figures a recap prints above it, so that the recap adds up.
+     *
+     * @throws PropelException
+     */
+    public function getTotalAmountWithoutTaxesWithShipping(): float
+    {
+        return round($this->getTotalAmountWithoutTaxesAfterDiscount() + $this->getTotalShippingWithoutTaxes(), 2);
+    }
+
+    /**
+     * All the tax of the order, postage included and discount taken off: the API's
+     * totalTaxAmount and the order loop's TOTAL_TAX. It is what is left of the total
+     * once the untaxed goods and the untaxed postage are taken out, each cut to the cent,
+     * so that untaxed goods + untaxed postage + tax = total, whichever rounding mode the
+     * order was invoiced with, and the untaxed total + tax = total with it.
+     *
+     * @throws PropelException
+     */
+    public function getTotalTaxAmount(): float
+    {
+        return round(
+            round($this->getTotalAmount(), 2)
+            - $this->getTotalAmountWithoutTaxesAfterDiscount()
+            - $this->getTotalShippingWithoutTaxes(),
+            2,
+        );
+    }
+
     public function getVatExempted(): bool
     {
         return 1 === $this->getOrderAddressRelatedByInvoiceOrderAddressId()?->getVatExempted();
@@ -576,6 +804,18 @@ class Order extends BaseOrder
             (new OrderEvent($this))->setStatus((int) $cancelled->getId()),
             TheliaEvents::ORDER_UPDATE_STATUS,
         );
+    }
+
+    /**
+     * The code the customer group of the order has now, null once that group is deleted.
+     *
+     * Not frozen: the order stores the group id, the discount rate and the taxed or
+     * untaxed display of the group at the time of the order, and the code is read on the
+     * group as it is today, so a renamed group shows its new code on its old orders.
+     */
+    public function getCustomerGroupCode(): ?string
+    {
+        return $this->getCustomerGroup()?->getCode();
     }
 
     /**

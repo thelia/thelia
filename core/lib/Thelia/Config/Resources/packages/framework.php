@@ -171,6 +171,22 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 20,
                 'interval' => '1 hour',
             ],
+            // Registering an account answers "This email already exists." for an address
+            // that has one, so an unauthenticated caller can list the registered
+            // addresses. Same two windows and same figures as the guest registration: the
+            // per-address one keeps one mailbox from being probed over and over, the
+            // per-client one stops a single caller from walking a list. Every attempt
+            // counts, successful or not.
+            'customer_registration_per_address' => [
+                'policy' => 'sliding_window',
+                'limit' => 5,
+                'interval' => '1 hour',
+            ],
+            'customer_registration_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 20,
+                'interval' => '1 hour',
+            ],
             // Opening a return writes a row and mails the customer, so an
             // unauthenticated flood of requests is worth capping per caller.
             // The limit is generous: a real customer opens a handful of returns,

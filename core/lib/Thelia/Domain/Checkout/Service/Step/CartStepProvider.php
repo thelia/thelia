@@ -51,6 +51,7 @@ final readonly class CartStepProvider implements CheckoutStepProviderInterface
     public function check(Cart $cart): void
     {
         $this->cartGuard->checkCartNotEmpty($cart);
+        $this->cartGuard->checkLinesAreAvailable($cart);
     }
 
     public function componentName(): ?string

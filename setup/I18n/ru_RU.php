@@ -1541,4 +1541,6 @@ return [
     'Where the country of the visitor is read: header (a header set by the CDN or the proxy) or ip_database (a MaxMind database that the shop installs in local/geoip)' => 'Источник страны посетителя: header (заголовок, добавленный CDN или прокси) или ip_database (база MaxMind, которую магазин размещает в local/geoip)',
     'Name of the HTTP header that carries the country code of the visitor when the source is header (e.g. CF-IPCountry)' => 'Имя HTTP-заголовка с кодом страны посетителя, если источник header (например, CF-IPCountry)',
     'File name of the MaxMind country database (.mmdb) inside local/geoip, when the source is ip_database' => 'Имя файла базы стран MaxMind (.mmdb) в local/geoip, если источник ip_database',
+    'Customer groups' => 'Группы клиентов',
+    'Default customer group' => 'Группа клиентов по умолчанию',
 ];

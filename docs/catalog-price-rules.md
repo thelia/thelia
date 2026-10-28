@@ -10,8 +10,8 @@ without anything having to run.
 A rule is made of three things. A **scope**: criteria combined with AND - categories
 (with or without the categories below them), brands, templates, feature values,
 attribute values, named products - the targets of one type combined with OR, an
-absent type meaning "all". An **audience**: everyone, or the customers named on the
-rule (customer groups are modeled, US #122 will fill the mode). An **effect**: a
+absent type meaning "all". An **audience**: everyone, the customers named on the
+rule, or customer groups (see [customer-groups.md](customer-groups.md)). An **effect**: a
 percentage off, an amount off per currency, or a fixed price per currency, the
 amounts and prices being typed tax included at the shop location, like the offsets
 of a flash sale. On top of that a priority, a stop flag, dates, and whether the
@@ -157,9 +157,11 @@ price it was placed at after the rule ends.
 
 The `product` loop also joins the stored public price for its `min_price` and
 `max_price` orders and filters, when a public rule is turned on and outside the back
-office. What a named customer alone is entitled to stays out of the orders: a page
+office. What a named customer alone is entitled to stays out of them: a loop page
 ordered by price orders such a customer's catalog by its public prices, as for a
-reserved sale. The `promo="1"` loop filter still reads `product_sale_elements.promo`
+reserved sale. The `untaxed_price_order` sort of the front API follows the price the
+visitor pays, rules included (see [product-listing-facets.md](product-listing-facets.md#price-sort)).
+The `promo="1"` loop filter still reads `product_sale_elements.promo`
 and knows nothing of the rules.
 
 ## Keeping the stored prices in step
@@ -206,7 +208,7 @@ every `CATALOG_PRICE_RULE_*` event and by the recompute command.
   over the `pse` and `p` aliases. A type no installed resolver answers for makes the
   rule cover nothing.
 - `Audience\AudienceResolverInterface` (tag `thelia.catalog_price_rule.audience`):
-  customer groups (US #122) plug in here.
+  the named customers and the customer groups modes are the two the core ships.
 - `Thelia\Domain\Pricing\CatalogPriceResolverInterface`: the contract a module pricing
   by rules of its own decorates, answering for the sale elements it covers and handing
   the rest to the core resolver. The alias to `Rule\CatalogPriceRuleResolver` is declared

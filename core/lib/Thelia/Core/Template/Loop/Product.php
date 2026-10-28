@@ -18,7 +18,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -27,8 +26,9 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Domain\Pricing\EffectivePrice;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\CurrencyConverter;
+use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
@@ -104,11 +104,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     private ?CurrencyModel $currency = null;
 
+    /** @var list<string> aliases of the sale element joins of the complex form, set by buildModelCriteria() */
+    private array $retainedSaleElementsAliases = [];
+
     public function __construct(
         protected readonly TaxEngine $taxEngine,
         protected readonly ReservedSaleVisibility $reservedSaleVisibility,
-        protected readonly EffectivePriceCatalog $effectivePriceCatalog,
+        protected readonly VisitorPriceReader $visitorPriceReader,
         protected readonly PricingActivityChecker $pricingActivityChecker,
+        protected readonly CurrencyConverter $currencyConverter,
     ) {
     }
 
@@ -260,38 +264,38 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $taxCountry = $this->taxEngine->getDeliveryCountry();
         $taxState = $this->taxEngine->getDeliveryState();
 
-        $securityContext = $this->securityContext;
-        $effectivePrices = $this->effectivePricesOf($loopResult);
+        $resolvedPrices = $this->resolvedPricesOf($loopResult);
 
         /** @var ProductModel $product */
         foreach ($loopResult->getResultDataCollection() as $product) {
             $loopResultRow = new LoopResultRow($product);
 
-            // A catalog price rule or a reserved operation writes nothing in the
-            // catalog, so its price is substituted here — in the virtual columns the
-            // rest of this method reads, so that the customer discount and the tax
-            // are applied to it exactly the way they are applied to a public promo
-            // price.
+            // What the visitor pays is resolved for the whole page by the customer price
+            // context - price of the group, rules, operations, then the discounts of the
+            // group and of the customer - and substituted here, in the virtual columns the
+            // rest of this method reads, so that the tax is applied to it exactly the way
+            // it is applied to a public price.
             //
-            // The price orders and the `min_price` / `max_price` filters read the
-            // public rule prices through the SQL join of addPriceJoins(); what a
-            // named customer alone is entitled to stays out of them, so a page ordered
-            // by price orders such a customer's catalog by its public prices.
-            $effectivePrice = $effectivePrices[(int) $product->getVirtualColumn('pse_id')] ?? null;
+            // The price orders and the `min_price` / `max_price` filters read the public
+            // prices (the catalog and the stored public rules) through the SQL joins of
+            // addPriceJoins(): what a customer, a group or a discount alone is entitled to
+            // stays out of them, so a page ordered or filtered by price does so on public
+            // prices.
+            $resolvedPrice = $resolvedPrices[(int) $product->getVirtualColumn('pse_id')] ?? null;
 
-            if (null !== $effectivePrice) {
-                $product->setVirtualColumn('promo_price', $effectivePrice->untaxedPromoPrice);
-                $product->setVirtualColumn('is_promo', 1);
-                $product->setVirtualColumn('display_initial_price', $effectivePrice->displayInitialPrice ? 1 : 0);
+            if (null !== $resolvedPrice) {
+                $product->setVirtualColumn('price', $resolvedPrice->untaxedPrice);
+                $product->setVirtualColumn('promo_price', $resolvedPrice->untaxedPromoPrice);
+                $product->setVirtualColumn('is_promo', $resolvedPrice->isPromo ? 1 : 0);
+
+                // Struck-through or not is the sale's call while the catalog prices the
+                // sale element, and the call of whatever priced it otherwise.
+                if (ResolvedPrice::SOURCE_BASE !== $resolvedPrice->source) {
+                    $product->setVirtualColumn('display_initial_price', $resolvedPrice->displayInitialPrice ? 1 : 0);
+                }
             }
 
             $price = $product->getVirtualColumn('price');
-
-            if (!$this->getBackendContext()
-                && $securityContext->hasCustomerUser()
-                && $securityContext->getCustomerUser()?->getDiscount() > 0) {
-                $price *= (1 - ($securityContext->getCustomerUser()?->getDiscount() / 100));
-            }
 
             try {
                 $taxedPrice = $product->getTaxedPrice(
@@ -304,12 +308,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
 
             $promoPrice = $product->getVirtualColumn('promo_price');
-
-            if (!$this->getBackendContext()
-                && $securityContext->hasCustomerUser()
-                && $securityContext->getCustomerUser()?->getDiscount() > 0) {
-                $promoPrice *= (1 - ($securityContext->getCustomerUser()?->getDiscount() / 100));
-            }
 
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
@@ -328,7 +326,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set('QUANTITY', $product->getVirtualColumn('quantity'))
                 ->set('EAN_CODE', $product->getVirtualColumn('ean_code'))
                 ->set('BEST_PRICE', $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
-                ->set('BEST_PRICE_TAX', $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
+                ->set('BEST_PRICE_TAX', $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
                 ->set('BEST_TAXED_PRICE', $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
                 ->set('PRICE', $price)
                 ->set('PRICE_TAX', $taxedPrice - $price)
@@ -359,9 +357,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $taxCountry = $this->taxEngine->getDeliveryCountry();
         $taxState = $this->taxEngine->getDeliveryState();
 
-        /** @var SecurityContext $securityContext */
-        $securityContext = $this->container->get('thelia.securityContext');
-        $lowestEffectivePrices = $this->lowestEffectivePricesOf($loopResult);
+        $cheapestPrices = $this->cheapestResolvedPricesOf($loopResult);
 
         /** @var ProductModel $product */
         foreach ($loopResult->getResultDataCollection() as $product) {
@@ -370,18 +366,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $price = $product->getRealLowestPrice();
             $isPromo = $product->getVirtualColumn('main_product_is_promo');
 
-            // The complex loop prices a product by the lowest of its sale elements,
-            // so a rule or a reserved operation only changes that price when it beats
-            // it — either may well cover one combination out of five.
-            $lowestEffectivePrice = $lowestEffectivePrices[(int) $product->getId()] ?? null;
+            // The complex loop prices a product by its cheapest sale element. For a visitor
+            // something prices beyond the catalog, that is the cheapest price the customer
+            // price context gives them over the sale elements the criteria retain.
+            $cheapestPrice = $cheapestPrices[(int) $product->getId()] ?? null;
 
-            if (null !== $lowestEffectivePrice && $lowestEffectivePrice->untaxedPromoPrice < (float) $price) {
-                $price = $lowestEffectivePrice->untaxedPromoPrice;
-                $isPromo = 1;
-            }
-
-            if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $price *= (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
+            if (null !== $cheapestPrice) {
+                $price = $cheapestPrice->chargedPrice();
+                $isPromo = $cheapestPrice->isPromo ? 1 : 0;
             }
 
             try {
@@ -608,9 +600,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $defaultCurrency = CurrencyModel::getDefaultCurrency();
         $defaultCurrencySuffix = '_default_currency';
 
+        // A default currency price is converted at rate / default rate, the way the cart
+        // converts it: the rate alone is only right while the default rate is 1.
+        $factorAsSql = $this->currencyConverter->factorAsSql($currency);
+
         $priceToCompareAsSQL = '';
         $isPSELeftJoinList = [];
         $isProductPriceFirstLeftJoin = [];
+
+        $this->retainedSaleElementsAliases = [];
 
         $search = ProductQuery::create();
 
@@ -837,12 +835,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join'.$defaultCurrencySuffix)
                         ->addJoinCondition('is_min_price_join'.$defaultCurrencySuffix, '`min_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
-                    /**
-                     * In propel we trust : $currency->getRate() always returns a float.
-                     * Or maybe not : rate value is checked as a float in overloaded getRate method.
-                     */
                     $MinPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `min_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
+                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `min_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$factorAsSql.'
                 ELSE
                     CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END
                 END';
@@ -873,12 +867,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->addJoinObject($maxPriceJoinDefaultCurrency, 'is_max_price_join'.$defaultCurrencySuffix)
                         ->addJoinCondition('is_max_price_join'.$defaultCurrencySuffix, '`max_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
-                    /**
-                     * In propel we trust : $currency->getRate() always returns a float.
-                     * Or maybe not : rate value is checked as a float in overloaded getRate method.
-                     */
-                    $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `max_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
+                    $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) OR `max_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
+                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `max_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$factorAsSql.'
                 ELSE
                     CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END
                 END';
@@ -955,17 +945,16 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $booleanMatchedPriceDefaultCurrency = 'CASE WHEN `'.$isProductPriceFirstLeftJoin[0].'`.PROMO=1 THEN `'.$isProductPriceFirstLeftJoin[1].$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `'.$isProductPriceFirstLeftJoin[1].$defaultCurrencySuffix.'`.PRICE END';
 
             if ($defaultCurrency?->getId() !== $currency->getId()) {
-                /**
-                 * In propel we trust : $currency->getRate() always returns a float.
-                 * Or maybe not : rate value is checked as a float in overloaded getRate method.
-                 */
                 $priceToCompareAsSQL =
                     'CASE WHEN ISNULL('.$booleanMatchedPrice.') THEN '
-                    .$booleanMatchedPriceDefaultCurrency.' * '.$currency->getRate()
+                    .$booleanMatchedPriceDefaultCurrency.' * '.$factorAsSql
                     .' ELSE '.$booleanMatchedPrice.' END';
             } else {
                 $priceToCompareAsSQL = $booleanMatchedPrice;
             }
+
+            // The joins the retained sale elements are read from, see retainedSaleElementsOf().
+            $this->retainedSaleElementsAliases = $isPSELeftJoinList;
 
             $search->withColumn('MAX('.$priceToCompareAsSQL.')', 'real_highest_price');
             $search->withColumn('MIN('.$priceToCompareAsSQL.')', 'real_lowest_price');
@@ -1114,15 +1103,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * The effective prices of the page, resolved once for the whole page rather
-     * than once per row.
+     * What the visitor pays for the sale element of each row of the page, resolved once
+     * for the whole page rather than once per row.
      *
-     * Empty in the back office: the catalog is what it edits, and a rule price or a
-     * reserved price is deliberately not part of the catalog.
+     * Empty in the back office: the catalog is what it edits, and what a rule, an
+     * operation, a group or a discount gives a customer is deliberately not part of it.
      *
-     * @return array<int, EffectivePrice> keyed by sale element id
+     * @return array<int, ResolvedPrice> keyed by sale element id
      */
-    private function effectivePricesOf(LoopResult $loopResult): array
+    private function resolvedPricesOf(LoopResult $loopResult): array
     {
         if ($this->getBackendContext() || !$this->currency instanceof CurrencyModel) {
             return [];
@@ -1135,17 +1124,71 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $productSaleElementsIds[] = (int) $product->getVirtualColumn('pse_id');
         }
 
-        return $this->effectivePriceCatalog->warm(
-            $productSaleElementsIds,
-            $this->currency,
-            $this->reservedSaleVisibility->currentCustomer(),
-        );
+        return $this->visitorPriceReader->resolve($productSaleElementsIds, $this->currency);
     }
 
     /**
-     * @return array<int, EffectivePrice> keyed by product id
+     * The sale elements the criteria of the loop retain, for each product of the page, so
+     * that the price a visitor is charged is the one of a sale element the loop would have
+     * returned - not of one it filtered out (out of stock, other attribute, not in promo...).
+     *
+     * One query for the whole page, run on the very criteria of the loop (the filters of the
+     * loop, the extensions of modules and the search included) restricted to the products of
+     * the page: no aggregated list whose length a database setting could cut.
+     *
+     * @param list<int> $productIds
+     *
+     * @return array<int, list<int>> sale element ids, keyed by product id
      */
-    private function lowestEffectivePricesOf(LoopResult $loopResult): array
+    private function retainedSaleElementsOf(array $productIds): array
+    {
+        $search = $this->extendsBuildModelCriteria($this->buildModelCriteria());
+
+        if (!$search instanceof ProductQuery) {
+            return [];
+        }
+
+        $this->setupSearchContext($search);
+
+        $columns = ['retained_product_id'];
+
+        $search
+            ->clearSelectColumns()
+            ->clearOrderByColumns()
+            ->clearGroupByColumns()
+            ->setDistinct()
+            ->withColumn(ProductTableMap::COL_ID, 'retained_product_id');
+
+        foreach ($this->retainedSaleElementsAliases as $index => $alias) {
+            $columns[] = 'retained_'.$index;
+            $search->withColumn('`'.$alias.'`.ID', 'retained_'.$index);
+        }
+
+        $search->filterById($productIds, Criteria::IN)->select($columns);
+
+        $retainedByProduct = [];
+
+        foreach ($search->find() as $row) {
+            $productId = (int) $row['retained_product_id'];
+
+            foreach (\array_slice($columns, 1) as $column) {
+                if (null !== $row[$column]) {
+                    $retainedByProduct[$productId][(int) $row[$column]] = (int) $row[$column];
+                }
+            }
+        }
+
+        return array_map(array_values(...), $retainedByProduct);
+    }
+
+    /**
+     * The cheapest price the visitor is charged among the sale elements of each product
+     * of the page that the criteria of the loop retain, for the complex form of the
+     * loop: one resolution for the whole page.
+     *
+     * @return array<int, ResolvedPrice> keyed by product id
+     */
+    private function cheapestResolvedPricesOf(LoopResult $loopResult): array
     {
         if ($this->getBackendContext() || !$this->currency instanceof CurrencyModel) {
             return [];
@@ -1158,11 +1201,28 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $productIds[] = (int) $product->getId();
         }
 
-        return $this->effectivePriceCatalog->lowestForProducts(
-            $productIds,
-            $this->currency,
-            $this->reservedSaleVisibility->currentCustomer(),
-        );
+        if ([] === $productIds || !$this->visitorPriceReader->mayPriceBeyondTheCatalog()) {
+            return [];
+        }
+
+        $retainedByProduct = $this->retainedSaleElementsOf($productIds);
+        $productSaleElementsIds = array_merge([], ...array_values($retainedByProduct));
+
+        $resolvedPrices = $this->visitorPriceReader->resolve(array_values(array_unique($productSaleElementsIds)), $this->currency);
+
+        $cheapest = [];
+
+        foreach ($retainedByProduct as $productId => $retained) {
+            foreach ($retained as $productSaleElementsId) {
+                $price = $resolvedPrices[$productSaleElementsId] ?? null;
+
+                if (null !== $price && (!isset($cheapest[$productId]) || $price->chargedPrice() < $cheapest[$productId]->chargedPrice())) {
+                    $cheapest[$productId] = $price;
+                }
+            }
+        }
+
+        return $cheapest;
     }
 
     /**
@@ -1249,19 +1309,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->addJoinObject($priceJoinDefaultCurrency, 'price_join'.$defaultCurrencySuffix)
                 ->addJoinCondition('price_join'.$defaultCurrencySuffix, '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
-            /**
-             * rate value is checked as a float in overloaded getRate method.
-             */
+            $factorAsSql = $this->currencyConverter->factorAsSql($currency);
+
             $priceToCompareAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN
-                CASE WHEN `pse`.PROMO=1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `price'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
+                CASE WHEN `pse`.PROMO=1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `price'.$defaultCurrencySuffix.'`.PRICE END * '.$factorAsSql.'
             ELSE
                 CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
             END';
 
             $priceToCompareAsSQL = $this->withRulePrice($priceToCompareAsSQL, $rulePriceJoined);
             $search->withColumn($priceToCompareAsSQL, 'real_price');
-            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END', 'price');
-            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END', 'promo_price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PRICE * '.$factorAsSql.' ELSE `price`.PRICE END', 'price');
+            $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE * '.$factorAsSql.' ELSE `price`.PROMO_PRICE END', 'promo_price');
         } else {
             $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
 

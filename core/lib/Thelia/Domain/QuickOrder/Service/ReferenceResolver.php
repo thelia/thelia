@@ -19,7 +19,7 @@ use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Localization\Service\LangService;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\QuickOrder\DTO\Candidate;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderTable;
@@ -41,7 +41,6 @@ use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
-use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
@@ -71,7 +70,7 @@ final readonly class ReferenceResolver
 {
     public function __construct(
         private ProductVisibility $productVisibility,
-        private EffectivePriceCatalog $effectivePriceCatalog,
+        private CustomerPriceContextInterface $customerPriceContext,
         private TaxEngine $taxEngine,
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
         private LangService $langService,
@@ -420,10 +419,10 @@ final readonly class ReferenceResolver
 
     /**
      * The unit price each sale element sells at to this customer, before tax, in the
-     * given currency: the catalog price converted from the default currency when the
-     * currency has none of its own, the promo price when the sale element is on
-     * promotion or a price rule covers it, the customer discount applied. Null for a
-     * sale element that has no price at all.
+     * given currency, as the customer price context resolves it for the whole batch:
+     * the price of the customer group, the discounts, the price rules and the reserved
+     * operations are all in it, and the promo price when the sale element is on
+     * promotion. Null for a sale element that has no price at all.
      *
      * @param array<int, ProductSaleElements> $saleElements
      *
@@ -435,52 +434,15 @@ final readonly class ReferenceResolver
             return [];
         }
 
-        $ids = array_keys($saleElements);
-        $currencyId = (int) $currency->getId();
-        $defaultCurrency = Currency::getDefaultCurrency();
-        $defaultCurrencyId = (int) $defaultCurrency->getId();
-        $rows = [];
-
-        $query = ProductPriceQuery::create()
-            ->filterByProductSaleElementsId($ids)
-            ->filterByCurrencyId(array_values(array_unique([$currencyId, $defaultCurrencyId])))
-            ->find();
-
-        foreach ($query as $row) {
-            $rows[(int) $row->getProductSaleElementsId()][(int) $row->getCurrencyId()] = $row;
-        }
-
-        $factor = 1 - ((float) $customer->getDiscount() / 100);
-        $effectivePrices = $this->effectivePriceCatalog->warm($ids, $currency, $customer);
+        $resolved = $this->customerPriceContext->resolve(array_keys($saleElements), $currency, $customer);
         $prices = [];
 
-        foreach ($saleElements as $id => $saleElementsRow) {
-            $row = $rows[$id][$currencyId] ?? null;
-            $rate = 1.0;
+        foreach (array_keys($saleElements) as $id) {
+            $price = $resolved[$id] ?? null;
 
-            if (null === $row || $row->getFromDefaultCurrency()) {
-                $row = $rows[$id][$defaultCurrencyId] ?? null;
-                $rate = (float) $currency->getRate() / (float) $defaultCurrency->getRate();
-            }
-
-            if (null === $row) {
-                $prices[$id] = null;
-
-                continue;
-            }
-
-            $promo = (bool) $saleElementsRow->getPromo();
-            $promoPrice = (float) $row->getPromoPrice() * $rate * $factor;
-            $effectivePrice = $effectivePrices[$id] ?? null;
-
-            if (null !== $effectivePrice) {
-                $promoPrice = $effectivePrice->untaxedPromoPrice * $factor;
-                $promo = true;
-            }
-
-            $prices[$id] = [
-                'untaxed' => $promo ? $promoPrice : (float) $row->getPrice() * $rate * $factor,
-                'promo' => $promo,
+            $prices[$id] = null === $price ? null : [
+                'untaxed' => $price->chargedPrice(),
+                'promo' => $price->isPromo,
             ];
         }
 

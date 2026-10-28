@@ -32,7 +32,6 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\OrderProduct as OrderProductModel;
 use Thelia\Model\ProductQuery;
@@ -248,8 +247,42 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public ?float $promoPrice = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
+    /**
+     * The taxed price of one unit as the line was charged: the promotional price and its tax
+     * for a line bought on promotion (the order loop's REAL_TAXED_PRICE), the price and its
+     * tax otherwise.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?float $unitTaxedPrice = null;
+
+    /**
+     * The taxed price of one unit before the promotion: the crossed-out price of a line bought
+     * on promotion, and the price itself of a line that was not (the order loop's TAXED_PRICE).
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
+    public ?float $unitTaxedPriceBeforePromotion = null;
+
+    /**
+     * The taxed promotional price of one unit, whether or not the line was bought on promotion
+     * (the order loop's TAXED_PROMO_PRICE).
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
+    public ?float $taxedPromoPrice = null;
+
+    /**
+     * What the line was charged without tax, for its whole quantity: the promotional price when
+     * the line was bought on promotion, built the way the rounding mode of the order builds the
+     * order total (the order product loop's REAL_TOTAL_PRICE). A service line, a gift wrapping,
+     * is stated with it, and a theme never multiplies a unit price by a quantity.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
+    public ?float $lineTotalWithoutTaxes = null;
+
+    /**
+     * The same with its tax: what the buyer paid for the line (REAL_TOTAL_TAXED_PRICE).
+     */
+    #[Groups([self::GROUP_ADMIN_READ, Order::GROUP_ADMIN_READ_SINGLE, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ])]
+    public ?float $lineTotalWithTaxes = null;
 
     #[Groups([self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -554,25 +587,25 @@ class OrderProduct implements PropelResourceInterface
         return null === $this->unitTaxedPrice ? null : $this->unitAmount($this->unitTaxedPrice);
     }
 
+    public function getUnitTaxedPriceBeforePromotion(): ?float
+    {
+        return null === $this->unitTaxedPriceBeforePromotion ? null : $this->unitAmount($this->unitTaxedPriceBeforePromotion);
+    }
+
+    public function getTaxedPromoPrice(): ?float
+    {
+        return null === $this->taxedPromoPrice ? null : $this->unitAmount($this->taxedPromoPrice);
+    }
+
     /**
-     * Exposes a unit amount with the precision the order total was built from.
-     *
-     * Under sum of roundings the total multiplies unit amounts already rounded
-     * to the cent, so the cent is what the line was charged on. Under rounding
-     * of sums the total keeps the stored precision, and a unit price cut to the
-     * cent here would no longer multiply up to the total the customer paid --
-     * which is the whole point of a price per gram or per millilitre.
+     * Exposes a unit amount with the precision the order total was built from: the reading
+     * of {@see OrderProductModel::roundUnitAmount()}, for a line that is not saved yet too.
      */
     private function unitAmount(float $amount): float
     {
         $propelModel = $this->getPropelModel();
-        $orderId = $propelModel instanceof OrderProductModel ? $propelModel->getOrderId() : null;
 
-        if (ConfigQuery::isRoundingModeRoundingOfSums($orderId)) {
-            return $amount;
-        }
-
-        return round($amount, 2);
+        return ($propelModel instanceof OrderProductModel ? $propelModel : new OrderProductModel())->roundUnitAmount($amount);
     }
 
     public function isWasNew(): bool
@@ -771,21 +804,18 @@ class OrderProduct implements PropelResourceInterface
 
         // The taxes are read from the model, not from $orderProductTaxes: that
         // relation belongs to the single read only, while unitTaxedPrice is
-        // returned by the collections too.
-        $taxes = $propelModel->getOrderProductTaxes();
+        // returned by the collections too. A line with no tax row is taxed at
+        // its price, not unknown.
+        $this->unitTaxedPrice = $propelModel->getTaxedUnitPrice((bool) $propelModel->getWasInPromo());
+        $this->unitTaxedPriceBeforePromotion = $propelModel->getTaxedUnitPrice(false);
 
-        if (0 === $taxes->count()) {
-            return;
+        if (null !== $propelModel->getPromoPrice()) {
+            $this->taxedPromoPrice = $propelModel->getTaxedUnitPrice(true);
         }
 
-        $wasInPromo = (bool) $propelModel->getWasInPromo();
-        $totalTax = 0.0;
-
-        foreach ($taxes as $tax) {
-            $totalTax += (float) ($wasInPromo ? $tax->getPromoAmount() : $tax->getAmount());
-        }
-
-        $this->unitTaxedPrice = (float) $propelModel->getPrice() + $totalTax;
+        $chargedTotals = $propelModel->getChargedLineTotals();
+        $this->lineTotalWithoutTaxes = $chargedTotals['untaxed'];
+        $this->lineTotalWithTaxes = $chargedTotals['taxed'];
     }
 
     public static function getPropelRelatedTableMap(): ?TableMap

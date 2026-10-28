@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -35,7 +36,10 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Security\SaleUnitScopeVoter;
 use Thelia\Api\State\Processor\CustomerDeleteProcessor;
+use Thelia\Api\State\Processor\CustomerRegistrationProcessor;
+use Thelia\Api\State\Processor\CustomerUpdateProcessor;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
@@ -45,6 +49,7 @@ use Thelia\Model\Map\CustomerTableMap;
     operations: [
         new Post(
             uriTemplate: '/admin/customers',
+            securityPostDenormalize: self::SECURITY_NO_GROUP_CHANGE_FOR_A_NEW_CUSTOMER,
         ),
         new GetCollection(
             uriTemplate: '/admin/customers',
@@ -55,11 +60,15 @@ use Thelia\Model\Map\CustomerTableMap;
         ),
         new Put(
             uriTemplate: '/admin/customers/{id}',
+            processor: CustomerUpdateProcessor::class,
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            securityPostDenormalize: self::SECURITY_NO_GROUP_CHANGE,
         ),
         new Patch(
             uriTemplate: '/admin/customers/{id}',
+            processor: CustomerUpdateProcessor::class,
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            securityPostDenormalize: self::SECURITY_NO_GROUP_CHANGE,
         ),
         new Delete(
             uriTemplate: '/admin/customers/{id}',
@@ -71,8 +80,14 @@ use Thelia\Model\Map\CustomerTableMap;
 )]
 #[ApiResource(
     operations: [
-        new Post( // todo custom route
+        // Open to a visitor, behind the API rate limit of an anonymous caller. The body is the
+        // registration input, which has no group: a token resolves the group on the server.
+        new Post(
             uriTemplate: '/front/customers',
+            input: CustomerRegistrationInput::class,
+            denormalizationContext: ['groups' => [self::GROUP_FRONT_REGISTER]],
+            validationContext: ['groups' => [self::GROUP_FRONT_REGISTER]],
+            processor: CustomerRegistrationProcessor::class,
         ),
         new Get(
             uriTemplate: '/front/account/customers/{id}',
@@ -96,6 +111,7 @@ use Thelia\Model\Map\CustomerTableMap;
         'ref',
         'firstname',
         'lastname',
+        'customerGroup.id' => 'exact',
     ],
 )]
 #[ApiFilter(
@@ -123,12 +139,23 @@ class Customer implements PropelResourceInterface
 {
     use PropelResourceTrait;
 
+    /**
+     * Moving a customer to another group changes what it pays and sees in every sale unit: an
+     * administrator restricted to a unit may write the customer, not its group (403 when the group
+     * sent is not the one the customer has).
+     */
+    public const SECURITY_NO_GROUP_CHANGE = 'is_granted("'.SaleUnitScopeVoter::UNRESTRICTED.'") or object.customerGroup === null or object.customerGroup.id === previous_object?.customerGroup?.id';
+
+    /** A new customer has no group to keep: a restricted administrator creates it in the default one. */
+    public const SECURITY_NO_GROUP_CHANGE_FOR_A_NEW_CUSTOMER = 'is_granted("'.SaleUnitScopeVoter::UNRESTRICTED.'") or object.customerGroup === null';
+
     public const GROUP_ADMIN_READ = 'admin:customer:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:customer:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:customer:write';
     public const GROUP_ADMIN_WRITE_UPDATE = 'admin:customer:write:update';
     public const GROUP_FRONT_READ_SINGLE = 'front:customer:read:single';
     public const GROUP_FRONT_WRITE = 'front:customer:write';
+    public const GROUP_FRONT_REGISTER = 'front:customer:register';
 
     #[Groups([self::GROUP_ADMIN_READ,
         Address::GROUP_ADMIN_READ,
@@ -149,6 +176,20 @@ class Customer implements PropelResourceInterface
     ])]
     #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
+
+    /**
+     * The group the customer belongs to. An administrator moves the customer to
+     * another group; the customer never does, and a new account joins the default
+     * group whatever it sends. The front only learns its code and title.
+     */
+    #[Relation(targetResource: CustomerGroup::class, preload: true)]
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_READ_SINGLE,
+        self::GROUP_ADMIN_WRITE,
+        self::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?CustomerGroup $customerGroup = null;
 
     #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_WRITE])]
@@ -211,13 +252,13 @@ class Customer implements PropelResourceInterface
     public ?string $sponsor = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Range(min: 0, max: 100, groups: [self::GROUP_ADMIN_WRITE])]
     public ?float $discount = null;
 
     public ?string $rememberMeToken = null;
     public ?string $rememberMeSerial = null;
     public ?bool $enable = null;
 
-    #[Groups([self::GROUP_FRONT_READ_SINGLE])]
     public ?string $confirmationToken = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -254,6 +295,18 @@ class Customer implements PropelResourceInterface
     public function setCustomerTitle(CustomerTitle $customerTitle): self
     {
         $this->customerTitle = $customerTitle;
+
+        return $this;
+    }
+
+    public function getCustomerGroup(): ?CustomerGroup
+    {
+        return $this->customerGroup;
+    }
+
+    public function setCustomerGroup(?CustomerGroup $customerGroup): self
+    {
+        $this->customerGroup = $customerGroup;
 
         return $this;
     }

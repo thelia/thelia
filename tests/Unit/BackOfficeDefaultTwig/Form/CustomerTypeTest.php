@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\BackOfficeDefaultTwig\Form;
 
 use BackOfficeDefaultTwigBundle\Form\Customer\CustomerType;
+use BackOfficeDefaultTwigBundle\Service\CustomerGroup\PostedCustomerGroupIds;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -33,6 +34,15 @@ final class CustomerTypeTest extends TestCase
     ];
 
     private const IDENTITY_FIELDS = ['title', 'firstname', 'lastname', 'email', 'lang_id', 'discount', 'reseller'];
+
+    protected function setUp(): void
+    {
+        // The core and the back-office theme ship in separate releases: a checkout of the
+        // core runs with a theme that may not carry the customer group field yet.
+        if (!class_exists(PostedCustomerGroupIds::class)) {
+            self::markTestSkipped('The back-office theme installed predates the customer groups.');
+        }
+    }
 
     public function testAddressFieldsArePresentByDefault(): void
     {
@@ -86,6 +96,7 @@ final class CustomerTypeTest extends TestCase
             'title_choices' => ['Mr' => 1],
             'country_choices' => ['France' => 64],
             'lang_choices' => ['Français' => 1],
+            'group_choices' => ['Default' => 1],
             'include_address' => false,
         ]);
         $builder->add('cellphone', TextType::class, ['constraints' => [new NotBlank()], 'required' => true]);
@@ -108,6 +119,29 @@ final class CustomerTypeTest extends TestCase
         $this->assertFalse($form->isValid(), 'the default form must keep its address constraints');
     }
 
+    public function testGroupFieldIsPresentAndRequiredOnEdit(): void
+    {
+        $form = $this->createForm(['include_id' => true, 'include_address' => false]);
+
+        $this->assertTrue($form->has('customer_group_id'));
+        $this->assertTrue($form->get('customer_group_id')->getConfig()->getRequired());
+        $this->assertNull($form->get('customer_group_id')->getConfig()->getOption('placeholder'), 'an existing account always holds a group: no empty choice');
+
+        $form->submit([
+            'title' => '1', 'firstname' => 'Ada', 'lastname' => 'Lovelace', 'email' => 'ada@example.com',
+            'id' => '5', 'customer_group_id' => '',
+        ]);
+        $this->assertFalse($form->get('customer_group_id')->isValid(), 'an edit without a group must be refused');
+    }
+
+    public function testGroupFieldIsOptionalOnCreation(): void
+    {
+        $form = $this->createForm([]);
+
+        $this->assertFalse($form->get('customer_group_id')->getConfig()->getRequired());
+        $this->assertNotNull($form->get('customer_group_id')->getConfig()->getOption('placeholder'), 'left empty, the core files the account under the default group');
+    }
+
     private function formFactory(): FormFactoryInterface
     {
         return Forms::createFormFactoryBuilder()
@@ -125,6 +159,7 @@ final class CustomerTypeTest extends TestCase
             'title_choices' => ['Mr' => 1],
             'country_choices' => ['France' => 64],
             'lang_choices' => ['Français' => 1],
+            'group_choices' => ['Default' => 1, 'Wholesale' => 2],
         ], $options));
     }
 }

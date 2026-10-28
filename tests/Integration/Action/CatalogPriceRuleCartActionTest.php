@@ -20,6 +20,8 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContext;
+use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -148,6 +150,11 @@ final class CatalogPriceRuleCartActionTest extends ActionIntegrationTestCase
 
     private function restoreCartAsCustomer(Cart $cart, Customer $customer): CartItem
     {
+        // Entitlements change between two requests, never in the middle of one: what
+        // the previous request resolved is not remembered by the next.
+        $this->getService(CustomerPriceContext::class)->reset();
+        $this->getService(EffectivePriceCatalog::class)->reset();
+
         $this->mainRequest()->cookies->set(
             ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
             $cart->getToken(),

@@ -22,17 +22,11 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggreg
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Api\Resource\FilterValue;
-use Thelia\Domain\Pricing\EffectivePrice;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
-use Thelia\Domain\Pricing\PricingActivityChecker;
-use Thelia\Domain\Sale\CurrentCustomerProvider;
+use Thelia\Domain\Catalog\Product\VisitorPriceReader;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
-use Thelia\Model\Customer;
 use Thelia\Model\Product;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRule;
@@ -41,12 +35,13 @@ use Thelia\Model\TaxRule;
  * Narrows a listing to a price interval, the one a buyer draws with the two handles of a
  * slider.
  *
- * The price is the one the product card shows: that of the default combination, its promotional
- * price when the combination is on sale or when a catalog price rule or a reserved sale prices
- * it, in the currency the shop is browsed in, taxes of the visitor's delivery country included.
- * The front API serves the card the same way (ProductPriceCurrencyListener picks the currency,
- * EffectivePriceListener the rule price), and this filter asks the same services. A slider
- * drawn on untaxed prices would keep, between 0 and 50, a card reading 55.
+ * The price is the one the product card shows: what the visitor pays for the default
+ * combination - the price of their group, the promotional price, the one a catalog price rule
+ * or a reserved sale gives, then the discounts of their group and their own - in the currency
+ * the shop is browsed in, taxes of the visitor's delivery country included unless their group
+ * is shown untaxed prices. The front API serves the card the same way (ProductPriceCurrencyListener
+ * picks the currency, EffectivePriceListener the price), and this filter asks the same service.
+ * A slider drawn on untaxed prices would keep, between 0 and 50, a card reading 55.
  *
  * The two values of the facet are the bounds of the slider, the cheapest and the dearest
  * product of the listing, rounded outwards to whole units. Their title carries the bound, which
@@ -56,7 +51,10 @@ use Thelia\Model\TaxRule;
  * Taxes depend on the product (a tax can read a feature of it), so prices are computed product
  * by product rather than in SQL, and kept for the request. Narrowing the listing adds a
  * condition on the product ids and joins nothing: the order the listing is sorted in is left
- * as it was.
+ * as it was. Only the products the query holds when the filter is applied are priced, not the
+ * whole catalogue: the filters applied after this one can only narrow that set further, so a
+ * product left out of it could not have been in the listing. What the resolver priced stays
+ * known for the request, so the price order of the same listing reads it without pricing again.
  */
 final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface, ResetInterface
 {
@@ -66,15 +64,13 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
 
     public const UPPER_BOUND = 2;
 
-    /** @var array<string, array<int, float>> displayed prices of every product, per currency, country and customer */
+    /** @var array<string, array<int, float|null>> displayed price of each product priced so far (null: none to show), per currency, country and customer */
     private array $catalogue = [];
 
     public function __construct(
         private readonly TaxEngine $taxEngine,
         private readonly ProductPriceCurrencyListener $currencyResolver,
-        private readonly EffectivePriceCatalog $effectivePriceCatalog,
-        private readonly PricingActivityChecker $activityChecker,
-        private readonly CurrentCustomerProvider $currentCustomerProvider,
+        private readonly VisitorPriceReader $visitorPriceReader,
     ) {
     }
 
@@ -99,7 +95,7 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
         [$min, $max] = $bounds;
         $productIds = [];
 
-        foreach ($this->displayedPrices(null) as $productId => $price) {
+        foreach ($this->displayedPrices($this->idsOf($query)) as $productId => $price) {
             if (($min === null || $price >= $min) && ($max === null || $price <= $max)) {
                 $productIds[] = $productId;
             }
@@ -198,87 +194,91 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
     }
 
     /**
+     * The products the query holds at this point, which the filters applied after this one can
+     * only narrow. Only their id is read: the query of a collection may eager load columns of
+     * the relations it serializes. The order is dropped with them: it does not change which
+     * products are held, and it may be written on a virtual column of the query (withColumn())
+     * that this read no longer selects.
+     *
+     * @return list<int>
+     */
+    private function idsOf(ModelCriteria $query): array
+    {
+        return array_values(array_unique(array_map('intval', (clone $query)->clearSelectColumns()->clearOrderByColumns()->select('Id')->find()->getData())));
+    }
+
+    /**
      * The price each product shows on its card, rounded to the cent. A product without a
      * default combination, or whose combination has no price in either the visitor's currency
      * or the default one, has no price to show and is left out.
      *
-     * @param list<int>|null $productIds null for every product
+     * @param list<int> $productIds
      *
      * @return array<int, float>
      */
-    private function displayedPrices(?array $productIds): array
+    private function displayedPrices(array $productIds): array
     {
         $currency = $this->currencyResolver->currentCurrency();
         $country = $this->taxEngine->getDeliveryCountry();
-        $customer = $this->pricingCustomer();
+        $customer = $this->visitorPriceReader->currentCustomer();
         $key = $currency->getId().'-'.$country->getId().'-'.($customer?->getId() ?? 0);
 
-        if (isset($this->catalogue[$key])) {
-            return $productIds === null
-                ? $this->catalogue[$key]
-                : array_intersect_key($this->catalogue[$key], array_flip($productIds));
+        $missing = array_values(array_filter(
+            $productIds,
+            fn (int $productId): bool => !\array_key_exists($productId, $this->catalogue[$key] ?? []),
+        ));
+
+        if ($missing !== []) {
+            $computed = $this->computeDisplayedPrices($missing, $currency, $country);
+
+            foreach ($missing as $productId) {
+                $this->catalogue[$key][$productId] = $computed[$productId] ?? null;
+            }
         }
 
-        $prices = $this->computeDisplayedPrices($productIds, $currency, $country, $customer);
+        $prices = [];
 
-        if ($productIds === null) {
-            $this->catalogue[$key] = $prices;
+        foreach ($productIds as $productId) {
+            $price = $this->catalogue[$key][$productId] ?? null;
+
+            if ($price !== null) {
+                $prices[$productId] = $price;
+            }
         }
 
         return $prices;
     }
 
     /**
-     * @param list<int>|null $productIds
+     * @param list<int> $productIds
      *
      * @return array<int, float>
      */
-    private function computeDisplayedPrices(?array $productIds, Currency $currency, Country $country, ?Customer $customer): array
+    private function computeDisplayedPrices(array $productIds, Currency $currency, Country $country): array
     {
-        $saleElements = ProductSaleElementsQuery::create()->filterByIsDefault(true);
+        $saleElements = ProductSaleElementsQuery::create()
+            ->filterByIsDefault(true)
+            ->filterByProductId($productIds, Criteria::IN);
 
-        if ($productIds !== null) {
-            $saleElements->filterByProductId($productIds, Criteria::IN);
-        }
-
-        /** @var array<int, array{Id: int, ProductId: int, Promo: int}> $rows */
-        $rows = $saleElements->select(['Id', 'ProductId', 'Promo'])->find()->getData();
+        /** @var array<int, array{Id: int, ProductId: int}> $rows */
+        $rows = $saleElements->select(['Id', 'ProductId'])->find()->getData();
 
         if ($rows === []) {
             return [];
         }
 
-        $defaultCurrency = Currency::getDefaultCurrency();
-        $pricesBySaleElement = [];
-
-        /** @var ProductPrice $productPrice */
-        foreach (ProductPriceQuery::create()
-            ->filterByProductSaleElementsId(array_column($rows, 'Id'), Criteria::IN)
-            ->filterByCurrencyId(array_unique([$currency->getId(), $defaultCurrency->getId()]), Criteria::IN)
-            ->find() as $productPrice
-        ) {
-            $pricesBySaleElement[$productPrice->getProductSaleElementsId()][$productPrice->getCurrencyId()] = $productPrice;
-        }
-
-        $effectivePrices = $this->effectivePrices(array_map('intval', array_column($rows, 'Id')), $currency, $customer);
+        $resolvedPrices = $this->visitorPriceReader->resolve(array_map('intval', array_column($rows, 'Id')), $currency, true);
         $untaxedByProduct = [];
 
         foreach ($rows as $row) {
-            $effectivePrice = $effectivePrices[(int) $row['Id']] ?? null;
-            $untaxed = $effectivePrice instanceof EffectivePrice
-                ? $effectivePrice->untaxedPromoPrice
-                : $this->untaxedPrice(
-                    $pricesBySaleElement[(int) $row['Id']] ?? [],
-                    (bool) $row['Promo'],
-                    $currency,
-                    $defaultCurrency,
-                );
+            $resolvedPrice = $resolvedPrices[(int) $row['Id']] ?? null;
 
-            if ($untaxed !== null) {
-                $untaxedByProduct[(int) $row['ProductId']] = $untaxed;
+            if ($resolvedPrice !== null) {
+                $untaxedByProduct[(int) $row['ProductId']] = $resolvedPrice->chargedPrice();
             }
         }
 
+        $displaysTaxedPrices = $this->visitorPriceReader->displaysTaxedPrices();
         $displayed = [];
 
         /** @var Product $product */
@@ -289,8 +289,9 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
         ) {
             $untaxed = $untaxedByProduct[(int) $product->getId()];
 
-            // No tax rule means no tax, as on the product card.
-            $taxed = $product->getTaxRule() instanceof TaxRule
+            // No tax rule means no tax, as on the product card; a group shown untaxed
+            // prices is drawn its slider on them.
+            $taxed = $displaysTaxedPrices && $product->getTaxRule() instanceof TaxRule
                 ? (float) $product->getTaxedPrice($country, $untaxed)
                 : $untaxed;
 
@@ -298,57 +299,5 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
         }
 
         return $displayed;
-    }
-
-    /**
-     * The untaxed price of a combination in the visitor's currency, the way
-     * ProductSaleElements::getPricesByCurrency() reads it: the price typed in that currency,
-     * or the default currency's converted when none was typed.
-     *
-     * @param array<int, ProductPrice> $prices by currency id
-     */
-    private function untaxedPrice(array $prices, bool $promo, Currency $currency, Currency $defaultCurrency): ?float
-    {
-        $price = $prices[$currency->getId()] ?? null;
-        $rate = 1.0;
-
-        if (!$price instanceof ProductPrice || $price->getFromDefaultCurrency()) {
-            $price = $prices[$defaultCurrency->getId()] ?? null;
-            $rate = (float) $currency->getRate() / (float) $defaultCurrency->getRate();
-        }
-
-        if (!$price instanceof ProductPrice) {
-            return null;
-        }
-
-        return (float) ($promo ? $price->getPromoPrice() : $price->getPrice()) * $rate;
-    }
-
-    /**
-     * The price a catalog price rule or a reserved sale gives the visitor, per sale element.
-     *
-     * @param list<int> $saleElementIds
-     *
-     * @return array<int, EffectivePrice>
-     */
-    private function effectivePrices(array $saleElementIds, Currency $currency, ?Customer $customer): array
-    {
-        if (!$this->activityChecker->hasActivePublicRule() && !$this->activityChecker->hasVisitorDependentPricing()) {
-            return [];
-        }
-
-        return $this->effectivePriceCatalog->warm($saleElementIds, $currency, $customer);
-    }
-
-    /**
-     * The customer a price may depend on. Asked only when something prices per visitor, as
-     * EffectivePriceListener does: reading the customer may open the session, and a listing
-     * of a shop where nothing prices beyond the catalogue must stay stateless.
-     */
-    private function pricingCustomer(): ?Customer
-    {
-        return $this->activityChecker->hasVisitorDependentPricing()
-            ? $this->currentCustomerProvider->getCurrentCustomer()
-            : null;
     }
 }
