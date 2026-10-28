@@ -281,7 +281,7 @@ final class AiToolRegistryCallTest extends AiToolTestCase
 
     public function testTheLogRowOfACustomerAndOfAVisitorHoldsTheirHashOnly(): void
     {
-        foreach ([[AiActor::customer(12), 'aiprobe.tools_customer', 'customer:12'], [AiActor::visitor('session-abc'), 'aiprobe.tools_public', 'visitor:session-abc']] as [$actor, $usage, $identity]) {
+        foreach ([[AiActor::customer(987654321), 'aiprobe.tools_customer', 'customer:987654321'], [AiActor::visitor('session-abc'), 'aiprobe.tools_public', 'visitor:session-abc']] as [$actor, $usage, $identity]) {
             $offer = $this->registry->offer(new AiToolContext($actor, $usage), ['aiprobemodule_catalog']);
             $result = $this->registry->call(new AiToolCall('toolu_01', 'aiprobemodule_catalog', []), $offer->context);
 
