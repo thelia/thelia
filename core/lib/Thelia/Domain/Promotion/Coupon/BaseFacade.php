@@ -20,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
@@ -65,7 +66,16 @@ class BaseFacade implements FacadeInterface
      */
     public function getCart(): ?Cart
     {
-        return CartDiscountScope::cart() ?? $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
+        $scopedCart = CartDiscountScope::cart();
+
+        if (null !== $scopedCart) {
+            return $scopedCart;
+        }
+
+        /** @var Session $session */
+        $session = $this->getRequest()->getSession();
+
+        return $session->getSessionCart($this->getDispatcher());
     }
 
     /**

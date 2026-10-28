@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Bridge\Propel;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -26,6 +27,6 @@ final class FrontOperation
 
     public static function isFront(?Operation $operation): bool
     {
-        return str_starts_with((string) $operation?->getUriTemplate(), self::URI_PREFIX);
+        return $operation instanceof HttpOperation && str_starts_with((string) $operation->getUriTemplate(), self::URI_PREFIX);
     }
 }

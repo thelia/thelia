@@ -236,13 +236,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         // The images of a category closed to the customer's group are hidden with it on
         // the front, whichever way the category is named; the back office lists them all.
-        if ('category' === strtolower((string) $objectType) && null !== $search && !$this->getBackendContext()) {
+        if ('category' === strtolower((string) $objectType) && !$this->getBackendContext()) {
             $this->categoryVisibility->applyTo($search, CategoryImageTableMap::COL_CATEGORY_ID);
         }
 
         // Likewise the images of a product the visitor may not see (a private drop, a category
         // closed to the group, a rule of a module).
-        if ('product' === strtolower((string) $objectType) && null !== $search && !$this->getBackendContext()) {
+        if ('product' === strtolower((string) $objectType) && !$this->getBackendContext()) {
             $this->productVisibility->applyTo($search, ProductImageTableMap::COL_PRODUCT_ID);
         }
 

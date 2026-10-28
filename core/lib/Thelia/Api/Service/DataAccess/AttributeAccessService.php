@@ -16,6 +16,7 @@ namespace Thelia\Api\Service\DataAccess;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -561,11 +562,12 @@ class AttributeAccessService
 
         if ([] !== $unpooledIds) {
             // LEFT, as a product with no tax rule must still be handed over, not dropped.
-            $fetched = ProductQuery::create()
+            /** @var ObjectCollection $fetchedProducts */
+            $fetchedProducts = ProductQuery::create()
                 ->joinWithTaxRule(Criteria::LEFT_JOIN)
                 ->filterById($unpooledIds, Criteria::IN)
-                ->find()
-                ->getArrayCopy('Id');
+                ->find();
+            $fetched = $fetchedProducts->getArrayCopy('Id');
 
             $this->seedTitles($fetched);
             $products += $fetched;

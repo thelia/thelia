@@ -492,6 +492,7 @@ class CustomerGroup extends AbstractTranslatableResource
             return;
         }
 
+        /** @var array{RestrictsCategories: int|string, RestrictsPaymentModules: int|string}|null $flags */
         $flags = CustomerGroupQuery::create()
             ->filterById($this->id)
             ->select(['RestrictsCategories', 'RestrictsPaymentModules'])

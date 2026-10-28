@@ -44,14 +44,16 @@ final readonly class CustomerGroupRegistrationLinkProcessor implements Processor
             throw new NotFoundHttpException('Customer group not found.');
         }
 
-        match ($operation->getExtraProperties()[self::ACTION] ?? null) {
+        $action = $operation->getExtraProperties()[self::ACTION] ?? null;
+
+        match ($action) {
             self::OPEN => $this->registration->open($group),
             self::REGENERATE => $this->registration->regenerate($group),
             self::CLOSE => $this->registration->close($group),
             default => throw new \LogicException('The operation does not say what to do with the registration link.'),
         };
 
-        if (self::CLOSE === ($operation->getExtraProperties()[self::ACTION] ?? null)) {
+        if (self::CLOSE === $action) {
             return null;
         }
 

@@ -16,7 +16,6 @@ namespace Thelia\Domain\Customer\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\CustomerGroup;
 use Thelia\Model\CustomerGroupCategory;
@@ -96,10 +95,10 @@ final readonly class CustomerGroupLinks
     /**
      * Brings the links of a group to the ids given: the others are deleted, the missing ones created.
      *
-     * @param ModelCriteria                        $groupLinks   the link query, already narrowed to the group
-     * @param string                               $linkedIdName the PHP name of the column holding the linked id
-     * @param list<int>                            $ids
-     * @param \Closure(int): ActiveRecordInterface $newLink
+     * @param ModelCriteria                                                     $groupLinks   the link query, already narrowed to the group
+     * @param string                                                            $linkedIdName the PHP name of the column holding the linked id
+     * @param list<int>                                                         $ids
+     * @param \Closure(int): (CustomerGroupCategory|CustomerGroupPaymentModule) $newLink
      */
     private function syncLinks(ModelCriteria $groupLinks, string $linkedIdName, array $ids, \Closure $newLink, ConnectionInterface $connection): void
     {

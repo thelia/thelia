@@ -51,7 +51,8 @@ class CustomerGroupResolver implements ResetInterface
 
     public function groupIdOf(?Customer $customer): int
     {
-        if (null === $customer || $customer->isNew() || null === $customer->getId()) {
+        // The generated getId() promises an int, though a model not stored yet holds null.
+        if (null === $customer || $customer->isNew() || 0 === (int) $customer->getId()) {
             return $this->defaultGroupId();
         }
 

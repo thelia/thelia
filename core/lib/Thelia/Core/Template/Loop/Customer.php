@@ -47,7 +47,7 @@ use Thelia\Type\TypeCollection;
  * @method string      getRef()
  * @method bool        getReseller()
  * @method int         getSponsor()
- * @method int[]       getCustomerGroup()
+ * @method int[]|null  getCustomerGroup()
  * @method bool|string getNewsletter()
  * @method string[]    getOrder()
  * @method bool        getWithPrevNextInfo()
