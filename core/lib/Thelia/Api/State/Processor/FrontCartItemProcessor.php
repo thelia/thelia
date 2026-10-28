@@ -39,6 +39,11 @@ use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
+use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\Cart;
@@ -79,6 +84,7 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         private CartLineAvailability $cartLineAvailability,
         private CartCompositionResolver $cartCompositionResolver,
         private ?StockReservationService $stockReservation = null,
+        private QuantityPolicy $quantityPolicy = new QuantityPolicy(),
     ) {
     }
 
@@ -161,7 +167,8 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         $composition = $this->compositionOf($saleElements, $data);
         $joined = $this->lineTheCartJoins($cart, $saleElements, $composition);
         $inLine = null === $joined ? 0.0 : (float) $joined->getQuantity();
-        $quantity = self::wholeQuantity($data->quantity, $inLine);
+        $quantity = self::positiveQuantity($data->quantity, $inLine);
+        $this->assertTheRulesAccept($inLine + $quantity, $saleElements);
 
         // The stock of a bundle is judged once, by the guard of the addition, from the composition
         // handed over below.
@@ -182,8 +189,11 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         // The caller asked for a quantity and gets it whole or not at all: the cart keeps
         // the quantity a line had, without a word, when the stock falls short
         // (CartItem::addQuantity), and a module ahead of it may take less than was asked.
-        // The line is compared with itself, as the ordering by reference does.
-        if ((float) $cartItem->getQuantity() - ($before[(int) $cartItem->getId()] ?? 0.0) < $quantity) {
+        // The line is compared with itself, as the ordering by reference does, in
+        // millionths: a quantity with decimals is never compared as a float.
+        $taken = (float) $cartItem->getQuantity() - ($before[(int) $cartItem->getId()] ?? 0.0);
+
+        if (QuantityScale::micro($taken) < QuantityScale::micro($quantity)) {
             throw new InvalidCartException('The cart did not take the whole quantity.');
         }
 
@@ -294,10 +304,17 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('A cart line changes its quantity only.');
         }
 
+        $quantity = self::positiveQuantity($data->quantity);
+        $saleElements = $cartItem->getProductSaleElements();
+
+        if (null !== $saleElements) {
+            $this->assertTheRulesAccept($quantity, $saleElements);
+        }
+
         return $this->cartFacade->updateItemQuantity(new CartItemUpdateQuantityDTO(
             $cartItem->getCart(),
             (int) $cartItem->getId(),
-            self::wholeQuantity($data->quantity),
+            $quantity,
         ));
     }
 
@@ -320,22 +337,34 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
     }
 
     /**
-     * The cart counts whole units: CartEvent keeps an integer quantity, so a fraction
-     * would be cut short without a word, and a number too large for an integer would
-     * come out as any other. The line the quantity leads to is held to the ceiling
-     * the ordering by reference sets (ReferenceQuantityLines::MAX_QUANTITY), which
-     * also turns away the INF a JSON number beyond a float decodes to.
+     * Zero or less is no quantity, and the line the quantity leads to is held to the
+     * ceiling the ordering by reference sets (ReferenceQuantityLines::MAX_QUANTITY), which
+     * also turns away the INF a JSON number beyond a float decodes to. Whether the
+     * quantity may carry decimals, and which ones, is for the rules of the combination.
      */
-    private static function wholeQuantity(?float $quantity, float $alreadyInLine = 0.0): int
+    private static function positiveQuantity(?float $quantity, float $alreadyInLine = 0.0): float
     {
-        if (null === $quantity || $quantity < 1 || $quantity !== floor($quantity)) {
-            throw new UnprocessableEntityHttpException('The quantity must be a whole number of at least 1.');
+        if (null === $quantity || is_nan($quantity) || $quantity <= 0) {
+            throw new UnprocessableEntityHttpException('The quantity must be greater than zero.');
         }
 
         if ($alreadyInLine + $quantity > ReferenceQuantityLines::MAX_QUANTITY) {
             throw new UnprocessableEntityHttpException(\sprintf('A cart line holds at most %d units.', ReferenceQuantityLines::MAX_QUANTITY));
         }
 
-        return (int) $quantity;
+        return $quantity;
+    }
+
+    /**
+     * The quantity the line will hold, judged by the rules of its combination: its
+     * minimum, its step and its decimals. A refusal says which quantities are sold.
+     */
+    private function assertTheRulesAccept(float $quantity, ProductSaleElements $saleElements): void
+    {
+        try {
+            $this->quantityPolicy->assertAcceptable($quantity, $saleElements);
+        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+            throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
+        }
     }
 }

@@ -22,7 +22,7 @@ readonly class CartItemUpdateQuantityDTO implements DTOEventActionInterface, Car
     public function __construct(
         private Cart $cart,
         private int $cartItemId,
-        private int $quantity,
+        private float $quantity,
     ) {
     }
 
