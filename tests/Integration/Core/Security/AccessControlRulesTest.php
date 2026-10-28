@@ -63,6 +63,16 @@ final class AccessControlRulesTest extends IntegrationTestCase
         self::assertContains('PUBLIC_ACCESS', $frontLoginRoles);
     }
 
+    public function testMcpEndpointRequiresRoleAdmin(): void
+    {
+        foreach (['/api/mcp', '/api/mcp/'] as $path) {
+            [$roles] = $this->accessMap->getPatterns(Request::create($path));
+
+            self::assertNotNull($roles, 'No access_control rule matched '.$path);
+            self::assertContains('ROLE_ADMIN', $roles);
+        }
+    }
+
     public function testApiDocsIsPublic(): void
     {
         [$roles] = $this->accessMap->getPatterns(Request::create('/api/docs'));

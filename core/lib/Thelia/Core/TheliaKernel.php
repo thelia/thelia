@@ -89,6 +89,7 @@ use Thelia\Domain\Ai\Guardrail\AiGuardrailRunner;
 use Thelia\Domain\Ai\Tool\AiReadToolInterface;
 use Thelia\Domain\Ai\Tool\AiWriteToolInterface;
 use Thelia\Domain\Ai\Tool\AsAiTool;
+use Thelia\Domain\Ai\Tool\Security\AiToolTokenAuthenticator;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
@@ -958,6 +959,16 @@ class TheliaKernel extends Kernel
                         'limiter' => ApiLoginRateLimiter::class,
                     ],
                 ],
+                // The MCP endpoint takes a dedicated, revocable token of its own, never the JWT of an
+                // administrator, and the token opens nothing else: this firewall comes before `api`, which
+                // would read the Bearer header as a JWT.
+                'mcp' => [
+                    'pattern' => '^/api/mcp(/|$)',
+                    'stateless' => true,
+                    'provider' => 'admin_provider',
+                    'custom_authenticators' => [AiToolTokenAuthenticator::class],
+                    'entry_point' => AiToolTokenAuthenticator::class,
+                ],
                 'api' => [
                     'pattern' => '^/api',
                     'stateless' => true,
@@ -975,6 +986,7 @@ class TheliaKernel extends Kernel
                 ['path' => '^/api/front/token/refresh', 'roles' => 'PUBLIC_ACCESS'],
                 ['path' => '^/api/admin/token/refresh', 'roles' => 'PUBLIC_ACCESS'],
                 ['path' => '^/api/docs', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api/mcp(/|$)', 'roles' => 'ROLE_ADMIN'],
                 ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN'],
                 ['path' => '^/api/front/account', 'roles' => 'ROLE_CUSTOMER'],
             ],
