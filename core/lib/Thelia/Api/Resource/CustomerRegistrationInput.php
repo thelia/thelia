@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Thelia\Api\Validator\RegistrationAttemptBudget;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\LangQuery;
@@ -34,6 +35,7 @@ use Thelia\Model\LangQuery;
  *
  * Every field is write only: the answer is the customer, not this body.
  */
+#[RegistrationAttemptBudget(groups: [Customer::GROUP_FRONT_REGISTER])]
 class CustomerRegistrationInput
 {
     #[Groups([Customer::GROUP_FRONT_REGISTER])]
