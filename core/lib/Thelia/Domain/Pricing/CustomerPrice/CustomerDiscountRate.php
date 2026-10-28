@@ -44,8 +44,9 @@ class CustomerDiscountRate implements ResetInterface
             return 0.0;
         }
 
-        // Not stored yet: the object is all there is to read.
-        if ($customer->isNew() || null === $customer->getId()) {
+        // Not stored yet (the generated getId() promises an int, yet a new model holds null):
+        // the object is all there is to read.
+        if ($customer->isNew() || 0 === (int) $customer->getId()) {
             return self::effectiveRate($customer->getDiscount());
         }
 

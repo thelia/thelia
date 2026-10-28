@@ -25,6 +25,7 @@ use Thelia\Domain\Pricing\Rule\Storage\PublicPriceSegmentWriter;
 use Thelia\Model\Currency;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\ProductQuery;
 
 /**
  * Orders a product query, in SQL, on the price of the default combination, either the public
@@ -114,6 +115,8 @@ class ProductPublicPriceOrder
      */
     private function joinPrices(ModelCriteria $query, Currency $currency, bool $publicPrice): string
     {
+        \assert($query instanceof ProductQuery);
+
         $query
             ->leftJoinProductSaleElements(self::SALE_ELEMENTS_JOIN_ALIAS)
             ->addJoinCondition(self::SALE_ELEMENTS_JOIN_ALIAS, '`'.self::SALE_ELEMENTS_JOIN_ALIAS.'`.`is_default` = 1');

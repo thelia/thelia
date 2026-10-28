@@ -50,6 +50,8 @@ final readonly class DeliveryOptionsProvider
             ? $this->productShippingRuleQuoter->quoteOptions($module, $cart, $country, $askCarrier)
             : $askCarrier($cart);
 
+        // A module hands its options over through an untyped setter: what it listed is checked, not assumed.
+        /** @var array<mixed> $options */
         foreach ($options as $option) {
             if ($option instanceof DeliveryModuleOption) {
                 $this->completeUntaxedPostage($option);

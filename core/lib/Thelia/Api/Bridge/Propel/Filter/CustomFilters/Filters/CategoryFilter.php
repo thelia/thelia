@@ -23,6 +23,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ProductCategoryQuery;
+use Thelia\Model\ProductQuery;
 
 class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface
 {
@@ -48,6 +49,8 @@ class CategoryFilter implements TheliaFilterInterface, TheliaAggregatedFilterInt
         if ($openToVisitorOnly) {
             $categoryIds = array_values(array_diff($categoryIds, $this->filterService->closedCategoryIds()));
         }
+
+        \assert($query instanceof ProductQuery);
 
         if ([] === $categoryIds) {
             $query->useProductCategoryQuery()->filterByCategoryId([], Criteria::IN)->endUse();

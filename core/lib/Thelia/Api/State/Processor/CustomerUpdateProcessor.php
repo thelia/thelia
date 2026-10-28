@@ -57,6 +57,7 @@ final readonly class CustomerUpdateProcessor implements ProcessorInterface
 
     private function groupOf(int $customerId): ?int
     {
+        /** @var int|string|null $customerGroupId */
         $customerGroupId = CustomerQuery::create()
             ->filterById($customerId)
             ->select('CustomerGroupId')

@@ -53,6 +53,7 @@ final readonly class CartAdditionDestinationGuard implements EventSubscriberInte
         // in place of the product that is shipped. A sale element that does not exist is left
         // to the addition to answer.
         $productSaleElementsId = $event->getProductSaleElementsId();
+        /** @var int|string|null $productId */
         $productId = null === $productSaleElementsId
             ? null
             : ProductSaleElementsQuery::create()->filterById($productSaleElementsId)->select('ProductId')->findOne();

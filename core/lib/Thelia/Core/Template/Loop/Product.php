@@ -1149,7 +1149,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $search = $this->extendsBuildModelCriteria($this->buildModelCriteria());
 
-        if (!$search instanceof ModelCriteria) {
+        if (!$search instanceof ProductQuery) {
             return [];
         }
 
