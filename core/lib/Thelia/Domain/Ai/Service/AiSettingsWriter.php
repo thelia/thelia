@@ -111,6 +111,10 @@ final readonly class AiSettingsWriter
             $this->vault->assertEnvironmentVariableName($apiKeyEnv);
         }
 
+        if (null !== $connection->getId() && $connection->getProvider() !== $provider->value) {
+            $this->assertNothingReliesOnTheProviderOf($connection, $provider);
+        }
+
         $newKey = null === $apiKey || '' === trim($apiKey) ? null : trim($apiKey);
         $movesTheStoredKey = null !== $connection->getId()
             && null === $newKey
@@ -287,6 +291,32 @@ final readonly class AiSettingsWriter
             ->save();
 
         return $setting;
+    }
+
+    /**
+     * A tier, a pinned usage or a model bound to the connection names a model of its current provider: under
+     * another provider the connection would no longer serve it, and the usages on it would turn inactive.
+     *
+     * @throws InvalidAiArgumentException
+     */
+    private function assertNothingReliesOnTheProviderOf(AiConnection $connection, AiProvider $provider): void
+    {
+        $modelIds = [];
+
+        foreach (AiTierAssignmentQuery::create()->filterByConnectionId($connection->getId())->find() as $assignment) {
+            $modelIds[] = $assignment->getModelId();
+        }
+
+        foreach (AiUsageSettingQuery::create()->filterByPinnedConnectionId($connection->getId())->filterByPinnedModelId(null, Criteria::ISNOTNULL)->find() as $setting) {
+            $modelIds[] = $setting->getPinnedModelId();
+        }
+
+        $boundModels = AiModelQuery::create()->filterByConnectionId($connection->getId())->filterByProvider($provider->value, Criteria::NOT_EQUAL)->count();
+        $usedModels = [] === $modelIds ? 0 : AiModelQuery::create()->filterById(array_values(array_unique($modelIds)), Criteria::IN)->filterByProvider($provider->value, Criteria::NOT_EQUAL)->count();
+
+        if ($boundModels + $usedModels > 0) {
+            throw new InvalidAiArgumentException('Tiers, usages or models rely on the provider of this connection: move them to another connection before changing its provider.');
+        }
     }
 
     public function setEnabled(bool $enabled): void

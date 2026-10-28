@@ -158,6 +158,24 @@ final class AiModelApiTest extends ApiTestCase
         self::assertNotNull(AiModelQuery::create()->findPk($modelId));
     }
 
+    public function testAnAssignedModelKeepsTheProviderAndTheConnectionItsTierReachesItBy(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $connection = $this->connection('mistral-tier');
+        $other = $this->connection('mistral-other');
+        $modelId = json_decode((string) $this->jsonRequest('POST', self::MODELS, $this->model(), $token)->getContent(), true)['id'];
+        self::assertSame(201, $this->jsonRequest('POST', self::TIERS, ['tier' => 'advanced', 'connectionId' => $connection->getId(), 'modelId' => $modelId], $token)->getStatusCode());
+
+        $provider = $this->jsonRequest('PATCH', self::MODELS.'/'.$modelId, ['provider' => 'anthropic'], $token, 'merge-patch+json');
+        $bound = $this->jsonRequest('PATCH', self::MODELS.'/'.$modelId, ['connectionId' => $other->getId()], $token, 'merge-patch+json');
+
+        self::assertSame(422, $provider->getStatusCode(), (string) $provider->getContent());
+        self::assertSame(422, $bound->getStatusCode(), (string) $bound->getContent());
+        self::assertSame('mistral', AiModelQuery::create()->findPk($modelId)->getProvider());
+        self::assertNull(AiModelQuery::create()->findPk($modelId)->getConnectionId());
+        self::assertSame(200, $this->jsonRequest('PATCH', self::MODELS.'/'.$modelId, ['connectionId' => $connection->getId()], $token, 'merge-patch+json')->getStatusCode());
+    }
+
     public function testNoTokenIsRefused(): void
     {
         foreach ([['GET', self::MODELS], ['POST', self::MODELS], ['GET', self::TIERS], ['POST', self::TIERS], ['DELETE', self::MODELS.'/1'], ['DELETE', self::TIERS.'/1']] as [$method, $uri]) {

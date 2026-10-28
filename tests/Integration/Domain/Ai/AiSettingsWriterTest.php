@@ -117,6 +117,23 @@ final class AiSettingsWriterTest extends IntegrationTestCase
         self::assertSame('sk-other-9876543210', $this->vault->resolve($moved));
     }
 
+    public function testTheProviderOfAConnectionATierReliesOnDoesNotChange(): void
+    {
+        $connection = $this->connection('mistral-main');
+        $this->writer->assignTier(null, 'fast', $connection->getId(), $this->model($connection, 'ministral-a')->getId());
+
+        try {
+            $this->connection('mistral-main', provider: 'anthropic', existing: $connection);
+            self::fail('The provider of a connection a tier relies on does not change.');
+        } catch (InvalidAiArgumentException) {
+        }
+
+        self::assertSame('mistral', AiConnectionQuery::create()->findOneByCode('mistral-main')->getProvider());
+
+        $unused = $this->connection('mistral-spare');
+        self::assertSame('anthropic', $this->connection('mistral-spare', provider: 'anthropic', existing: $unused)->getProvider());
+    }
+
     public function testAConnectionThatBreaksARuleIsRefusedAndNothingIsSaved(): void
     {
         foreach ([
