@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Ai;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiActorType;
+use Thelia\Domain\Ai\AiAudience;
 use Thelia\Domain\Ai\AiFinishReason;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiMessage;
@@ -546,6 +547,16 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         self::assertSame(1, $this->resolver->calls);
         self::assertSame(['visitor', $this->hasher->hash(AiActor::visitor('resolved-visitor'))], [$this->lastLog()->getActorType(), $this->lastLog()->getActorHash()]);
         self::assertSame(AiActorType::Visitor->value, $this->lastLog()->getActorType());
+    }
+
+    public function testTheResolverIsToldTheAudienceOfTheUsage(): void
+    {
+        $gateway = $this->gatewayAnswering([Wire::chat('ok'), Wire::chat('ok')]);
+
+        $gateway->complete(new AiRequest('aiprobe.pages', [AiMessage::user('Hello')]));
+        $gateway->complete(new AiRequest('aiprobe.scoring', [AiMessage::user('Hello')]));
+
+        self::assertSame([AiAudience::Admin, AiAudience::System], $this->resolver->audiences);
     }
 
     public function testAnActorTheRequestNamesIsNotLookedUp(): void

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiActorResolverInterface;
+use Thelia\Domain\Ai\AiAudience;
 use Thelia\Model\Admin;
 use Thelia\Model\Customer;
 
@@ -42,7 +43,7 @@ class AiActorResolver implements AiActorResolverInterface
     ) {
     }
 
-    public function resolve(): AiActor
+    public function resolve(?AiAudience $audience = null): AiActor
     {
         $request = $this->requestStack->getMainRequest();
 
@@ -50,7 +51,8 @@ class AiActorResolver implements AiActorResolverInterface
             return AiActor::system($this->process());
         }
 
-        $admin = $this->securityContext->getAdminUser();
+        // An administrator who tries the chat of the shop is a customer or a visitor of it, never an administrator.
+        $admin = AiAudience::Public === $audience || AiAudience::Customer === $audience ? null : $this->securityContext->getAdminUser();
 
         if ($admin instanceof Admin) {
             return AiActor::admin($admin->getId());

@@ -23,6 +23,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiActorResolverInterface;
 use Thelia\Domain\Ai\AiActorType;
+use Thelia\Domain\Ai\AiAudience;
 use Thelia\Domain\Ai\Service\AiActorResolver;
 use Thelia\Test\IntegrationTestCase;
 
@@ -106,6 +107,40 @@ final class AiActorResolverTest extends IntegrationTestCase
 
         self::assertSame(AiActorType::Admin, $actor->type);
         self::assertSame((string) $admin->getId(), $actor->identifier);
+    }
+
+    /**
+     * @return iterable<string, array{AiAudience|null, AiActorType}>
+     */
+    public static function audiencesOfAnAdministratorWhoIsAlsoACustomer(): iterable
+    {
+        yield 'no audience: the administrator comes first, as before' => [null, AiActorType::Admin];
+        yield 'an admin usage' => [AiAudience::Admin, AiActorType::Admin];
+        yield 'a system usage' => [AiAudience::System, AiActorType::Admin];
+        yield 'a public usage' => [AiAudience::Public, AiActorType::Customer];
+        yield 'a customer usage' => [AiAudience::Customer, AiActorType::Customer];
+    }
+
+    #[DataProvider('audiencesOfAnAdministratorWhoIsAlsoACustomer')]
+    public function testAnAdministratorWhoUsesTheChatOfTheShopIsNeverTakenForAnAdministrator(?AiAudience $audience, AiActorType $expected): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle());
+        $session = $this->requestWithSession();
+        $session->setAdminUser($factory->admin());
+        $session->setCustomerUser($customer);
+
+        self::assertSame($expected, $this->resolver()->resolve($audience)->type);
+    }
+
+    public function testAnAdministratorWhoIsNoCustomerIsAVisitorOnAPublicUsage(): void
+    {
+        $session = $this->requestWithSession();
+        $session->setAdminUser($this->createFixtureFactory()->admin());
+        $session->start();
+
+        self::assertSame(AiActorType::Visitor, $this->resolver()->resolve(AiAudience::Public)->type);
+        self::assertSame(AiActorType::Admin, $this->resolver()->resolve(AiAudience::Admin)->type);
     }
 
     public function testASignedInCustomerIsKnownByHisIdentifier(): void

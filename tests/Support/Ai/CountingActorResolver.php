@@ -16,6 +16,7 @@ namespace Thelia\Tests\Support\Ai;
 
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiActorResolverInterface;
+use Thelia\Domain\Ai\AiAudience;
 
 /**
  * Resolves the actor the test chose and counts how many times it was asked.
@@ -24,13 +25,17 @@ final class CountingActorResolver implements AiActorResolverInterface
 {
     public int $calls = 0;
 
+    /** @var list<AiAudience|null> */
+    public array $audiences = [];
+
     public function __construct(private readonly AiActor $actor)
     {
     }
 
-    public function resolve(): AiActor
+    public function resolve(?AiAudience $audience = null): AiActor
     {
         ++$this->calls;
+        $this->audiences[] = $audience;
 
         return $this->actor;
     }
