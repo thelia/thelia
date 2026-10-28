@@ -47,4 +47,13 @@ interface AiUsageRegistryInterface
      * @throws Exception\UnknownAiUsageException
      */
     public function compliance(string $usageId): array;
+
+    /**
+     * The notice "you are talking with an AI" (AI Act, article 50(1)) to show before a visitor writes to an
+     * interactive usage, translated in the domain `core` into $locale (the current one when null). Null when
+     * the usage is not interactive or the merchant turned the notice off for it: show nothing then.
+     *
+     * @throws Exception\UnknownAiUsageException
+     */
+    public function transparencyNotice(string $usageId, ?string $locale = null): ?string;
 }

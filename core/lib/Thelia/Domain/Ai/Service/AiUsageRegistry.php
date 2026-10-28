@@ -16,7 +16,9 @@ namespace Thelia\Domain\Ai\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Ai\AiAudience;
+use Thelia\Domain\Ai\AiTransparency;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
 use Thelia\Domain\Ai\AsAiUsage;
 use Thelia\Domain\Ai\Compliance\AiComplianceStatus;
@@ -30,6 +32,8 @@ use Thelia\Domain\Ai\Repository\AiUsageSettingRepository;
  */
 class AiUsageRegistry implements AiUsageRegistryInterface
 {
+    public const string TRANSPARENCY_NOTICE = 'You are talking with an AI assistant. Its answers can contain mistakes.';
+
     /** @var array<string, AsAiUsage>|null */
     private ?array $usages = null;
 
@@ -85,6 +89,21 @@ class AiUsageRegistry implements AiUsageRegistryInterface
             $setting?->getTransparencyNotice() ?? true,
             $setting?->getProvenanceMark() ?? true,
         );
+    }
+
+    public function transparencyNotice(string $usageId, ?string $locale = null): ?string
+    {
+        $usage = $this->get($usageId);
+
+        if (AiTransparency::Interactive !== $usage->transparency) {
+            return null;
+        }
+
+        if (!($this->settings->findByUsage($usageId)?->getTransparencyNotice() ?? true)) {
+            return null;
+        }
+
+        return Translator::getInstance()->trans(self::TRANSPARENCY_NOTICE, [], 'core', $locale);
     }
 
     /**

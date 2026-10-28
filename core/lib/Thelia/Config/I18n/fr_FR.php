@@ -1041,4 +1041,5 @@ return [
     'The host is written as a number the system would read as another address.' => 'L\'hôte est écrit sous la forme d\'un nombre que le système lirait comme une autre adresse.',
     'The host is not a valid IP address.' => 'L\'hôte n\'est pas une adresse IP valide.',
     'The host embeds an IPv4 address.' => 'L\'hôte embarque une adresse IPv4.',
+    'You are talking with an AI assistant. Its answers can contain mistakes.' => 'Vous échangez avec un assistant IA. Ses réponses peuvent comporter des erreurs.',
 ];
