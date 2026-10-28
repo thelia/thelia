@@ -52,7 +52,7 @@ readonly class SaleUnitStockListener implements EventSubscriberInterface
             return;
         }
 
-        $resource->setQuantity((int) floor($quantity));
+        $resource->setQuantity($quantity);
     }
 
     public static function getSubscribedEvents(): array

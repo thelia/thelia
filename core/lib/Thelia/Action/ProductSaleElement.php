@@ -184,6 +184,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 $salesElement->setManufacturerBrandId(0 === $event->getManufacturerBrandId() ? null : $event->getManufacturerBrandId());
             }
 
+            $event->getQuantityRule()?->applyTo($salesElement);
+
             $salesElement->save();
 
             // Update/create price for current currency
