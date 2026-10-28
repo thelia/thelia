@@ -113,6 +113,28 @@ final class AiUsageRegistryTest extends IntegrationTestCase
         self::assertSame(ComplianceState::NotMet, $this->registry->compliance('aiprobe.writing')[0]->state);
     }
 
+    public function testTheNoticeOfAnInteractiveUsageIsTranslatedAndFollowsTheSetting(): void
+    {
+        self::assertSame('You are talking with an AI assistant. Its answers can contain mistakes.', $this->registry->transparencyNotice('aiprobe.chat', 'en_US'));
+        self::assertSame('Vous échangez avec un assistant IA. Ses réponses peuvent comporter des erreurs.', $this->registry->transparencyNotice('aiprobe.chat', 'fr_FR'));
+
+        $this->setting('aiprobe.chat', notice: false);
+
+        self::assertNull($this->registry->transparencyNotice('aiprobe.chat', 'en_US'));
+    }
+
+    public function testAUsageThatIsNotInteractiveHasNoNotice(): void
+    {
+        self::assertNull($this->registry->transparencyNotice('aiprobe.writing'));
+    }
+
+    public function testTheNoticeOfAnUnknownUsageIsRefused(): void
+    {
+        $this->expectException(UnknownAiUsageException::class);
+
+        $this->registry->transparencyNotice('nobody.nothing');
+    }
+
     private function setting(string $usageId, bool $enabled = true, ?string $budget = null, bool $notice = true, bool $provenance = true): void
     {
         $setting = AiUsageSettingQuery::create()->findOneByUsageId($usageId) ?? (new AiUsageSetting())->setUsageId($usageId);
