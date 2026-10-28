@@ -28,13 +28,15 @@ use Thelia\Domain\Ai\Internal\AiAssert;
 final readonly class AiMessage
 {
     /**
-     * @param list<AiToolCall> $toolCalls
+     * @param list<AiToolCall>     $toolCalls
+     * @param array<string, mixed> $providerState opaque, do not read: sent back to the provider as it came (AiResponse::$providerState)
      */
     private function __construct(
         public AiMessageRole $role,
         public string $content,
         public array $toolCalls = [],
         public ?string $toolCallId = null,
+        public array $providerState = [],
     ) {
     }
 
@@ -46,7 +48,8 @@ final readonly class AiMessage
     }
 
     /**
-     * The previous answer of the model, sent back as it came in the response, tool calls included.
+     * The previous answer of the model, sent back as it came in the response, tool calls included. Prefer
+     * fromResponse(), which also carries the opaque state of the provider.
      *
      * @param list<AiToolCall> $toolCalls
      */
@@ -63,7 +66,9 @@ final readonly class AiMessage
 
     public static function fromResponse(AiResponse $response): self
     {
-        return self::assistant($response->text, $response->toolCalls);
+        $message = self::assistant($response->text, $response->toolCalls);
+
+        return [] === $response->providerState ? $message : new self($message->role, $message->content, $message->toolCalls, null, $response->providerState);
     }
 
     /**

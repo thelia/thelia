@@ -27,4 +27,11 @@ enum AiFinishReason: string
     case ToolCalls = 'tool_calls';
     /** The provider refused to answer. */
     case ContentFilter = 'content_filter';
+    /** Any other reason a provider gives (`pause_turn`, a new word): the layer never fails on a reason it does not know. */
+    case Other = 'other';
+
+    public static function fromProvider(?string $reason): self
+    {
+        return null === $reason ? self::Other : (self::tryFrom($reason) ?? self::Other);
+    }
 }
