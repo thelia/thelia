@@ -193,6 +193,15 @@ final class ApiContractExampleTest extends TestCase
         self::assertSame(1742, $final->tokenUsage->total());
     }
 
+    public function testTheContractHasNoToolRunByTheProvider(): void
+    {
+        foreach ([AsAiUsage::class, AiRequest::class] as $class) {
+            $names = array_map(static fn (\ReflectionParameter $parameter): string => $parameter->getName(), (new \ReflectionMethod($class, '__construct'))->getParameters());
+
+            self::assertNotContains('serverTools', $names, $class);
+        }
+    }
+
     public function testAuthorizeTakesTheCeilingOfTheCallAsAnOptionalDecimal(): void
     {
         $parameters = (new \ReflectionMethod(AiCostRecorderInterface::class, 'authorize'))->getParameters();
@@ -314,7 +323,6 @@ final class ApiContractExampleTest extends TestCase
         yield 'usage without purpose' => [static fn () => new AsAiUsage('theliacms.page', ' ', AiAudience::Admin, AiTier::Fast)];
         yield 'usage repeating a capability' => [static fn () => new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast, [AiCapability::Tools, AiCapability::Tools])];
         yield 'usage listing a core guardrail' => [static fn () => new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast, guardrails: [CoreGuardrail::Budget->value => GuardrailMode::Block])];
-        yield 'usage with a server tool holding a space' => [static fn () => new AsAiUsage('theliacms.page', 'p', AiAudience::Admin, AiTier::Fast, serverTools: ['web fetch'])];
         yield 'request without message' => [static fn () => new AiRequest('theliacms.page', [])];
         yield 'request ending on the model' => [static fn () => new AiRequest('theliacms.page', [$user, AiMessage::assistant('Hi')])];
         yield 'tool result answering no call' => [static fn () => new AiRequest('theliacms.page', [$user, AiMessage::toolResult('toolu_99', [])])];

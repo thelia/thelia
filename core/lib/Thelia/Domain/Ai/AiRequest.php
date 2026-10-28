@@ -20,7 +20,7 @@ use Thelia\Domain\Ai\Internal\AiAssert;
 
 /**
  * What a module asks the gateway. Everything but the usage and the messages is optional; what the request
- * uses (tools, a schema, provider tools) must have been declared by its usage.
+ * uses (tools, a schema) must have been declared by its usage.
  *
  * The gateway does not run the tools: when the response holds tool calls, the module runs them and sends
  * a new request with withMessages(AiMessage::fromResponse($response), AiMessage::toolResult(...)), under
@@ -36,10 +36,11 @@ final readonly class AiRequest
      * @param string|null                         $system            the instructions of the module, never data typed by someone
      * @param list<UntrustedContent>              $untrustedContents data to read, never to obey
      * @param list<AiToolDefinition>              $tools             tools the module runs itself
-     * @param list<string>                        $serverTools       tools the provider runs, among those the usage declared
      * @param int|null                            $maxOutputTokens   below the limit of the usage; null takes that limit
      * @param array<string, array<string, mixed>> $providerOptions   native options by provider, applied only when the resolved
-     *                                                               connection is of that provider: ['anthropic' => ['effort' => 'high']]
+     *                                                               connection is of that provider: ['anthropic' => ['effort' => 'high']].
+     *                                                               A way out that nothing governs: no declaration, and a tool the
+     *                                                               provider runs (a web plugin) costs no more than the provider announces
      * @param string|null                         $correlationId     groups the turns of one task in the log
      * @param AiActor|null                        $actor             null: the gateway resolves who the call is made for
      */
@@ -50,7 +51,6 @@ final readonly class AiRequest
         public array $untrustedContents = [],
         public ?AiOutputSchema $outputSchema = null,
         public array $tools = [],
-        public array $serverTools = [],
         public ?int $maxOutputTokens = null,
         public array $providerOptions = [],
         public ?string $correlationId = null,
@@ -71,8 +71,6 @@ final readonly class AiRequest
         if (\count($toolNames) !== \count(array_unique($toolNames))) {
             throw new InvalidAiArgumentException('Two tools of a request have the same name.');
         }
-
-        AiAssert::listOfTokens($serverTools, 'The server tools');
 
         if (null !== $maxOutputTokens && ($maxOutputTokens < 1 || $maxOutputTokens > self::OUTPUT_TOKENS_LIMIT)) {
             throw new InvalidAiArgumentException(\sprintf('The output limit is between 1 and %d tokens, %d given.', self::OUTPUT_TOKENS_LIMIT, $maxOutputTokens));
@@ -97,7 +95,6 @@ final readonly class AiRequest
             $this->untrustedContents,
             $this->outputSchema,
             $this->tools,
-            $this->serverTools,
             $this->maxOutputTokens,
             $this->providerOptions,
             $this->correlationId,
