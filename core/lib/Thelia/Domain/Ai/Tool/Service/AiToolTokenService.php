@@ -35,7 +35,7 @@ use Thelia\Model\Map\AdminTableMap;
  * his rights as they are at each request, and is limited to the scopes it was given (or to nothing more than
  * his rights when it was created with `allRights`, a choice the caller makes on purpose).
  *
- * @internal
+ * Public for the back office, which creates and revokes the tokens of the administrator through it.
  */
 final readonly class AiToolTokenService
 {

@@ -54,6 +54,13 @@ final class AiToolTokenServiceTest extends AiToolTestCase
         parent::tearDown();
     }
 
+    public function testTheClassesTheBackOfficeInjectsAreNotMarkedInternal(): void
+    {
+        foreach ([AiToolTokenService::class, \Thelia\Domain\Ai\Tool\Mcp\McpAllowedHosts::class] as $class) {
+            self::assertStringNotContainsString('@internal', (string) (new \ReflectionClass($class))->getDocComment(), $class);
+        }
+    }
+
     public function testOnlyTheFingerprintAndThePrefixAreStored(): void
     {
         $created = $this->tokens->create($this->owner->getId(), 'Claude Code', [['resource' => 'admin.product', 'access' => 'VIEW']]);

@@ -27,7 +27,7 @@ use Thelia\Model\LangQuery;
  * the loopback names (`localhost`, `127.0.0.1`, `[::1]`). They are read from the database when a request comes in,
  * never when the container is built: a console command or a fresh install reads nothing.
  *
- * @internal
+ * Public for the back office, which tells the administrator whether the host he uses is accepted (hosts()).
  */
 final readonly class McpAllowedHosts
 {
