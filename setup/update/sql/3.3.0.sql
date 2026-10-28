@@ -1992,6 +1992,7 @@ CREATE TABLE IF NOT EXISTS `ai_usage_log`
     `kind` VARCHAR(16) NOT NULL COMMENT 'completion, stream, or external for a cost a module paid outside the gateway',
     `connection_code` VARCHAR(64) COMMENT 'the code of the connection, kept as text so that the log outlives the connection',
     `provider` VARCHAR(32) COMMENT 'the provider, or the paid service of an external cost',
+    `jurisdiction` VARCHAR(8) COMMENT 'eu or non_eu: where the provider processed the data',
     `model` VARCHAR(128) COMMENT 'the model, or the operation of an external cost',
     `input_tokens` INTEGER DEFAULT 0 NOT NULL,
     `output_tokens` INTEGER DEFAULT 0 NOT NULL,

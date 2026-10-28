@@ -3493,6 +3493,7 @@
     <column description="completion, stream, or external for a cost a module paid outside the gateway" name="kind" required="true" size="16" type="VARCHAR" />
     <column description="the code of the connection, kept as text so that the log outlives the connection" name="connection_code" size="64" type="VARCHAR" />
     <column description="the provider, or the paid service of an external cost" name="provider" size="32" type="VARCHAR" />
+    <column description="eu or non_eu: where the provider processed the data" name="jurisdiction" size="8" type="VARCHAR" />
     <column description="the model, or the operation of an external cost" name="model" size="128" type="VARCHAR" />
     <column defaultValue="0" name="input_tokens" required="true" type="INTEGER" />
     <column defaultValue="0" name="output_tokens" required="true" type="INTEGER" />
