@@ -1958,6 +1958,7 @@ CREATE TABLE IF NOT EXISTS `ai_usage_setting`
     `requests_per_minute` INTEGER COMMENT 'requests an actor may send in a minute, empty: the default of the audience',
     `requests_per_day` INTEGER COMMENT 'requests an actor may send in a day, empty: the default of the audience',
     `max_output_tokens` INTEGER COMMENT 'the output limit of every request, empty: the limit of the model',
+    `max_input_characters` INTEGER COMMENT 'the size limit of what a person types, in characters, empty: the default of the usage',
     `pinned_connection_id` INTEGER COMMENT 'a connection that replaces the one of the tier for this usage',
     `pinned_model_id` INTEGER COMMENT 'a model that replaces the one of the tier for this usage',
     `guardrails` TEXT COMMENT 'JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares',

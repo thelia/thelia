@@ -3461,6 +3461,7 @@
     <column description="requests an actor may send in a minute, empty: the default of the audience" name="requests_per_minute" type="INTEGER" />
     <column description="requests an actor may send in a day, empty: the default of the audience" name="requests_per_day" type="INTEGER" />
     <column description="the output limit of every request, empty: the limit of the model" name="max_output_tokens" type="INTEGER" />
+    <column description="the size limit of what a person types, in characters, empty: the default of the usage" name="max_input_characters" type="INTEGER" />
     <column description="a connection that replaces the one of the tier for this usage" name="pinned_connection_id" type="INTEGER" />
     <column description="a model that replaces the one of the tier for this usage" name="pinned_model_id" type="INTEGER" />
     <column description="JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares" name="guardrails" type="LONGVARCHAR" />

@@ -47,6 +47,8 @@ final readonly class AsAiUsage
      * @param list<AiCapability>           $capabilities what the model must be able to do
      * @param array<string, GuardrailMode> $guardrails   optional guardrails (classifiers) by name, with their default mode; the
      *                                                   deterministic ones of CoreGuardrail always apply and are not listed here
+     * @param int|null                     $maxInputCharacters the default size limit of what a person types (the last user message), in
+     *                                                   characters; the merchant can change it in the settings of the usage; null: no limit of its own
      */
     public function __construct(
         public string $id,
@@ -56,6 +58,7 @@ final readonly class AsAiUsage
         public array $capabilities = [],
         public AiTransparency $transparency = AiTransparency::None,
         public array $guardrails = [],
+        public ?int $maxInputCharacters = null,
     ) {
         AiAssert::usageId($id);
         AiAssert::notBlank($purpose, 'The purpose of a usage');
@@ -64,6 +67,10 @@ final readonly class AsAiUsage
 
         if (\count($capabilities) !== \count(array_unique(array_map(static fn (AiCapability $capability): string => $capability->value, $capabilities)))) {
             throw new InvalidAiArgumentException(\sprintf('The usage "%s" repeats a capability.', $id));
+        }
+
+        if (null !== $maxInputCharacters && $maxInputCharacters < 1) {
+            throw new InvalidAiArgumentException(\sprintf('The input limit of the usage "%s" is at least one character.', $id));
         }
 
         AiAssert::mapOf($guardrails, GuardrailMode::class, 'The guardrails of a usage');
