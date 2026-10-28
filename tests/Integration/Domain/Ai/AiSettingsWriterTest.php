@@ -249,6 +249,24 @@ final class AiSettingsWriterTest extends IntegrationTestCase
         $this->writer->saveUsageSetting(null, 'nobody.declared');
     }
 
+    public function testTheMcpServerIsSwitchedOnAndOffThroughTheWriter(): void
+    {
+        $settings = new AiSettings();
+
+        try {
+            $this->writer->setMcpEnabled(true);
+            ConfigQuery::resetCache();
+            self::assertTrue($settings->mcpEnabled());
+
+            $this->writer->setMcpEnabled(false);
+            ConfigQuery::resetCache();
+            self::assertFalse($settings->mcpEnabled());
+        } finally {
+            ConfigQuery::write('ai_mcp_enabled', '0');
+            ConfigQuery::resetCache();
+        }
+    }
+
     public function testTheGlobalSettingsAreWritten(): void
     {
         $settings = new AiSettings();
