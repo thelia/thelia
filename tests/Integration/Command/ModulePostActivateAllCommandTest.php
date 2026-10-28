@@ -17,11 +17,13 @@ namespace Thelia\Tests\Integration\Command;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Thelia\Model\HookQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Module\FailingPostActivationModule;
+use Thelia\Tests\Support\Module\HookDeclaringModule;
 use Thelia\Tests\Support\Module\RecordingPostActivationModule;
 
 /**
@@ -75,6 +77,24 @@ final class ModulePostActivateAllCommandTest extends IntegrationTestCase
         self::assertStringContainsString('Post-activation failed for 1 module(s): FailingPostActivationProbe.', $display);
         self::assertSame(1, RecordingPostActivationModule::$postActivationCount, 'The modules after the failing one must still be post-activated.');
         self::assertStringContainsString('1 module(s) post-activated.', $display);
+    }
+
+    /**
+     * A module activated from the back office or by module:activate gets the
+     * hooks it declares. One activated by the install has to get them too, or
+     * the screens that render them stay without the tabs other modules add.
+     */
+    public function testRegistersTheHooksAModuleDeclares(): void
+    {
+        $this->activateProbeModule('HookDeclaringProbe', HookDeclaringModule::class);
+
+        $tester = $this->runCommand();
+
+        self::assertSame(Command::SUCCESS, $tester->getStatusCode(), $tester->getDisplay());
+        $hook = HookQuery::create()->findOneByCode(HookDeclaringModule::HOOK_CODE);
+        self::assertNotNull($hook, 'The hook the module declares is registered.');
+        self::assertTrue((bool) $hook->getBlock());
+        self::assertTrue((bool) $hook->getActivate());
     }
 
     private function activateProbeModule(string $code, string $moduleClass): void
