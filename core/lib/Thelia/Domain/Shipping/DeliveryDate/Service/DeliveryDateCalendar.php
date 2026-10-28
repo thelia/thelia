@@ -20,8 +20,6 @@ use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliveryDateOffer;
 use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliveryDay;
 use Thelia\Domain\Shipping\DeliveryDate\DTO\DeliverySlotOffer;
 use Thelia\Domain\Shipping\DeliveryDate\Enum\DeliveryDateChoiceMode;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\DeliveryClosureQuery;
 use Thelia\Model\DeliveryDateRule;
 use Thelia\Model\DeliveryDateRuleQuery;
 use Thelia\Model\DeliverySlotBookingQuery;
@@ -52,6 +50,7 @@ final readonly class DeliveryDateCalendar
 
     public function __construct(
         private ContainerInterface $container,
+        private DeliveryClosedDays $closedDays,
     ) {
     }
 
@@ -115,10 +114,7 @@ final readonly class DeliveryDateCalendar
             return new DeliveryDateOffer((int) $module->getId(), $choiceMode, []);
         }
 
-        $closedWeekdays = ClosedWeekdays::parse(
-            $rule->getClosedWeekdays() ?? (string) ConfigQuery::read(ClosedWeekdays::SHOP_CONFIG_NAME, ''),
-        );
-        $closedDays = $this->closedDaysBetween((int) $module->getId(), $first, $last);
+        $closedDays = $this->closedDays->between((int) $module->getId(), $first, $last, $rule);
         $slots = DeliveryDateChoiceMode::Slot === $choiceMode ? $this->slotsOf((int) $module->getId(), $locale) : [];
         $bookings = [] === $slots ? [] : $this->bookingsBetween(array_keys($slots), $first, $last);
 
@@ -126,7 +122,7 @@ final readonly class DeliveryDateCalendar
 
         for ($date = $first; $date <= $last; $date = $date->modify('+1 day')) {
             $key = $date->format('Y-m-d');
-            $open = !\in_array((int) $date->format('N'), $closedWeekdays, true) && !isset($closedDays[$key]);
+            $open = !isset($closedDays[$key]);
             $daySlots = [];
 
             foreach ($slots as $slotId => $slot) {
@@ -165,42 +161,6 @@ final readonly class DeliveryDateCalendar
         // implementing the contract: the merchant's setting is then ignored, not honoured
         // against what the carrier says it can do.
         return \in_array($stored, $this->acceptedChoiceModesOf($module), true) ? $stored : DeliveryDateChoiceMode::None;
-    }
-
-    /**
-     * The days the shop or this carrier is closed between the two bounds, keyed by date.
-     *
-     * @return array<string, true>
-     */
-    private function closedDaysBetween(int $moduleId, \DateTimeImmutable $first, \DateTimeImmutable $last): array
-    {
-        $closures = DeliveryClosureQuery::create()
-            ->filterByModuleId($moduleId)
-            ->_or()
-            ->filterByModuleId(null, Criteria::ISNULL)
-            ->filterByStartDate($last->format('Y-m-d'), Criteria::LESS_EQUAL)
-            ->filterByEndDate($first->format('Y-m-d'), Criteria::GREATER_EQUAL)
-            ->find();
-
-        $closed = [];
-
-        foreach ($closures as $closure) {
-            $start = DeliveryDateGuard::parseDay((string) $closure->getStartDate('Y-m-d'));
-            $end = DeliveryDateGuard::parseDay((string) $closure->getEndDate('Y-m-d'));
-
-            if (null === $start || null === $end) {
-                continue;
-            }
-
-            $from = max($first, $start);
-            $to = min($last, $end);
-
-            for ($date = $from; $date <= $to; $date = $date->modify('+1 day')) {
-                $closed[$date->format('Y-m-d')] = true;
-            }
-        }
-
-        return $closed;
     }
 
     /**

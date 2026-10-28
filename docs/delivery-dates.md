@@ -44,6 +44,8 @@ Written through `Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSetting
 
 `DeliveryDateCalendar::offerFor($module, $now, $locale)` lists every day from today + delay to today + horizon, each with `open` (the carrier delivers that day) and `available` (open and, for slots, one slot left), and for slots their hours and whether each can still be taken (a slot of today whose hours are over cannot). It reads neither the session nor the cart, and costs the same few queries whatever the length of the window. Days are calendar days in the time zone PHP runs in, which is the shop's; hours are local.
 
+The closed days come from `DeliveryClosedDays::between($moduleId, $first, $last)`: the closed days of the week of the carrier (or of the shop when its rule sets none) and the exceptional closures of the shop or of that carrier, keyed by date, in two queries at most. Anything else that counts delivery days ahead, a module estimating when a parcel arrives, reads it too, so it skips the days the buyer cannot pick, whether or not the carrier offers a choice of date.
+
 `DeliveryDateGuard` judges a choice against that list, recomputed at the time of asking. It is called by `CartGuard::checkValidDelivery()`, so the Flexy tunnel, `GET .../validation` and `POST .../place` all refuse the same way:
 
 | Code | Raised when |
