@@ -23,6 +23,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
+use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Form\Exception\StockNotFoundException;
@@ -40,6 +44,7 @@ class CartAdd extends BaseForm
     public function __construct(
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
         protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
+        protected readonly ?QuantityPolicy $quantityPolicy = null,
     ) {
     }
 
@@ -85,6 +90,7 @@ class CartAdd extends BaseForm
                     new NotBlank(),
                     new Callback($this->checkStock(...)),
                     new GreaterThanOrEqual(value: 0),
+                    new Callback($this->checkQuantityRules(...)),
                 ],
                 'label' => Translator::getInstance()->trans('Quantity'),
                 'label_attr' => [
@@ -155,6 +161,34 @@ class CartAdd extends BaseForm
             if ($availableQuantity < $value && 0 === $product->getVirtual() && ConfigQuery::checkAvailableStock()) {
                 $context->addViolation(Translator::getInstance()->trans('quantity value is not valid'));
             }
+        }
+    }
+
+    /**
+     * The quantity is judged by the rules of its combination, the way the cart judges it,
+     * and refused with the valid quantities. Zero is the cart's to refuse.
+     */
+    public function checkQuantityRules($value, ExecutionContextInterface $context): void
+    {
+        $data = $context->getRoot()->getData();
+
+        if (!is_numeric($value) || $value <= 0 || null === ($data['product_sale_elements_id'] ?? null)) {
+            return;
+        }
+
+        $productSaleElements = ProductSaleElementsQuery::create()
+            ->filterById($data['product_sale_elements_id'])
+            ->filterByProductId($data['product'])
+            ->findOne();
+
+        if (null === $productSaleElements) {
+            return;
+        }
+
+        try {
+            ($this->quantityPolicy ?? new QuantityPolicy())->assertAcceptable((float) $value, $productSaleElements);
+        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+            $context->addViolation($refusal->getMessage());
         }
     }
 

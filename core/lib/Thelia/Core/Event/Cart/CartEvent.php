@@ -30,6 +30,7 @@ class CartEvent extends ActionEvent
     protected ?int $cartItemId = null;
     protected ?BundleComposition $bundleComposition = null;
     protected ?float $bundleAvailability = null;
+    protected bool $offeredByAPromotion = false;
 
     public function __construct(
         protected Cart $cart,
@@ -155,6 +156,17 @@ class CartEvent extends ActionEvent
         return $this;
     }
 
+    /**
+     * The line is a gift a promotion adds (FreeProduct): it is not sold, so the cart
+     * holds it to none of the quantity rules of its combination.
+     */
+    public function setOfferedByAPromotion(bool $offeredByAPromotion): static
+    {
+        $this->offeredByAPromotion = $offeredByAPromotion;
+
+        return $this;
+    }
+
     public function getBundleComposition(): ?BundleComposition
     {
         return $this->bundleComposition;
@@ -174,6 +186,11 @@ class CartEvent extends ActionEvent
     public function getBundleAvailability(): ?float
     {
         return $this->bundleAvailability;
+    }
+
+    public function isOfferedByAPromotion(): bool
+    {
+        return $this->offeredByAPromotion;
     }
 
     public function getCart(): Cart

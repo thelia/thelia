@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Model\CartItem;
 
 /**
@@ -37,8 +38,18 @@ trait AmountCouponTrait
         $this->amount = (float) $effects[$this->getAmountFieldName()];
     }
 
+    /**
+     * The amount comes off every unit of a line sold by the piece, and once off a line
+     * sold by measure: 1.25 kg is one article, not one and a quarter.
+     */
     public function getCartItemDiscount(CartItem $cartItem): float
     {
+        $productSaleElements = $cartItem->getProductSaleElements();
+
+        if (null !== $productSaleElements && QuantityRule::fromProductSaleElements($productSaleElements)->isSoldByMeasure()) {
+            return $this->amount;
+        }
+
         return $cartItem->getQuantity() * $this->amount;
     }
 
