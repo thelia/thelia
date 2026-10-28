@@ -32,12 +32,13 @@ use Thelia\Model\AiConnectionQuery;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiModelQuery;
 use Thelia\Model\AiTierAssignmentQuery;
+use Thelia\Model\AiUsageSettingQuery;
 
 /**
  * Creates, updates and deletes a model row. The unicity of (provider, name, connection) is checked here, not
  * left to the index: MySQL does not compare NULLs, so two rows of the catalogue of a provider (no connection)
  * would pass it. A row written through the API is `manual`. A refusal is a 422, a model still assigned to a
- * tier is a 409 on deletion.
+ * tier is a 409 on deletion, and it keeps the provider and the connection its tiers and usages reach it by.
  */
 final readonly class AiModelWriteProcessor implements ProcessorInterface
 {
@@ -105,6 +106,10 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
             }
         }
 
+        if (null !== $model->getId() && ($model->getProvider() !== $provider->value || $model->getConnectionId() !== $connectionId)) {
+            $this->assertItsTiersAndUsagesStillReachIt($model, $provider, $connectionId);
+        }
+
         $taken = AiModelQuery::create()->filterByProvider($provider->value)->filterByName($name);
         null === $connectionId ? $taken->filterByConnectionId(null, Criteria::ISNULL) : $taken->filterByConnectionId($connectionId);
 
@@ -150,6 +155,33 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
             ->setSupportsStreaming((int) ($data->getSupportsStreaming() ?? true))
             ->setSource(AiModelSpecification::SOURCE_MANUAL)
             ->setActive((int) ($data->getActive() ?? true));
+    }
+
+    /**
+     * A tier or a pinned usage reaches the model through a connection: that connection must still serve it
+     * once the provider or the connection of the model changes.
+     */
+    private function assertItsTiersAndUsagesStillReachIt(AiModel $model, AiProvider $provider, ?int $connectionId): void
+    {
+        $connectionIds = [];
+
+        foreach (AiTierAssignmentQuery::create()->filterByModelId($model->getId())->find() as $assignment) {
+            $connectionIds[] = $assignment->getConnectionId();
+        }
+
+        foreach (AiUsageSettingQuery::create()->filterByPinnedModelId($model->getId())->filterByPinnedConnectionId(null, Criteria::ISNOTNULL)->find() as $setting) {
+            $connectionIds[] = $setting->getPinnedConnectionId();
+        }
+
+        if ([] === $connectionIds) {
+            return;
+        }
+
+        foreach (AiConnectionQuery::create()->filterById(array_values(array_unique($connectionIds)), Criteria::IN)->find() as $connection) {
+            if ($connection->getProvider() !== $provider->value || (null !== $connectionId && $connectionId !== $connection->getId())) {
+                throw new UnprocessableEntityHttpException('A tier or a usage reaches this model through a connection that would no longer serve it: give them another model first.');
+            }
+        }
     }
 
     private function positive(?int $value, string $label): ?int

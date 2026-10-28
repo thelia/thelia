@@ -50,6 +50,7 @@ final readonly class AiFailureExplainer
         'The environment variable that holds an API key must end with "_KEY" or "_TOKEN" and must not be one of the application (APP_, DATABASE_, JWT_).',
         'The name of the environment variable that holds an API key must be letters, digits and underscores.',
         'The connection now points to another server: type its API key again, the saved key is not sent to a new address.',
+        'Tiers, usages or models rely on the provider of this connection: move them to another connection before changing its provider.',
         'The connection does not exist.',
         'The model does not exist.',
         'The model is not served by this connection.',

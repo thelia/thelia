@@ -1072,6 +1072,7 @@ return [
     'The environment variable that holds an API key must end with "_KEY" or "_TOKEN" and must not be one of the application (APP_, DATABASE_, JWT_).' => 'La variable d\'environnement qui contient une clé d\'API doit finir par « _KEY » ou « _TOKEN » et ne doit pas être une variable de l\'application (APP_, DATABASE_, JWT_).',
     'The name of the environment variable that holds an API key must be letters, digits and underscores.' => 'Le nom de la variable d\'environnement qui contient une clé d\'API se compose de lettres, de chiffres et de tirets bas.',
     'The connection now points to another server: type its API key again, the saved key is not sent to a new address.' => 'La connexion pointe désormais vers un autre serveur : saisissez de nouveau sa clé d\'API, la clé enregistrée n\'est pas envoyée à une nouvelle adresse.',
+    'Tiers, usages or models rely on the provider of this connection: move them to another connection before changing its provider.' => 'Des gammes, des usages ou des modèles reposent sur le fournisseur de cette connexion : rattachez-les à une autre connexion avant de changer son fournisseur.',
     'The connection does not exist.' => 'La connexion n\'existe pas.',
     'The model does not exist.' => 'Le modèle n\'existe pas.',
     'The model is not served by this connection.' => 'Ce modèle n\'est pas proposé par cette connexion.',
