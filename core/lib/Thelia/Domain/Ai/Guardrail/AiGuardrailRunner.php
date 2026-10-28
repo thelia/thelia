@@ -27,7 +27,9 @@ use Thelia\Model\AiUsageSetting;
  *
  * The guardrails a usage runs are those the merchant chose on its settings (a JSON object, name to mode) or,
  * when the field is empty, those the usage declares. A guardrail that is chosen and not installed, or that
- * throws, counts as a failed check: a moderation that silently does nothing is worse than a refusal.
+ * throws, counts as a failed check: a moderation that silently does nothing is worse than a refusal. In
+ * `block` mode that check stops the call; in `annotate` mode it never does, the failure is only written to
+ * the log (`unavailable` when the guardrail is not installed, `guardrail_error` when it threw).
  *
  * @internal
  */
@@ -77,6 +79,23 @@ final readonly class AiGuardrailRunner
     }
 
     /**
+     * Whether each installed guardrail can run now, by name, from the connections and settings alone (no call).
+     * One that does not say is usable.
+     *
+     * @return array<string, GuardrailAvailability>
+     */
+    public function availability(): array
+    {
+        $availability = [];
+
+        foreach ($this->guardrails as $guardrail) {
+            $availability[$guardrail->name()] = $guardrail instanceof AiGuardrailAvailabilityInterface ? $guardrail->availability() : GuardrailAvailability::usable();
+        }
+
+        return $availability;
+    }
+
+    /**
      * Runs the guardrails of the selection that apply to the stage, and stops at the first one that blocks.
      *
      * @param array<string, GuardrailMode> $selection
@@ -100,7 +119,7 @@ final readonly class AiGuardrailRunner
 
             if (null === $guardrail) {
                 if (GuardrailStage::Input === $stage) {
-                    $verdicts[] = GuardrailVerdict::fail($name, $stage, 'guardrail_unavailable')->withMode($mode);
+                    $verdicts[] = GuardrailVerdict::fail($name, $stage, GuardrailAvailability::UNAVAILABLE)->withMode($mode);
                 }
             } elseif ($guardrail->supports($stage)) {
                 $verdicts[] = $this->inspect($guardrail, $name, $stage, $request, $output, $mode);
