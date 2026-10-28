@@ -347,7 +347,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
-    <column name="quantity" required="true" type="FLOAT" />
+    <column name="quantity" required="true" type="DOUBLE" />
     <column defaultValue="0" name="position" required="true" type="INTEGER" />
     <column defaultValue="true" name="visible" required="true" type="BOOLEAN" />
     <column defaultValue="0" name="promo" type="TINYINT" />
@@ -985,7 +985,7 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="description" type="CLOB" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <column name="quantity" required="true" type="FLOAT" />
+    <column name="quantity" required="true" type="DOUBLE" />
     <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />
     <column name="was_new" required="true" type="TINYINT" />
@@ -1118,8 +1118,8 @@
     <column name="order_return_id" required="true" type="INTEGER" />
     <column name="order_product_id" required="true" type="INTEGER" />
     <column description="the sale element to restock, snapshot from the order product" name="product_sale_elements_id" type="INTEGER" />
-    <column description="the quantity the customer asks to return" name="quantity" required="true" type="FLOAT" />
-    <column defaultValue="0" description="the quantity actually received by the merchant" name="quantity_received" type="FLOAT" />
+    <column description="the quantity the customer asks to return" name="quantity" required="true" type="DOUBLE" />
+    <column defaultValue="0" description="the quantity actually received by the merchant" name="quantity_received" type="DOUBLE" />
     <column description="the condition the returned goods were received in" name="received_condition" size="45" type="VARCHAR" />
     <column defaultValue="0" description="whether the received goods can be sold again" name="resellable" type="BOOLEAN" />
     <column defaultValue="0.000000" description="the paid taxed price for the returned quantity of this line" name="refund_amount" scale="6" size="16" type="DECIMAL" />
@@ -1167,7 +1167,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_shipment_id" required="true" type="INTEGER" />
     <column name="order_product_id" required="true" type="INTEGER" />
-    <column description="how much of the order line this shipment carries" name="quantity" required="true" type="FLOAT" />
+    <column description="how much of the order line this shipment carries" name="quantity" required="true" type="DOUBLE" />
     <foreign-key foreignTable="order_shipment" name="fk_order_shipment_item_order_shipment_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_shipment_id" />
     </foreign-key>
@@ -1864,7 +1864,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="cart_id" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
-    <column defaultValue="1" name="quantity" type="FLOAT" />
+    <column defaultValue="1" name="quantity" type="DOUBLE" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column defaultValue="0.000000" name="price" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />

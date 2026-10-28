@@ -38,8 +38,9 @@ use Thelia\Model\OrderShipment;
 final readonly class ShippedQuantityCalculator
 {
     /**
-     * Below this, two FLOAT quantities are the same: `order_product.quantity` is a
-     * FLOAT, and a sum of thirds compared exactly would leave a hundredth to ship.
+     * Below this, two quantities are the same: `order_product.quantity` is a binary
+     * floating point number, and a sum of thirds compared exactly would leave a hundredth
+     * to ship.
      */
     public const float TOLERANCE = 0.0001;
 

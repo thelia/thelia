@@ -1148,4 +1148,74 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- ---------------------------------------------------------------------
+-- Quantities and stocks in double precision
+-- ---------------------------------------------------------------------
+-- A single precision FLOAT gives six significant digits back: 1234.567 kg was read as
+-- 1234.57. The quantity columns become DOUBLE. A FLOAT turned into a DOUBLE keeps its
+-- binary error (0.7 becomes 0.699999988079071), so each converted value is brought back
+-- to the seven significant digits a FLOAT holds, and never past the thousandth, the finest
+-- decimal a quantity is sold with: 0.7 is 0.7 again, 123456.7 stays 123456.7. A column
+-- already in DOUBLE is left alone, so the script can be replayed.
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `product_sale_elements` MODIFY `quantity` DOUBLE NOT NULL', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `product_sale_elements` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `cart_item` MODIFY `quantity` DOUBLE DEFAULT 1', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `cart_item` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_product` MODIFY `quantity` DOUBLE NOT NULL', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_product` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_return_line' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_return_line` MODIFY `quantity` DOUBLE NOT NULL COMMENT ''the quantity the customer asks to return''', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_return_line` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_return_line' AND `COLUMN_NAME` = 'quantity_received' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_return_line` MODIFY `quantity_received` DOUBLE DEFAULT 0 COMMENT ''the quantity actually received by the merchant''', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_return_line` SET `quantity_received` = ROUND(`quantity_received`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity_received`), 0.001)))))) WHERE `quantity_received` <> ROUND(`quantity_received`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity_received`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_shipment_item' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_shipment_item` MODIFY `quantity` DOUBLE NOT NULL COMMENT ''how much of the order line this shipment carries''', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_shipment_item` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -395,10 +395,11 @@ class Order extends BaseOrder
     }
 
     /**
-     * The quantity of a line as it was sold. The column is a single precision FLOAT, which
-     * keeps 0.7 kg as 0.69999998: multiplied as it is, a line of 0.7 at 0.75 would come to
-     * 0.52499998 and be rounded down where the cart rounded 0.525 up. A quantity carries
-     * three decimals at most, so rounding it there gives back the quantity sold.
+     * The quantity of a line as it was sold. The column is a binary floating point number:
+     * a quantity written with an error past the thousandth (a single precision FLOAT kept
+     * 0.7 kg as 0.69999998) would make a line of 0.7 at 0.75 come to 0.52499998 and be
+     * rounded down where the cart rounded 0.525 up. A quantity carries three decimals at
+     * most, so rounding it there gives back the quantity sold.
      */
     private static function storedQuantity(): string
     {
