@@ -17,10 +17,12 @@ namespace Thelia\Tests\Integration\Domain\QuickOrder;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Domain\CustomerList\Exception\PurchaseListNotFoundException;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
+use Thelia\Domain\QuickOrder\Enum\LineStatus;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderCartNotFoundException;
 use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\QuickOrderFacade;
@@ -115,6 +117,50 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
         self::assertCount(1, $table->lines);
         self::assertSame((int) $saleElements->getId(), $table->lines[0]->productSaleElementsId);
         self::assertSame(3, $table->lines[0]->quantity);
+    }
+
+    /**
+     * The quick order and the purchase lists count whole units: a line off the rules of
+     * its combination, or of a combination sold by measure, is refused before anything
+     * reaches the cart, and the other lines go on.
+     */
+    public function testALineTheRulesOfItsCombinationRefuseNeverReachesTheCart(): void
+    {
+        $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+        $bySix = $this->saleElements();
+        (new QuantityRule(minQuantity: 6.0, step: 6.0))->applyTo($bySix);
+        $bySix->save();
+        $byMeasure = $this->saleElements();
+        (new QuantityRule(minQuantity: 0.5, step: 0.5, decimals: 1))->applyTo($byMeasure);
+        $byMeasure->save();
+        $plain = $this->saleElements();
+
+        $table = $this->facade->addToCart($this->customer, $cart, self::lines([
+            (string) $bySix->getRef() => 7,
+            (string) $byMeasure->getRef() => 2,
+            (string) $plain->getRef() => 1,
+        ]));
+
+        self::assertSame(
+            [LineStatus::QuantityRefused, LineStatus::QuantityRefused, LineStatus::Resolved],
+            array_map(static fn (QuickOrderLine $line): LineStatus => $line->status, $table->lines),
+        );
+        self::assertSame('Sold by 6: 6, 12, 18…', $table->lines[0]->refusalReason);
+        self::assertSame('This product is sold by measure: order it from its product page.', $table->lines[1]->refusalReason);
+        self::assertSame([[(int) $plain->getId(), 1.0]], $this->cartLines($cart));
+    }
+
+    public function testAPurchaseListLineOffTheRulesIsToldWhenTheListIsLoaded(): void
+    {
+        $saleElements = $this->saleElements();
+        (new QuantityRule(minQuantity: 6.0, step: 6.0))->applyTo($saleElements);
+        $saleElements->save();
+        $list = $this->getService(PurchaseListFacade::class)->create($this->customer, 'Restock', self::lines([(string) $saleElements->getRef() => 3]));
+
+        $table = $this->facade->resolvePurchaseList($this->customer, (int) $list->getId(), $this->currency);
+
+        self::assertSame(LineStatus::QuantityRefused, $table->lines[0]->status);
+        self::assertSame('The smallest quantity you can order is 6.', $table->lines[0]->refusalReason);
     }
 
     public function testTheListOfAnotherAccountIsNotLoaded(): void

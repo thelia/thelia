@@ -19,6 +19,13 @@ use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
+use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
+use Thelia\Domain\Catalog\Quantity\QuantityTranslation;
+use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
@@ -77,6 +84,7 @@ final readonly class ReferenceResolver
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
         private LangService $langService,
         private BundleDisplayedStock $bundleDisplayedStock,
+        private QuantityPolicy $quantityPolicy = new QuantityPolicy(),
     ) {
     }
 
@@ -180,6 +188,12 @@ final readonly class ReferenceResolver
             return new QuickOrderLine($line->reference, $line->quantity, LineStatus::Unavailable, $saleElementsId, $productId, $title);
         }
 
+        $refusal = $this->refusalByTheRules($chosen, $line->quantity);
+
+        if (null !== $refusal) {
+            return new QuickOrderLine($line->reference, $line->quantity, LineStatus::QuantityRefused, $saleElementsId, $productId, $title, refusalReason: $refusal);
+        }
+
         // A virtual product is never short of stock, as on its product page. A bundle is
         // supplied by its components, never by the stock of its own sale element.
         $isBundle = isset($bundleStocks[$productId]);
@@ -213,6 +227,28 @@ final readonly class ReferenceResolver
             $taxedUnitPrice,
             $price['promo'],
         );
+    }
+
+    /**
+     * Why the rules of the combination refuse the quantity of a line, null when they sell
+     * it. The quick order and the purchase lists count whole units: a combination sold by
+     * measure is ordered from its product page, where its decimals can be typed.
+     */
+    private function refusalByTheRules(ProductSaleElements $saleElements, int $quantity): ?string
+    {
+        try {
+            if (QuantityRule::fromProductSaleElements($saleElements)->isSoldByMeasure()) {
+                return QuantityTranslation::trans('This product is sold by measure: order it from its product page.');
+            }
+
+            $this->quantityPolicy->assertAcceptable((float) $quantity, $saleElements);
+        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+            return $refusal->getMessage();
+        } catch (InvalidQuantityRuleException) {
+            return null;
+        }
+
+        return null;
     }
 
     /**

@@ -25,6 +25,7 @@ use Thelia\Core\Event\Cart\CartCheckoutEvent;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\Cart\CartItemQuantityAdjustedEvent;
 use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Cart\CartSaleUnitSwitchedEvent;
@@ -35,15 +36,22 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
+use Thelia\Domain\Cart\Exception\CartQuantityRefusedException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Cart\Exception\ProductNotAvailableException;
 use Thelia\Domain\Cart\Exception\ProductWithoutPriceException;
 use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Cart\Service\CartLineVisibility;
+use Thelia\Domain\Cart\Service\CartQuantityReconciler;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
+use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
@@ -105,6 +113,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
         protected ?SellableStock $sellableStock = null,
         protected ?StockReservationService $stockReservation = null,
+        protected ?QuantityPolicy $quantityPolicy = null,
+        protected ?CartQuantityReconciler $cartQuantityReconciler = null,
     ) {
     }
 
@@ -308,6 +318,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $appends = $cartItem instanceof CartItem && $append;
         $bundleComposition = $event->getBundleComposition();
 
+        // Whoever adds the line (the cart form, the API, a theme, a quick order through
+        // CartFacade), what the line will hold is judged by the rules of its combination
+        // here: refused with the valid quantities, never brought to them silently. A gift
+        // a promotion adds is not sold, and is held to none of them.
+        if (!$event->isOfferedByAPromotion()) {
+            $this->assertTheRulesAccept(($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity, $productSaleElements);
+        }
+
         // The stock of the sale unit the visitor buys from, when it keeps one: the
         // national counter may well cover a quantity the unit itself cannot sell.
         $ownStockQuantity = $this->saleUnitAvailableStock?->ownQuantity((int) $productSaleElements->getId());
@@ -440,6 +458,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 // as somebody who sees less) may be reduced or removed, never increased.
                 if ($quantity > (float) $cartItem->getQuantity() && $this->cartLineVisibility?->isLineHidden($cartItem)) {
                     throw new ProductNotAvailableException();
+                }
+
+                // Zero or less leaves the line as it was (CartItem::updateQuantity()).
+                $productSaleElements = $cartItem->getProductSaleElements();
+
+                if ($quantity > 0 && null !== $productSaleElements) {
+                    $this->assertTheRulesAccept($quantity, $productSaleElements);
                 }
 
                 $event->setCartItem(
@@ -646,6 +671,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $cart->getSaleUnitId(),
             $cartId > 0 ? $cartId : null,
         );
+    }
+
+    /**
+     * @throws CartQuantityRefusedException when the rules of the combination do not sell this quantity
+     */
+    private function assertTheRulesAccept(float $quantity, ProductSaleElements $productSaleElements): void
+    {
+        try {
+            ($this->quantityPolicy ?? new QuantityPolicy())->assertAcceptable($quantity, $productSaleElements);
+        } catch (QuantityRefusedException $refusal) {
+            throw CartQuantityRefusedException::byTheRules($refusal);
+        } catch (NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+            throw new CartQuantityRefusedException($refusal->getMessage(), previous: $refusal);
+        }
+    }
+
+    private function quantityReconciler(): CartQuantityReconciler
+    {
+        return $this->cartQuantityReconciler ?? new CartQuantityReconciler($this->quantityPolicy ?? new QuantityPolicy());
     }
 
     /**
@@ -862,12 +906,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             $cart->setSaleUnitId($saleUnitId);
             $cart->resetModified(CartTableMap::COL_SALE_UNIT_ID);
-            $changes = $this->switchLinesTo($cart, $saleUnitId);
+            [$changes, $adjustments] = $this->switchLinesTo($cart, $saleUnitId);
             $con->commit();
         } catch (\Throwable $exception) {
             $con->rollBack();
 
             throw $exception;
+        }
+
+        foreach ($adjustments as $adjustment) {
+            $dispatcher->dispatch($adjustment, TheliaEvents::CART_ITEM_QUANTITY_ADJUSTED);
         }
 
         $dispatcher->dispatch(
@@ -877,11 +925,20 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @return list<CartLineChange> the lines that were removed, reduced or repriced
+     * A quantity cut down to the stock of the unit is then brought to the rules of its
+     * combination, so that the cut never leaves a line off its step: the line is
+     * removed when the valid quantity below the stock is below the smallest one sold.
+     *
+     * The lines that were removed, reduced or repriced, and the adjustments to tell once
+     * the switch is saved.
+     *
+     * @return array{0: list<CartLineChange>, 1: list<CartItemQuantityAdjustedEvent>}
      */
     private function switchLinesTo(CartModel $cart, ?int $saleUnitId): array
     {
         $checkStock = ConfigQuery::checkAvailableStock();
+        $reconciler = $this->quantityReconciler();
+        $adjustments = [];
         /** @var array<int, array{0: CartItem, 1: float, 2: float}> $before line, quantity and price before, by line id */
         $before = [];
         $changes = [];
@@ -927,9 +984,28 @@ class Cart extends BaseAction implements EventSubscriberInterface
                     continue;
                 }
 
-                if ($quantity > $available) {
-                    $cartItem->setQuantity($available)->save();
+                $kept = min($quantity, $available);
+            } else {
+                $kept = $quantity;
+            }
+
+            $decision = $reconciler->decide($productSaleElements, $kept);
+
+            if (null !== $decision) {
+                $adjustments[] = new CartItemQuantityAdjustedEvent($cartItem, $decision);
+
+                if ($decision->removesTheLine()) {
+                    $changes[] = $this->lineChange($cartItem, $quantity, 0.0, $price, $price);
+                    $cartItem->delete();
+
+                    continue;
                 }
+
+                $kept = (float) $decision->quantity;
+            }
+
+            if (QuantityScale::micro($kept) !== QuantityScale::micro($quantity)) {
+                $cartItem->setQuantity($kept)->save();
             }
 
             $before[(int) $cartItem->getId()] = [$cartItem, $quantity, $price];
@@ -957,7 +1033,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        return $changes;
+        return [$changes, $adjustments];
     }
 
     private function lineChange(CartItem $cartItem, float $previousQuantity, float $quantity, float $previousPrice, float $price): CartLineChange
@@ -1024,6 +1100,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
         // session holds the cart (Session::getSessionCart), not here: the listeners read it.
         if (!$cart->isNew() && [] !== ($this->cartLineVisibility?->removeHiddenLines($cart) ?? [])) {
             $cartRestoreEvent->markLinesRemoved();
+        }
+
+        // A restored cart may have been filled under other rules: its lines are brought
+        // to the rules of today, and CART_ITEM_QUANTITY_ADJUSTED tells which.
+        if (!$cart->isNew()) {
+            $this->quantityReconciler()->reconcile($cart, $dispatcher);
         }
 
         // A restored cart may have been created a long time ago: bring the price and the special offer

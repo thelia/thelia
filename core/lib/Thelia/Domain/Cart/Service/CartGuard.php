@@ -21,6 +21,7 @@ use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\CartLineUnavailableException;
+use Thelia\Domain\Checkout\Exception\CartQuantitiesAdjustedException;
 use Thelia\Domain\Checkout\Exception\DeliveryAddressMovedException;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
@@ -61,6 +62,7 @@ class CartGuard
         private readonly CartLineVisibility $cartLineVisibility,
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
         private readonly ?BundleOrderPlanner $bundleOrderPlanner = null,
+        private readonly ?CartQuantityReconciler $cartQuantityReconciler = null,
     ) {
     }
 
@@ -118,6 +120,26 @@ class CartGuard
         $productIds = array_values(array_unique(array_map(static fn (CartItem $line): int => (int) $line->getProductId(), $hiddenLines)));
 
         throw new CartLineUnavailableException($this->cartShippingRules->titlesOf($productIds, $this->locale()), array_map(static fn (CartItem $line): int => (int) $line->getId(), $hiddenLines));
+    }
+
+    /**
+     * The lines are brought to the rules of their combination, which may have changed
+     * since the cart was filled. A cart that had to be adjusted is refused this once, so
+     * that the buyer sees the new quantities before paying for them.
+     *
+     * @throws CartQuantitiesAdjustedException
+     */
+    public function checkQuantities(?Cart $cart): void
+    {
+        if (null === $cart) {
+            return;
+        }
+
+        $adjustments = ($this->cartQuantityReconciler ?? new CartQuantityReconciler())->reconcile($cart, $this->dispatcher);
+
+        if ([] !== $adjustments) {
+            throw new CartQuantitiesAdjustedException($adjustments);
+        }
     }
 
     /**

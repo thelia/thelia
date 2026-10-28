@@ -249,6 +249,7 @@ class FreeProduct extends AbstractRemoveOnProducts
                 $cartEvent->setNewness(true);
                 $cartEvent->setAppend(false);
                 $cartEvent->setQuantity(1);
+                $cartEvent->setOfferedByAPromotion(true);
                 $cartEvent->setProductSaleElementsId($freeProduct->getDefaultSaleElements()->getId());
                 $cartEvent->setProductId($this->offeredProductId);
 

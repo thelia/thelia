@@ -17,6 +17,9 @@ namespace Thelia\Tests\Integration\Domain\Promotion;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
+use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Model\Cart;
@@ -55,6 +58,61 @@ final class CouponListEffectsCartTest extends ActionIntegrationPromotionTestCase
         $this->addItem($cart, $second);
 
         self::assertSame(3.0, $this->cartDiscount($cart), 'The second product of the list must be discounted too.');
+    }
+
+    /**
+     * Decision of the shop: an amount per article comes off once from a line sold by
+     * measure (1.25 kg is one article), and off every unit of a line sold by the piece.
+     */
+    public function testAnAmountPerArticleComesOffOnceFromALineSoldByMeasure(): void
+    {
+        $category = $this->factory->category();
+        $byMeasure = $this->productIn($category);
+        $saleElements = $this->defaultPseFor($byMeasure);
+        (new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2))->applyTo($saleElements);
+        $saleElements->save();
+
+        $this->automaticPromotion(
+            type: 'thelia.coupon.type.remove_amount_on_products',
+            effects: $this->effectsSavedByTheBackOffice('thelia.coupon.type.remove_amount_on_products', [
+                'amount' => '3',
+                'category_id' => (string) $category->getId(),
+                'products' => [(string) $byMeasure->getId()],
+            ]),
+            conditions: $this->atLeastLines(1),
+        );
+
+        $cart = $this->newEmptyCart();
+        $event = (new CartEvent($cart))
+            ->setProductId($byMeasure->getId())
+            ->setProductSaleElementsId($saleElements->getId())
+            ->setQuantity(1.25)
+            ->setNewness(true)
+            ->setAppend(false);
+        $this->dispatch($event, TheliaEvents::CART_ADDITEM);
+
+        self::assertSame(3.0, $this->cartDiscount($cart), 'Once for the line, not 1.25 times.');
+    }
+
+    public function testAnAmountPerArticleComesOffEveryUnitOfALineSoldByThePiece(): void
+    {
+        $category = $this->factory->category();
+        $product = $this->productIn($category);
+
+        $this->automaticPromotion(
+            type: 'thelia.coupon.type.remove_amount_on_products',
+            effects: $this->effectsSavedByTheBackOffice('thelia.coupon.type.remove_amount_on_products', [
+                'amount' => '3',
+                'category_id' => (string) $category->getId(),
+                'products' => [(string) $product->getId()],
+            ]),
+            conditions: $this->atLeastLines(1),
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $product, quantity: 2);
+
+        self::assertSame(6.0, $this->cartDiscount($cart));
     }
 
     public function testACategoryDiscountAppliesToEveryCategoryOfTheList(): void
