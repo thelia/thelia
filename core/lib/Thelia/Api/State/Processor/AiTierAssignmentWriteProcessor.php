@@ -18,25 +18,25 @@ use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\AiTierAssignment as AiTierAssignmentResource;
-use Thelia\Domain\Ai\AiTier;
-use Thelia\Model\AiConnectionQuery;
-use Thelia\Model\AiModelQuery;
+use Thelia\Domain\Ai\Exception\AiExceptionInterface;
+use Thelia\Domain\Ai\Service\AiSettingsWriter;
 use Thelia\Model\AiTierAssignment;
 use Thelia\Model\AiTierAssignmentQuery;
 
 /**
- * Assigns a connection and a model to a tier. The model must belong to the provider of the connection, and to
- * the connection itself when it is bound to one; a tier has one assignment at most. A refusal is a 422.
+ * Assigns a connection and a model to a tier by the rules of {@see AiSettingsWriter}: a tier has one assignment at
+ * most. A refusal is a 422.
  */
 final readonly class AiTierAssignmentWriteProcessor implements ProcessorInterface
 {
-    public function __construct(private ApiResourcePropelTransformerService $transformer)
-    {
+    public function __construct(
+        private ApiResourcePropelTransformerService $transformer,
+        private AiSettingsWriter $writer,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
@@ -55,28 +55,16 @@ final readonly class AiTierAssignmentWriteProcessor implements ProcessorInterfac
             throw new UnprocessableEntityHttpException('An AI tier assignment is expected.');
         }
 
-        $tier = AiTier::tryFrom((string) $data->getTier())
-            ?? throw new UnprocessableEntityHttpException(\sprintf('The tier must be one of: %s.', implode(', ', array_column(AiTier::cases(), 'value'))));
-        $connection = AiConnectionQuery::create()->findPk((int) $data->getConnectionId())
-            ?? throw new UnprocessableEntityHttpException('The connection does not exist.');
-        $model = AiModelQuery::create()->findPk((int) $data->getModelId())
-            ?? throw new UnprocessableEntityHttpException('The model does not exist.');
-
-        if ($model->getProvider() !== $connection->getProvider() || (null !== $model->getConnectionId() && $model->getConnectionId() !== $connection->getId())) {
-            throw new UnprocessableEntityHttpException('The model is not served by this connection.');
+        try {
+            $assignment = $this->writer->assignTier(
+                $assignment,
+                (string) $data->getTier(),
+                (int) $data->getConnectionId(),
+                (int) $data->getModelId(),
+            );
+        } catch (AiExceptionInterface $refusal) {
+            throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
         }
-
-        $taken = AiTierAssignmentQuery::create()->filterByTier($tier->value);
-
-        if (null !== $assignment->getId()) {
-            $taken->filterById($assignment->getId(), Criteria::NOT_EQUAL);
-        }
-
-        if ($taken->count() > 0) {
-            throw new UnprocessableEntityHttpException('This tier already has an assignment: update it instead.');
-        }
-
-        $assignment->setTier($tier->value)->setConnectionId($connection->getId())->setModelId($model->getId())->save();
 
         return $this->transformer->modelToResource(
             resourceClass: AiTierAssignmentResource::class,
