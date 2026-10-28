@@ -36,7 +36,7 @@ final class AiProviderFixtures
         return self::json([
             'id' => 'abc', 'object' => 'chat.completion', 'created' => 1786820845, 'model' => 'probe-model-2026',
             'usage' => ['prompt_tokens' => $promptTokens, 'total_tokens' => $promptTokens + $completionTokens, 'completion_tokens' => $completionTokens, 'prompt_tokens_details' => ['cached_tokens' => $cachedTokens]] + $usageExtra,
-            'choices' => [['index' => 0, 'finish_reason' => null === $toolCalls ? $finish : 'tool_calls', 'message' => ['role' => 'assistant', 'content' => $content, 'tool_calls' => $toolCalls]]],
+            'choices' => [['index' => 0, 'finish_reason' => null === $toolCalls || 'stop' !== $finish ? $finish : 'tool_calls', 'message' => ['role' => 'assistant', 'content' => $content, 'tool_calls' => $toolCalls]]],
         ]);
     }
 
@@ -97,7 +97,7 @@ final class AiProviderFixtures
         return self::json(['id' => 'msg_01', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-probe-2026', 'content' => $content, 'stop_reason' => $stop, 'stop_sequence' => null, 'usage' => $usage]);
     }
 
-    public static function anthropicStream(int $inputTokens = 25, int $outputTokens = 15, int $cacheRead = 0, int $cacheWrite = 0): MockResponse
+    public static function anthropicStream(int $inputTokens = 25, int $outputTokens = 15, int $cacheRead = 0, int $cacheWrite = 0, string $stop = 'end_turn'): MockResponse
     {
         return self::sse(self::events([
             ['message_start', ['type' => 'message_start', 'message' => ['id' => 'msg_01', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-probe-2026', 'content' => [], 'stop_reason' => null, 'stop_sequence' => null, 'usage' => ['input_tokens' => $inputTokens, 'cache_read_input_tokens' => $cacheRead, 'cache_creation_input_tokens' => $cacheWrite, 'output_tokens' => 1]]]],
@@ -105,7 +105,23 @@ final class AiProviderFixtures
             ['content_block_delta', ['type' => 'content_block_delta', 'index' => 0, 'delta' => ['type' => 'text_delta', 'text' => 'Bon']]],
             ['content_block_delta', ['type' => 'content_block_delta', 'index' => 0, 'delta' => ['type' => 'text_delta', 'text' => 'jour']]],
             ['content_block_stop', ['type' => 'content_block_stop', 'index' => 0]],
-            ['message_delta', ['type' => 'message_delta', 'delta' => ['stop_reason' => 'end_turn', 'stop_sequence' => null], 'usage' => ['output_tokens' => $outputTokens]]],
+            ['message_delta', ['type' => 'message_delta', 'delta' => ['stop_reason' => $stop, 'stop_sequence' => null], 'usage' => ['output_tokens' => $outputTokens]]],
+            ['message_stop', ['type' => 'message_stop']],
+        ]));
+    }
+
+    /**
+     * RECORDED shape (claude-haiku-5-5, 28/10/2026): a thinking block that spent the whole budget, no text, stop reason max_tokens.
+     */
+    public static function anthropicThinkingOnlyStream(int $inputTokens = 22, int $outputTokens = 600): MockResponse
+    {
+        return self::sse(self::events([
+            ['message_start', ['type' => 'message_start', 'message' => ['id' => 'msg_01', 'type' => 'message', 'role' => 'assistant', 'model' => 'claude-probe-2026', 'content' => [], 'stop_reason' => null, 'stop_sequence' => null, 'usage' => ['input_tokens' => $inputTokens, 'cache_read_input_tokens' => 0, 'cache_creation_input_tokens' => 0, 'output_tokens' => 3]]]],
+            ['content_block_start', ['type' => 'content_block_start', 'index' => 0, 'content_block' => ['type' => 'thinking', 'thinking' => '', 'signature' => '']]],
+            ['content_block_delta', ['type' => 'content_block_delta', 'index' => 0, 'delta' => ['type' => 'thinking_delta', 'thinking' => 'The user wants a story']]],
+            ['content_block_delta', ['type' => 'content_block_delta', 'index' => 0, 'delta' => ['type' => 'signature_delta', 'signature' => 'sig-1']]],
+            ['content_block_stop', ['type' => 'content_block_stop', 'index' => 0]],
+            ['message_delta', ['type' => 'message_delta', 'delta' => ['stop_reason' => 'max_tokens', 'stop_sequence' => null], 'usage' => ['output_tokens' => $outputTokens]]],
             ['message_stop', ['type' => 'message_stop']],
         ]));
     }
@@ -128,13 +144,14 @@ final class AiProviderFixtures
     /**
      * @param list<array<string, mixed>> $output
      */
-    public static function responses(array $output, int $inputTokens = 120, int $outputTokens = 9, int $cachedTokens = 0, string $status = 'completed'): MockResponse
+    public static function responses(array $output, int $inputTokens = 120, int $outputTokens = 9, int $cachedTokens = 0, string $status = 'completed', ?string $incompleteReason = null): MockResponse
     {
-        return self::json([
+        return self::json(array_filter([
             'id' => 'resp_1', 'object' => 'response', 'status' => $status, 'model' => 'gpt-probe-2026',
+            'incomplete_details' => null === $incompleteReason ? null : ['reason' => $incompleteReason],
             'output' => $output,
             'usage' => ['input_tokens' => $inputTokens, 'input_tokens_details' => ['cached_tokens' => $cachedTokens], 'output_tokens' => $outputTokens, 'total_tokens' => $inputTokens + $outputTokens],
-        ]);
+        ], static fn (mixed $value): bool => null !== $value));
     }
 
     /**

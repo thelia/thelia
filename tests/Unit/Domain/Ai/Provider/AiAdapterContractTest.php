@@ -69,6 +69,52 @@ final class AiAdapterContractTest extends AiProviderTestCase
         self::assertSame('POST', $this->sent[0]['method']);
     }
 
+    /** @return iterable<string, array{AiProvider, string|null, string}> the providers whose library refuses an answer cut inside a tool call (Ollama's does not) */
+    public static function providersThatRefuseACutToolCall(): iterable
+    {
+        foreach (self::providers() as $name => $provider) {
+            if (AiProvider::Ollama !== $provider[0]) {
+                yield $name => $provider;
+            }
+        }
+    }
+
+    #[DataProvider('providersThatRefuseACutToolCall')]
+    public function testAToolCallCutAtTheOutputLimitIsATruncatedAnswerNotAProviderFailure(AiProvider $provider, ?string $baseUrl, string $url): void
+    {
+        $cut = match ($provider) {
+            AiProvider::Anthropic => Wire::anthropic([['type' => 'text', 'text' => 'Let me'], ['type' => 'tool_use', 'id' => 'toolu_01', 'name' => 'list_categories', 'input' => ['limit' => 3]]], 'max_tokens', ['input_tokens' => 21, 'output_tokens' => 20]),
+            AiProvider::OpenAi => Wire::responses([Wire::responsesMessage('Let me'), Wire::responsesToolCall()], 21, 20, 0, 'incomplete', 'max_output_tokens'),
+            default => Wire::chat('Let me', Wire::chatToolCall(), finish: 'length'),
+        };
+        $adapter = $this->adapter(self::adapterClass($provider), $this->transport($cut), self::PINNED);
+
+        $result = $adapter->complete($this->request(tools: [self::tool()]), $this->target($provider, $baseUrl, self::keyFor($provider)));
+
+        self::assertSame(AiFinishReason::MaxTokens, $result->finishReason);
+        self::assertSame('Let me', $result->text);
+        self::assertSame([], $result->toolCalls, 'a cut call cannot be run');
+        self::assertSame([21, 20], [$result->tokenUsage->inputTokens, $result->tokenUsage->outputTokens]);
+        self::assertTrue($result->complete);
+    }
+
+    public function testAnOpenAiStreamCutAtTheOutputLimitKeepsTheTextAndSaysMaxTokens(): void
+    {
+        $body = 'event: response.created'."\ndata: ".json_encode(['type' => 'response.created', 'response' => ['id' => 'resp_1', 'status' => 'in_progress']])."\n\n"
+            .'event: response.output_text.delta'."\ndata: ".json_encode(['type' => 'response.output_text.delta', 'item_id' => 'msg_1', 'output_index' => 0, 'content_index' => 0, 'delta' => 'Bon'])."\n\n"
+            .'event: response.incomplete'."\ndata: ".json_encode(['type' => 'response.incomplete', 'response' => ['id' => 'resp_1', 'status' => 'incomplete', 'incomplete_details' => ['reason' => 'max_output_tokens'], 'usage' => ['input_tokens' => 10, 'input_tokens_details' => ['cached_tokens' => 0], 'output_tokens' => 4, 'total_tokens' => 14]]])."\n\n";
+        $adapter = $this->adapter(self::adapterClass(AiProvider::OpenAi), $this->transport(Wire::sse($body)), self::PINNED);
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::OpenAi, null, self::keyFor(AiProvider::OpenAi)));
+
+        self::assertEquals([new TextDelta('Bon')], $this->events($stream));
+
+        $result = $stream->result();
+
+        self::assertSame(AiFinishReason::MaxTokens, $result->finishReason);
+        self::assertSame('Bon', $result->text);
+        self::assertTrue($result->complete);
+    }
+
     #[DataProvider('providers')]
     public function testAStreamYieldsTheDeltasThenKnowsTheTokens(AiProvider $provider, ?string $baseUrl, string $url): void
     {
