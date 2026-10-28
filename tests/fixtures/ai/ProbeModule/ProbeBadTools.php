@@ -112,3 +112,17 @@ final class ProbeDuplicateNameTool implements AiReadToolInterface
 {
     use ProbeBadReader;
 }
+
+#[AsAiTool(name: 'aiprobemodule_multiple', description: 'Relies on a keyword the registry does not check.', resource: AdminResources::PRODUCT)]
+final class ProbeUnsupportedKeywordTool implements AiReadToolInterface
+{
+    public function inputSchema(): array
+    {
+        return ['type' => 'object', 'additionalProperties' => false, 'properties' => ['quantity' => ['type' => 'integer', 'multipleOf' => 10]]];
+    }
+
+    public function execute(array $arguments, AiToolContext $context): array
+    {
+        return [];
+    }
+}

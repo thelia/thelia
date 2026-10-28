@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Ai\Tool\Internal\AiToolDeclaration;
+use Thelia\Domain\Ai\Tool\Internal\AiToolSchema;
 use Thelia\Domain\Ai\Tool\Service\AiToolInstances;
 
 /**
@@ -56,6 +57,7 @@ final class RegisterAiToolPass implements CompilerPassInterface
 
             $declaration = AiToolDeclaration::fromClass($class);
             $name = $declaration->name();
+            $this->assertSchemaIsChecked($name, $class);
 
             if (isset($classes[$name])) {
                 throw new InvalidAiArgumentException(\sprintf('The AI tool "%s" is declared twice, by "%s" and by "%s". Each tool name must be unique.', $name, $classes[$name], $class));
@@ -73,6 +75,21 @@ final class RegisterAiToolPass implements CompilerPassInterface
         if ($container->hasDefinition(AiToolInstances::class)) {
             $container->getDefinition(AiToolInstances::class)->setArgument('$locator', ServiceLocatorTagPass::register($container, $references));
         }
+    }
+
+    /**
+     * The schema of a tool is read on an instance built without its constructor: a tool whose schema depends on its
+     * services cannot be read here and is checked the first time it is offered (AiToolSchema::forTransport()).
+     */
+    private function assertSchemaIsChecked(string $name, string $class): void
+    {
+        try {
+            $schema = (new \ReflectionClass($class))->newInstanceWithoutConstructor()->inputSchema();
+        } catch (\Throwable) {
+            return;
+        }
+
+        AiToolSchema::forTransport($name, $schema);
     }
 
     private function assertEveryToolIsDeclared(ContainerBuilder $container): void

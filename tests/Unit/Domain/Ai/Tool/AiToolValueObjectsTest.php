@@ -130,4 +130,12 @@ final class AiToolValueObjectsTest extends TestCase
 
         AiToolSchema::forTransport('shop_read', ['type' => 'object', 'properties' => ['a' => ['type' => 'string']]]);
     }
+
+    public function testASchemaWithAKeywordThatIsNotCheckedIsRefusedWithTheToolAndTheKeyword(): void
+    {
+        $this->expectException(InvalidAiArgumentException::class);
+        $this->expectExceptionMessageMatches('~tool "shop_read".*/properties/mail: format~');
+
+        AiToolSchema::forTransport('shop_read', ['type' => 'object', 'additionalProperties' => false, 'properties' => ['mail' => ['type' => 'string', 'format' => 'email']]]);
+    }
 }

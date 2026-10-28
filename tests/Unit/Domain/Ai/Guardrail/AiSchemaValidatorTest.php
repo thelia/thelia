@@ -170,4 +170,38 @@ final class AiSchemaValidatorTest extends TestCase
         self::assertCount(5, $errors);
         self::assertStringNotContainsString('secret', implode(' ', $errors));
     }
+
+    public function testASchemaThatUsesOnlyEnforcedKeywordsAndAnnotationsHasNoUnsupportedKeyword(): void
+    {
+        $schema = self::PAGE + ['$comment' => 'x', 'title' => 'Page'];
+        $schema['properties']['rating'] += ['description' => 'A grade', 'default' => 3, 'examples' => [1], 'exclusiveMinimum' => 0];
+
+        self::assertSame([], AiSchemaValidator::unsupportedKeywords($schema));
+    }
+
+    /**
+     * @param array<string, mixed> $schema
+     */
+    #[DataProvider('unsupportedKeywords')]
+    public function testAKeywordTheValidatorIgnoresIsReported(array $schema, string $expected): void
+    {
+        self::assertSame([$expected], AiSchemaValidator::unsupportedKeywords($schema));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string}>
+     */
+    public static function unsupportedKeywords(): iterable
+    {
+        yield 'multipleOf' => [['type' => 'object', 'properties' => ['n' => ['type' => 'integer', 'multipleOf' => 10]]], '/properties/n: multipleOf'];
+        yield 'format' => [['type' => 'object', 'properties' => ['mail' => ['type' => 'string', 'format' => 'email']]], '/properties/mail: format'];
+        yield 'patternProperties' => [['type' => 'object', 'patternProperties' => ['^x' => ['type' => 'string']]], '/: patternProperties'];
+        yield 'contains' => [['type' => 'object', 'properties' => ['l' => ['type' => 'array', 'contains' => ['type' => 'string']]]], '/properties/l: contains'];
+        yield 'dependentRequired' => [['type' => 'object', 'dependentRequired' => ['a' => ['b']]], '/: dependentRequired'];
+        yield 'unknown keyword' => [['type' => 'object', 'whatever' => true], '/: whatever'];
+        yield 'in an array item' => [['type' => 'array', 'items' => ['type' => 'string', 'format' => 'uri']], '/items: format'];
+        yield 'in a combination' => [['anyOf' => [['type' => 'string'], ['type' => 'integer', 'multipleOf' => 2]]], '/anyOf/1: multipleOf'];
+        yield 'in a definition' => [['$defs' => ['d' => ['type' => 'string', 'format' => 'date']]], '/$defs/d: format'];
+        yield 'draft-04 exclusiveMinimum' => [['type' => 'integer', 'minimum' => 0, 'exclusiveMinimum' => true], '/: exclusiveMinimum'];
+    }
 }
