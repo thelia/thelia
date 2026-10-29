@@ -131,7 +131,8 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
     public function reject(int $approvalId, ?string $note = null): AiToolApprovalView
     {
         $approver = $this->approver();
-        $this->decidable($approvalId, $approver);
+        // Rejecting applies nothing: a proposal whose tool is gone, or now asks for another right, is still rejected.
+        $this->pending($approvalId, $approver);
 
         if (!$this->approvals->reject($approvalId, $approver->getId(), $approver->getLogin(), $note, new \DateTimeImmutable())) {
             throw new AiToolApprovalException(AiToolApprovalFailure::NotPending, 'Another decision was taken on this proposal first.');
@@ -195,12 +196,29 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
     }
 
     /**
-     * Steps 1 to 3 of a decision: the approver holds the right stored on the row (else the proposal does not exist
-     * for him), the row is pending and not expired, the tool still declares that right.
+     * Steps 1 to 3 of an approval: the proposal is pending (see pending()), and its tool still declares the right
+     * stored on the row.
      *
      * @return array{AiToolApproval, AiToolDeclaration}
      */
     private function decidable(int $approvalId, Admin $approver): array
+    {
+        $row = $this->pending($approvalId, $approver);
+        $declaration = $this->declarations->find($row->getToolName());
+        $attribute = $declaration?->attribute;
+
+        if (null === $declaration || AiToolEffect::Write !== $declaration->effect || $attribute?->resource !== $row->getAclResource() || $attribute?->module !== $row->getAclModule() || $attribute?->access !== $row->getAclAccess()) {
+            throw new AiToolApprovalException(AiToolApprovalFailure::ToolGone, 'The tool that made this proposal is gone or now asks for another right.');
+        }
+
+        return [$row, $declaration];
+    }
+
+    /**
+     * Steps 1 and 2 of a decision: the approver holds the right stored on the row (else the proposal does not exist
+     * for him), the row is pending and not expired.
+     */
+    private function pending(int $approvalId, Admin $approver): AiToolApproval
     {
         $row = $this->visibleRow($approvalId, $approver);
 
@@ -222,14 +240,7 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
             throw new AiToolApprovalException(AiToolApprovalFailure::Expired, 'This proposal has expired.');
         }
 
-        $declaration = $this->declarations->find($row->getToolName());
-        $attribute = $declaration?->attribute;
-
-        if (null === $declaration || AiToolEffect::Write !== $declaration->effect || $attribute?->resource !== $row->getAclResource() || $attribute?->module !== $row->getAclModule() || $attribute?->access !== $row->getAclAccess()) {
-            throw new AiToolApprovalException(AiToolApprovalFailure::ToolGone, 'The tool that made this proposal is gone or now asks for another right.');
-        }
-
-        return [$row, $declaration];
+        return $row;
     }
 
     /**
