@@ -136,6 +136,8 @@ class AiModelCatalog
             supportsStreaming: (bool) $row->getSupportsStreaming(),
             source: (string) $row->getSource(),
             connectionId: $row->getConnectionId(),
+            // A row has no column for it: what the list measured stays true of the model.
+            thinkingOff: ($models[$name] ?? null)?->thinkingOff,
         );
 
         return $models;
@@ -196,6 +198,7 @@ class AiModelCatalog
                 supportsVision: true === ($capabilities['vision'] ?? null),
                 supportsStreaming: true,
                 source: AiModelSpecification::SOURCE_CATALOG,
+                thinkingOff: $entry['thinking_off'] ?? null,
             );
         }
 

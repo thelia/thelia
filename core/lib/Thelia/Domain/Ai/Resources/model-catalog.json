@@ -20,7 +20,8 @@
         "tools": true,
         "vision": true
       },
-      "deprecation_date": null
+      "deprecation_date": null,
+      "thinking_off": "adaptive"
     },
     {
       "provider": "anthropic",
@@ -37,7 +38,8 @@
         "tools": true,
         "vision": true
       },
-      "deprecation_date": null
+      "deprecation_date": null,
+      "thinking_off": "adaptive"
     },
     {
       "provider": "anthropic",
@@ -88,7 +90,8 @@
         "tools": true,
         "vision": true
       },
-      "deprecation_date": null
+      "deprecation_date": null,
+      "thinking_off": "disabled"
     },
     {
       "provider": "anthropic",
@@ -275,7 +278,8 @@
         "tools": true,
         "vision": true
       },
-      "deprecation_date": null
+      "deprecation_date": null,
+      "thinking_off": "adaptive"
     },
     {
       "provider": "anthropic",
@@ -360,7 +364,8 @@
         "tools": true,
         "vision": true
       },
-      "deprecation_date": null
+      "deprecation_date": null,
+      "thinking_off": "between_tools"
     },
     {
       "provider": "mistral",

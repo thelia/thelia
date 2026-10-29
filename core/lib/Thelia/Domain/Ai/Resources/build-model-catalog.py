@@ -18,6 +18,12 @@ API = "https://api.github.com/repos/BerriAI/litellm/commits?path=model_prices_an
 PROVIDERS = {"mistral": "mistral", "anthropic": "anthropic", "openai": "openai",
              "scaleway": "scaleway", "ovhcloud": "ovhcloud", "albert": None, "ollama": "ollama"}
 MODES = {"chat", "completion"}
+# What LiteLLM does not say: the `thinking` setting that keeps an Anthropic model from thinking before it answers,
+# measured on the API on 2026-10-29. "adaptive" marks a model that refuses "disabled" and has no off switch: the
+# adapter asks it for the lowest effort. A model left out is sent "disabled", and the adapter learns from a refusal.
+THINKING_OFF = {("anthropic", "claude-fable-5"): "adaptive", ("anthropic", "claude-fable-5-1"): "adaptive",
+                ("anthropic", "claude-opus-5-5"): "adaptive", ("anthropic", "claude-sonnet-5-5"): "between_tools",
+                ("anthropic", "claude-haiku-5-5"): "disabled"}
 
 
 def money(per_token):
@@ -74,6 +80,7 @@ def main():
             model = key[len(provider_key) + 1:] if key.startswith(provider_key + "/") else key
             if not is_listed(model, v.get("deprecation_date"), today):
                 continue
+            thinking_off = THINKING_OFF.get((name, model))
             models.append({
                 "provider": name, "model": model, "mode": v["mode"],
                 "input_usd_per_million": money(v.get("input_cost_per_token")),
@@ -86,6 +93,7 @@ def main():
                                  "tools": v.get("supports_function_calling"),
                                  "vision": v.get("supports_vision")},
                 "deprecation_date": v.get("deprecation_date"),
+                **({"thinking_off": thinking_off} if thinking_off else {}),
             })
             counts[name] += 1
     models.sort(key=lambda m: (m["provider"], m["model"]))

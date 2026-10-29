@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * What the layer knows about one model: its prices (per million tokens, decimal strings), its limits and
  * what it can do. Comes from the embedded price list or from a row the merchant added or edited.
  *
+ * `thinkingOff` is the native `thinking` setting that keeps the model from thinking before it answers, when the
+ * embedded list knows it (Anthropic: `disabled`, `between_tools`, or `adaptive` for a model that has no off switch).
+ *
  * @internal
  */
 #[Exclude]
@@ -46,6 +49,7 @@ final readonly class AiModelSpecification
         public bool $supportsStreaming,
         public string $source,
         public ?int $connectionId = null,
+        public ?string $thinkingOff = null,
     ) {
     }
 }
