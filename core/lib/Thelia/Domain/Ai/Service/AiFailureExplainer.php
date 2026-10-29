@@ -25,6 +25,7 @@ use Thelia\Domain\Ai\Exception\AiUsageViolationException;
 use Thelia\Domain\Ai\Exception\InactiveAiUsageException;
 use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Guardrail\GuardrailStage;
+use Thelia\Domain\Ai\Vault\AiEnvironmentKey;
 
 /**
  * The message of an exception of the AI layer in plain words, in the language asked for (domain `core`).
@@ -47,8 +48,9 @@ final readonly class AiFailureExplainer
         'Another connection already has this code.',
         'The title is required.',
         'The jurisdiction ("eu" or "non_eu") is required for this provider.',
-        'The environment variable that holds an API key must end with "_KEY" or "_TOKEN" and must not be one of the application (APP_, DATABASE_, JWT_).',
-        'The name of the environment variable that holds an API key must be letters, digits and underscores.',
+        AiEnvironmentKey::NOT_ALLOWED,
+        AiEnvironmentKey::OTHER_ADDRESS,
+        AiEnvironmentKey::INVALID_NAME,
         'The connection now points to another server: type its API key again, the saved key is not sent to a new address.',
         'Tiers, usages or models rely on the provider of this connection: move them to another connection before changing its provider.',
         'The connection does not exist.',
@@ -138,7 +140,8 @@ final readonly class AiFailureExplainer
      */
     public function explainCheckError(string $stored, ?string $locale = null): string
     {
-        if (\in_array($stored, self::CHECK_ERRORS, true)) {
+        // A refusal of the settings stops the test before any call, the variable of the key for one.
+        if (\in_array($stored, self::CHECK_ERRORS, true) || \in_array($stored, self::FIXED_SENTENCES, true)) {
             return $this->translator->trans($stored, [], $locale);
         }
 
