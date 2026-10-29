@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Command;
 
 use AiProbeModule\FormulaWriter;
 use AiProbeModule\ProbeWriter;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,6 +33,7 @@ use Thelia\Domain\Ai\Service\AiUsageRegister;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
 use Thelia\Domain\Ai\Vault\AiKeyCipher;
 use Thelia\Domain\Ai\Vault\AiKeyVault;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\AiConnection;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiTierAssignment;
@@ -57,7 +59,7 @@ final class AiUsagesCommandTest extends IntegrationTestCase
         parent::setUp();
 
         $settings = new AiUsageSettingRepository();
-        $translator = new AiTextTranslator(new RequestStack());
+        $translator = new AiTextTranslator(new LangService(new RequestStack(), new NullLogger()));
         $registry = new AiUsageRegistry(['aiprobe.writing' => ProbeWriter::class, 'aiprobe.chat' => ProbeWriter::class], $settings, new AiSettings(), $translator);
         $resolver = new AiTargetResolver($registry, $settings, new AiRoutingRepository(), new AiModelCatalog(), new AiKeyVault(new AiKeyCipher('usages-test-secret')));
         $this->command = new AiUsagesCommand(new AiUsageRegister($registry, $settings, $resolver, $translator));

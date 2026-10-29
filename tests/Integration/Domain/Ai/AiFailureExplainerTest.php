@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use AiProbeModule\ProbeWriter;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\Exception\AiBudgetExceededException;
@@ -39,6 +40,7 @@ use Thelia\Domain\Ai\Service\AiTextTranslator;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
 use Thelia\Domain\Ai\Vault\AiKeyCipher;
 use Thelia\Domain\Ai\Vault\AiKeyVault;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Webhook\WebhookUrlValidator;
 use Thelia\Test\IntegrationTestCase;
 
@@ -155,6 +157,6 @@ final class AiFailureExplainerTest extends IntegrationTestCase
 
     private function explainer(): AiFailureExplainer
     {
-        return new AiFailureExplainer(new AiTextTranslator(new RequestStack()));
+        return new AiFailureExplainer(new AiTextTranslator(new LangService(new RequestStack(), new NullLogger())));
     }
 }
