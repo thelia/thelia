@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Ai\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\AiTier;
@@ -37,6 +38,7 @@ use Thelia\Model\AiTierAssignment;
 use Thelia\Model\AiTierAssignmentQuery;
 use Thelia\Model\AiUsageSetting;
 use Thelia\Model\AiUsageSettingQuery;
+use Thelia\Model\Map\AiConnectionTableMap;
 
 /**
  * The one way to write the settings of the AI layer: connections, models, the model of each range, what the
@@ -302,18 +304,45 @@ final readonly class AiSettingsWriter
         return $setting;
     }
 
+    public const string CONNECTION_IN_TIER = 'This connection is assigned to a tier: assign another one first.';
+
+    public const string MODEL_IN_TIER = 'This model is assigned to a tier: assign another one first.';
+
+    public const string CONNECTION_PINNED = 'This connection is pinned for the usage "%s": pin the usage elsewhere first.';
+
+    public const string MODEL_PINNED = 'This model is pinned for the usage "%s": pin the usage elsewhere first.';
+
+    public const string CONNECTION_STILL_USED = 'Other settings still rely on this connection: free it first.';
+
+    public const string MODEL_STILL_USED = 'Other settings still rely on this model: free it first.';
+
     /**
-     * Deletes a connection, unless a range still runs on it.
+     * Deletes a connection, with the models bound to it, unless a range runs on it or a usage is pinned to it or to
+     * one of these models: the database would unpin the usage in silence, and it could turn inactive.
      *
      * @throws AiResourceInUseException
      */
     public function deleteConnection(AiConnection $connection): void
     {
-        if (AiTierAssignmentQuery::create()->filterByConnectionId($connection->getId())->count() > 0) {
-            throw new AiResourceInUseException('This connection is assigned to a tier: assign another one first.');
-        }
+        $this->deleteUnlessUsed(static function () use ($connection): void {
+            if (AiTierAssignmentQuery::create()->filterByConnectionId($connection->getId())->count() > 0) {
+                throw new AiResourceInUseException(self::CONNECTION_IN_TIER);
+            }
 
-        $connection->delete();
+            $boundModels = AiModelQuery::create()->filterByConnectionId($connection->getId())->select(['Id'])->find()->getData();
+            $pinned = AiUsageSettingQuery::create()
+                ->filterByPinnedConnectionId($connection->getId())
+                ->_or()
+                ->filterByPinnedModelId(array_map('intval', $boundModels), Criteria::IN)
+                ->orderByUsageId()
+                ->findOne();
+
+            if (null !== $pinned) {
+                throw new AiResourceInUseException(\sprintf(self::CONNECTION_PINNED, $pinned->getUsageId()));
+            }
+
+            $connection->delete();
+        }, self::CONNECTION_STILL_USED);
     }
 
     /**
@@ -421,17 +450,64 @@ final readonly class AiSettingsWriter
     }
 
     /**
-     * Deletes a model row, unless a range is assigned to it.
+     * Deletes a model row, unless a range is assigned to it or a usage is pinned to it.
      *
      * @throws AiResourceInUseException
      */
     public function deleteModel(AiModel $model): void
     {
-        if (AiTierAssignmentQuery::create()->filterByModelId($model->getId())->count() > 0) {
-            throw new AiResourceInUseException('This model is assigned to a tier: assign another one first.');
+        $this->deleteUnlessUsed(static function () use ($model): void {
+            if (AiTierAssignmentQuery::create()->filterByModelId($model->getId())->count() > 0) {
+                throw new AiResourceInUseException(self::MODEL_IN_TIER);
+            }
+
+            $pinned = AiUsageSettingQuery::create()->filterByPinnedModelId($model->getId())->orderByUsageId()->findOne();
+
+            if (null !== $pinned) {
+                throw new AiResourceInUseException(\sprintf(self::MODEL_PINNED, $pinned->getUsageId()));
+            }
+
+            $model->delete();
+        }, self::MODEL_STILL_USED);
+    }
+
+    /**
+     * The checks and the deletion in one transaction. A row written between the two (or one the checks do not cover)
+     * makes the database refuse the deletion: that refusal is an AiResourceInUseException too, never an SQL error.
+     *
+     * @param \Closure(): void $checkThenDelete
+     *
+     * @throws AiResourceInUseException
+     */
+    private function deleteUnlessUsed(\Closure $checkThenDelete, string $stillUsed): void
+    {
+        $connection = Propel::getWriteConnection(AiConnectionTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $checkThenDelete();
+            $connection->commit();
+        } catch (\Throwable $failure) {
+            $connection->rollBack();
+
+            if (!$failure instanceof AiExceptionInterface && self::isAForeignKeyRefusal($failure)) {
+                throw new AiResourceInUseException($stillUsed, 0, $failure);
+            }
+
+            throw $failure;
+        }
+    }
+
+    private static function isAForeignKeyRefusal(\Throwable $failure): bool
+    {
+        for ($link = $failure; null !== $link; $link = $link->getPrevious()) {
+            // SQLSTATE 23000, MySQL error 1451: a row of another table still points to this one.
+            if ($link instanceof \PDOException && '23000' === (string) $link->getCode()) {
+                return true;
+            }
         }
 
-        $model->delete();
+        return false;
     }
 
     /**
