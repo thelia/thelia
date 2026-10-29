@@ -20,10 +20,12 @@ use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
+use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
 use Thelia\Domain\Checkout\Service\CheckoutValidationService;
 use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
 use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
 use Thelia\Domain\Order\OrderFacade;
+use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -152,6 +154,71 @@ final class BundleOrderRevalidationTest extends ActionIntegrationTestCase
         self::assertSame(CheckoutStep::CODE_CART, $bundleViolations[0]->stepCode);
         self::assertSame(['productReference' => (string) $example['bundle']->getRef(), 'cartItemId' => (int) $line->getId()], $bundleViolations[0]->details);
         self::assertStringContainsString((string) $example['bundle']->getRef(), $bundleViolations[0]->message);
+    }
+
+    public function testTheVerdictOfTheOrderIsGivenForEveryPackLineAtOnce(): void
+    {
+        $planner = $this->getService(BundleOrderPlanner::class);
+        [$example, $cart, $line] = $this->aCartHoldingThePack();
+        [$second] = [$this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class))];
+        $secondLine = $this->addBundleLine($cart, $second['bundle'], [(int) $second['bike']->getId() => '1', (int) $second['helmet']->getId() => '2']);
+        $this->addSimpleLine($cart, $this->component($this->factory, '10', 5));
+        $cart = CartQuery::create()->findPk($cart->getId());
+
+        self::assertSame([], $planner->refusalsOf($cart->getCartItems()));
+
+        $example['helmetProduct']->setVisible(0)->save();
+        $second['bikeProduct']->delete();
+        $cart = CartQuery::create()->findPk($cart->getId());
+        $refusals = $planner->refusalsOf($cart->getCartItems());
+
+        self::assertSame([(int) $line->getId(), (int) $secondLine->getId()], array_keys($refusals), 'Both packs are refused, not only the first.');
+        self::assertSame((string) $example['bundle']->getRef(), $refusals[(int) $line->getId()]->productReference);
+        self::assertSame((string) $second['bundle']->getRef(), $refusals[(int) $secondLine->getId()]->productReference);
+    }
+
+    public function testTheVerdictOfTheOrderFlagsALineOfAPackLeftWithoutCompositionAndSparesAnOfferedOne(): void
+    {
+        $planner = $this->getService(BundleOrderPlanner::class);
+        [, $cart, $line] = $this->aCartHoldingThePackWithoutComposition();
+
+        self::assertSame([(int) $line->getId()], array_keys($planner->refusalsOf($cart->getCartItems())));
+
+        $line->setIsOffered(1)->save();
+
+        self::assertSame([], $planner->refusalsOf(CartQuery::create()->findPk($cart->getId())->getCartItems()));
+    }
+
+    public function testTheProgressionSaysWhyTheCartStepRefusesAPackThatCannotBeOrdered(): void
+    {
+        $progression = $this->getService(CheckoutProgressionService::class);
+        [$example, $cart, $line] = $this->aCartHoldingThePack();
+        $progression->forget();
+
+        self::assertNotSame(CheckoutStep::CODE_CART, $progression->firstViolation($cart)?->stepCode, 'A pack that can be ordered stops nothing at the cart step.');
+
+        $example['helmetProduct']->setVisible(0)->save();
+        $progression->forget();
+        $violation = $progression->firstViolation($cart);
+
+        self::assertNotNull($violation);
+        self::assertSame(CheckoutStep::CODE_CART, $violation->stepCode);
+        self::assertSame(CheckoutViolationCode::BundleLineNotOrderable->value, $violation->code);
+        self::assertSame(['productReference' => (string) $example['bundle']->getRef(), 'cartItemId' => (int) $line->getId()], $violation->details);
+        self::assertSame($progression->firstIncompleteStep($cart)?->code, $violation->stepCode, 'The violation is the one of the step the buyer is sent back to.');
+    }
+
+    public function testTheProgressionNamesTheEmptyCartAsAViolationOfTheCartStep(): void
+    {
+        [$customer, $currency] = $this->aBuyer();
+        $cart = $this->aCart($customer, $currency);
+        $progression = $this->getService(CheckoutProgressionService::class);
+        $progression->forget();
+
+        $violation = $progression->firstViolation($cart);
+
+        self::assertSame(CheckoutStep::CODE_CART, $violation?->stepCode);
+        self::assertSame(CheckoutViolationCode::CartEmpty->value, $violation->code);
     }
 
     public function testACartWithoutAPackPassesTheStepOfTheCart(): void

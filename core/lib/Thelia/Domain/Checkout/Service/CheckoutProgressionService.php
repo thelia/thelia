@@ -21,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\DTO\CheckoutStepView;
+use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\CheckoutException;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
 use Thelia\Model\Cart;
@@ -62,7 +63,7 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
     /** @var array<string, list<CheckoutStepView>> */
     private array $activeStepsCache = [];
 
-    /** @var array<string, bool> */
+    /** @var array<string, CheckoutException|null> the refusal of a step for a cart, null when it passes */
     private array $checkCache = [];
 
     /** @var array<string, CheckoutStepProviderInterface>|null */
@@ -114,6 +115,27 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
         foreach ($this->activeSteps($cart) as $step) {
             if (!$this->passes($cart, $step->code)) {
                 return $step;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Why the first step this cart has not satisfied refuses it, or null when it is ready to be ordered.
+     *
+     * The answer behind firstIncompleteStep(): a theme that sends the buyer back to that step can say what
+     * is wrong instead of sending them back without a word.
+     *
+     * @throws PropelException
+     */
+    public function firstViolation(Cart $cart): ?CheckoutViolation
+    {
+        foreach ($this->activeSteps($cart) as $step) {
+            $refusal = $this->refusalOf($cart, $step->code);
+
+            if (null !== $refusal) {
+                return CheckoutViolation::fromRefusal($step->code, $refusal);
             }
         }
 
@@ -434,26 +456,34 @@ final class CheckoutProgressionService implements EventSubscriberInterface, Rese
      */
     private function passes(Cart $cart, string $code): bool
     {
+        return null === $this->refusalOf($cart, $code);
+    }
+
+    /**
+     * @throws PropelException
+     */
+    private function refusalOf(Cart $cart, string $code): ?CheckoutException
+    {
         $key = $this->cartKey($cart).'|'.$code;
 
-        if (isset($this->checkCache[$key])) {
+        if (\array_key_exists($key, $this->checkCache)) {
             return $this->checkCache[$key];
         }
 
         $provider = $this->providersByCode()[$code] ?? null;
 
         if (null === $provider) {
-            return $this->checkCache[$key] = true;
+            return $this->checkCache[$key] = null;
         }
 
         try {
             $provider->check($cart);
-            $passes = true;
-        } catch (CheckoutException) {
-            $passes = false;
+            $refusal = null;
+        } catch (CheckoutException $exception) {
+            $refusal = $exception;
         }
 
-        return $this->checkCache[$key] = $passes;
+        return $this->checkCache[$key] = $refusal;
     }
 
     /**
