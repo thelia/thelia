@@ -65,4 +65,26 @@ final readonly class AiProviderPresets
     {
         return \in_array($provider, [AiProvider::Ollama, AiProvider::OpenAiCompatible, AiProvider::OvhCloud], true);
     }
+
+    /**
+     * The model the test of a connection calls when no range or usage uses one of that connection: a cheap model of the
+     * provider that its endpoints serve under that exact name, checked against the documentation of each provider
+     * on 29/10/2026. OpenAI is a dated snapshot, because the undated aliases are not served by the Responses API of
+     * `eu.api.openai.com` (https://developers.openai.com/api/docs/guides/your-data.md). Null for a provider with no
+     * name that every one of its accounts or servers has: Ollama (the models are those the server pulled), a
+     * compatible endpoint, OVHcloud and Albert, whose catalogue changes, and the gateway of Thelia. The test then asks
+     * the administrator to choose a model instead of calling one that may not exist.
+     *
+     * A name here is a promise to keep: replace it when the provider retires the model.
+     */
+    public function probeModel(AiProvider $provider): ?string
+    {
+        return match ($provider) {
+            AiProvider::Mistral => 'ministral-3b-2512',
+            AiProvider::Anthropic => 'claude-haiku-5-5',
+            AiProvider::OpenAi => 'gpt-5.4-nano-2026-03-17',
+            AiProvider::Scaleway => 'mistral-small-3.2-24b-instruct-2506',
+            AiProvider::OvhCloud, AiProvider::Albert, AiProvider::Ollama, AiProvider::OpenAiCompatible, AiProvider::TheliaAi => null,
+        };
+    }
 }

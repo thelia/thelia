@@ -31,6 +31,7 @@ use Thelia\Domain\Ai\Provider\AiResultReader;
 use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\Provider\UntrustedContentDelimiter;
 use Thelia\Domain\Ai\Repository\AiUsageSettingRepository;
+use Thelia\Domain\Ai\Repository\AiRoutingRepository;
 use Thelia\Domain\Ai\Service\AiConnectionTester;
 use Thelia\Domain\Ai\Service\AiFailureExplainer;
 use Thelia\Domain\Ai\Service\AiSettings;
@@ -231,6 +232,6 @@ final class AiKeyEnvironmentVariableTest extends IntegrationTestCase
             new AiProviderErrorTranslator(),
         );
 
-        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault());
+        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault(), new AiProviderPresets(), new AiRoutingRepository());
     }
 }

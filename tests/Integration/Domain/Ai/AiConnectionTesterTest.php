@@ -19,7 +19,9 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Domain\Ai\AiTier;
 use Thelia\Domain\Ai\Catalog\AiModelCatalog;
+use Thelia\Domain\Ai\Catalog\AiModelSpecification;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
 use Thelia\Domain\Ai\Provider\AiHttpClientFactory;
 use Thelia\Domain\Ai\Provider\AiMessageBagFactory;
@@ -30,6 +32,7 @@ use Thelia\Domain\Ai\Provider\AiResultReader;
 use Thelia\Domain\Ai\Provider\AnthropicAdapter;
 use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\Provider\UntrustedContentDelimiter;
+use Thelia\Domain\Ai\Repository\AiRoutingRepository;
 use Thelia\Domain\Ai\Service\AiConnectionTester;
 use Thelia\Domain\Ai\Service\AiFailureExplainer;
 use Thelia\Domain\Ai\Service\AiTextTranslator;
@@ -38,6 +41,9 @@ use Thelia\Domain\Ai\Vault\AiKeyVault;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Webhook\WebhookUrlValidator;
 use Thelia\Model\AiConnection;
+use Thelia\Model\AiModel;
+use Thelia\Model\AiTierAssignment;
+use Thelia\Model\AiUsageSetting;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Ai\AiProviderFixtures;
 
@@ -86,11 +92,12 @@ final class AiConnectionTesterTest extends IntegrationTestCase
         self::assertNull($connection->getCheckError());
     }
 
-    public function testAnAnthropicConnectionAnswersOnTheFirstModelOfTheCatalogueWithoutThinking(): void
+    public function testAnAnthropicConnectionAnswersWithoutThinkingOnAModelThatRefusesDisabled(): void
     {
         $connection = $this->connection('anthropic');
+        $this->assign(AiTier::Fast, $connection, 'claude-fable-5', 'anthropic');
 
-        // The API as it answered on 2026-10-29: the first model of the catalogue refuses "disabled".
+        // The API as it answered on 2026-10-29: claude-fable-5 refuses "disabled".
         $error = $this->anthropicTester(static fn (array $body): MockResponse => AiProviderFixtures::anthropicMeasured((string) $body['model'], (string) $body['thinking']['type']))->test($connection);
 
         self::assertNull($error);
@@ -121,6 +128,75 @@ final class AiConnectionTesterTest extends IntegrationTestCase
 
         self::assertStringContainsString('No model', (string) $error);
         self::assertSame([], $this->sent);
+    }
+
+    public function testTheProbeModelOfThePresetIsCalledWhenNoRangeUsesAModelOfTheConnection(): void
+    {
+        $this->tester([AiProviderFixtures::chat('ok')])->test($this->connection());
+
+        self::assertSame('ministral-3b-2512', $this->sentModel(0));
+    }
+
+    public function testAModelARangeRunsOnTheConnectionWinsOverTheProbeModel(): void
+    {
+        $connection = $this->connection();
+        $this->assign(AiTier::Advanced, $connection, 'mistral-large-latest');
+        $this->assign(AiTier::Fast, $connection, 'mistral-small-latest');
+
+        $this->tester([AiProviderFixtures::chat('ok')])->test($connection);
+
+        self::assertSame('mistral-small-latest', $this->sentModel(0), 'the fast range comes first');
+    }
+
+    public function testAModelPinnedToAUsageOnTheConnectionIsCalledWhenNoRangeHasOne(): void
+    {
+        $connection = $this->connection();
+        $model = $this->model('mistral-medium-latest');
+        (new AiUsageSetting())->setUsageId('aitester.usage')->setPinnedConnectionId($connection->getId())->setPinnedModelId($model->getId())->save();
+
+        $this->tester([AiProviderFixtures::chat('ok')])->test($connection);
+
+        self::assertSame('mistral-medium-latest', $this->sentModel(0));
+    }
+
+    public function testAModelOfAnotherConnectionIsNotUsed(): void
+    {
+        $other = $this->connection();
+        $this->assign(AiTier::Fast, $other, 'mistral-small-latest');
+        $mine = (new AiConnection())->setCode('tester-mine')->setTitle('Mine')->setProvider('mistral')->setJurisdiction('eu')->setApiKeyEncrypted($this->vault()->encrypt(self::KEY));
+        $mine->save();
+
+        $this->tester([AiProviderFixtures::chat('ok')])->test($mine);
+
+        self::assertSame('ministral-3b-2512', $this->sentModel(0));
+    }
+
+    public function testAnOllamaServerWithNoModelChosenIsNotAskedForAModelItMayNotHave(): void
+    {
+        // The embedded list holds models of Ollama (codegeex4 comes first): none of them is a promise that this server pulled it.
+        $connection = $this->connection('ollama');
+
+        $error = $this->tester([])->test($connection);
+
+        self::assertSame(AiFailureExplainer::CHECK_NO_MODEL, $error);
+        self::assertSame([], $this->sent);
+    }
+
+    public function testTheFailureNamesTheModelThatWasCalled(): void
+    {
+        $connection = $this->connection();
+        $refusal = new MockResponse(json_encode(['message' => 'Invalid model: ministral-3b-2512']), ['http_code' => 400, 'response_headers' => ['content-type: application/json']]);
+
+        $error = (string) $this->tester([$refusal])->test($connection);
+
+        self::assertStringEndsWith(' (model: ministral-3b-2512)', $error);
+        self::assertLessThanOrEqual(255, mb_strlen($error));
+
+        $long = new MockResponse(json_encode(['message' => str_repeat('x', 600)]), ['http_code' => 400, 'response_headers' => ['content-type: application/json']]);
+        $error = (string) $this->tester([$long])->test($connection);
+
+        self::assertStringEndsWith(' (model: ministral-3b-2512)', $error, 'a long answer of the provider does not cut the name');
+        self::assertLessThanOrEqual(255, mb_strlen($error));
     }
 
     public function testTheStoredErrorIsToldInFrenchAndInEnglishWhenShown(): void
@@ -158,7 +234,25 @@ final class AiConnectionTesterTest extends IntegrationTestCase
             new ArrayAdapter(),
         );
 
-        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault());
+        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault(), new AiProviderPresets(), new AiRoutingRepository());
+    }
+
+    private function sentModel(int $call): ?string
+    {
+        return $this->sent[$call]['body']['model'] ?? null;
+    }
+
+    private function model(string $name, string $provider = 'mistral'): AiModel
+    {
+        $model = (new AiModel())->setProvider($provider)->setName($name)->setInputPrice('1.000000')->setOutputPrice('2.000000')->setSupportsStreaming(true)->setActive(true)->setSource(AiModelSpecification::SOURCE_MANUAL);
+        $model->save();
+
+        return $model;
+    }
+
+    private function assign(AiTier $tier, AiConnection $connection, string $name, string $provider = 'mistral'): void
+    {
+        (new AiTierAssignment())->setTier($tier->value)->setConnectionId($connection->getId())->setModelId($this->model($name, $provider)->getId())->save();
     }
 
     private function connection(string $provider = 'mistral'): AiConnection
@@ -190,7 +284,7 @@ final class AiConnectionTesterTest extends IntegrationTestCase
                 $headers[strtolower($name)] = $value;
             }
 
-            $this->sent[] = ['url' => $url, 'headers' => $headers];
+            $this->sent[] = ['url' => $url, 'headers' => $headers, 'body' => isset($options['body']) && \is_string($options['body']) ? json_decode($options['body'], true) : null];
 
             return array_shift($queue) ?? throw new \LogicException('No more mock responses queued.');
         });
@@ -203,6 +297,6 @@ final class AiConnectionTesterTest extends IntegrationTestCase
             new AiProviderErrorTranslator(),
         );
 
-        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault());
+        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault(), new AiProviderPresets(), new AiRoutingRepository());
     }
 }
