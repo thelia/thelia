@@ -156,6 +156,7 @@ class Delivery extends BaseSpecificModule
 
             return $country;
         }
+        return null;
     }
 
     protected function getCurrentState(): mixed
@@ -171,6 +172,7 @@ class Delivery extends BaseSpecificModule
 
             return $state;
         }
+        return null;
     }
 
     protected function getDeliveryAddress(): mixed
