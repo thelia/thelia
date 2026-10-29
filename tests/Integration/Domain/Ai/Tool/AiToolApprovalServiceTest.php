@@ -314,7 +314,24 @@ final class AiToolApprovalServiceTest extends AiToolTestCase
         AiToolApprovalQuery::create()->filterById($id)->update(['ToolName' => 'aiprobemodule_read']);
         $this->logInAsAdmin($this->approver);
 
-        $this->assertRefused(AiToolApprovalFailure::ToolGone, fn () => $this->approvals->reject($id));
+        $this->assertRefused(AiToolApprovalFailure::ToolGone, fn () => $this->approvals->approve($id));
+        self::assertSame(0, ProbeToolState::$applyCalls);
+    }
+
+    public function testAProposalWhoseToolIsGoneIsStillRejected(): void
+    {
+        $id = $this->propose();
+        $this->buildServices(['aiprobemodule_read' => ProbeReadTool::class]);
+        $this->logInAsAdmin($this->approver);
+
+        try {
+            $this->approvals->reject($id, 'the module was removed');
+        } catch (AiToolApprovalException $refusal) {
+            self::fail(\sprintf('Rejecting a proposal whose tool is gone is refused (%s): it stays pending until it expires.', $refusal->reason->value));
+        }
+
+        self::assertSame(AiToolApprovalStatus::Rejected->value, AiToolApprovalQuery::create()->findPk($id)?->getStatus());
+        self::assertSame(0, ProbeToolState::$applyCalls);
     }
 
     public function testAnExpiredProposalIsMarkedExpiredAndRefused(): void
