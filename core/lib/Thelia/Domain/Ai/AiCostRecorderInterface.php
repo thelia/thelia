@@ -29,13 +29,14 @@ interface AiCostRecorderInterface
      * @param string $maximumCost the highest cost the call can reach, a positive decimal with a point; the budget check
      *                            counts it as spent, so a call that would cross the budget is refused before it runs.
      *                            '0' only checks that the budget is not reached yet
+     * @param string $currency    the currency of $maximumCost, an ISO 4217 code like the one of AiExternalCost::$currency; the budget hold carries it
      *
      * @throws Exception\UnknownAiUsageException
      * @throws Exception\InactiveAiUsageException
      * @throws Exception\AiJurisdictionRefusedException when the merchant turned "EU only" on and the service is outside the EU
      * @throws Exception\AiBudgetExceededException
      */
-    public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0'): void;
+    public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0', string $currency = 'USD'): void;
 
     /**
      * @return int the identifier of the row written to the usage log

@@ -30,6 +30,7 @@ use Thelia\Domain\Ai\Log\AiUsageLogWriter;
 use Thelia\Domain\Ai\Repository\AiUsageSettingRepository;
 use Thelia\Domain\Ai\Service\AiSettings;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
+use Thelia\Model\AiBudgetReservationQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tests\Support\Ai\AiGatewayTestCase;
 
@@ -120,6 +121,29 @@ final class AiExternalCostRecorderTest extends AiGatewayTestCase
         $this->recorder->authorize('aiprobe.scoring', 'typesafe', AiJurisdiction::EuropeanUnion, '1');
 
         self::assertSame(1, $this->holds());
+    }
+
+    public function testTheHoldCarriesTheCurrencyOfTheMaximumCost(): void
+    {
+        $this->recorder->authorize('aiprobe.scoring', 'typesafe', AiJurisdiction::EuropeanUnion, '0.5', 'EUR');
+        $this->recorder->authorize('aiprobe.scoring', 'dataforseo', AiJurisdiction::OutsideEuropeanUnion, '0.5');
+
+        $currencies = [];
+        foreach (AiBudgetReservationQuery::create()->orderById()->find() as $reservation) {
+            $currencies[] = $reservation->getCurrency();
+        }
+
+        self::assertSame(['EUR', 'USD'], $currencies);
+    }
+
+    public function testACurrencyThatIsNotAnIsoCodeIsRefusedBeforeAnythingIsHeld(): void
+    {
+        try {
+            $this->recorder->authorize('aiprobe.scoring', 'typesafe', AiJurisdiction::EuropeanUnion, '0.5', 'euro');
+            self::fail('"euro" is not an ISO 4217 code.');
+        } catch (InvalidAiArgumentException) {
+            self::assertSame(0, $this->holds());
+        }
     }
 
     public function testAProviderNameTheCostWouldRefuseIsRefusedBeforeAnythingIsHeld(): void
