@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Support\Ai;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Thelia\Domain\Ai\AiJurisdiction;
@@ -51,6 +52,9 @@ abstract class AiProviderTestCase extends TestCase
     /** @var list<array{method: string, url: string, headers: array<string, string>, body: array<string, mixed>|null, options: array<string, mixed>}> */
     protected array $sent = [];
 
+    /** What the Anthropic adapters of a test remember about the models, shared by all of them as the application pool is. */
+    protected ?ArrayAdapter $thinkingModes = null;
+
     /**
      * @param list<MockResponse>|MockResponse $responses
      */
@@ -59,17 +63,28 @@ abstract class AiProviderTestCase extends TestCase
         $queue = \is_array($responses) ? $responses : [$responses];
 
         return new MockHttpClient(function (string $method, string $url, array $options) use (&$queue): MockResponse {
-            $headers = [];
-
-            foreach ($options['headers'] ?? [] as $line) {
-                [$name, $value] = explode(': ', $line, 2);
-                $headers[strtolower($name)] = $value;
-            }
-
-            $body = isset($options['body']) && \is_string($options['body']) ? json_decode($options['body'], true) : null;
-            $this->sent[] = ['method' => $method, 'url' => $url, 'headers' => $headers, 'body' => $body, 'options' => $options];
+            $this->record($method, $url, $options);
 
             return array_shift($queue) ?? throw new \LogicException('No more mock responses queued.');
+        });
+    }
+
+    /**
+     * The Anthropic API as it answered on 2026-10-29: each call gets the answer recorded for its model and its
+     * `thinking` setting (AiProviderFixtures::anthropicMeasured()).
+     */
+    protected function measuredAnthropic(): MockHttpClient
+    {
+        return new MockHttpClient(function (string $method, string $url, array $options): MockResponse {
+            $body = $this->record($method, $url, $options) ?? [];
+            $model = \is_string($body['model'] ?? null) ? $body['model'] : '';
+            $thinking = \is_string($body['thinking']['type'] ?? null) ? $body['thinking']['type'] : '';
+
+            if (!AiProviderFixtures::anthropicWasMeasured($model, $thinking)) {
+                throw new \LogicException(\sprintf('The API was not asked "%s" with thinking "%s".', $model, $thinking));
+            }
+
+            return AiProviderFixtures::anthropicMeasured($model, $thinking);
         });
     }
 
@@ -79,14 +94,20 @@ abstract class AiProviderTestCase extends TestCase
      */
     protected function adapter(string $class, MockHttpClient $transport, array $pinnedHosts = []): AbstractPlatformAdapter
     {
-        return new $class(
+        $services = [
             (new AiHttpClientFactory(60, 300))->withTransport($transport, $pinnedHosts),
             new AiBaseUrlValidator(new WebhookUrlValidator()),
             new AiProviderPresets(),
             new AiMessageBagFactory(new UntrustedContentDelimiter()),
             new AiResultReader(),
             new AiProviderErrorTranslator(),
-        );
+        ];
+
+        if (AnthropicAdapter::class === $class) {
+            return new AnthropicAdapter(...$services, thinkingModes: $this->thinkingModes ??= new ArrayAdapter());
+        }
+
+        return new $class(...$services);
     }
 
     /**
@@ -103,7 +124,7 @@ abstract class AiProviderTestCase extends TestCase
         };
     }
 
-    protected function target(AiProvider $provider, ?string $baseUrl = self::PUBLIC_URL, ?string $key = self::KEY, bool $privateNetwork = false, string $model = 'probe-model', bool $structured = true, ?int $maxOutputTokens = 8000): AiTarget
+    protected function target(AiProvider $provider, ?string $baseUrl = self::PUBLIC_URL, ?string $key = self::KEY, bool $privateNetwork = false, string $model = 'probe-model', bool $structured = true, ?int $maxOutputTokens = 8000, ?string $thinkingOff = null): AiTarget
     {
         return new AiTarget(
             1,
@@ -113,7 +134,7 @@ abstract class AiProviderTestCase extends TestCase
             $key,
             $privateNetwork,
             AiJurisdiction::EuropeanUnion,
-            new AiModelSpecification($provider->value, $model, null, '1.000000', '5.000000', '0.100000', null, 'USD', 100000, $maxOutputTokens, $structured, true, false, true, AiModelSpecification::SOURCE_CATALOG),
+            new AiModelSpecification($provider->value, $model, null, '1.000000', '5.000000', '0.100000', null, 'USD', 100000, $maxOutputTokens, $structured, true, false, true, AiModelSpecification::SOURCE_CATALOG, thinkingOff: $thinkingOff),
         );
     }
 
@@ -123,6 +144,27 @@ abstract class AiProviderTestCase extends TestCase
     protected function request(?array $messages = null, mixed ...$arguments): AiRequest
     {
         return new AiRequest('probe.test', $messages ?? [AiMessage::user('Bonjour')], ...$arguments);
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>|null the JSON body
+     */
+    private function record(string $method, string $url, array $options): ?array
+    {
+        $headers = [];
+
+        foreach ($options['headers'] ?? [] as $line) {
+            [$name, $value] = explode(': ', $line, 2);
+            $headers[strtolower($name)] = $value;
+        }
+
+        $body = isset($options['body']) && \is_string($options['body']) ? json_decode($options['body'], true) : null;
+        $body = \is_array($body) ? $body : null;
+        $this->sent[] = ['method' => $method, 'url' => $url, 'headers' => $headers, 'body' => $body, 'options' => $options];
+
+        return $body;
     }
 
     /**

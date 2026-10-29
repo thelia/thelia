@@ -1,0 +1,35 @@
+{
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "url": "https://api.anthropic.com/v1/messages",
+                "headers": {
+                    "anthropic-version": [
+                        "2023-06-01"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-api-key": [
+                        "[redacted]"
+                    ]
+                },
+                "body": "{\"model\":\"claude-fable-5\",\"max_tokens\":16,\"messages\":[{\"role\":\"user\",\"content\":\"Reply with the word ok.\"}],\"thinking\":{\"type\":\"adaptive\"},\"output_config\":{\"effort\":\"low\"}}"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "request-id": [
+                        "req_011CgWGnY1GxfqybuYixrHEB"
+                    ]
+                },
+                "body_format": "json",
+                "body": "{\"model\":\"claude-fable-5\",\"id\":\"msg_011CgWGnYLsAUFsBGFXzp5CH\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"container\":null,\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":15,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":0},\"output_tokens\":4,\"output_tokens_details\":{\"thinking_tokens\":0},\"service_tier\":\"standard\",\"inference_geo\":\"global\",\"speed\":\"standard\"},\"diagnostics\":null}"
+            }
+        }
+    ]
+}

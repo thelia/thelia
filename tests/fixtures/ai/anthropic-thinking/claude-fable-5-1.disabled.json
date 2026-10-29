@@ -1,0 +1,35 @@
+{
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "url": "https://api.anthropic.com/v1/messages",
+                "headers": {
+                    "anthropic-version": [
+                        "2023-06-01"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-api-key": [
+                        "[redacted]"
+                    ]
+                },
+                "body": "{\"model\":\"claude-fable-5-1\",\"max_tokens\":16,\"messages\":[{\"role\":\"user\",\"content\":\"Reply with the word ok.\"}],\"thinking\":{\"type\":\"disabled\"}}"
+            },
+            "response": {
+                "status": 400,
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "request-id": [
+                        "req_011CgWGkCKYQRXAJcECrD9KY"
+                    ]
+                },
+                "body_format": "json",
+                "body": "{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"\\\"thinking.type.disabled\\\" is not supported for this model. Use \\\"thinking.type.adaptive\\\" and \\\"output_config.effort\\\" to control thinking behavior.\"},\"request_id\":\"req_011CgWGkCKYQRXAJcECrD9KY\"}"
+            }
+        }
+    ]
+}

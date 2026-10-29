@@ -21,7 +21,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  *
  * SIMULATED, written from the public documentation of each API (Anthropic Messages, Mistral and OpenAI chat
  * completions, OpenAI Responses, Ollama chat), except the three recorded cassettes of symfony/ai in
- * tests/fixtures/ai/*.json, which the tests that use them say.
+ * tests/fixtures/ai/*.json, which the tests that use them say, and the answers of the Anthropic API recorded on
+ * 2026-10-29 in tests/fixtures/ai/anthropic-thinking/ (anthropicMeasured()).
  */
 final class AiProviderFixtures
 {
@@ -250,6 +251,23 @@ final class AiProviderFixtures
         $interaction = json_decode((string) file_get_contents(\dirname(__DIR__, 2).'/fixtures/ai/'.$name.'.json'), true, flags: \JSON_THROW_ON_ERROR)['interactions'][0]['response'];
 
         return new MockResponse($interaction['body'], ['http_code' => $interaction['status'], 'response_headers' => ['content-type' => 'sse' === ($interaction['body_format'] ?? '') ? 'text/event-stream' : 'application/json']]);
+    }
+
+    /**
+     * The answer the Anthropic API gave on 2026-10-29 to the probe of a connection (`max_tokens` 16) for this model
+     * and this `thinking` setting: refused (HTTP 400) or answered.
+     */
+    public static function anthropicMeasured(string $model, string $thinking): MockResponse
+    {
+        return self::cassette('anthropic-thinking/'.$model.'.'.$thinking);
+    }
+
+    /**
+     * Whether the API was asked this model with this `thinking` setting on 2026-10-29.
+     */
+    public static function anthropicWasMeasured(string $model, string $thinking): bool
+    {
+        return is_file(\dirname(__DIR__, 2).'/fixtures/ai/anthropic-thinking/'.$model.'.'.$thinking.'.json');
     }
 
     /**

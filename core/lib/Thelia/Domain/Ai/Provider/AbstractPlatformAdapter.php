@@ -64,7 +64,7 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
     final public function complete(AiRequest $request, AiTarget $target): AiProviderResult
     {
         try {
-            $deferred = $this->invoke($request, $target, false);
+            $deferred = $this->call($request, $target, false);
             $this->assertSuccessful($deferred, $target);
 
             $body = self::bodyOf($deferred);
@@ -127,9 +127,18 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
      *
      * @return array<string, mixed>
      */
-    protected function nativeOptions(array $native): array
+    protected function nativeOptions(array $native, AiTarget $target): array
     {
         return $native;
+    }
+
+    /**
+     * Whether the provider refused a default the adapter chose, in words the family knows how to answer: the call
+     * is then sent once more, with what nativeOptions() gives this time. Called before the answer is read.
+     */
+    protected function retries(DeferredResult $deferred, AiRequest $request, AiTarget $target): bool
+    {
+        return false;
     }
 
     /**
@@ -164,7 +173,7 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
      */
     private function read(AiRequest $request, AiTarget $target, AiStreamProgress $progress): \Generator
     {
-        $deferred = $this->invoke($request, $target, true);
+        $deferred = $this->call($request, $target, true);
         $this->assertSuccessful($deferred, $target);
         $result = $deferred->getResult();
 
@@ -245,6 +254,16 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
         }
     }
 
+    /**
+     * One more try at most, inside the call: the gateway sees one call, logged and budgeted once.
+     */
+    private function call(AiRequest $request, AiTarget $target, bool $stream): DeferredResult
+    {
+        $deferred = $this->invoke($request, $target, $stream);
+
+        return $this->retries($deferred, $request, $target) ? $this->invoke($request, $target, $stream) : $deferred;
+    }
+
     private function invoke(AiRequest $request, AiTarget $target, bool $stream): DeferredResult
     {
         $apiKey = $target->apiKey();
@@ -315,7 +334,7 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
      */
     private function options(AiRequest $request, AiTarget $target, bool $stream): array
     {
-        $native = array_diff_key($this->nativeOptions($request->optionsFor($target->provider)), array_flip(self::RESERVED_OPTIONS));
+        $native = array_diff_key($this->nativeOptions($request->optionsFor($target->provider), $target), array_flip(self::RESERVED_OPTIONS));
 
         $options = $this->outputLimit($this->outputTokens($request, $target));
 
