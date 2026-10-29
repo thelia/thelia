@@ -50,6 +50,38 @@ final class BundleCompositionServiceTest extends ActionIntegrationTestCase
         $this->service->addItem((int) $outer->getId(), (int) $this->saleElementsOf($inner)->getId());
     }
 
+    public function testTheRefusalsOfTheAdminNameTheProductByItsReferenceAndNeverByItsId(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->service);
+        $inner = $this->bundleProduct($this->factory, $this->service);
+        $plain = $this->component($this->factory, '10', 1);
+        $bundleId = (int) $example['bundle']->getId();
+        $bundleRef = (string) $example['bundle']->getRef();
+        $bikeRef = (string) $example['bikeProduct']->getRef();
+        $bikeItemId = (int) $example['bike']->getId();
+        $bikeSaleElementsId = (int) $this->saleElementsOf($example['bikeProduct'])->getId();
+        $otherBundleId = (int) $inner->getId();
+
+        $refusals = [
+            'a bundle as a component' => [fn () => $this->service->addItem($bundleId, (int) $this->saleElementsOf($inner)->getId()), \sprintf('Product %s is a bundle: a bundle cannot hold another bundle.', $inner->getRef())],
+            'a bundle as its own component' => [fn () => $this->service->addItem($bundleId, (int) $this->saleElementsOf($example['bundle'])->getId()), \sprintf('Product %s cannot be a component of itself.', $bundleRef)],
+            'a component made a bundle' => [fn () => $this->service->setBundleSettings((int) $example['bikeProduct']->getId(), true), \sprintf('Product %s is a component of a bundle: it cannot become a bundle.', $bikeRef)],
+            'a component added to a plain product' => [fn () => $this->service->addItem((int) $plain->getId(), $bikeSaleElementsId), \sprintf('Product %s is not a bundle: turn it into one before adding components.', $plain->getRef())],
+            'a component added twice' => [fn () => $this->service->addItem($bundleId, $bikeSaleElementsId), \sprintf('Product %s is already a component of bundle %s.', $bikeRef, $bundleRef)],
+            'an item moved to another bundle' => [fn () => $this->service->updateItem($bikeItemId, $bikeSaleElementsId, '1', null, null, true, $otherBundleId), \sprintf('Component %s belongs to bundle %s and cannot be moved to another: delete it and add a new one.', $bikeRef, $bundleRef)],
+            'an item given another sale element' => [fn () => $this->service->updateItem($bikeItemId, (int) $this->saleElementsOf($example['helmetProduct'])->getId(), '1', null, null, true), \sprintf('Component %s keeps its sale element: delete it and add a new one.', $bikeRef)],
+        ];
+
+        foreach ($refusals as $case => [$gesture, $expected]) {
+            try {
+                $gesture();
+                self::fail($case.' is refused.');
+            } catch (BundleDefinitionException $refusal) {
+                self::assertSame($expected, $refusal->getMessage(), $case);
+            }
+        }
+    }
+
     public function testABundleCannotBeItsOwnComponent(): void
     {
         $bundle = $this->bundleProduct($this->factory, $this->service);
