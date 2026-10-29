@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
+use Thelia\Domain\Ai\Vault\AiEnvironmentKey;
 use Thelia\Model\Base\AiConnection as BaseAiConnection;
 
 /**
@@ -41,8 +43,11 @@ class AiConnection extends BaseAiConnection
             return false;
         }
 
-        $value = $_SERVER[$name] ?? $_ENV[$name] ?? getenv($name);
-
-        return \is_string($value) && '' !== trim($value);
+        try {
+            return null !== AiEnvironmentKey::read($name);
+        } catch (InvalidAiArgumentException) {
+            // A name the vault refuses to read is no key, whatever the variable holds.
+            return false;
+        }
     }
 }
