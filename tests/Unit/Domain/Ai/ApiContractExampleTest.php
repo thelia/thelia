@@ -235,7 +235,7 @@ final class ApiContractExampleTest extends TestCase
             /** @var list<AiExternalCost> */
             public array $recorded = [];
 
-            public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0'): void
+            public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0', string $currency = 'USD'): void
             {
                 if ($this->europeanUnionOnly && AiJurisdiction::EuropeanUnion !== $jurisdiction) {
                     throw new AiJurisdictionRefusedException($provider, $jurisdiction);
