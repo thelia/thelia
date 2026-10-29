@@ -57,10 +57,11 @@ final readonly class AiBudgetLedger
      * @param string      $amount      the highest cost of the call, decimal string: '0' only checks that the budget is not reached yet
      * @param string|null $usageBudget the monthly budget of the usage, decimal string; null or zero: the usage has none of its own
      * @param string      $monthlyCap  the global monthly cap, decimal string; '0': no global cap
+     * @param string      $currency    the currency of the prices that produced the amount, like the one the log row of the call will carry
      *
      * @throws AiBudgetExceededException the budget of the usage, or the global cap, cannot take the amount
      */
-    public function reserve(string $usageId, string $amount, ?string $usageBudget, string $monthlyCap): AiBudgetHold
+    public function reserve(string $usageId, string $amount, ?string $usageBudget, string $monthlyCap, string $currency = 'USD'): AiBudgetHold
     {
         $amountUnits = AiDecimal::parse($amount);
         $budgetUnits = null === $usageBudget ? 0 : AiDecimal::parse($usageBudget);
@@ -71,7 +72,7 @@ final readonly class AiBudgetLedger
         $connection->beginTransaction();
 
         try {
-            $outcome = $this->attempt($connection, $usageId, $amountUnits, $budgetUnits, $capUnits);
+            $outcome = $this->attempt($connection, $usageId, $amountUnits, $currency, $budgetUnits, $capUnits);
             $connection->commit();
         } catch (\Throwable $throwable) {
             $connection->rollBack();
@@ -104,7 +105,7 @@ final readonly class AiBudgetLedger
     /**
      * The two checks and the insert, under the lock. The refusal is returned, not thrown.
      */
-    private function attempt(ConnectionInterface $connection, string $usageId, int $amountUnits, int $budgetUnits, int $capUnits): AiBudgetHold|AiBudgetExceededException
+    private function attempt(ConnectionInterface $connection, string $usageId, int $amountUnits, string $currency, int $budgetUnits, int $capUnits): AiBudgetHold|AiBudgetExceededException
     {
         $this->lock($connection);
 
@@ -123,7 +124,7 @@ final readonly class AiBudgetLedger
         $row = (new AiBudgetReservation())
             ->setUsageId($usageId)
             ->setAmount(AiDecimal::format($amountUnits))
-            ->setCurrency('USD')
+            ->setCurrency($currency)
             ->setExpiresAt($now->modify(\sprintf('+%d seconds', self::HOLD_LIFETIME_SECONDS)));
         $row->save($connection);
 

@@ -172,6 +172,7 @@ final readonly class AiAdmission
                 $this->calculator->reservation($target->model, $characters, (int) $effective->maxOutputTokens),
                 $setting?->getMonthlyBudget(),
                 $this->globalSettings->monthlyCap(),
+                $target->model->currency,
             );
         } catch (AiBudgetExceededException $exceeded) {
             $refuse(

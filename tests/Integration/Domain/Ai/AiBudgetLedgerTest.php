@@ -49,6 +49,13 @@ final class AiBudgetLedgerTest extends IntegrationTestCase
         self::assertEqualsWithDelta(time() + AiBudgetLedger::HOLD_LIFETIME_SECONDS, $row->getExpiresAt()?->getTimestamp(), 5);
     }
 
+    public function testAReservationCarriesTheCurrencyItIsGiven(): void
+    {
+        $hold = $this->ledger->reserve('aiprobe.writing', '0.25000000', '10', '0', 'EUR');
+
+        self::assertSame('EUR', AiBudgetReservationQuery::create()->findPk($hold->id)?->getCurrency());
+    }
+
     public function testTheSecondOfTwoReservationsThatDoNotFitTogetherIsRefused(): void
     {
         $first = $this->ledger->reserve('aiprobe.writing', '0.60000000', '1', '0');
