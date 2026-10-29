@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use AiProbeModule\ProbeWriter;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Domain\Ai\AiProvenance;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
@@ -23,6 +24,7 @@ use Thelia\Domain\Ai\Service\AiSettings;
 use Thelia\Domain\Ai\Service\AiTextTranslator;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
 use Thelia\Domain\Ai\Twig\AiTransparencyExtension;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\AiUsageSetting;
 use Thelia\Model\AiUsageSettingQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -103,7 +105,7 @@ final class AiTransparencyExtensionTest extends IntegrationTestCase
     private function twig(AiUsageRegistryInterface $registry): Environment
     {
         $twig = new Environment(new ArrayLoader(), ['autoescape' => 'html']);
-        $twig->addExtension(new AiTransparencyExtension($registry, new AiTextTranslator(new RequestStack())));
+        $twig->addExtension(new AiTransparencyExtension($registry, new AiTextTranslator(new LangService(new RequestStack(), new NullLogger()))));
 
         return $twig;
     }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Service;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAiUsagePass;
@@ -24,6 +25,7 @@ use Thelia\Domain\Ai\AsAiUsage;
 use Thelia\Domain\Ai\Compliance\AiComplianceStatus;
 use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Repository\AiUsageSettingRepository;
+use Thelia\Domain\Localization\Service\LangService;
 
 /**
  * The usages found at build time (RegisterAiUsagePass), read back from the attribute of their class.
@@ -45,7 +47,7 @@ class AiUsageRegistry implements AiUsageRegistryInterface
         private readonly array $usageClasses,
         private readonly AiUsageSettingRepository $settings,
         private readonly AiSettings $globalSettings,
-        private readonly AiTextTranslator $translator = new AiTextTranslator(new RequestStack()),
+        private readonly AiTextTranslator $translator = new AiTextTranslator(new LangService(new RequestStack(), new NullLogger())),
     ) {
     }
 

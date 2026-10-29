@@ -14,21 +14,20 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Service;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Lang;
+use Thelia\Domain\Localization\Service\LangService;
 
 /**
  * Translates the texts of the AI layer in the domain `core`, the one the console, the API and a mail render
- * read. The locale is the one asked for, else the one of the visitor of the current request, else the one of
- * the default language of the shop: no request is assumed (console, mail rendering, queue worker).
+ * read. The locale is the one asked for, else the one {@see LangService} gives for the current request (the
+ * language of the back-office in the back-office, the one of the visitor on the storefront), else the one of the
+ * default language of the shop: no request is assumed (console, mail rendering, queue worker).
  *
  * @internal
  */
 final readonly class AiTextTranslator
 {
-    public function __construct(private RequestStack $requestStack)
+    public function __construct(private LangService $langService)
     {
     }
 
@@ -46,16 +45,6 @@ final readonly class AiTextTranslator
             return $locale;
         }
 
-        $request = $this->requestStack->getMainRequest();
-
-        if ($request instanceof Request && $request->hasSession()) {
-            $sessionLocale = $request->getSession()->getLang()?->getLocale();
-
-            if (null !== $sessionLocale && '' !== $sessionLocale) {
-                return $sessionLocale;
-            }
-        }
-
-        return Lang::getDefaultLanguage()->getLocale();
+        return (string) $this->langService->getLocale();
     }
 }

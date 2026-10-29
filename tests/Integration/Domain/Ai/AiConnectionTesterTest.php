@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Ai;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,6 +33,7 @@ use Thelia\Domain\Ai\Service\AiFailureExplainer;
 use Thelia\Domain\Ai\Service\AiTextTranslator;
 use Thelia\Domain\Ai\Vault\AiKeyCipher;
 use Thelia\Domain\Ai\Vault\AiKeyVault;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Webhook\WebhookUrlValidator;
 use Thelia\Model\AiConnection;
 use Thelia\Test\IntegrationTestCase;
@@ -94,7 +96,7 @@ final class AiConnectionTesterTest extends IntegrationTestCase
 
     public function testTheStoredErrorIsToldInFrenchAndInEnglishWhenShown(): void
     {
-        $explainer = new AiFailureExplainer(new AiTextTranslator(new RequestStack()));
+        $explainer = new AiFailureExplainer(new AiTextTranslator(new LangService(new RequestStack(), new NullLogger())));
         $noModel = $this->tester([])->test($this->connection('openai_compatible'));
         $refused = $this->tester([new MockResponse(json_encode(['message' => 'Unauthorized']), ['http_code' => 401, 'response_headers' => ['content-type: application/json']])])->test($this->connection());
 
