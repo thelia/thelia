@@ -32,6 +32,9 @@ use Thelia\Domain\Ai\Exception\AiProviderUnavailableException;
  */
 final class OpenAiAdapter extends AbstractPlatformAdapter
 {
+    /** The Responses API refuses a `max_output_tokens` below 16 (https://developers.openai.com/api/reference/resources/responses/methods/create.md). */
+    public const int MINIMUM_OUTPUT_TOKENS = 16;
+
     public function supports(AiProvider $provider): bool
     {
         return AiProvider::OpenAi === $provider;
@@ -57,6 +60,11 @@ final class OpenAiAdapter extends AbstractPlatformAdapter
     protected function model(AiTarget $target, array $capabilities): Model
     {
         return new Gpt($target->model->name, $capabilities);
+    }
+
+    protected function outputLimit(int $tokens): array
+    {
+        return parent::outputLimit(max(self::MINIMUM_OUTPUT_TOKENS, $tokens));
     }
 
     protected function refusal(array $body): ?AiProviderRefusal
