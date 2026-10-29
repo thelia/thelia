@@ -26,7 +26,10 @@ use Thelia\Model\Customer;
  * Combines everything that prices a sale element outside the catalog columns,
  * for a batch and a visitor.
  *
- * The sale unit speaks first: where the request sells from a unit that priced
+ * A bundle priced by its components has no price of the catalog to be ruled on: its
+ * price is the sum of its components less its discount, and nothing else touches it.
+ *
+ * The sale unit speaks next: where the request sells from a unit that priced
  * a sale element itself, that price is the price — the national rules and
  * operations are computed against the national catalog and have nothing to say
  * about it. Everywhere else the rules come next: a rule replaces the promo
@@ -42,6 +45,7 @@ class EffectivePriceResolver
         private readonly SaleAudienceChecker $saleAudienceChecker,
         private readonly ?SaleUnitPriceResolver $saleUnitPriceResolver = null,
         private readonly ?SaleUnitContext $saleUnitContext = null,
+        private readonly ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
     ) {
     }
 
@@ -63,8 +67,10 @@ class EffectivePriceResolver
         }
 
         $now ??= new \DateTimeImmutable();
-        $saleUnitPrices = $this->saleUnitPriceResolver?->resolve($productSaleElementsIds, $currency) ?? [];
-        $remaining = array_values(array_diff($productSaleElementsIds, array_keys($saleUnitPrices)));
+        $bundlePrices = $this->bundleEffectivePriceSource?->forSaleElements($productSaleElementsIds, $currency) ?? [];
+        $priced = array_values(array_diff($productSaleElementsIds, array_keys($bundlePrices)));
+        $saleUnitPrices = [] !== $priced ? ($this->saleUnitPriceResolver?->resolve($priced, $currency) ?? []) : [];
+        $remaining = array_values(array_diff($priced, array_keys($saleUnitPrices)));
 
         $rulePrices = [] !== $remaining
             ? $this->catalogPriceResolver->resolve($remaining, $currency, $customer, $now)
@@ -77,6 +83,12 @@ class EffectivePriceResolver
         $saleUnitId = $this->saleUnitContext?->getSaleUnit()?->getId();
 
         foreach ($productSaleElementsIds as $pseId) {
+            if (isset($bundlePrices[$pseId])) {
+                $effective[$pseId] = $bundlePrices[$pseId];
+
+                continue;
+            }
+
             if (isset($saleUnitPrices[$pseId])) {
                 $effective[$pseId] = new EffectivePrice(
                     $pseId,

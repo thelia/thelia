@@ -34,8 +34,13 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Cart\Service\CartAddressService;
+use Thelia\Domain\Catalog\Bundle\BundleComposition;
+use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
+use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Pricing\BundleEffectivePriceSource;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
@@ -91,6 +96,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?SaleUnitStockResolver $saleUnitStockResolver = null,
         protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
         protected ?CartShippingRules $cartShippingRules = null,
+        protected ?CartLineAvailability $cartLineAvailability = null,
+        protected ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
     ) {
     }
 
@@ -298,16 +305,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $cartItem = $findItemEvent->getCartItem();
         $appends = $cartItem instanceof CartItem && $append;
+        $bundleComposition = $event->getBundleComposition();
 
         // The stock of the sale unit the visitor buys from, when it keeps one: the
         // national counter may well cover a quantity the unit itself cannot sell.
         $saleUnitQuantity = $this->saleUnitAvailableStock?->ownQuantity((int) $productSaleElements->getId());
 
-        // A new line is checked here, whoever adds it (the cart form, the API, a
-        // module through CartFacade): nothing else stands between it and the cart.
-        // An addition to a line on the national counter keeps the cap of
-        // CartItem::addQuantity().
-        if (null !== $saleUnitQuantity || !$appends) {
+        // The line of a bundle is supplied by its components, whose stock the guard of
+        // CART_ADDITEM has already judged out loud (BundleCartAdditionGuard): the stock of the
+        // sale element that stands for the bundle is never read.
+        if (null !== $bundleComposition) {
+            // Taken from the event when the guard asked; the line checks nothing when the shop does not.
+            $saleUnitQuantity = ConfigQuery::checkAvailableStock()
+                ? ($event->getBundleAvailability() ?? $this->cartLineAvailability?->forLine($productSaleElements, $bundleComposition))
+                : null;
+        } elseif (null !== $saleUnitQuantity || !$appends) {
+            // A new line is checked here, whoever adds it (the cart form, the API, a
+            // module through CartFacade): nothing else stands between it and the cart.
+            // An addition to a line on the national counter keeps the cap of
+            // CartItem::addQuantity().
             $this->assertStock(
                 $productSaleElements,
                 ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity
@@ -324,7 +340,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 $discount,
             );
 
-            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices);
+            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $productPrices, $bundleComposition);
         }
 
         $this->settlePrices($cart);
@@ -445,8 +461,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * customer taken out of a selection, an operation that is over, all fall back to
      * the catalog price on the next refresh, which is what makes a line written weeks
      * ago a price the shop still stands behind.
+     *
+     * With $bundleLinesOnly, only the lines priced by the components of a bundle are settled:
+     * the other lines of the cart keep the price they hold, as they did before bundles existed.
      */
-    protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency): void
+    protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency, bool $bundleLinesOnly = false): void
     {
         $customer = $cart->getCustomer();
         $discount = 0.0;
@@ -456,11 +475,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $discount = (float) $customer->getDiscount();
         }
 
-        $effectivePrices = $this->effectivePriceResolver->resolve(
-            $this->saleElementIdsOf($cart),
-            $currency,
-            $customer,
-        );
+        $effectivePrices = $bundleLinesOnly
+            ? []
+            : $this->effectivePriceResolver->resolve(
+                $this->saleElementIdsOf($cart),
+                $currency,
+                $customer,
+            );
+        $bundleLinePrices = $this->bundleLinePricesOf($cart, $currency);
 
         // cart item
         foreach ($cart->getCartItems() as $cartItem) {
@@ -468,6 +490,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
             // price: settling it against the catalog would charge the customer for a
             // gift the shop decided to give.
             if (1 === (int) $cartItem->getIsOffered()) {
+                continue;
+            }
+
+            if ($bundleLinesOnly && !isset($bundleLinePrices[(int) $cartItem->getId()])) {
+                continue;
+            }
+
+            // A line whose composition the bundle can no longer hold has no price to settle to: it
+            // keeps its last one, and the order refuses it.
+            if (\array_key_exists((int) $cartItem->getId(), $bundleLinePrices) && null === $bundleLinePrices[(int) $cartItem->getId()]) {
                 continue;
             }
 
@@ -479,24 +511,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             $productPrice = $productSaleElements->getPricesByCurrency($currency, $discount);
 
-            [$promo, $promoPrice] = $this->promoOfLine(
+            // A bundle line is priced from the composition it holds; the others from their sale element.
+            [$price, $promo, $promoPrice] = $this->settledLine(
                 $productSaleElements,
                 $productPrice,
-                $effectivePrices,
+                $bundleLinePrices[(int) $cartItem->getId()] ?? $effectivePrices[(int) $productSaleElements->getId()] ?? null,
                 $discount,
             );
 
             // Nothing changed for this item, leave it alone. The comparison is made on
             // the settled values, rule and reserved price included: comparing the
             // catalog ones would keep a line at a price the customer has since lost.
-            if ((float) $cartItem->getPrice() === (float) $productPrice->getPrice()
+            if ((float) $cartItem->getPrice() === $price
                 && (float) $cartItem->getPromoPrice() === $promoPrice
                 && (int) $cartItem->getPromo() === $promo) {
                 continue;
             }
 
             $cartItem
-                ->setPrice((string) $productPrice->getPrice())
+                ->setPrice((string) $price)
                 ->setPromoPrice((string) $promoPrice)
                 ->setPromo($promo)
                 ->save();
@@ -515,14 +548,37 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     private function settlePrices(CartModel $cart): void
     {
-        if (!$this->pricingActivityChecker->hasActivePublicRule()
-            && !$this->pricingActivityChecker->hasVisitorDependentPricing()
-            && true !== $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
-            && !$this->holdsSpecialOffer($cart)) {
+        if ($this->pricingActivityChecker->hasActivePublicRule()
+            || $this->pricingActivityChecker->hasVisitorDependentPricing()
+            || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
+            || $this->holdsSpecialOffer($cart)) {
+            $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
+
             return;
         }
 
-        $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
+        // The components of a bundle priced by them may have changed price since the line was
+        // written; the other lines of the cart are none of their business, and a cart without a
+        // bundle line is not touched, whatever the catalog sells.
+        if ($this->pricingActivityChecker->hasComputedBundles() && $this->holdsBundleLine($cart)) {
+            $this->refreshCartItemPrices($cart, $this->currencyOf($cart), true);
+        }
+    }
+
+    /**
+     * Whether the cart holds a line with a composition, asked of the database for the reason
+     * holdsSpecialOffer() is.
+     */
+    private function holdsBundleLine(CartModel $cart): bool
+    {
+        if (null === $cartId = $cart->getId()) {
+            return false;
+        }
+
+        return CartItemQuery::create()
+            ->filterByCartId($cartId)
+            ->filterByBundleComposition(null, Criteria::ISNOTNULL)
+            ->exists();
     }
 
     /**
@@ -541,11 +597,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         // Asked of the database, not of getCartItems(): loading the collection here
         // would freeze it in memory before the promotions have placed their lines.
-        return CartItemQuery::create()
+        $query = CartItemQuery::create()
             ->filterByCartId($cartId)
             ->filterByPromo(1)
-            ->filterByIsOffered(0)
-            ->exists();
+            ->filterByIsOffered(0);
+
+        // A line of a bundle priced by its components is on offer by the discount of its bundle,
+        // which settlePrices() follows on its own: it is not the trace of a rule. A fixed bundle is
+        // priced as a product, by its sale element, and its offer ends the way the offer of a product
+        // does. A shop without such a bundle has no line to leave out, and no join to pay for.
+        if ($this->pricingActivityChecker->hasComputedBundles()) {
+            $query
+                ->useProductQuery()
+                    ->filterByIsBundle(0)
+                    ->_or()
+                    ->filterByBundlePriceMode(BundlePriceMode::Computed->value, Criteria::NOT_EQUAL)
+                ->endUse();
+        }
+
+        return $query->exists();
     }
 
     /**
@@ -576,41 +646,76 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * The special offer a cart line carries: the catalog one, unless a catalog price
-     * rule or a reserved operation resolved a price of its own for this customer.
+     * What a cart line is priced at: the catalog prices of its sale element, unless an effective
+     * price says otherwise (a catalog price rule, a reserved operation, the components of a
+     * bundle), merged by EffectivePrice::settle() like every reader does.
      *
      * A rule replaces the catalog special offer; a reserved operation only comes
      * through when it beats what the customer would otherwise pay.
      *
-     * @param array<int, EffectivePrice> $effectivePrices as resolved for the whole batch
-     *
-     * @return array{0: int, 1: float} the promo flag, and the untaxed promo price
+     * @return array{0: float, 1: int, 2: float} the untaxed price, the promo flag, and the untaxed promo price
      */
-    private function promoOfLine(
+    private function settledLine(
         ProductSaleElements $productSaleElements,
         ProductPriceTools $catalogPrices,
-        array $effectivePrices,
+        ?EffectivePrice $effectivePrice,
         float $discount,
     ): array {
-        $effectivePrice = $effectivePrices[(int) $productSaleElements->getId()] ?? null;
-
         if (null === $effectivePrice) {
-            return [(int) $productSaleElements->getPromo(), round((float) $catalogPrices->getPromoPrice(), 6)];
+            return [
+                (float) $catalogPrices->getPrice(),
+                (int) $productSaleElements->getPromo(),
+                round((float) $catalogPrices->getPromoPrice(), 6),
+            ];
         }
-
-        $promoPrice = $effectivePrice->untaxedPromoPrice;
 
         // A customer discount rate applies on top, the way getPricesByCurrency()
         // applies it to the catalog prices. It scales both prices by the same
         // factor, so it never changes which of the two is the lower one.
-        if ($discount > 0) {
-            $promoPrice *= 1 - $discount / 100;
+        $settled = $effectivePrice->settle((float) $catalogPrices->getPrice(), $discount);
+
+        // `cart_item.price` and `cart_item.promo_price` are DECIMAL(16,6): rounding here is what
+        // makes the value written and the value read back compare equal, so a refresh that
+        // changes nothing writes nothing.
+        return [
+            $settled->priceReplaced ? round($settled->untaxedPrice, 6) : (float) $catalogPrices->getPrice(),
+            $settled->isPromo ? 1 : 0,
+            round($settled->untaxedPromoPrice, 6),
+        ];
+    }
+
+    /**
+     * The effective price of the bundle lines of a cart, from the composition each holds,
+     * by line id: none for a bundle that is not priced by its components, null for a line whose
+     * composition the bundle can no longer hold.
+     *
+     * @return array<int, EffectivePrice|null>
+     */
+    private function bundleLinePricesOf(CartModel $cart, CurrencyModel $currency): array
+    {
+        if (null === $this->bundleEffectivePriceSource) {
+            return [];
         }
 
-        // `cart_item.promo_price` is a DECIMAL(16,6): rounding here is what makes
-        // the value written and the value read back compare equal, so a refresh
-        // that changes nothing writes nothing.
-        return [1, round($promoPrice, 6)];
+        $lines = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (1 === (int) $cartItem->getIsOffered() || null === $cartItem->getProductSaleElementsId()) {
+                continue;
+            }
+
+            try {
+                $composition = $cartItem->getBundleCompositionValue();
+            } catch (InvalidBundleCompositionException) {
+                continue;
+            }
+
+            if (null !== $composition) {
+                $lines[(int) $cartItem->getId()] = [(int) $cartItem->getProductId(), (int) $cartItem->getProductSaleElementsId(), $composition];
+            }
+        }
+
+        return $this->bundleEffectivePriceSource->forLines($lines, $currency);
     }
 
     /**
@@ -623,13 +728,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, float $quantity): CartItem
     {
         $cartItem->setDispatcher($dispatcher);
-        $cartItem->updateQuantity(
-            $quantity,
-            $this->saleUnitAvailableStock?->ownQuantity((int) $cartItem->getProductSaleElementsId()),
-        )
-            ->save();
+        $cartItem->updateQuantity($quantity, $this->availableQuantityOfLine($cartItem))->save();
 
         return $cartItem;
+    }
+
+    /**
+     * The ceiling a line is checked against, when it is not the national counter of its sale
+     * element: the stock of the sale unit the visitor buys from, or what the components of a
+     * bundle can supply (the stock of the sale element standing for the bundle is never read).
+     */
+    private function availableQuantityOfLine(CartItem $cartItem): ?float
+    {
+        $composition = $cartItem->getBundleCompositionValue();
+
+        if (null !== $composition) {
+            return $this->cartLineAvailability?->forLine($cartItem->getProductSaleElements(), $composition);
+        }
+
+        return $this->saleUnitAvailableStock?->ownQuantity((int) $cartItem->getProductSaleElementsId());
     }
 
     /**
@@ -687,26 +804,36 @@ class Cart extends BaseAction implements EventSubscriberInterface
         ProductSaleElements $productSaleElements,
         float $quantity,
         ProductPriceTools $productPrices,
+        ?BundleComposition $bundleComposition = null,
     ): CartItem {
         // The line is the proof of the price the shop agreed to: an order is built
         // from it, so a rule or reserved price has to be written down here and not
         // worked out again later, when the rule or the operation may well be over.
         $customer = $cart->getCustomer();
         $discount = null !== $customer && $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
+        // The same currency the catalog prices of this line were read in: the two
+        // are compared against each other, so resolving them apart would let a
+        // price in one currency undercut a catalog price in another.
+        $currency = $this->currencyOf($cart);
+        $saleElementsId = (int) $productSaleElements->getId();
 
-        [$promo, $promoPrice] = $this->promoOfLine(
-            $productSaleElements,
-            $productPrices,
-            // The same currency the catalog prices of this line were read in: the two
-            // are compared against each other, so resolving them apart would let a
-            // price in one currency undercut a catalog price in another.
-            $this->effectivePriceResolver->resolve(
-                [(int) $productSaleElements->getId()],
-                $this->currencyOf($cart),
-                $customer,
-            ),
-            $discount,
-        );
+        $effectivePrice = null;
+
+        if (null !== $bundleComposition) {
+            $bundlePrices = $this->bundleEffectivePriceSource?->forLines([0 => [$productId, $saleElementsId, $bundleComposition]], $currency) ?? [];
+
+            // The guard of the addition judged the composition a moment ago: a line that cannot be priced
+            // now is refused, not written at the price of a catalog it is not sold by.
+            if (\array_key_exists(0, $bundlePrices) && null === $bundlePrices[0]) {
+                throw InvalidBundleCompositionException::malformed(\sprintf('the composition proposed for product %d cannot be priced', $productId));
+            }
+
+            $effectivePrice = $bundlePrices[0] ?? null;
+        }
+
+        $effectivePrice ??= $this->effectivePriceResolver->resolve([$saleElementsId], $currency, $customer)[$saleElementsId] ?? null;
+
+        [$price, $promo, $promoPrice] = $this->settledLine($productSaleElements, $productPrices, $effectivePrice, $discount);
 
         $cartItem = new CartItem();
         $cartItem->setDispatcher($dispatcher);
@@ -715,7 +842,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductId($productId)
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
-            ->setPrice((string) $productPrices->getPrice())
+            ->setBundleComposition($bundleComposition?->toCanonicalJson())
+            ->setPrice((string) $price)
             ->setPromoPrice((string) $promoPrice)
             ->setPromo($promo)
             ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30))
@@ -759,6 +887,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
             // A line a promotion offered is never the one a customer adds to: adding
             // the same product by hand must open a regular, paid line of its own.
             ->filterByIsOffered(0)
+            // Two compositions of the same bundle are two lines.
+            ->filterByBundleComposition(
+                $event->getBundleComposition()?->toCanonicalJson(),
+                null === $event->getBundleComposition() ? Criteria::ISNULL : Criteria::EQUAL,
+            )
             ->findOne()
         ) {
             $event->setCartItem($foundItem);
@@ -860,12 +993,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $quantity = (float) $cartItem->getQuantity();
             $price = $cartItem->getRealPrice();
 
-            if ($checkStock && 0 === (int) $productSaleElements->getProduct()->getVirtual()) {
-                $available = $this->saleUnitStockResolver?->availableQuantity(
-                    $saleUnitId,
-                    (int) $productSaleElements->getId(),
-                    (float) $productSaleElements->getQuantity(),
-                ) ?? (float) $productSaleElements->getQuantity();
+            $composition = $cartItem->getBundleCompositionValue();
+
+            if ($checkStock && (null !== $composition || 0 === (int) $productSaleElements->getProduct()->getVirtual())) {
+                $available = null !== $composition && null !== $this->cartLineAvailability
+                    ? $this->cartLineAvailability->forLine($productSaleElements, $composition)
+                    : ($this->saleUnitStockResolver?->availableQuantity(
+                        $saleUnitId,
+                        (int) $productSaleElements->getId(),
+                        (float) $productSaleElements->getQuantity(),
+                    ) ?? (float) $productSaleElements->getQuantity());
 
                 if ($available <= 0) {
                     $changes[] = $this->lineChange($cartItem, $quantity, 0.0, $price, $price);
@@ -1208,7 +1345,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $this->getSession()->getCurrency(),
             $dispatcher,
             $this->saleUnitStockResolver,
+            $this->cartLineAvailability,
         );
+
+        // A copied bundle line is priced from its composition, like on any other refresh.
+        if ($this->pricingActivityChecker->hasComputedBundles() && $this->holdsBundleLine($newCart)) {
+            $newCart->clearCartItems();
+            $this->refreshCartItemPrices($newCart, $this->currencyOf($newCart), true);
+        }
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
         $dispatcher->dispatch($cartEvent, TheliaEvents::CART_DUPLICATE);

@@ -333,7 +333,7 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
      */
     private function effectivePrices(array $saleElementIds, Currency $currency, ?Customer $customer): array
     {
-        if (!$this->activityChecker->hasActivePublicRule() && !$this->activityChecker->hasVisitorDependentPricing()) {
+        if (!$this->activityChecker->hasActivePublicRule() && !$this->activityChecker->hasComputedBundles() && !$this->activityChecker->hasVisitorDependentPricing()) {
             return [];
         }
 

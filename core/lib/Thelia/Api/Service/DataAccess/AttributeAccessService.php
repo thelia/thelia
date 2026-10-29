@@ -26,6 +26,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Catalog\Bundle\BundleLineContents;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\DiscountProration;
 use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
@@ -44,6 +45,8 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Model\Tools\ModelCriteriaTools;
@@ -459,24 +462,95 @@ class AttributeAccessService
      * other line. It is what lets a cart page strike the gift's own price
      * instead of showing one anonymous total.
      *
-     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float}>
+     * A line of a bundle also carries the components the customer retained, in the order of the
+     * bundle, as `bundle_components`: `[{"bundleItemId": 12, "productSaleElementsId": 77,
+     * "productId": 42, "title": "Helmet", "quantity": "2"}]`, the quantity of one bundle as a decimal
+     * string. Read for the whole cart in a handful of queries, whatever the number of bundle lines.
+     *
+     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float, bundle_components?: list<array{bundleItemId: int, productSaleElementsId: int, productId: int, title: string, quantity: string}>}>
      */
     private function cartItems(Cart $cart, Country $taxCountry, ?State $taxState): array
     {
         $offeredDiscounts = $this->offeredTaxedDiscounts($cart, $taxCountry, $taxState);
+        $bundleComponents = $this->bundleComponentsOf($cart);
 
         $items = [];
 
         foreach ($cart->getCartItems() as $cartItem) {
-            $items[] = [
+            $item = [
                 'id' => (int) $cartItem->getId(),
                 'product_id' => (int) $cartItem->getProductId(),
                 'is_offered' => (int) $cartItem->getIsOffered(),
                 'offered_taxed_discount' => $offeredDiscounts[(int) $cartItem->getId()] ?? 0.0,
             ];
+
+            if (isset($bundleComponents[(int) $cartItem->getId()])) {
+                $item['bundle_components'] = $bundleComponents[(int) $cartItem->getId()];
+            }
+
+            $items[] = $item;
         }
 
         return $items;
+    }
+
+    /**
+     * The components each bundle line of the cart retained, by line id, with the title of their
+     * product in the language of the page (the default language when it has none).
+     *
+     * @return array<int, list<array{bundleItemId: int, productSaleElementsId: int, productId: int, title: string, quantity: string}>>
+     */
+    private function bundleComponentsOf(Cart $cart): array
+    {
+        $lines = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            if (null !== $composition = $cartItem->getBundleCompositionValue()) {
+                $lines[(int) $cartItem->getId()] = [(int) $cartItem->getProductId(), $composition];
+            }
+        }
+
+        if ([] === $lines) {
+            return [];
+        }
+
+        $contents = BundleLineContents::of($lines);
+        $productIds = [];
+
+        foreach ($contents as $content) {
+            foreach ($content['components'] as $component) {
+                $productIds[] = $component['productId'];
+            }
+        }
+
+        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
+        $locale = $this->getSession()->getLang()?->getLocale() ?? $defaultLocale;
+        $titles = [];
+
+        foreach (ProductI18nQuery::create()
+            ->filterById(array_values(array_unique($productIds)), Criteria::IN)
+            ->filterByLocale([$locale, $defaultLocale], Criteria::IN)
+            ->find() as $translation) {
+            if ($locale === $translation->getLocale() || !isset($titles[(int) $translation->getId()])) {
+                $titles[(int) $translation->getId()] = (string) $translation->getTitle();
+            }
+        }
+
+        $components = [];
+
+        foreach ($contents as $cartItemId => $content) {
+            foreach ($content['components'] as $component) {
+                $components[$cartItemId][] = [
+                    'bundleItemId' => $component['bundleItemId'],
+                    'productSaleElementsId' => $component['productSaleElementsId'],
+                    'productId' => $component['productId'],
+                    'title' => $titles[$component['productId']] ?? '',
+                    'quantity' => $component['quantity'],
+                ];
+            }
+        }
+
+        return $components;
     }
 
     /**

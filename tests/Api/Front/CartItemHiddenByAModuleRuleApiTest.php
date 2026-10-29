@@ -19,6 +19,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Security\CartOwnership;
 use Thelia\Api\State\Processor\FrontCartItemProcessor;
+use Thelia\Domain\Cart\Bundle\CartCompositionResolver;
+use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Catalog\Product\ProductVisibilityRuleInterface;
@@ -115,6 +117,8 @@ final class CartItemHiddenByAModuleRuleApiTest extends ApiTestCase
             $visibility,
             $this->getService(ApiResourcePropelTransformerService::class),
             $this->getService(EventDispatcherInterface::class),
+            $this->getService(CartLineAvailability::class),
+            $this->getService(CartCompositionResolver::class),
         ));
     }
 }
