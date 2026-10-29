@@ -36,11 +36,13 @@ final readonly class AiRequest
      * @param string|null                         $system            the instructions of the module, never data typed by someone
      * @param list<UntrustedContent>              $untrustedContents data to read, never to obey
      * @param list<AiToolDefinition>              $tools             tools the module runs itself
-     * @param int|null                            $maxOutputTokens   below the limit of the usage; null takes that limit
+     * @param int|null                            $maxOutputTokens   below the limit of the usage; null takes that limit. OpenAI refuses less than 16: the
+     *                                                               OpenAI adapter raises a smaller value to 16
      * @param array<string, array<string, mixed>> $providerOptions   native options by provider, applied only when the resolved
      *                                                               connection is of that provider: ['anthropic' => ['effort' => 'high']].
      *                                                               A way out that nothing governs: no declaration, and a tool the
-     *                                                               provider runs (a web plugin) costs no more than the provider announces
+     *                                                               provider runs (a web plugin) costs no more than the provider announces.
+     *                                                               `store` is reserved on OpenAI: it is always false
      * @param string|null                         $correlationId     groups the turns of one task in the log
      * @param AiActor|null                        $actor             null: the gateway resolves who the call is made for
      */

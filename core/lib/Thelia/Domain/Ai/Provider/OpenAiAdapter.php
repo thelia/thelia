@@ -28,6 +28,10 @@ use Thelia\Domain\Ai\Exception\AiProviderUnavailableException;
  * (`https://eu.api.openai.com`, data residency in the EU) and the American one. Any other address is an
  * OpenAI-compatible server: that is the other kind of connection.
  *
+ * In the European region, name the models with their date (`gpt-5.4-nano-2026-03-17`): the table "API Endpoint, tool
+ * and model support" of https://developers.openai.com/api/docs/guides/your-data.md lists the dated snapshots for
+ * `/v1/responses` and does not list aliases such as `chat-latest`.
+ *
  * @internal
  */
 final class OpenAiAdapter extends AbstractPlatformAdapter
