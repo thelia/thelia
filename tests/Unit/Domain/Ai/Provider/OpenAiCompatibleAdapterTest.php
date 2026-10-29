@@ -45,6 +45,25 @@ final class OpenAiCompatibleAdapterTest extends AiProviderTestCase
         self::assertSame($expected, $this->sent[0]['url']);
     }
 
+    public function testOvhCloudIsCalledWithoutKeyAndScalewayIsNot(): void
+    {
+        $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport(Wire::chat('ok')), self::PINNED);
+
+        $adapter->complete($this->request(), $this->target(AiProvider::OvhCloud, null, null));
+
+        self::assertCount(1, $this->sent);
+        self::assertArrayNotHasKey('authorization', $this->sent[0]['headers']);
+
+        try {
+            $adapter->complete($this->request(), $this->target(AiProvider::Scaleway, null, null));
+            self::fail('A connection that needs a key was called without one.');
+        } catch (AiProviderUnavailableException $exception) {
+            self::assertStringContainsString('has no API key', $exception->getMessage());
+        }
+
+        self::assertCount(1, $this->sent);
+    }
+
     public function testACompatibleConnectionWithoutAddressHasNowhereToGo(): void
     {
         $adapter = $this->adapter(OpenAiCompatibleAdapter::class, $this->transport(Wire::chat('ok')));

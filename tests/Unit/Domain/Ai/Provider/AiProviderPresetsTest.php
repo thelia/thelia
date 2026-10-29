@@ -55,13 +55,15 @@ final class AiProviderPresetsTest extends TestCase
         }
     }
 
-    public function testOnlyTheSelfHostedAndCompatibleConnectionsMayHaveNoKey(): void
+    public function testOnlyTheConnectionsThatAnswerAnonymouslyMayHaveNoKey(): void
     {
         $presets = new AiProviderPresets();
 
         self::assertTrue($presets->keyIsOptional(AiProvider::Ollama));
         self::assertTrue($presets->keyIsOptional(AiProvider::OpenAiCompatible));
+        self::assertTrue($presets->keyIsOptional(AiProvider::OvhCloud), 'AI Endpoints answers an anonymous caller');
         self::assertFalse($presets->keyIsOptional(AiProvider::Mistral));
         self::assertFalse($presets->keyIsOptional(AiProvider::Anthropic));
+        self::assertFalse($presets->keyIsOptional(AiProvider::Scaleway));
     }
 }
