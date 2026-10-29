@@ -347,8 +347,8 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
                 'type' => 'json_schema',
                 'json_schema' => [
                     'name' => $request->outputSchema->name,
-                    // OpenAI refuses a strict schema that does not close its objects.
-                    'strict' => false === ($request->outputSchema->schema['additionalProperties'] ?? null),
+                    // OpenAI refuses a strict schema in which an object is open or has an optional property.
+                    'strict' => AiStrictSchema::accepts($request->outputSchema->schema),
                     'schema' => $request->outputSchema->schema,
                 ],
             ];
