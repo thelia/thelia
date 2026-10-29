@@ -536,6 +536,30 @@ final class BundleReviewRulesTest extends ActionIntegrationTestCase
         }
     }
 
+    public function testTheMessagesOfTheAdminAreInTheFrenchAndEnglishCatalogs(): void
+    {
+        $translator = Translator::getInstance();
+        $parameters = ['%id' => '7', '%ref' => 'R', '%component' => 'C', '%bundle' => 'B', '%count' => '2'];
+
+        foreach ([
+            'Product %id does not exist.' => 'Le produit 7 n\'existe pas.',
+            'Bundle item %id does not exist.' => 'Le composant de pack 7 n\'existe pas.',
+            'Component %component belongs to bundle %bundle and cannot be moved to another: delete it and add a new one.' => 'Le composant C appartient au pack B et ne peut pas être déplacé vers un autre : supprimez-le et ajoutez-en un nouveau.',
+            'Component %component keeps its sale element: delete it and add a new one.' => 'Le composant C garde sa déclinaison : supprimez-le et ajoutez-en un nouveau.',
+            'Sale element %id does not exist.' => 'La déclinaison 7 n\'existe pas.',
+            'Product %ref is not a bundle: turn it into one before adding components.' => 'Le produit R n\'est pas un pack : transformez-le en pack avant d\'y ajouter des composants.',
+            'Product %ref cannot be a component of itself.' => 'Le produit R ne peut pas être son propre composant.',
+            'Product %ref is a bundle: a bundle cannot hold another bundle.' => 'Le produit R est un pack : un pack ne peut pas contenir un autre pack.',
+            'Product %ref is a component of a bundle: it cannot become a bundle.' => 'Le produit R est le composant d\'un pack : il ne peut pas devenir un pack.',
+            'Product %ref has %count sale elements: a bundle has a single one, so it cannot become a bundle.' => 'Le produit R a 2 déclinaisons : un pack n\'en a qu\'une, il ne peut donc pas devenir un pack.',
+            'Product %ref is a bundle: it has a single sale element and no other can be created.' => 'Le produit R est un pack : il n\'a qu\'une déclinaison et aucune autre ne peut être créée.',
+            'Product %component is already a component of bundle %bundle.' => 'Le produit C est déjà un composant du pack B.',
+        ] as $key => $french) {
+            self::assertSame($french, $translator->trans($key, $parameters, 'core', 'fr_FR', false, false), $key);
+            self::assertSame(strtr($key, $parameters), $translator->trans($key, $parameters, 'core', 'en_US', false, false), $key);
+        }
+    }
+
     // M9 and I6 live next to the code they prove: ProductBundleItemApiTest and OfferedCartLineServiceTest.
 
     /**
