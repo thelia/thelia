@@ -42,4 +42,14 @@ final class MistralAdapter extends AbstractPlatformAdapter
     {
         return new Mistral($target->model->name, $capabilities);
     }
+
+    /**
+     * `finish_reason: model_length` (the model reached its own length: the answer is cut short) is in the schema of
+     * the chat endpoint of Mistral, and the bridge throws "Unsupported finish reason" on it. `error` is not a
+     * truncation and stays a failure.
+     */
+    protected function stoppedShort(array $body): bool
+    {
+        return 'model_length' === ($body['choices'][0]['finish_reason'] ?? null);
+    }
 }

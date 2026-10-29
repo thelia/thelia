@@ -76,6 +76,10 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
                 return $this->results->fromRefusal($deferred, $target, $refusal, $requestId, $this->announcedCost($deferred));
             }
 
+            if ($this->stoppedShort($body)) {
+                return $this->results->fromTruncated($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred), $requestId);
+            }
+
             try {
                 return $this->results->fromDeferred($deferred, $target, null !== $request->outputSchema, $this->announcedCost($deferred), $requestId);
             } catch (MaxOutputTokensException) {
@@ -158,6 +162,17 @@ abstract class AbstractPlatformAdapter implements AiProviderAdapterInterface
     protected function refusal(array $body): ?AiProviderRefusal
     {
         return null;
+    }
+
+    /**
+     * Whether the body says the answer stopped short with a reason the library cannot read (it throws on it): the
+     * answer is then read from the body, as a truncation.
+     *
+     * @param array<string, mixed> $body
+     */
+    protected function stoppedShort(array $body): bool
+    {
+        return false;
     }
 
     /**
