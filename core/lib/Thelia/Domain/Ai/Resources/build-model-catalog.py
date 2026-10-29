@@ -6,6 +6,7 @@ Without argument: downloads the file into a temporary directory first. With a lo
 (`<sha> <commit date>`) is written as the source commit, so a catalogue is rebuilt from the very commit it names.
 
 Fine-tuned models (`ft:*`) and models whose deprecation date has passed are left out.
+Where LiteLLM disagrees with the documentation of the provider, the documentation wins (IDENTIFIERS, STRUCTURED_OUTPUT).
 """
 import json, subprocess, sys, tempfile, urllib.request, datetime
 from decimal import Decimal
@@ -27,6 +28,16 @@ THINKING_OFF = {("anthropic", "claude-fable-5"): "adaptive", ("anthropic", "clau
                 ("anthropic", "claude-opus-5-5"): "adaptive", ("anthropic", "claude-sonnet-5-5"): "between_tools",
                 ("anthropic", "claude-haiku-5-5"): "disabled", ("anthropic", "claude-opus-5"): "disabled",
                 ("anthropic", "claude-sonnet-5"): "disabled"}
+
+# The identifier the API of the provider takes. Scaleway Generative APIs (serverless, `api.scaleway.ai/v1`) names a
+# model without the vendor prefix LiteLLM adds: `llama-3.3-70b-instruct`, not `meta/llama-3.3-70b-instruct`
+# (https://www.scaleway.com/en/docs/generative-apis/reference-content/supported-models/).
+IDENTIFIERS = {"scaleway": lambda model: model.rsplit("/", 1)[-1]}
+
+# Structured output, where LiteLLM says nothing or says no and the documentation says yes: Scaleway lists "Supports
+# structured output: Yes" for each model of the catalogue, Ollama takes a JSON schema in `format`
+# (https://docs.ollama.com/capabilities/structured-outputs).
+STRUCTURED_OUTPUT = {"scaleway": True, "ollama": True}
 
 
 def money(per_token):
@@ -81,6 +92,7 @@ def main():
             if "audio" in key or key.endswith("container"):
                 continue  # audio-in/out chat variants and non-model entries
             model = key[len(provider_key) + 1:] if key.startswith(provider_key + "/") else key
+            model = IDENTIFIERS.get(name, lambda m: m)(model)
             if not is_listed(model, v.get("deprecation_date"), today):
                 continue
             thinking_off = THINKING_OFF.get((name, model))
@@ -92,7 +104,7 @@ def main():
                 "cache_write_usd_per_million": money(v.get("cache_creation_input_token_cost")),
                 "context_window": v.get("max_input_tokens", v.get("max_tokens")),
                 "max_output_tokens": v.get("max_output_tokens"),
-                "capabilities": {"structured_output": v.get("supports_response_schema"),
+                "capabilities": {"structured_output": STRUCTURED_OUTPUT.get(name, v.get("supports_response_schema")),
                                  "tools": v.get("supports_function_calling"),
                                  "vision": v.get("supports_vision")},
                 "deprecation_date": v.get("deprecation_date"),
