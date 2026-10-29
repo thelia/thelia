@@ -266,8 +266,18 @@ final readonly class AiResultReader
             FinishReasonCase::LENGTH => AiFinishReason::MaxTokens,
             FinishReasonCase::TOOL_CALL => AiFinishReason::ToolCalls,
             FinishReasonCase::CONTENT_FILTER => AiFinishReason::ContentFilter,
-            default => AiFinishReason::fromProvider($reason->getRaw()),
+            default => self::byWord($reason->getRaw()),
         };
+    }
+
+    /**
+     * A stop reason the library does not map: the ones that mean the answer stopped short are a truncation.
+     * Anthropic `model_context_window_exceeded` (the response filled the context window, to be treated as
+     * truncated: https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons).
+     */
+    private static function byWord(?string $word): AiFinishReason
+    {
+        return 'model_context_window_exceeded' === $word ? AiFinishReason::MaxTokens : AiFinishReason::fromProvider($word);
     }
 
     /**
