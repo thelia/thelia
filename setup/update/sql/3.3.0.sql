@@ -2210,4 +2210,200 @@ INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`,
     ('ai_tool_approval_ttl_hours', '24', 0, 0, NOW(), NOW()),
     ('ai_tool_token_max_days', '365', 0, 0, NOW(), NOW());
 
+-- ---------------------------------------------------------------------
+-- Titles of the configuration variables that reached the shops without one
+--
+-- The "Purpose" column of the variables screen is `config_i18n.title`. The
+-- scripts that added these variables wrote the `config` row alone, so a shop
+-- displays them with an empty purpose: the variables of the automatic invoice
+-- numbering (3.0.0-alpha1), of the guest checkout, the checkout layout and the
+-- product returns (3.1.0), of the image formats, the header menu and the
+-- product videos (3.2.0), and of the AI layer (3.3.0). The two CDN base URLs
+-- are seeded by the fresh install, but their wording is missing from the
+-- translation catalogs, so the seed wrote NULL (and had the two swapped).
+--
+-- The titles go through a temporary table so that one list serves both the
+-- rows to create (INSERT IGNORE leaves alone a shop that already wrote its
+-- own title) and the rows that exist with an empty title (UPDATE fills only
+-- those). The temporary table lives on the connection and is dropped at the
+-- end: replaying the script changes nothing.
+-- ---------------------------------------------------------------------
+
+DROP TEMPORARY TABLE IF EXISTS `config_title_seed`;
+
+CREATE TEMPORARY TABLE `config_title_seed` (
+    `name` VARCHAR(255) NOT NULL,
+    `locale` CHAR(5) NOT NULL,
+    `title` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+-- The CDN base URLs: seeded since 2.x, but their titles never reached the translation catalogs, so the seed wrote NULL (and had the two wordings swapped).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('cdn.documents-base-url', 'en_US', 'Base URL of the CDN serving the images and documents (leave empty when the shop uses no CDN)'),
+    ('cdn.documents-base-url', 'fr_FR', 'URL de base du CDN qui sert les images et les documents (laisser vide si la boutique n''utilise pas de CDN)'),
+    ('cdn.documents-base-url', 'de_DE', 'Basis-URL des CDN, das die Bilder und Dokumente ausliefert (leer lassen, wenn der Shop kein CDN nutzt)'),
+    ('cdn.documents-base-url', 'es_ES', 'URL base del CDN que sirve las imágenes y los documentos (dejar vacío si la tienda no usa CDN)'),
+    ('cdn.documents-base-url', 'nl_NL', 'Basis-URL van het CDN dat de afbeeldingen en documenten levert (leeg laten als de winkel geen CDN gebruikt)'),
+    ('cdn.documents-base-url', 'ru_RU', 'Базовый URL CDN, раздающего изображения и документы (оставьте пустым, если магазин не использует CDN)'),
+    ('cdn.assets-base-url', 'en_US', 'Base URL of the CDN serving the assets of the templates (leave empty when the shop uses no CDN)'),
+    ('cdn.assets-base-url', 'fr_FR', 'URL de base du CDN qui sert les ressources des modèles (laisser vide si la boutique n''utilise pas de CDN)'),
+    ('cdn.assets-base-url', 'de_DE', 'Basis-URL des CDN, das die Assets der Templates ausliefert (leer lassen, wenn der Shop kein CDN nutzt)'),
+    ('cdn.assets-base-url', 'es_ES', 'URL base del CDN que sirve los recursos de las plantillas (dejar vacío si la tienda no usa CDN)'),
+    ('cdn.assets-base-url', 'nl_NL', 'Basis-URL van het CDN dat de assets van de templates levert (leeg laten als de winkel geen CDN gebruikt)'),
+    ('cdn.assets-base-url', 'ru_RU', 'Базовый URL CDN, раздающего ресурсы шаблонов (оставьте пустым, если магазин не использует CDN)');
+
+-- Automatic invoice numbering (3.0.0-alpha1).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('invoice_ref_auto', 'en_US', 'Number the invoices automatically (1) or leave the invoice reference to an invoicing module (0)'),
+    ('invoice_ref_auto', 'fr_FR', 'Numéroter les factures automatiquement (1) ou laisser la référence de facture à un module de facturation (0)'),
+    ('invoice_ref_auto', 'de_DE', 'Rechnungen automatisch nummerieren (1) oder die Rechnungsnummer einem Rechnungsmodul überlassen (0)'),
+    ('invoice_ref_auto', 'es_ES', 'Numerar las facturas automáticamente (1) o dejar la referencia de factura a un módulo de facturación (0)'),
+    ('invoice_ref_auto', 'nl_NL', 'Facturen automatisch nummeren (1) of het factuurnummer aan een facturatiemodule overlaten (0)'),
+    ('invoice_ref_auto', 'ru_RU', 'Нумеровать счета автоматически (1) или оставить номер счёта модулю выставления счетов (0)'),
+    ('invoice_ref_format', 'en_US', 'Format of the automatic invoice references, with the placeholders %year% and %number%'),
+    ('invoice_ref_format', 'fr_FR', 'Format des références de facture automatiques, avec les marqueurs %year% et %number%'),
+    ('invoice_ref_format', 'de_DE', 'Format der automatischen Rechnungsnummern, mit den Platzhaltern %year% und %number%'),
+    ('invoice_ref_format', 'es_ES', 'Formato de las referencias de factura automáticas, con los marcadores %year% y %number%'),
+    ('invoice_ref_format', 'nl_NL', 'Formaat van de automatische factuurnummers, met de plaatshouders %year% en %number%'),
+    ('invoice_ref_format', 'ru_RU', 'Формат автоматических номеров счетов с подстановками %year% и %number%');
+
+-- Guest checkout and checkout layout (3.1.0).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('guest_checkout_mode', 'en_US', 'Guest checkout: disabled, enabled, or enabled_unless_product_forbids (refused when the cart holds a product that requires an account)'),
+    ('guest_checkout_mode', 'fr_FR', 'Commande sans compte : disabled (désactivée), enabled (activée) ou enabled_unless_product_forbids (refusée quand le panier contient un produit qui exige un compte)'),
+    ('guest_checkout_mode', 'de_DE', 'Gastbestellung: disabled (aus), enabled (an) oder enabled_unless_product_forbids (abgelehnt, wenn der Warenkorb ein Produkt enthält, das ein Konto verlangt)'),
+    ('guest_checkout_mode', 'es_ES', 'Compra sin cuenta: disabled (desactivada), enabled (activada) o enabled_unless_product_forbids (rechazada cuando el carrito contiene un producto que exige una cuenta)'),
+    ('guest_checkout_mode', 'nl_NL', 'Bestellen zonder account: disabled (uit), enabled (aan) of enabled_unless_product_forbids (geweigerd wanneer de winkelwagen een product bevat dat een account vereist)'),
+    ('guest_checkout_mode', 'ru_RU', 'Заказ без учётной записи: disabled (выключен), enabled (включён) или enabled_unless_product_forbids (отклоняется, если в корзине есть товар, требующий учётной записи)'),
+    ('checkout_display_mode', 'en_US', 'Layout of the checkout: steps (one screen per step) or one_page (the whole checkout on a single page)'),
+    ('checkout_display_mode', 'fr_FR', 'Présentation du tunnel de commande : steps (un écran par étape) ou one_page (tout le tunnel sur une seule page)'),
+    ('checkout_display_mode', 'de_DE', 'Aufbau des Bestellvorgangs: steps (ein Bildschirm pro Schritt) oder one_page (der ganze Bestellvorgang auf einer Seite)'),
+    ('checkout_display_mode', 'es_ES', 'Presentación del proceso de compra: steps (una pantalla por etapa) o one_page (todo el proceso en una sola página)'),
+    ('checkout_display_mode', 'nl_NL', 'Indeling van het bestelproces: steps (één scherm per stap) of one_page (het hele bestelproces op één pagina)'),
+    ('checkout_display_mode', 'ru_RU', 'Вид оформления заказа: steps (один экран на шаг) или one_page (всё оформление на одной странице)');
+
+-- Product returns (3.1.0).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('order_return_enabled', 'en_US', 'Let customers open a product return on their orders (1 = yes, 0 = no)'),
+    ('order_return_enabled', 'fr_FR', 'Permettre aux clients d''ouvrir un retour de produits sur leurs commandes (1 = oui, 0 = non)'),
+    ('order_return_enabled', 'de_DE', 'Kunden erlauben, eine Rücksendung zu ihren Bestellungen zu eröffnen (1 = ja, 0 = nein)'),
+    ('order_return_enabled', 'es_ES', 'Permitir a los clientes abrir una devolución de productos en sus pedidos (1 = sí, 0 = no)'),
+    ('order_return_enabled', 'nl_NL', 'Klanten toestaan een retour op hun bestellingen te openen (1 = ja, 0 = nee)'),
+    ('order_return_enabled', 'ru_RU', 'Разрешить покупателям оформлять возврат товаров по своим заказам (1 = да, 0 = нет)'),
+    ('order_return_window_days', 'en_US', 'Days after the shipment of an order (or its creation when it was never shipped) during which a customer may open a return'),
+    ('order_return_window_days', 'fr_FR', 'Nombre de jours après l''expédition d''une commande (ou sa création si elle n''a jamais été expédiée) pendant lesquels un client peut ouvrir un retour'),
+    ('order_return_window_days', 'de_DE', 'Tage nach dem Versand einer Bestellung (oder ihrer Anlage, wenn sie nie versandt wurde), in denen ein Kunde eine Rücksendung eröffnen kann'),
+    ('order_return_window_days', 'es_ES', 'Días después del envío de un pedido (o de su creación si nunca se envió) durante los cuales un cliente puede abrir una devolución'),
+    ('order_return_window_days', 'nl_NL', 'Dagen na de verzending van een bestelling (of de aanmaak ervan als ze nooit is verzonden) waarin een klant een retour kan openen'),
+    ('order_return_window_days', 'ru_RU', 'Дней после отправки заказа (или его создания, если он не был отправлен), в течение которых покупатель может оформить возврат'),
+    ('order_return_restock_mode', 'en_US', 'Restocking of the goods received from a return: auto (every received line), resellable (only the lines marked as resellable) or never'),
+    ('order_return_restock_mode', 'fr_FR', 'Remise en stock des produits reçus d''un retour : auto (toutes les lignes reçues), resellable (seules les lignes marquées revendables) ou never (jamais)'),
+    ('order_return_restock_mode', 'de_DE', 'Wiedereinlagerung der aus einer Rücksendung erhaltenen Waren: auto (jede erhaltene Position), resellable (nur die als wiederverkäuflich markierten Positionen) oder never (nie)'),
+    ('order_return_restock_mode', 'es_ES', 'Reposición de los productos recibidos de una devolución: auto (todas las líneas recibidas), resellable (solo las líneas marcadas como revendibles) o never (nunca)'),
+    ('order_return_restock_mode', 'nl_NL', 'Opnieuw op voorraad zetten van de goederen uit een retour: auto (elke ontvangen regel), resellable (alleen de als herverkoopbaar gemarkeerde regels) of never (nooit)'),
+    ('order_return_restock_mode', 'ru_RU', 'Возврат на склад товаров, полученных по возврату: auto (все полученные позиции), resellable (только позиции, отмеченные как пригодные к перепродаже) или never (никогда)');
+
+-- Modern image formats (3.2.0).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('image_formats', 'en_US', 'Modern image formats offered on top of the source one, comma separated among webp and avif (empty: none)'),
+    ('image_formats', 'fr_FR', 'Formats d''image modernes proposés en plus du format d''origine, séparés par des virgules parmi webp et avif (vide : aucun)'),
+    ('image_formats', 'de_DE', 'Moderne Bildformate zusätzlich zum Ausgangsformat, kommagetrennt aus webp und avif (leer: keine)'),
+    ('image_formats', 'es_ES', 'Formatos de imagen modernos ofrecidos además del formato de origen, separados por comas entre webp y avif (vacío: ninguno)'),
+    ('image_formats', 'nl_NL', 'Moderne afbeeldingsformaten naast het bronformaat, door komma''s gescheiden uit webp en avif (leeg: geen)'),
+    ('image_formats', 'ru_RU', 'Современные форматы изображений в дополнение к исходному, через запятую из webp и avif (пусто: никаких)'),
+    ('image_quality_webp', 'en_US', 'Encoder quality (in %) of the generated WebP images'),
+    ('image_quality_webp', 'fr_FR', 'Qualité d''encodage (en %) des images WebP générées'),
+    ('image_quality_webp', 'de_DE', 'Encoder-Qualität (in %) der erzeugten WebP-Bilder'),
+    ('image_quality_webp', 'es_ES', 'Calidad de codificación (en %) de las imágenes WebP generadas'),
+    ('image_quality_webp', 'nl_NL', 'Encoderkwaliteit (in %) van de gegenereerde WebP-afbeeldingen'),
+    ('image_quality_webp', 'ru_RU', 'Качество кодирования (в %) создаваемых изображений WebP'),
+    ('image_quality_avif', 'en_US', 'Encoder quality (in %) of the generated AVIF images'),
+    ('image_quality_avif', 'fr_FR', 'Qualité d''encodage (en %) des images AVIF générées'),
+    ('image_quality_avif', 'de_DE', 'Encoder-Qualität (in %) der erzeugten AVIF-Bilder'),
+    ('image_quality_avif', 'es_ES', 'Calidad de codificación (en %) de las imágenes AVIF generadas'),
+    ('image_quality_avif', 'nl_NL', 'Encoderkwaliteit (in %) van de gegenereerde AVIF-afbeeldingen'),
+    ('image_quality_avif', 'ru_RU', 'Качество кодирования (в %) создаваемых изображений AVIF');
+
+-- Header menu (3.2.0).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('header_menu_items', 'en_US', 'Links of the header menu, an ordered list of references written folder:<id>,content:<id>'),
+    ('header_menu_items', 'fr_FR', 'Liens du menu d''en-tête, liste ordonnée de références écrites folder:<id>,content:<id>'),
+    ('header_menu_items', 'de_DE', 'Links des Kopfzeilenmenüs, eine geordnete Liste von Verweisen in der Form folder:<id>,content:<id>'),
+    ('header_menu_items', 'es_ES', 'Enlaces del menú de cabecera, lista ordenada de referencias escritas folder:<id>,content:<id>'),
+    ('header_menu_items', 'nl_NL', 'Links van het headermenu, een geordende lijst van verwijzingen geschreven als folder:<id>,content:<id>'),
+    ('header_menu_items', 'ru_RU', 'Ссылки меню шапки, упорядоченный список ссылок вида folder:<id>,content:<id>');
+
+-- Product videos (3.2.0).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('videos_library_path', 'en_US', 'Path to the directory where the hosted video files are stored'),
+    ('videos_library_path', 'fr_FR', 'Chemin vers le répertoire où sont stockés les fichiers vidéo hébergés'),
+    ('videos_library_path', 'de_DE', 'Pfad zum Verzeichnis, in dem die selbst gehosteten Videodateien liegen'),
+    ('videos_library_path', 'es_ES', 'Ruta al directorio donde se almacenan los archivos de vídeo alojados'),
+    ('videos_library_path', 'nl_NL', 'Pad naar de map waarin de zelf gehoste videobestanden staan'),
+    ('videos_library_path', 'ru_RU', 'Путь к каталогу, где хранятся размещённые на сайте видеофайлы'),
+    ('video_providers', 'en_US', 'Video platforms a product video may be pasted from, comma separated among youtube, vimeo and dailymotion'),
+    ('video_providers', 'fr_FR', 'Plateformes vidéo dont l''adresse d''une vidéo produit peut être collée, séparées par des virgules parmi youtube, vimeo et dailymotion'),
+    ('video_providers', 'de_DE', 'Videoplattformen, von denen ein Produktvideo eingefügt werden darf, kommagetrennt aus youtube, vimeo und dailymotion'),
+    ('video_providers', 'es_ES', 'Plataformas de vídeo desde las que se puede pegar un vídeo de producto, separadas por comas entre youtube, vimeo y dailymotion'),
+    ('video_providers', 'nl_NL', 'Videoplatforms waarvan een productvideo mag worden geplakt, door komma''s gescheiden uit youtube, vimeo en dailymotion'),
+    ('video_providers', 'ru_RU', 'Видеоплатформы, с которых можно вставить видео товара, через запятую из youtube, vimeo и dailymotion');
+
+-- AI layer (3.3.0).
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('ai_enabled', 'en_US', 'Enable (1) or disable (0) the AI features'),
+    ('ai_enabled', 'fr_FR', 'Activer (1) ou désactiver (0) les fonctions d''IA'),
+    ('ai_enabled', 'de_DE', 'KI-Funktionen aktivieren (1) oder deaktivieren (0)'),
+    ('ai_enabled', 'es_ES', 'Activar (1) o desactivar (0) las funciones de IA'),
+    ('ai_enabled', 'nl_NL', 'AI-functies inschakelen (1) of uitschakelen (0)'),
+    ('ai_enabled', 'ru_RU', 'Включить (1) или выключить (0) функции ИИ'),
+    ('ai_monthly_cap', 'en_US', 'Monthly spending cap shared by every AI usage, in the currency of the provider prices (0: no global cap)'),
+    ('ai_monthly_cap', 'fr_FR', 'Plafond de dépense mensuel partagé par tous les usages de l''IA, dans la devise des tarifs du fournisseur (0 : pas de plafond global)'),
+    ('ai_monthly_cap', 'de_DE', 'Monatliche Ausgabenobergrenze für alle KI-Nutzungen zusammen, in der Währung der Anbieterpreise (0: keine globale Obergrenze)'),
+    ('ai_monthly_cap', 'es_ES', 'Límite mensual de gasto compartido por todos los usos de la IA, en la moneda de las tarifas del proveedor (0: sin límite global)'),
+    ('ai_monthly_cap', 'nl_NL', 'Maandelijks uitgavenplafond gedeeld door alle AI-gebruik, in de valuta van de tarieven van de aanbieder (0: geen globaal plafond)'),
+    ('ai_monthly_cap', 'ru_RU', 'Месячный лимит расходов, общий для всех использований ИИ, в валюте тарифов поставщика (0: без общего лимита)'),
+    ('ai_eu_only', 'en_US', 'Refuse any AI provider hosted outside the European Union (1 = yes, 0 = no)'),
+    ('ai_eu_only', 'fr_FR', 'Refuser tout fournisseur d''IA hébergé hors de l''Union européenne (1 = oui, 0 = non)'),
+    ('ai_eu_only', 'de_DE', 'Jeden außerhalb der Europäischen Union gehosteten KI-Anbieter ablehnen (1 = ja, 0 = nein)'),
+    ('ai_eu_only', 'es_ES', 'Rechazar cualquier proveedor de IA alojado fuera de la Unión Europea (1 = sí, 0 = no)'),
+    ('ai_eu_only', 'nl_NL', 'Elke buiten de Europese Unie gehoste AI-aanbieder weigeren (1 = ja, 0 = nee)'),
+    ('ai_eu_only', 'ru_RU', 'Отклонять поставщиков ИИ, размещённых за пределами Европейского союза (1 = да, 0 = нет)'),
+    ('ai_log_retention_days', 'en_US', 'Days a row of the AI usage log is kept before the maintenance purge deletes it (400 when invalid)'),
+    ('ai_log_retention_days', 'fr_FR', 'Nombre de jours pendant lesquels une ligne du journal d''usage de l''IA est conservée avant que la purge de maintenance la supprime (400 si invalide)'),
+    ('ai_log_retention_days', 'de_DE', 'Tage, die ein Eintrag des KI-Nutzungsprotokolls aufbewahrt wird, bevor die Wartungsbereinigung ihn löscht (400 bei ungültigem Wert)'),
+    ('ai_log_retention_days', 'es_ES', 'Días que se conserva una línea del registro de uso de la IA antes de que la purga de mantenimiento la elimine (400 si no es válido)'),
+    ('ai_log_retention_days', 'nl_NL', 'Dagen dat een regel van het AI-gebruikslogboek wordt bewaard voordat de onderhoudsopschoning hem verwijdert (400 bij een ongeldige waarde)'),
+    ('ai_log_retention_days', 'ru_RU', 'Дней хранения записи журнала использования ИИ до её удаления при обслуживании (400 при недопустимом значении)'),
+    ('ai_mcp_enabled', 'en_US', 'Open (1) or close (0) the MCP server through which external assistants call the AI tools with a token'),
+    ('ai_mcp_enabled', 'fr_FR', 'Ouvrir (1) ou fermer (0) le serveur MCP par lequel des assistants externes appellent les outils d''IA avec un jeton'),
+    ('ai_mcp_enabled', 'de_DE', 'Den MCP-Server öffnen (1) oder schließen (0), über den externe Assistenten die KI-Werkzeuge mit einem Token aufrufen'),
+    ('ai_mcp_enabled', 'es_ES', 'Abrir (1) o cerrar (0) el servidor MCP por el que los asistentes externos llaman a las herramientas de IA con un token'),
+    ('ai_mcp_enabled', 'nl_NL', 'De MCP-server openen (1) of sluiten (0) waarmee externe assistenten de AI-tools met een token aanroepen'),
+    ('ai_mcp_enabled', 'ru_RU', 'Открыть (1) или закрыть (0) сервер MCP, через который внешние ассистенты вызывают инструменты ИИ по токену'),
+    ('ai_tool_approval_ttl_hours', 'en_US', 'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)'),
+    ('ai_tool_approval_ttl_hours', 'fr_FR', 'Nombre d''heures pendant lesquelles une proposition d''écriture d''un outil d''IA attend l''approbation d''un administrateur avant d''expirer (24 si invalide)'),
+    ('ai_tool_approval_ttl_hours', 'de_DE', 'Stunden, die ein Schreibvorschlag eines KI-Werkzeugs auf die Freigabe eines Administrators wartet, bevor er verfällt (24 bei ungültigem Wert)'),
+    ('ai_tool_approval_ttl_hours', 'es_ES', 'Horas que una propuesta de escritura de una herramienta de IA espera la aprobación de un administrador antes de caducar (24 si no es válido)'),
+    ('ai_tool_approval_ttl_hours', 'nl_NL', 'Uren dat een schrijfvoorstel van een AI-tool op de goedkeuring van een beheerder wacht voordat het vervalt (24 bij een ongeldige waarde)'),
+    ('ai_tool_approval_ttl_hours', 'ru_RU', 'Часов, в течение которых предложение записи от инструмента ИИ ждёт одобрения администратора до истечения срока (24 при недопустимом значении)'),
+    ('ai_tool_token_max_days', 'en_US', 'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)'),
+    ('ai_tool_token_max_days', 'fr_FR', 'Durée de vie maximale, en jours, d''un jeton remis à un assistant externe pour le serveur MCP (365 si invalide)'),
+    ('ai_tool_token_max_days', 'de_DE', 'Längste Gültigkeit, in Tagen, eines Tokens, das einem externen Assistenten für den MCP-Server ausgestellt wird (365 bei ungültigem Wert)'),
+    ('ai_tool_token_max_days', 'es_ES', 'Vida máxima, en días, de un token entregado a un asistente externo para el servidor MCP (365 si no es válido)'),
+    ('ai_tool_token_max_days', 'nl_NL', 'Langste levensduur, in dagen, van een token dat aan een externe assistent voor de MCP-server wordt gegeven (365 bij een ongeldige waarde)'),
+    ('ai_tool_token_max_days', 'ru_RU', 'Максимальный срок жизни, в днях, токена, выданного внешнему ассистенту для сервера MCP (365 при недопустимом значении)');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `config_title_seed`.`locale`, `config_title_seed`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name`;
+
+UPDATE `config_i18n`
+INNER JOIN `config` ON `config`.`id` = `config_i18n`.`id`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name` AND `config_title_seed`.`locale` = `config_i18n`.`locale`
+SET `config_i18n`.`title` = `config_title_seed`.`title`
+WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
+
+DROP TEMPORARY TABLE `config_title_seed`;
+
 SET FOREIGN_KEY_CHECKS = 1;

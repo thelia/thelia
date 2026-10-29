@@ -195,6 +195,117 @@ final class UpdateScriptTest extends TestCase
     }
 
     /**
+     * The "Purpose" column of the variables screen is `config_i18n.title`. Four
+     * releases seeded a visible variable with its `config` row alone, so the
+     * screen listed it with an empty purpose - on an updated shop, and on a
+     * fresh install too, since `setup/insert.sql.tpl` had no title row for it.
+     */
+    public function testEveryVisibleVariableOfTheFreshInstallSeedHasATitle(): void
+    {
+        $titled = $this->variablesTitledIn($this->freshInstallSeed());
+        $untitled = [];
+
+        foreach ($this->visibleVariablesSeededIn($this->freshInstallSeed()) as $name => $id) {
+            if (!\in_array($id, $titled, true)) {
+                $untitled[] = $name;
+            }
+        }
+
+        self::assertSame(
+            [],
+            $untitled,
+            'setup/insert.sql seeds these variables without an en_US title, so the variables screen shows them with an empty purpose: '
+            .implode(', ', $untitled)
+            .'. Add their intl() row to the config_i18n block of setup/insert.sql.tpl, their wording to setup/I18n, and regenerate the seed.',
+        );
+    }
+
+    /**
+     * An updated shop never replays the fresh install seed: the script that
+     * adds a variable has to write its titles too, and name the variable in a
+     * statement of its own (the `config_title_seed` block of 3.3.0.sql shows
+     * the form).
+     */
+    public function testThePendingUpdateScriptGivesATitleToEveryVariableItSeeds(): void
+    {
+        $statements = $this->statementsOf($this->pendingScript());
+        $configInserts = array_filter(
+            $statements,
+            static fn (string $statement): bool => 1 === preg_match('/^INSERT\s+(?:IGNORE\s+)?INTO\s+`config`/i', $statement),
+        );
+        $otherStatements = implode("\n", array_diff_key($statements, $configInserts));
+        $titledOnFreshInstall = $this->variablesTitledIn($this->freshInstallSeed());
+        $freshInstallIds = $this->visibleVariablesSeededIn($this->freshInstallSeed());
+        $judged = 0;
+
+        foreach ($configInserts as $statement) {
+            preg_match_all("/^\\s*\\('([^']+)',\\s*(?:'(?:[^']|'')*'|@\\w+),\\s*\\d,\\s*(\\d),\\s*NOW\\(\\)/m", $statement, $rows, \PREG_SET_ORDER);
+
+            foreach ($rows as [, $name, $hidden]) {
+                if ('0' !== $hidden) {
+                    continue;
+                }
+
+                ++$judged;
+
+                self::assertStringContainsString(
+                    "'".$name."'",
+                    $otherStatements,
+                    \sprintf('%s seeds the variable "%s" without a title: an updated shop shows it with an empty purpose.', self::PENDING_SCRIPT, $name),
+                );
+                self::assertArrayHasKey(
+                    $name,
+                    $freshInstallIds,
+                    \sprintf('%s seeds the variable "%s", which setup/insert.sql does not: a fresh install would not have it.', self::PENDING_SCRIPT, $name),
+                );
+                self::assertContains(
+                    $freshInstallIds[$name],
+                    $titledOnFreshInstall,
+                    \sprintf('setup/insert.sql seeds the variable "%s" without an en_US title: a fresh install shows it with an empty purpose.', $name),
+                );
+            }
+        }
+
+        self::assertGreaterThan(0, $judged, 'The pending script seeds no visible variable: this test has lost its subject.');
+    }
+
+    /**
+     * The same, for every table the fresh install translates: a row seeded in a
+     * table the shop reads through its `_i18n` companion, without that companion,
+     * is a status, a reason, a message or a hook with no label at all. This test
+     * judges the tables, the locale test above judges the locales of the rows.
+     */
+    public function testThePendingUpdateScriptTranslatesEveryTranslatedTableItSeeds(): void
+    {
+        $translated = [];
+        foreach ($this->tablesInsertedInto($this->freshInstallSeed()) as $table) {
+            if (str_ends_with($table, '_i18n')) {
+                $translated[] = substr($table, 0, -\strlen('_i18n'));
+            }
+        }
+        self::assertNotEmpty($translated, 'The fresh install seed translates nothing: this test has lost its subject.');
+
+        $seeded = $this->tablesInsertedInto($this->pendingScript());
+        $judged = 0;
+
+        foreach ($seeded as $table) {
+            if (!\in_array($table, $translated, true)) {
+                continue;
+            }
+
+            ++$judged;
+
+            self::assertContains(
+                $table.'_i18n',
+                $seeded,
+                \sprintf('%s seeds rows of `%s` without their `%s_i18n` rows: a shop updated to this version shows them with no label at all.', self::PENDING_SCRIPT, $table, $table),
+            );
+        }
+
+        self::assertGreaterThan(0, $judged, 'The pending script seeds no translated table: this test has lost its subject.');
+    }
+
+    /**
      * A forced AUTO_INCREMENT on a table the script seeds nothing into is a
      * dump artefact: it comes from the developer database the DDL was exported
      * from, and it makes the first row of an updated shop take an id the fresh
@@ -296,6 +407,51 @@ final class UpdateScriptTest extends TestCase
     }
 
     /**
+     * The visible variables the fresh install seeds, name to id: the rows of
+     * its INSERT into `config` whose `hidden` column is 0.
+     *
+     * @return array<string, int>
+     */
+    private function visibleVariablesSeededIn(string $seed): array
+    {
+        $variables = [];
+
+        foreach ($this->insertsInto($seed, 'config') as $statement) {
+            preg_match_all("/^\\s*\\((\\d+),\\s*'([^']+)',\\s*.*?,\\s*\\d,\\s*(\\d),\\s*NOW\\(\\)/m", $statement, $rows, \PREG_SET_ORDER);
+
+            foreach ($rows as [, $id, $name, $hidden]) {
+                if ('0' === $hidden) {
+                    $variables[$name] = (int) $id;
+                }
+            }
+        }
+
+        self::assertNotEmpty($variables, 'The fresh install seed no longer seeds config: this test has lost its subject.');
+
+        return $variables;
+    }
+
+    /**
+     * The ids of the variables the seed gives a non-NULL en_US title to.
+     *
+     * @return list<int>
+     */
+    private function variablesTitledIn(string $seed): array
+    {
+        $ids = [];
+
+        foreach ($this->insertsInto($seed, 'config_i18n') as $statement) {
+            preg_match_all("/^\\s*\\((\\d+),\\s*'en_US',\\s*'/m", $statement, $rows, \PREG_SET_ORDER);
+
+            foreach ($rows as [, $id]) {
+                $ids[] = (int) $id;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
      * The INSERT statements of a script that write rows into the given table.
      *
      * @return list<string>
@@ -341,7 +497,7 @@ final class UpdateScriptTest extends TestCase
      */
     private function statementsOf(string $sql): array
     {
-        $withoutComments = preg_replace('/^\s*--.*$/m', '', $sql) ?? $sql;
+        $withoutComments = preg_replace(['/^\s*--.*$/m', '#/\*.*?\*/#s'], '', $sql) ?? $sql;
 
         $statements = [];
 
