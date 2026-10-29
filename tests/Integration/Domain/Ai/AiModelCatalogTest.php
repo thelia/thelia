@@ -74,6 +74,18 @@ final class AiModelCatalogTest extends IntegrationTestCase
         self::assertSame(AiModelSpecification::SOURCE_MANUAL, $model->source);
     }
 
+    public function testTheListSaysHowAnAnthropicModelAnswersWithoutThinkingAndARowKeepsIt(): void
+    {
+        self::assertSame('adaptive', $this->catalog()->find('anthropic', 'claude-fable-5')?->thinkingOff);
+        self::assertSame('between_tools', $this->catalog()->find('anthropic', 'claude-sonnet-5-5')?->thinkingOff);
+        self::assertSame('disabled', $this->catalog()->find('anthropic', 'claude-haiku-5-5')?->thinkingOff);
+        self::assertNull($this->catalog()->find('anthropic', 'claude-haiku-4-5')?->thinkingOff, 'not measured');
+
+        $this->row('anthropic', 'claude-opus-5-5', input: '3.000000');
+
+        self::assertSame('adaptive', $this->catalog()->find('anthropic', 'claude-opus-5-5')?->thinkingOff, 'a row has no column for it');
+    }
+
     public function testARowAddsAModelTheListDoesNotKnow(): void
     {
         $this->row('mistral', 'ministral-private-preview', input: '0.020000', output: '0.020000');
