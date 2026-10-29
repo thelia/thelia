@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
@@ -26,7 +27,6 @@ use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\Provider\OllamaAdapter;
 use Thelia\Domain\Ai\Provider\OpenAiAdapter;
 use Thelia\Domain\Ai\Provider\OpenAiCompatibleAdapter;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Test\IntegrationTestCase;
 
 /**
