@@ -48,7 +48,8 @@ use Thelia\Domain\Ai\Service\AiSettings;
  * the same process, so the hold is kept here, by usage and service, and taken back in the order it was made; a hold
  * whose record() never comes expires by itself (AiBudgetLedger::HOLD_LIFETIME_SECONDS).
  *
- * Amounts are added as they are written, whatever their currency: the layer converts nothing.
+ * The hold carries the currency given to authorize(), the one of the highest cost, as the row written by record()
+ * carries the one of the cost. Amounts are added as they are written, whatever their currency: the layer converts nothing.
  *
  * @internal
  */
@@ -70,11 +71,12 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
     ) {
     }
 
-    public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0'): void
+    public function authorize(string $usageId, string $provider, AiJurisdiction $jurisdiction, string $maximumCost = '0', string $currency = 'USD'): void
     {
         $usage = $this->usages->get($usageId);
         AiExternalCost::assertProvider($provider);
         AiAssert::decimal($maximumCost, 'The maximum cost');
+        AiAssert::currency($currency);
 
         if (!$this->usages->isActive($usage->id)) {
             throw new InactiveAiUsageException($usage->id);
@@ -87,7 +89,7 @@ final class AiExternalCostRecorder implements AiCostRecorderInterface
         }
 
         try {
-            $hold = $this->ledger->reserve($usage->id, $maximumCost, $this->settings->findByUsage($usage->id)?->getMonthlyBudget(), $this->globalSettings->monthlyCap());
+            $hold = $this->ledger->reserve($usage->id, $maximumCost, $this->settings->findByUsage($usage->id)?->getMonthlyBudget(), $this->globalSettings->monthlyCap(), $currency);
         } catch (AiBudgetExceededException $exceeded) {
             $reason = $exceeded->globalCap ? 'budget_global' : 'budget';
             $this->refuse($usage->id, $usage->audience, $provider, $jurisdiction, $reason, [GuardrailVerdict::fail(CoreGuardrail::Budget->value, GuardrailStage::Input, $reason)]);
