@@ -20,6 +20,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Domain\OrderReturn\Exception\ReturnRequestConflictException;
+use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
 
@@ -50,9 +51,6 @@ use Thelia\Model\Map\OrderTableMap;
 #[AsAlias(OrderReturnWriteTransactionInterface::class)]
 final class OrderReturnWriteTransaction implements OrderReturnWriteTransactionInterface
 {
-    private const int ER_CHECKREAD = 1020;
-    private const int ER_LOCK_DEADLOCK = 1213;
-
     private bool $readsSeeCommits = false;
 
     /**
@@ -104,7 +102,7 @@ final class OrderReturnWriteTransaction implements OrderReturnWriteTransactionIn
         } catch (\Throwable $exception) {
             $connection->rollBack();
 
-            if ($this->isLockConflict($exception)) {
+            if (LockConflictDetector::isLockConflict($exception)) {
                 throw new ReturnRequestConflictException(ReturnRequestConflictException::MESSAGE, previous: $exception);
             }
 
@@ -261,21 +259,5 @@ final class OrderReturnWriteTransaction implements OrderReturnWriteTransactionIn
         }
 
         return !$openInPdo;
-    }
-
-    /**
-     * A deadlock (1213), or on MariaDB 11.6 and later a row changed since the
-     * picture of the transaction was taken (1020), wherever Propel wrapped it.
-     */
-    private function isLockConflict(\Throwable $exception): bool
-    {
-        for ($current = $exception; null !== $current; $current = $current->getPrevious()) {
-            if ($current instanceof \PDOException
-                && \in_array((int) ($current->errorInfo[1] ?? 0), [self::ER_LOCK_DEADLOCK, self::ER_CHECKREAD], true)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
