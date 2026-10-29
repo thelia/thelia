@@ -43,7 +43,6 @@ use Thelia\Domain\Ai\Tool\Log\AiToolCallLogWriter;
 use Thelia\Domain\Ai\Tool\Service\AiToolAccessChecker;
 use Thelia\Domain\Ai\Tool\Service\AiToolApprovalRepository;
 use Thelia\Domain\Ai\Tool\Service\AiToolApprovalService;
-use Thelia\Domain\Ai\Tool\Service\AiToolArgumentValidator;
 use Thelia\Domain\Ai\Tool\Service\AiToolDeclarations;
 use Thelia\Domain\Ai\Tool\Service\AiToolExecutionGuard;
 use Thelia\Domain\Ai\Tool\Service\AiToolInstances;
@@ -135,7 +134,7 @@ abstract class AiToolTestCase extends IntegrationTestCase
         $this->logger = new RecordingToolLogger();
         $declarations = new AiToolDeclarations($tools);
         $instances = new AiToolInstances(new ServiceLocator($factories));
-        $validator = new AiToolArgumentValidator(new AiSchemaValidator());
+        $validator = new AiSchemaValidator();
         $settings = new AiSettings();
 
         $this->registry = new AiToolRegistry(
