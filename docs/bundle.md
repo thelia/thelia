@@ -101,7 +101,9 @@ Example, two bundles ordered, the bike weighing 12.5 kg and the helmet 0.5 kg, t
 | 11 | `bundle_component` | 10 | the bike's | 2 | 0 | 0 | 12.5 | none |
 | 12 | `bundle_component` | 10 | the helmet's | 4 | 0 | 0 | 0.5 | none |
 
-The quantity of a component line is the component quantity times the quantity of the bundle line. A component line carries the title, reference, attributes, GTIN and MPN of the component, is never offered, and has no `order_product_tax` row. The `ORDER_PRODUCT_*_CREATE` events of a component carry no `cartItemId`. A bundle line without a composition that a promotion offers is ordered with the default composition, never as a plain product; a non-offered one without composition (a line written before the product became a bundle) is refused like a pack the catalogue no longer holds, by the cart step and by the order (`BundleLineNotOrderableException`), instead of being priced at the technical sale element with no stock taken from the components. Before the order, the cart step of the checkout reads every bundle line the way the order will (`CartGuard::checkBundleLinesOrderable()`): a pack whose composition the catalogue no longer holds (component deleted or offline, a required item added since, a quantity out of bounds) is reported with the violation code `bundle-line-not-orderable` and the buyer has to remove the pack and add it again. A deadlock or a changed row met while placing the order (`OrderPlacementConflictException`) answers 409 and the order can be placed again. The messages the buyer reads are in the core catalogs (`Config/I18n`).
+The quantity of a component line is the component quantity times the quantity of the bundle line. A component line carries the title, reference, attributes, GTIN and MPN of the component, is never offered, and has no `order_product_tax` row. The `ORDER_PRODUCT_*_CREATE` events of a component carry no `cartItemId`. A bundle line without a composition that a promotion offers is ordered with the default composition, never as a plain product; a non-offered one without composition (a line written before the product became a bundle) is refused like a pack the catalogue no longer holds, by the cart step and by the order (`BundleLineNotOrderableException`), instead of being priced at the technical sale element with no stock taken from the components. Before the order, the cart step of the checkout reads every bundle line the way the order will (`CartGuard::checkBundleLinesOrderable()`): a pack whose composition the catalogue no longer holds (component deleted or offline, a required item added since, a quantity out of bounds) is reported with the violation code `bundle-line-not-orderable` and the buyer has to remove the pack and add it again. The checkout sends the buyer back to the cart with that message (`CheckoutProgressionService::firstViolation()`).
+
+The same verdict is on the line before the checkout: `AttributeAccessService::cartItems()` (`attr('cart', 'cart_items')`) adds `bundle_orderable` (bool) and `bundle_refusal` (the translated reason the order would give) to each bundle line, computed by `BundleOrderPlanner::refusalsOf()`. A theme can show the reason on the line and ask the buyer to remove it. A cart with no bundle line costs no extra query. A deadlock or a changed row met while placing the order (`OrderPlacementConflictException`) answers 409 and the order can be placed again. The messages the buyer reads are in the core catalogs (`Config/I18n`).
 
 How each gesture reads these lines (`OrderProduct` predicates):
 
@@ -157,7 +159,7 @@ POST /api/admin/product_bundle_items
 {"bundleProduct":"/api/admin/products/42","productSaleElements":"/api/admin/product_sale_elements/77","quantity":1,"minQuantity":0,"maxQuantity":3,"required":false}
 ```
 
-Every write goes through `BundleCompositionService`, one transaction each; its refusals are `BundleDefinitionException` (422).
+Every write goes through `BundleCompositionService`, one transaction each; its refusals are `BundleDefinitionException` (422). The messages are translated (`Config/I18n`) and name the product by its reference, the id being used only when the product, the item or the sale element no longer exists.
 
 ### Adding a bundle to a cart
 
@@ -202,6 +204,7 @@ POST /api/front/cart_items
 - **Reorder from a purchase list takes the default composition.** `customer_list_item` stores a reference and a quantity, so a bundle bought with another composition comes back with the default one, never as bare components.
 - **The displayed availability ignores the reserved visibility of a component.** A bundle with a required component reserved to a customer group shows a stock above 0 to a visitor outside the group, and the addition is refused.
 - **A computed bundle takes the national price of its components.** The price of a component is its promotion price or its price in the currency of the request, as the national sale element gives it, even when the bundle is sold in a sale unit that sets its own prices: the prices of the sale unit are not read for the components.
+- **The cart total still counts an invalid pack line.** A line flagged `bundle_orderable = false` stays in the total of the cart until the buyer removes it; only the cart step and the order refuse it.
 - **A bundle holds no bundle.**
 - A bundle offered by a coupon with no kept component is not checked against stock.
 - The PDF and e-mail templates show the component lines with a price of 0; a "included in the bundle" mention is left to the templates.
