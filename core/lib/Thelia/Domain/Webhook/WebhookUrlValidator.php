@@ -30,6 +30,14 @@ final readonly class WebhookUrlValidator
     }
 
     /**
+     * The same rules with plain http allowed or not, whatever this instance was configured with.
+     */
+    public function withInsecureUrls(bool $allowInsecure): self
+    {
+        return new self($allowInsecure);
+    }
+
+    /**
      * @throws InvalidWebhookUrlException
      */
     public function validate(string $url): void

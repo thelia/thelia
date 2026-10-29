@@ -94,6 +94,26 @@ final class AiBaseUrlValidatorTest extends TestCase
         $this->validator()->validate($url, true);
     }
 
+    public function testThePlainHttpFlagOfTheWebhooksChangesNothingForAConnection(): void
+    {
+        $this->expectException(InvalidAiArgumentException::class);
+        $this->expectExceptionMessage('The base URL is not allowed');
+
+        (new AiBaseUrlValidator(new WebhookUrlValidator(allowInsecure: true)))->validate('http://93.184.216.34/v1', false);
+    }
+
+    public function testTheFlagOfTheAiLayerAllowsPlainHttpOnAPublicAddressAndNothingElse(): void
+    {
+        $validator = new AiBaseUrlValidator(new WebhookUrlValidator(), allowInsecure: true);
+
+        $validator->validate('http://93.184.216.34/v1', false);
+        $this->addToAssertionCount(1);
+
+        $this->expectException(InvalidAiArgumentException::class);
+
+        $validator->validate('http://10.0.0.5/v1', false);
+    }
+
     private function validator(): AiBaseUrlValidator
     {
         return new AiBaseUrlValidator(new WebhookUrlValidator());
