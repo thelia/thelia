@@ -1,5 +1,7 @@
 # 3.3.0
 
+Third minor of the 3.x line. 746 commits since 3.2.0. The version number follows the update script this release ships, `setup/update/sql/3.3.0.sql`, which creates the tables of the sale units, the order shipments, the delivery dates and slots, the shipping rules of the products, the payment parts of an order, the background jobs, the webhooks and the AI layer with its tools.
+
 ## Multi-shop (sale units)
 
 - Sale units: one Thelia instance and one database sell from several places, a storefront on its own domain, a pick-up store, a logical outlet an API consumer names, over a catalog that stays national and shared. Each unit carries its own prices, its own stock and the orders placed on it. The current unit is resolved on every front request by a priority chain (domain, then session, then the `X-Sale-Unit` header, which only ever names an active unit) and held in `SaleUnitContext`, null for a single shop and for a request that resolved no unit. Units are managed through `/api/admin/sale_units` and read through `/api/front/sale_units`, which serves the active ones only, under the new `admin.sale-unit` right.
