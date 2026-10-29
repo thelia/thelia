@@ -23,7 +23,7 @@ on:
       branch:
         description: Branch to publish
         type: choice
-        options: [ main, '3.2', '3.1' ]
+        options: [ main, '3.3', '3.2', '3.1' ]
         default: main
 
 permissions: {}
@@ -89,7 +89,7 @@ jobs:
       - name: Publish
         if: steps.source.outputs.skip != 'true'
         env:
-          BRANCHES: ${{ github.event_name == 'schedule' && '3.2 3.1' || inputs.branch || 'main' }}
+          BRANCHES: ${{ github.event_name == 'schedule' && '3.3 3.2 3.1' || inputs.branch || 'main' }}
           # The hourly run turns red when a maintenance branch is left unpublished
           SPLIT_REQUIRE_KNOWN_BRANCHES: ${{ github.event_name == 'schedule' && '1' || '' }}
           SPLIT_KEY_DIR: ${{ runner.temp }}/keys
