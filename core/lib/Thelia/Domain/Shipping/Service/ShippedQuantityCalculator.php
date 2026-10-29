@@ -31,8 +31,9 @@ use Thelia\Model\OrderShipment;
  * A draft holds its lines as firmly as a shipped parcel, so two drafts composed
  * together cannot both take the last unit; a cancelled shipment holds nothing.
  *
- * Only the lines that physically leave count: a service line (gift wrapping) and a
- * virtual product are never to ship, and are absent from what is returned.
+ * Only the lines that physically leave count: a service line (gift wrapping), the line of a
+ * bundle (its components are what ships) and a virtual product are never to ship, and are
+ * absent from what is returned.
  */
 final readonly class ShippedQuantityCalculator
 {
@@ -146,7 +147,7 @@ final readonly class ShippedQuantityCalculator
         $lines = [];
 
         foreach (OrderProductQuery::create()->filterByOrderId($order->getId())->orderById()->find($connection) as $line) {
-            if ($line->isServiceLine() || 1 === (int) $line->getVirtual()) {
+            if (!$line->isShippableLine() || 1 === (int) $line->getVirtual()) {
                 continue;
             }
 

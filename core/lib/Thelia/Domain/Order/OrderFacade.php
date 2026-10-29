@@ -20,10 +20,16 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Domain\Catalog\Bundle\BundleComponentReader;
+use Thelia\Domain\Catalog\Bundle\BundleDecimal;
 use Thelia\Domain\Checkout\Service\ConsentAnswerStoreInterface;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
+use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
 use Thelia\Domain\Order\Exception\StockShortageException;
+use Thelia\Domain\Order\Service\BundleOrderComponent;
+use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\Order\Service\GiftWrappingLineFactory;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
 use Thelia\Domain\Order\Service\OrderFactory;
@@ -34,12 +40,14 @@ use Thelia\Domain\Order\Service\StockDecrementer;
 use Thelia\Domain\Order\Service\StockPolicy;
 use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
+use Thelia\Domain\Order\Service\VirtualProductContext;
 use Thelia\Domain\Order\Service\VirtualProductHandler;
 use Thelia\Domain\Payment\Enum\OrderPaymentPartState;
 use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
 use Thelia\Domain\Payment\OrderPaymentComposer;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
+use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliverySlotBooker;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
@@ -54,9 +62,12 @@ use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderConsent;
 use Thelia\Model\OrderPaymentPart;
 use Thelia\Model\OrderPostageTax;
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductSaleElements;
 
 readonly class OrderFacade
 {
@@ -81,6 +92,8 @@ readonly class OrderFacade
         private SaleUnitContext $saleUnitContext,
         private SaleUnitStockResolver $saleUnitStockResolver,
         private OrderPaymentComposer $orderPaymentComposer,
+        private BundleOrderPlanner $bundleOrderPlanner,
+        private BundleComponentReader $bundleComponentReader,
     ) {
     }
 
@@ -91,6 +104,9 @@ readonly class OrderFacade
      *                                       (the back office, the command line) has no buyer at the keyboard, so
      *                                       there is nothing to record and no session to purge afterwards.
      *
+     * @throws BundleLineNotOrderableException a pack of the cart whose composition the catalogue no longer holds
+     * @throws StockShortageException          a line, or a component of a pack, the stock cannot serve
+     * @throws OrderPlacementConflictException another order placed at the same moment broke a lock tie with this one
      * @throws \Exception
      * @throws PropelException
      */
@@ -120,7 +136,13 @@ readonly class OrderFacade
         // Fail fast on predictable stock shortages before creating anything.
         // The authoritative guard remains the conditional UPDATE performed by
         // StockDecrementer inside the transaction.
-        $this->assertCartStockIsAvailable($cart);
+        //
+        // The pack lines are read here, once, for that check and for the lines written
+        // below: what a pack is made of is what leaves the stock, never the stock of the
+        // pack itself.
+        $bundleComponents = $this->bundleOrderPlanner->componentsOf($cart->getCartItems());
+
+        $this->assertCartStockIsAvailable($cart, $bundleComponents);
 
         $connection = $this->orderTransactionManager->begin();
 
@@ -173,11 +195,22 @@ readonly class OrderFacade
 
             $cartItems = $cart->getCartItems();
 
+            // First what the order takes from the stock, all of it, then the lines: the
+            // stock rows are locked by the conditional updates in one order, the ascending
+            // id of the sale element, whatever the order of the lines and of the items of
+            // the packs. Two orders sharing two sale elements then wait on each other
+            // instead of each holding the row the other needs.
+            $plannedLines = [];
+            $stockTakes = [];
+
             foreach ($cartItems as $cartItem) {
                 $product = $cartItem->getProduct();
                 $productSaleElements = $cartItem->getProductSaleElements();
 
-                $productI18n = $this->translationProvider->getProductTranslation($lang->getLocale(), $product->getId());
+                // A pack with no composition is no product: it would leave the stock of its components untouched.
+                if (!isset($bundleComponents[(int) $cartItem->getId()])) {
+                    BundleOrderPlanner::assertNotABundleLineWithoutComposition($cartItem, $product);
+                }
 
                 // Virtual Products
                 $virtualContext = $this->virtualProductHandler->resolve(
@@ -187,43 +220,33 @@ readonly class OrderFacade
                     $productSaleElements->getId()
                 );
 
-                $checkStock = $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock);
+                // A pack holds no stock of its own: its components are what is taken from it.
+                $components = $bundleComponents[(int) $cartItem->getId()] ?? null;
+                $plannedComponents = [];
 
-                if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
-                    try {
-                        // Atomic conditional decrement: check and write are a single
-                        // statement, so concurrent checkouts cannot oversell.
-                        $this->stockDecrementer->decrement(
-                            $productSaleElements->getId(),
-                            (float) $cartItem->getQuantity(),
-                            guardAvailability: $checkStock,
-                            allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
-                            connection: $connection,
-                            // The unit the order was stamped with: what a cancellation or a
-                            // return gives back to, so the two movements always meet.
-                            saleUnitId: $placedOrder->getSaleUnitId(),
-                        );
-                    } catch (TheliaProcessException $shortage) {
-                        // The decrementer knows a row id and a quantity; only here is
-                        // there a product to name, and a caller told "not enough stock"
-                        // about a cart of ten lines has nothing to act on. The type is
-                        // what a caller maps to an answer: everything else this class
-                        // raises is a defect, not a shortage.
-                        throw new StockShortageException($product->getRef(), previous: $shortage);
-                    }
-                } elseif ($checkStock) {
-                    // Stock is managed later (e.g. at payment): keep the
-                    // advisory availability check on order creation.
-                    $this->stockPolicy->assertStockIsAvailable(
-                        $cartItem->getQuantity(),
-                        $this->saleUnitStockResolver->availableQuantity(
-                            $placedOrder->getSaleUnitId(),
-                            $productSaleElements->getId(),
-                            (float) $productSaleElements->getQuantity(),
-                        ),
-                        $product->getRef(),
-                    );
+                if (null === $components) {
+                    $stockTakes[] = [$product, $productSaleElements, (float) $cartItem->getQuantity(), $virtualContext];
                 }
+
+                foreach ($components ?? [] as $component) {
+                    $componentContext = $this->virtualProductHandler->resolve(
+                        $dispatcher,
+                        $placedOrder,
+                        $component->product,
+                        (int) $component->productSaleElements->getId(),
+                    );
+
+                    $stockTakes[] = [$component->product, $component->productSaleElements, $component->quantity, $componentContext];
+                    $plannedComponents[] = [$component, $componentContext];
+                }
+
+                $plannedLines[] = [$cartItem, $product, $productSaleElements, $virtualContext, null === $components ? null : $plannedComponents];
+            }
+
+            $this->takeEverythingFromStock($placedOrder, $stockTakes, $manageStockOnCreation, $connection);
+
+            foreach ($plannedLines as [$cartItem, $product, $productSaleElements, $virtualContext, $components]) {
+                $productI18n = $this->translationProvider->getProductTranslation($lang->getLocale(), $product->getId());
 
                 // Taxes
                 $taxRuleI18n = $this->translationProvider->getTaxRuleTranslation($lang->getLocale(), $product->getTaxRuleId());
@@ -241,16 +264,20 @@ readonly class OrderFacade
                 );
 
                 // Create OrderProduct + taxes + attributes
-                $orderProduct = $this->orderProductFactory->createOrderProduct(
-                    placedOrder: $placedOrder,
-                    product: $product,
-                    productSaleElements: $productSaleElements,
-                    productI18n: $productI18n,
-                    cartItem: $cartItem,
-                    virtualContext: $virtualContext,
-                    taxRuleI18n: $taxRuleI18n,
-                    connection: $connection
-                );
+                $lineArguments = [
+                    'placedOrder' => $placedOrder,
+                    'product' => $product,
+                    'productSaleElements' => $productSaleElements,
+                    'productI18n' => $productI18n,
+                    'cartItem' => $cartItem,
+                    'virtualContext' => $virtualContext,
+                    'taxRuleI18n' => $taxRuleI18n,
+                    'connection' => $connection,
+                ];
+
+                $orderProduct = null === $components
+                    ? $this->orderProductFactory->createOrderProduct(...$lineArguments)
+                    : $this->orderProductFactory->createBundleLine(...$lineArguments);
 
                 /** @var OrderProductTax $tax */
                 foreach ($taxDetails as $tax) {
@@ -264,6 +291,10 @@ readonly class OrderFacade
                     $lang->getLocale(),
                     $connection
                 );
+
+                foreach ($components ?? [] as [$component, $componentContext]) {
+                    $this->persistBundleComponent($placedOrder, $orderProduct, $component, $componentContext, $lang, $connection);
+                }
             }
 
             // After the goods, so it reads last on the invoice the way it is charged last:
@@ -313,6 +344,14 @@ readonly class OrderFacade
             return $placedOrder;
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
+
+            // Another order took a lock this one needed and the database broke the tie:
+            // nothing of this order stands, and placed again it is judged on what the
+            // other one left.
+            if (LockConflictDetector::isLockConflict($throwable)) {
+                throw new OrderPlacementConflictException($throwable);
+            }
+
             throw $throwable;
         }
     }
@@ -586,20 +625,100 @@ readonly class OrderFacade
     /**
      * Read-only pre-check on the whole cart, before any row is written.
      *
+     * A line of a product bought on its own is checked on its own, against the stock of its
+     * sale element: the check a cart without any pack has always had. A sale element a pack
+     * of the cart takes as a component is checked once for everything the cart asks of it,
+     * its components and the lines of the same sale element bought alone: they come out of
+     * one stock, and checked one at a time each of them would pass while together they do
+     * not. A pack line asks for its components, never for the sale element of the pack,
+     * which holds no stock.
+     *
      * Virtual products are skipped: their stock usage is decided by an event
      * that requires the placed order, so they are handled in the main loop.
      *
+     * @param array<int, list<BundleOrderComponent>> $bundleComponents the pack lines, by cart line id
+     *
      * @throws StockShortageException
      */
-    private function assertCartStockIsAvailable(CartModel $cart): void
+    private function assertCartStockIsAvailable(CartModel $cart, array $bundleComponents): void
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return;
         }
 
+        // A cart without a pack is checked as it always was, with the queries it always had.
+        if ([] === $bundleComponents) {
+            $this->assertStockOfEachLineIsAvailable($cart);
+
+            return;
+        }
+
+        /** @var array<int, int> $askedByStock in millionths, for the sale elements a pack takes */
+        $askedByStock = [];
+        /** @var array<int, string> $referenceByStock */
+        $referenceByStock = [];
+        /** @var list<array{0: int, 1: int, 2: string}> $singleLines sale element, millionths, reference */
+        $singleLines = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            foreach ($bundleComponents[(int) $cartItem->getId()] ?? [] as $component) {
+                if (1 !== $component->product->getVirtual()) {
+                    $productSaleElementsId = (int) $component->productSaleElements->getId();
+                    $askedByStock[$productSaleElementsId] = ($askedByStock[$productSaleElementsId] ?? 0) + BundleDecimal::toMicro($component->quantity);
+                    $referenceByStock[$productSaleElementsId] ??= (string) $component->product->getRef();
+                }
+            }
+
+            if (isset($bundleComponents[(int) $cartItem->getId()])) {
+                continue;
+            }
+
+            BundleOrderPlanner::assertNotABundleLineWithoutComposition($cartItem, $cartItem->getProduct());
+
+            if (1 === $cartItem->getProduct()->getVirtual()) {
+                continue;
+            }
+
+            $singleLines[] = [(int) $cartItem->getProductSaleElementsId(), BundleDecimal::toMicro((float) $cartItem->getQuantity()), (string) $cartItem->getProduct()->getRef()];
+        }
+
+        foreach ($singleLines as [$productSaleElementsId, $askedMicro, $reference]) {
+            if (isset($askedByStock[$productSaleElementsId])) {
+                $askedByStock[$productSaleElementsId] += $askedMicro;
+            }
+        }
+
+        // One read for every sale element of the cart, the sale unit's own stock included:
+        // the one source the cart itself reads.
+        $available = $this->bundleComponentReader->read([...array_column($singleLines, 0), ...array_keys($askedByStock)]);
+        $availableQuantity = static fn (int $productSaleElementsId): float => isset($available[$productSaleElementsId]) ? $available[$productSaleElementsId]->availableQuantity : 0.0;
+
+        foreach ($singleLines as [$productSaleElementsId, $askedMicro, $reference]) {
+            if (!isset($askedByStock[$productSaleElementsId])) {
+                $this->stockPolicy->assertStockIsAvailable($askedMicro / BundleDecimal::SCALE, $availableQuantity($productSaleElementsId), $reference);
+            }
+        }
+
+        foreach ($askedByStock as $productSaleElementsId => $askedMicro) {
+            $this->stockPolicy->assertStockIsAvailable($askedMicro / BundleDecimal::SCALE, $availableQuantity($productSaleElementsId), $referenceByStock[$productSaleElementsId]);
+        }
+    }
+
+    /**
+     * The check of a cart without any pack, line by line against the stock of its sale element.
+     *
+     * @throws StockShortageException
+     */
+    private function assertStockOfEachLineIsAvailable(CartModel $cart): void
+    {
         $saleUnitId = $this->saleUnitContext->getSaleUnit()?->getId();
 
         foreach ($cart->getCartItems() as $cartItem) {
+            // Judged before the stock: the sale element of a pack holds none, and a shortage
+            // would hide what is wrong with the line. A pack line holding its composition
+            // never reaches here (a cart with one takes the other path).
+            BundleOrderPlanner::assertNotABundleLineWithoutComposition($cartItem, $cartItem->getProduct());
+
             if (1 === $cartItem->getProduct()->getVirtual()) {
                 continue;
             }
@@ -616,5 +735,109 @@ readonly class OrderFacade
                 $cartItem->getProduct()->getRef(),
             );
         }
+    }
+
+    /**
+     * Takes a quantity of a sale element from the stock of the order, in its transaction.
+     *
+     * @throws StockShortageException
+     */
+    private function takeFromStock(
+        ModelOrder $placedOrder,
+        Product $product,
+        ProductSaleElements $productSaleElements,
+        float $quantity,
+        VirtualProductContext $virtualContext,
+        bool $manageStockOnCreation,
+        ConnectionInterface $connection,
+    ): void {
+        $checkStock = $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock);
+
+        if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
+            try {
+                // Atomic conditional decrement: check and write are a single
+                // statement, so concurrent checkouts cannot oversell.
+                $this->stockDecrementer->decrement(
+                    $productSaleElements->getId(),
+                    $quantity,
+                    guardAvailability: $checkStock,
+                    allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
+                    connection: $connection,
+                    // The unit the order was stamped with: what a cancellation or a
+                    // return gives back to, so the two movements always meet.
+                    saleUnitId: $placedOrder->getSaleUnitId(),
+                );
+            } catch (TheliaProcessException $shortage) {
+                // The decrementer knows a row id and a quantity; only here is
+                // there a product to name, and a caller told "not enough stock"
+                // about a cart of ten lines has nothing to act on. The type is
+                // what a caller maps to an answer: everything else this class
+                // raises is a defect, not a shortage.
+                throw new StockShortageException($product->getRef(), previous: $shortage);
+            }
+        } elseif ($checkStock) {
+            // Stock is managed later (e.g. at payment): keep the
+            // advisory availability check on order creation.
+            $this->stockPolicy->assertStockIsAvailable(
+                $quantity,
+                $this->saleUnitStockResolver->availableQuantity(
+                    $placedOrder->getSaleUnitId(),
+                    $productSaleElements->getId(),
+                    (float) $productSaleElements->getQuantity(),
+                ),
+                $product->getRef(),
+            );
+        }
+    }
+
+    /**
+     * Takes from the stock what the order asks of it, in the ascending id of the sale
+     * element (stable for one sale element asked by several lines): the order every
+     * placement locks the stock rows in. Each line keeps its own take and its own guard,
+     * the check a line of a cart without any pack has always had.
+     *
+     * @param list<array{0: Product, 1: ProductSaleElements, 2: float, 3: VirtualProductContext}> $stockTakes
+     *
+     * @throws StockShortageException
+     */
+    private function takeEverythingFromStock(ModelOrder $placedOrder, array $stockTakes, bool $manageStockOnCreation, ConnectionInterface $connection): void
+    {
+        usort($stockTakes, static fn (array $first, array $second): int => (int) $first[1]->getId() <=> (int) $second[1]->getId());
+
+        foreach ($stockTakes as [$product, $productSaleElements, $quantity, $virtualContext]) {
+            $this->takeFromStock($placedOrder, $product, $productSaleElements, $quantity, $virtualContext, $manageStockOnCreation, $connection);
+        }
+    }
+
+    /**
+     * A component of a pack becomes a line of the order of its own, under the line of the
+     * pack. Its stock was taken with the rest of the order, the way a product bought alone
+     * is: same guard, same transaction, same sale unit.
+     */
+    private function persistBundleComponent(
+        ModelOrder $placedOrder,
+        OrderProduct $bundleLine,
+        BundleOrderComponent $component,
+        VirtualProductContext $virtualContext,
+        LangModel $lang,
+        ConnectionInterface $connection,
+    ): void {
+        $componentLine = $this->orderProductFactory->createBundleComponentLine(
+            $placedOrder,
+            $bundleLine,
+            $component->product,
+            $component->productSaleElements,
+            $this->translationProvider->getProductTranslation($lang->getLocale(), $component->product->getId()),
+            $component->quantity,
+            $virtualContext,
+            $connection,
+        );
+
+        $this->orderProductFactory->persistAttributeCombinations(
+            $componentLine,
+            $component->productSaleElements,
+            $lang->getLocale(),
+            $connection,
+        );
     }
 }

@@ -25,6 +25,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\CustomerList;
 use Thelia\Model\CustomerListItemQuery;
 use Thelia\Model\CustomerListQuery;
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -167,6 +168,11 @@ final readonly class PurchaseListRepository
      * rather than from the catalog: a sale element deleted since is dropped
      * from the line, its reference stays. Null when the order is not one of
      * the customer's.
+     *
+     * A bundle is taken as its own line, the sale element of the bundle. The lines of its
+     * components are never taken: they were written by the bundle, a list that held them
+     * would order them again on top of the bundle that already brings them. A list keeps a
+     * reference and a quantity, so the bundle comes back with its default composition.
      */
     public function linesOfOrder(Customer $customer, int $orderId): ?ReferenceQuantityLines
     {
@@ -181,6 +187,7 @@ final readonly class PurchaseListRepository
 
         $orderProducts = OrderProductQuery::create()
             ->filterByOrderId((int) $order->getId())
+            ->filterByLineType(OrderProduct::LINE_TYPE_BUNDLE_COMPONENT, Criteria::NOT_EQUAL)
             ->orderById()
             ->find();
 

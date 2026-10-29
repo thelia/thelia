@@ -22,6 +22,7 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionInterface;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionPayloadField;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\OrderProduct;
 
 /**
  * Puts the ordered quantities back in stock, or takes them out, on a transition
@@ -97,11 +98,16 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
         $saleUnitId = $context->order->getSaleUnitId();
 
         try {
-            foreach ($context->order->getOrderProducts() as $orderProduct) {
+            // In the ascending id of the sale element, the order the placement locked the stock rows in.
+            $orderProducts = $context->order->getOrderProducts()->getData();
+            usort($orderProducts, static fn (OrderProduct $first, OrderProduct $second): int => (int) $first->getProductSaleElementsId() <=> (int) $second->getProductSaleElementsId());
+
+            foreach ($orderProducts as $orderProduct) {
                 $productSaleElementsId = $orderProduct->getProductSaleElementsId();
                 $quantity = (float) $orderProduct->getQuantity();
 
-                if (null === $productSaleElementsId || $quantity <= 0) {
+                // The sale element of a pack holds no stock: its component lines carry the movement.
+                if (null === $productSaleElementsId || $quantity <= 0 || !$orderProduct->movesStockOfItsOwn()) {
                     continue;
                 }
 
