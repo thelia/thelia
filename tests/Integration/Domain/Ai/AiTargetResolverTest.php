@@ -93,6 +93,19 @@ final class AiTargetResolverTest extends IntegrationTestCase
         self::assertFalse($target->allowPrivateNetwork);
     }
 
+    public function testAModelThatTheEmbeddedListNoLongerHoldsKeepsRunningFromItsRow(): void
+    {
+        // Retired from the embedded list in 3.3.0 (the provider does not serve it): a range assigned to it before keeps its price and its settings.
+        self::assertNull((new AiModelCatalog())->find('mistral', 'codestral-mamba-latest'));
+        $connection = $this->connection('mistral-main', 'mistral', 'eu', apiKey: 'sk-stored-0123');
+        $this->assign(AiTier::Fast, $connection, $this->model('mistral', 'codestral-mamba-latest', '0.250000', '0.250000'));
+
+        $target = $this->resolver->resolve('aiprobe.writing');
+
+        self::assertSame('codestral-mamba-latest', $target->model->name);
+        self::assertSame('0.250000', $target->model->inputPrice);
+    }
+
     public function testTheKeyOfTheEnvironmentWinsOverTheStoredOne(): void
     {
         $connection = $this->connection('mistral-main', 'mistral', 'eu', apiKey: 'sk-stored-0123', keyEnvironment: self::ENVIRONMENT_VARIABLE);

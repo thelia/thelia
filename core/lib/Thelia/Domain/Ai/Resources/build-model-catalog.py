@@ -5,7 +5,7 @@ Usage: python3 -I build-model-catalog.py [path/to/model_prices_and_context_windo
 Without argument: downloads the file into a temporary directory first. With a local file, the optional label
 (`<sha> <commit date>`) is written as the source commit, so a catalogue is rebuilt from the very commit it names.
 
-Fine-tuned models (`ft:*`) and models whose deprecation date has passed are left out.
+Fine-tuned models (`ft:*`), models whose deprecation date has passed and the models of EXCLUDED are left out.
 Where LiteLLM disagrees with the documentation of the provider, the documentation wins (IDENTIFIERS, STRUCTURED_OUTPUT).
 """
 import json, subprocess, sys, tempfile, urllib.request, datetime
@@ -28,6 +28,17 @@ THINKING_OFF = {("anthropic", "claude-fable-5"): "adaptive", ("anthropic", "clau
                 ("anthropic", "claude-opus-5-5"): "adaptive", ("anthropic", "claude-sonnet-5-5"): "between_tools",
                 ("anthropic", "claude-haiku-5-5"): "disabled", ("anthropic", "claude-opus-5"): "disabled",
                 ("anthropic", "claude-sonnet-5"): "disabled"}
+
+# Models LiteLLM lists that the provider does not serve, checked on 29/10/2026. Mistral: absent from GET /v1/models
+# (or an alias of another model, `mistral-tiny` being served by ministral-8b-latest: its price is wrong).
+# OpenAI: shut down or deprecated (https://developers.openai.com/api/docs/models/all) or unknown to the provider.
+EXCLUDED = {
+    "mistral": {"codestral-mamba-latest", "devstral-latest", "devstral-medium-latest", "devstral-small-latest",
+                "ministral-3-14b-2512", "ministral-3-3b-2512", "ministral-3-8b-2512", "mistral-code-agent-latest",
+                "mistral-large-3", "mistral-small", "mistral-tiny", "open-mistral-nemo", "pixtral-large-latest"},
+    "openai": {"daybreak-blue-latest", "daybreak-red-latest", "gpt-5.5-cyber", "gpt-5.5-cyber-preview",
+               "gpt-4o-search-preview", "gpt-4o-mini-search-preview"},
+}
 
 # The identifier the API of the provider takes. Scaleway Generative APIs (serverless, `api.scaleway.ai/v1`) names a
 # model without the vendor prefix LiteLLM adds: `llama-3.3-70b-instruct`, not `meta/llama-3.3-70b-instruct`
@@ -93,7 +104,7 @@ def main():
                 continue  # audio-in/out chat variants and non-model entries
             model = key[len(provider_key) + 1:] if key.startswith(provider_key + "/") else key
             model = IDENTIFIERS.get(name, lambda m: m)(model)
-            if not is_listed(model, v.get("deprecation_date"), today):
+            if model in EXCLUDED.get(name, ()) or not is_listed(model, v.get("deprecation_date"), today):
                 continue
             thinking_off = THINKING_OFF.get((name, model))
             models.append({
