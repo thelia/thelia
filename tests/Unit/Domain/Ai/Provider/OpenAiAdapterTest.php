@@ -136,6 +136,18 @@ final class OpenAiAdapterTest extends AiProviderTestCase
         self::assertSame(300, $this->lastBody()['max_output_tokens']);
     }
 
+    public function testTheResponseIsNeverStoredByOpenAiWhateverTheModuleAsks(): void
+    {
+        $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('ok')]), Wire::responses([Wire::responsesMessage('ok')])]), self::PINNED);
+        $target = $this->target(AiProvider::OpenAi, null);
+
+        $adapter->complete($this->request(), $target);
+        self::assertFalse($this->lastBody()['store']);
+
+        $adapter->complete($this->request(providerOptions: ['openai' => ['store' => true]]), $target);
+        self::assertFalse($this->lastBody()['store'], 'the option is reserved');
+    }
+
     public function testTheRequestIdIsTheHeaderOfTheProviderElseTheIdOfTheResponse(): void
     {
         $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('ok')], headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID]), Wire::responses([Wire::responsesMessage('ok')])]), self::PINNED);
