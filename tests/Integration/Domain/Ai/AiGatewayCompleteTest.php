@@ -96,6 +96,20 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         self::assertCount(1, $this->sent);
     }
 
+    public function testAModelThatRefusesDisabledThinkingIsTriedAgainInsideOneCallLoggedAndBudgetedOnce(): void
+    {
+        $this->connect(provider: 'anthropic');
+        $gateway = $this->gatewayAnswering([Wire::anthropicMeasured('claude-fable-5-1', 'disabled'), Wire::anthropic([['type' => 'text', 'text' => 'ok']], usage: ['input_tokens' => 21, 'output_tokens' => 20])]);
+
+        $response = $gateway->complete($this->request());
+
+        self::assertSame('ok', $response->text);
+        self::assertSame(['disabled', 'adaptive'], array_map(static fn (array $sent): mixed => $sent['body']['thinking']['type'] ?? null, $this->sent));
+        self::assertSame(1, $this->logCount());
+        self::assertSame(['succeeded', '0.00006100'], [$this->lastLog()->getStatus(), $this->lastLog()->getCost()]);
+        self::assertSame(0, $this->holds(), 'the hold of the call is released once');
+    }
+
     public function testACostIsLabelledWithTheCurrencyOfThePricesOfTheModel(): void
     {
         $this->model->setCurrency('EUR')->save();

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use Psr\Log\NullLogger;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,6 +27,7 @@ use Thelia\Domain\Ai\Provider\AiProviderAdapters;
 use Thelia\Domain\Ai\Provider\AiProviderErrorTranslator;
 use Thelia\Domain\Ai\Provider\AiProviderPresets;
 use Thelia\Domain\Ai\Provider\AiResultReader;
+use Thelia\Domain\Ai\Provider\AnthropicAdapter;
 use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\Provider\UntrustedContentDelimiter;
 use Thelia\Domain\Ai\Service\AiConnectionTester;
@@ -43,7 +45,7 @@ final class AiConnectionTesterTest extends IntegrationTestCase
 {
     private const string KEY = 'sk-tester-0123456789abcdef';
 
-    /** @var list<array{url: string, headers: array<string, string>}> */
+    /** @var list<array{url: string, headers: array<string, string>, body?: mixed}> */
     private array $sent = [];
 
     public function testAnAnsweringConnectionIsRecordedAsChecked(): void
@@ -84,6 +86,33 @@ final class AiConnectionTesterTest extends IntegrationTestCase
         self::assertNull($connection->getCheckError());
     }
 
+    public function testAnAnthropicConnectionAnswersOnTheFirstModelOfTheCatalogueWithoutThinking(): void
+    {
+        $connection = $this->connection('anthropic');
+
+        // The API as it answered on 2026-10-29: the first model of the catalogue refuses "disabled".
+        $error = $this->anthropicTester(static fn (array $body): MockResponse => AiProviderFixtures::anthropicMeasured((string) $body['model'], (string) $body['thinking']['type']))->test($connection);
+
+        self::assertNull($error);
+        self::assertNull($connection->getCheckError());
+        self::assertCount(1, $this->sent);
+        self::assertSame('claude-fable-5', $this->sent[0]['body']['model']);
+        self::assertSame(['type' => 'adaptive'], $this->sent[0]['body']['thinking']);
+        self::assertSame(16, $this->sent[0]['body']['max_tokens']);
+    }
+
+    public function testAProbeCutAtItsSixteenTokensBeforeAnyTextStillProvesTheConnection(): void
+    {
+        $connection = $this->connection('anthropic');
+        // SIMULATED from the documentation of the Messages API: a turn cut while thinking.
+        $cut = AiProviderFixtures::anthropic([['type' => 'thinking', 'thinking' => 'The user wants', 'signature' => 'EqQBCgIYAhIM']], 'max_tokens', ['input_tokens' => 15, 'output_tokens' => 16]);
+
+        $error = $this->anthropicTester(static fn (array $body): MockResponse => $cut)->test($connection);
+
+        self::assertNull($error);
+        self::assertNull($connection->getCheckError());
+    }
+
     public function testAConnectionWithoutKnownModelCallsNothing(): void
     {
         $connection = $this->connection('openai_compatible');
@@ -106,6 +135,30 @@ final class AiConnectionTesterTest extends IntegrationTestCase
         self::assertStringStartsWith('The AI connection "tester-mistral" failed: ', $explainer->explainCheckError((string) $refused, 'en_US'));
         self::assertSame('something else', $explainer->explainCheckError('something else', 'fr_FR'), 'an unknown text comes back as stored');
         self::assertSame((string) $noModel, 'No model is known for this connection: add one first.', 'the column keeps the English text');
+    }
+
+    /**
+     * @param \Closure(array<string, mixed>): MockResponse $answer
+     */
+    private function anthropicTester(\Closure $answer): AiConnectionTester
+    {
+        $transport = new MockHttpClient(function (string $method, string $url, array $options) use ($answer): MockResponse {
+            $body = json_decode((string) $options['body'], true, flags: \JSON_THROW_ON_ERROR);
+            $this->sent[] = ['url' => $url, 'headers' => [], 'body' => $body];
+
+            return $answer($body);
+        });
+        $adapter = new AnthropicAdapter(
+            (new AiHttpClientFactory(60, 300))->withTransport($transport, ['api.anthropic.com' => '93.184.216.34']),
+            new AiBaseUrlValidator(new WebhookUrlValidator()),
+            new AiProviderPresets(),
+            new AiMessageBagFactory(new UntrustedContentDelimiter()),
+            new AiResultReader(),
+            new AiProviderErrorTranslator(),
+            new ArrayAdapter(),
+        );
+
+        return new AiConnectionTester(new AiProviderAdapters([$adapter]), new AiModelCatalog(), $this->vault());
     }
 
     private function connection(string $provider = 'mistral'): AiConnection

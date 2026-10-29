@@ -23,6 +23,7 @@ use Thelia\Domain\Ai\AiResponse;
 use Thelia\Domain\Ai\AiTokenUsage;
 use Thelia\Domain\Ai\AiToolCall;
 use Thelia\Domain\Ai\AiToolDefinition;
+use Thelia\Domain\Ai\Exception\AiProviderUnavailableException;
 use Thelia\Domain\Ai\Provider\AiProviderResult;
 use Thelia\Domain\Ai\Provider\AnthropicAdapter;
 use Thelia\Tests\Support\Ai\AiProviderFixtures as Wire;
@@ -170,6 +171,127 @@ final class AnthropicAdapterTest extends AiProviderTestCase
         $adapter->complete($this->request(providerOptions: ['anthropic' => ['effort' => 'low']]), $target);
         self::assertSame(['type' => 'disabled'], $this->lastBody()['thinking']);
         self::assertSame('low', $this->lastBody()['output_config']['effort']);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function measuredModels(): iterable
+    {
+        foreach (['claude-fable-5', 'claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5'] as $model) {
+            yield $model => [$model];
+        }
+    }
+
+    #[DataProvider('measuredModels')]
+    public function testEveryMeasuredModelAnswersTheProbeOfAConnectionWithoutThinkingInOneCall(string $model): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->measuredAnthropic());
+
+        $result = $adapter->complete($this->request([AiMessage::user('Reply with the word ok.')], maxOutputTokens: 16), $this->target(AiProvider::Anthropic, model: $model, thinkingOff: self::shippedThinkingOff($model)));
+
+        self::assertSame('ok', $result->text);
+        self::assertSame(AiFinishReason::Completed, $result->finishReason);
+        self::assertCount(1, $this->sent, 'the catalogue knows the model: no refused call first');
+        self::assertSame(4, $result->tokenUsage->outputTokens, 'the two letters and the end of the turn, nothing spent thinking');
+    }
+
+    public function testAModelThatCannotStopThinkingIsAskedTheLowestEffortUnlessTheRequestNamesOne(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport([Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => '{"a":"b"}']])]));
+        $target = $this->target(AiProvider::Anthropic, model: 'claude-fable-5', thinkingOff: AnthropicAdapter::THINKING_ADAPTIVE);
+
+        $adapter->complete($this->request(), $target);
+        self::assertSame(['type' => 'adaptive'], $this->lastBody()['thinking']);
+        self::assertSame('low', $this->lastBody()['output_config']['effort']);
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => ['effort' => 'high']]), $target);
+        self::assertSame('high', $this->lastBody()['output_config']['effort'], 'the effort of the request wins');
+
+        $adapter->complete($this->request(outputSchema: new AiOutputSchema('pair', ['type' => 'object', 'properties' => ['a' => ['type' => 'string']], 'additionalProperties' => false])), $target);
+        self::assertSame('low', $this->lastBody()['output_config']['effort']);
+        self::assertSame('json_schema', $this->lastBody()['output_config']['format']['type'], 'the format of the answer sits next to the effort');
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function refusalsOfDisabled(): iterable
+    {
+        yield 'adaptive asked' => ['claude-fable-5-1', AnthropicAdapter::THINKING_ADAPTIVE];
+        yield 'between_tools asked' => ['claude-sonnet-5-5', AnthropicAdapter::THINKING_BETWEEN_TOOLS];
+    }
+
+    #[DataProvider('refusalsOfDisabled')]
+    public function testAModelTheCatalogueDoesNotKnowThatRefusesDisabledIsTriedOnceMoreThenRemembered(string $model, string $instead): void
+    {
+        $target = $this->target(AiProvider::Anthropic, model: $model);
+
+        $result = $this->adapter(AnthropicAdapter::class, $this->measuredAnthropic())->complete($this->request(maxOutputTokens: 16), $target);
+
+        self::assertSame('ok', $result->text);
+        self::assertSame(['disabled', $instead], array_map(static fn (array $sent): mixed => $sent['body']['thinking']['type'] ?? null, $this->sent));
+
+        // Another adapter over the same pool, as the next request of the shop gets.
+        $this->sent = [];
+        $this->adapter(AnthropicAdapter::class, $this->measuredAnthropic())->complete($this->request(maxOutputTokens: 16), $target);
+
+        self::assertCount(1, $this->sent);
+        self::assertSame($instead, $this->lastBody()['thinking']['type']);
+    }
+
+    public function testAStreamOfAModelThatRefusesDisabledIsTriedOnceMoreBeforeAnyText(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport([Wire::anthropicMeasured('claude-fable-5-1', 'disabled'), Wire::anthropicStream()]));
+        $stream = $adapter->stream($this->request(), $this->target(AiProvider::Anthropic, model: 'claude-fable-5-1'));
+        $texts = [];
+
+        foreach ($stream as $event) {
+            $texts[] = $event->text;
+        }
+
+        self::assertSame(['Bon', 'jour'], $texts);
+        self::assertSame(['disabled', 'adaptive'], array_map(static fn (array $sent): mixed => $sent['body']['thinking']['type'] ?? null, $this->sent));
+    }
+
+    public function testAnotherRefusalIsNotTriedAgain(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::json(['type' => 'error', 'error' => ['type' => 'invalid_request_error', 'message' => 'max_tokens: Field required']], 400)));
+
+        try {
+            $adapter->complete($this->request(), $this->target(AiProvider::Anthropic, model: 'claude-fable-5-1'));
+            self::fail('The refusal should come through.');
+        } catch (AiProviderUnavailableException $failure) {
+            self::assertStringContainsString('max_tokens: Field required', $failure->getMessage());
+        }
+
+        self::assertCount(1, $this->sent);
+    }
+
+    public function testThinkingTheRequestAsksItselfIsNotChangedOnARefusal(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->measuredAnthropic());
+
+        try {
+            $adapter->complete($this->request(providerOptions: ['anthropic' => ['thinking' => ['type' => 'disabled']]], maxOutputTokens: 16), $this->target(AiProvider::Anthropic, model: 'claude-opus-5-5', thinkingOff: AnthropicAdapter::THINKING_ADAPTIVE));
+            self::fail('The refusal should come through.');
+        } catch (AiProviderUnavailableException $failure) {
+            self::assertStringContainsString('"thinking.type.disabled" is not supported for this model', $failure->getMessage());
+        }
+
+        self::assertCount(1, $this->sent);
+    }
+
+    /**
+     * What the shipped catalogue says of the model, read from the file the catalogue reads.
+     */
+    private static function shippedThinkingOff(string $model): ?string
+    {
+        $data = json_decode((string) file_get_contents(\dirname(__DIR__, 5).'/core/lib/Thelia/Domain/Ai/Resources/model-catalog.json'), true, flags: \JSON_THROW_ON_ERROR);
+
+        foreach ($data['models'] as $entry) {
+            if ('anthropic' === $entry['provider'] && $model === $entry['model']) {
+                return $entry['thinking_off'] ?? null;
+            }
+        }
+
+        return null;
     }
 
     public function testAToolCallCutAtTheLimitKeepsTheTextAndTheTokensInsteadOfFailing(): void

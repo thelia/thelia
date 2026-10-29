@@ -46,6 +46,7 @@ use Thelia\Domain\Ai\Provider\AiProviderErrorTranslator;
 use Thelia\Domain\Ai\Provider\AiProviderPresets;
 use Thelia\Domain\Ai\Provider\AiResultReader;
 use Thelia\Domain\Ai\Provider\AiTargetResolver;
+use Thelia\Domain\Ai\Provider\AnthropicAdapter;
 use Thelia\Domain\Ai\Provider\OpenAiCompatibleAdapter;
 use Thelia\Domain\Ai\Provider\UntrustedContentDelimiter;
 use Thelia\Domain\Ai\Repository\AiRoutingRepository;
@@ -133,19 +134,19 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
     /**
      * Assigns the model of the tests to the tier of every probe usage, on a connection of the given jurisdiction.
      */
-    protected function connect(string $jurisdiction = 'eu', bool $tools = true, string $code = 'probe-main'): void
+    protected function connect(string $jurisdiction = 'eu', bool $tools = true, string $code = 'probe-main', string $provider = 'openai_compatible'): void
     {
         AiTierAssignmentQuery::create()->deleteAll();
         AiConnectionQuery::create()->deleteAll();
 
         $this->connection = (new AiConnection())
-            ->setCode($code)->setTitle($code)->setProvider('openai_compatible')->setJurisdiction($jurisdiction)
+            ->setCode($code)->setTitle($code)->setProvider($provider)->setJurisdiction($jurisdiction)
             ->setBaseUrl(self::PUBLIC_URL)->setActive(true)
             ->setApiKeyEncrypted($this->vault->encrypt('sk-probe-0123456789abcdef'));
         $this->connection->save();
 
         $this->model = (new AiModel())
-            ->setProvider('openai_compatible')->setName('probe-model')->setConnectionId($this->connection->getId())
+            ->setProvider($provider)->setName('probe-model')->setConnectionId($this->connection->getId())
             ->setInputPrice('1.000000')->setOutputPrice('2.000000')->setSupportsStructuredOutput(true)->setSupportsTools($tools)->setSupportsStreaming(true)
             ->setActive(true)->setSource(AiModelSpecification::SOURCE_MANUAL);
         $this->model->save();
@@ -168,14 +169,17 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
             return array_shift($queue) ?? throw new \LogicException('No more mock responses queued.');
         });
 
-        $adapter = new OpenAiCompatibleAdapter(
+        $services = [
             (new AiHttpClientFactory(60, 300))->withTransport($transport),
             new AiBaseUrlValidator(new WebhookUrlValidator()),
             new AiProviderPresets(),
             new AiMessageBagFactory(new UntrustedContentDelimiter()),
             new AiResultReader(),
             new AiProviderErrorTranslator(),
-        );
+        ];
+        $adapter = 'anthropic' === $this->connection->getProvider()
+            ? new AnthropicAdapter(...$services, thinkingModes: new ArrayAdapter())
+            : new OpenAiCompatibleAdapter(...$services);
 
         $settings = new AiUsageSettingRepository();
         $globalSettings = new AiSettings();
