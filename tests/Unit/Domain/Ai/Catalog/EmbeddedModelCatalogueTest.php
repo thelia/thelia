@@ -40,6 +40,25 @@ final class EmbeddedModelCatalogueTest extends TestCase
         self::assertArrayHasKey('gpt-oss-120b', $scaleway);
     }
 
+    public function testTheModelsTheProvidersNoLongerServeAreNotListed(): void
+    {
+        $models = self::models();
+
+        // Mistral: absent from GET /v1/models (codestral-mamba-latest answers 400 invalid_model), or an alias of another model (mistral-tiny).
+        foreach (['codestral-mamba-latest', 'devstral-latest', 'devstral-medium-latest', 'devstral-small-latest', 'ministral-3-14b-2512', 'ministral-3-3b-2512', 'ministral-3-8b-2512', 'mistral-code-agent-latest', 'mistral-large-3', 'mistral-small', 'mistral-tiny', 'open-mistral-nemo', 'pixtral-large-latest'] as $name) {
+            self::assertArrayNotHasKey($name, $models['mistral'], $name);
+        }
+
+        // OpenAI: deprecated (daybreak), unknown to the provider (gpt-5.5-cyber) or shut down (search previews).
+        foreach (['daybreak-blue-latest', 'daybreak-red-latest', 'gpt-5.5-cyber', 'gpt-5.5-cyber-preview', 'gpt-4o-search-preview', 'gpt-4o-mini-search-preview'] as $name) {
+            self::assertArrayNotHasKey($name, $models['openai'], $name);
+        }
+
+        // The models behind the probes of the connection test stay.
+        self::assertArrayHasKey('ministral-3b-2512', $models['mistral']);
+        self::assertArrayHasKey('gpt-5.4-nano-2026-03-17', $models['openai']);
+    }
+
     public function testOllamaModelsTakeStructuredOutput(): void
     {
         $ollama = self::models()['ollama'];

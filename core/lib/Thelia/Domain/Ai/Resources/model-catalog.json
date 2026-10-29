@@ -3,7 +3,7 @@
   "source_commit_or_date": "f6f49d16cc2422d2a83c93c074e0ac4d6a889cc5 2026-10-28T10:15:56Z",
   "license": "MIT",
   "attribution": "Copyright (c) 2023 Berri AI",
-  "generated_at": "2026-10-29T09:52:14+00:00",
+  "generated_at": "2026-10-29T09:53:09+00:00",
   "models": [
     {
       "provider": "anthropic",
@@ -407,74 +407,6 @@
     },
     {
       "provider": "mistral",
-      "model": "codestral-mamba-latest",
-      "mode": "chat",
-      "input_usd_per_million": "0.25",
-      "output_usd_per_million": "0.25",
-      "cache_read_usd_per_million": "0.025",
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 256000,
-      "capabilities": {
-        "structured_output": null,
-        "tools": null,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "devstral-latest",
-      "mode": "chat",
-      "input_usd_per_million": "0.40",
-      "output_usd_per_million": "2.00",
-      "cache_read_usd_per_million": "0.04",
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 256000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "devstral-medium-latest",
-      "mode": "chat",
-      "input_usd_per_million": "0.40",
-      "output_usd_per_million": "2.00",
-      "cache_read_usd_per_million": "0.04",
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 256000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "devstral-small-latest",
-      "mode": "chat",
-      "input_usd_per_million": "0.10",
-      "output_usd_per_million": "0.30",
-      "cache_read_usd_per_million": "0.01",
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 256000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
       "model": "glm-5-2",
       "mode": "chat",
       "input_usd_per_million": "1.40",
@@ -577,57 +509,6 @@
     },
     {
       "provider": "mistral",
-      "model": "ministral-3-14b-2512",
-      "mode": "chat",
-      "input_usd_per_million": "0.20",
-      "output_usd_per_million": "0.20",
-      "cache_read_usd_per_million": "0.02",
-      "cache_write_usd_per_million": null,
-      "context_window": 262144,
-      "max_output_tokens": 262144,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "ministral-3-3b-2512",
-      "mode": "chat",
-      "input_usd_per_million": "0.10",
-      "output_usd_per_million": "0.10",
-      "cache_read_usd_per_million": "0.01",
-      "cache_write_usd_per_million": null,
-      "context_window": 131072,
-      "max_output_tokens": 131072,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "ministral-3-8b-2512",
-      "mode": "chat",
-      "input_usd_per_million": "0.15",
-      "output_usd_per_million": "0.15",
-      "cache_read_usd_per_million": "0.015",
-      "cache_write_usd_per_million": null,
-      "context_window": 262144,
-      "max_output_tokens": 262144,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
       "model": "ministral-3b-2512",
       "mode": "chat",
       "input_usd_per_million": "0.10",
@@ -696,23 +577,6 @@
     },
     {
       "provider": "mistral",
-      "model": "mistral-code-agent-latest",
-      "mode": "chat",
-      "input_usd_per_million": "0.40",
-      "output_usd_per_million": "2.00",
-      "cache_read_usd_per_million": "0.04",
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 256000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
       "model": "mistral-code-fim-latest",
       "mode": "chat",
       "input_usd_per_million": "0.30",
@@ -748,23 +612,6 @@
     {
       "provider": "mistral",
       "model": "mistral-large-2512",
-      "mode": "chat",
-      "input_usd_per_million": "0.50",
-      "output_usd_per_million": "1.50",
-      "cache_read_usd_per_million": "0.05",
-      "cache_write_usd_per_million": null,
-      "context_window": 262144,
-      "max_output_tokens": 262144,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "mistral-large-3",
       "mode": "chat",
       "input_usd_per_million": "0.50",
       "output_usd_per_million": "1.50",
@@ -934,23 +781,6 @@
     },
     {
       "provider": "mistral",
-      "model": "mistral-small",
-      "mode": "chat",
-      "input_usd_per_million": "0.10",
-      "output_usd_per_million": "0.30",
-      "cache_read_usd_per_million": "0.01",
-      "cache_write_usd_per_million": null,
-      "context_window": 32000,
-      "max_output_tokens": 8191,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
       "model": "mistral-small-2603",
       "mode": "chat",
       "input_usd_per_million": "0.15",
@@ -980,23 +810,6 @@
         "structured_output": true,
         "tools": true,
         "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "mistral-tiny",
-      "mode": "chat",
-      "input_usd_per_million": "0.25",
-      "output_usd_per_million": "0.25",
-      "cache_read_usd_per_million": "0.025",
-      "cache_write_usd_per_million": null,
-      "context_window": 32000,
-      "max_output_tokens": 8191,
-      "capabilities": {
-        "structured_output": true,
-        "tools": null,
-        "vision": null
       },
       "deprecation_date": null
     },
@@ -1044,40 +857,6 @@
       "cache_write_usd_per_million": null,
       "context_window": 262144,
       "max_output_tokens": 262144,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "open-mistral-nemo",
-      "mode": "chat",
-      "input_usd_per_million": "0.30",
-      "output_usd_per_million": "0.30",
-      "cache_read_usd_per_million": "0.03",
-      "cache_write_usd_per_million": null,
-      "context_window": 128000,
-      "max_output_tokens": 128000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": null,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "mistral",
-      "model": "pixtral-large-latest",
-      "mode": "chat",
-      "input_usd_per_million": "2.00",
-      "output_usd_per_million": "6.00",
-      "cache_read_usd_per_million": "0.20",
-      "cache_write_usd_per_million": null,
-      "context_window": 128000,
-      "max_output_tokens": 128000,
       "capabilities": {
         "structured_output": true,
         "tools": true,
@@ -1716,40 +1495,6 @@
     },
     {
       "provider": "openai",
-      "model": "daybreak-blue-latest",
-      "mode": "chat",
-      "input_usd_per_million": "4.00",
-      "output_usd_per_million": "20.00",
-      "cache_read_usd_per_million": "0.40",
-      "cache_write_usd_per_million": "5.00",
-      "context_window": 922000,
-      "max_output_tokens": 128000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "openai",
-      "model": "daybreak-red-latest",
-      "mode": "chat",
-      "input_usd_per_million": "12.50",
-      "output_usd_per_million": "75.00",
-      "cache_read_usd_per_million": "1.25",
-      "cache_write_usd_per_million": "15.625",
-      "context_window": 400000,
-      "max_output_tokens": 128000,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "openai",
       "model": "gpt-4.1",
       "mode": "chat",
       "input_usd_per_million": "2.00",
@@ -1900,40 +1645,6 @@
         "vision": true
       },
       "deprecation_date": "2027-01-14"
-    },
-    {
-      "provider": "openai",
-      "model": "gpt-4o-mini-search-preview",
-      "mode": "chat",
-      "input_usd_per_million": "0.15",
-      "output_usd_per_million": "0.60",
-      "cache_read_usd_per_million": "0.075",
-      "cache_write_usd_per_million": null,
-      "context_window": 128000,
-      "max_output_tokens": 16384,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "openai",
-      "model": "gpt-4o-search-preview",
-      "mode": "chat",
-      "input_usd_per_million": "2.50",
-      "output_usd_per_million": "10.00",
-      "cache_read_usd_per_million": "1.25",
-      "cache_write_usd_per_million": null,
-      "context_window": 128000,
-      "max_output_tokens": 16384,
-      "capabilities": {
-        "structured_output": true,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
     },
     {
       "provider": "openai",
@@ -2272,40 +1983,6 @@
         "structured_output": true,
         "tools": true,
         "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "openai",
-      "model": "gpt-5.5-cyber",
-      "mode": "chat",
-      "input_usd_per_million": "12.50",
-      "output_usd_per_million": "75.00",
-      "cache_read_usd_per_million": "1.25",
-      "cache_write_usd_per_million": null,
-      "context_window": null,
-      "max_output_tokens": null,
-      "capabilities": {
-        "structured_output": null,
-        "tools": null,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "openai",
-      "model": "gpt-5.5-cyber-preview",
-      "mode": "chat",
-      "input_usd_per_million": "12.50",
-      "output_usd_per_million": "75.00",
-      "cache_read_usd_per_million": "1.25",
-      "cache_write_usd_per_million": null,
-      "context_window": null,
-      "max_output_tokens": null,
-      "capabilities": {
-        "structured_output": null,
-        "tools": null,
-        "vision": null
       },
       "deprecation_date": null
     },
