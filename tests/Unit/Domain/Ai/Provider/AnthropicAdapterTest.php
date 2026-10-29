@@ -395,6 +395,7 @@ final class AnthropicAdapterTest extends AiProviderTestCase
         yield 'stop sequence' => ['stop_sequence', AiFinishReason::Completed];
         yield 'output limit' => ['max_tokens', AiFinishReason::MaxTokens];
         yield 'refusal' => ['refusal', AiFinishReason::ContentFilter];
+        yield 'the context window is full' => ['model_context_window_exceeded', AiFinishReason::MaxTokens];
         yield 'a pause of the provider' => ['pause_turn', AiFinishReason::Other];
         yield 'a word that does not exist yet' => ['something_new_in_2027', AiFinishReason::Other];
     }
