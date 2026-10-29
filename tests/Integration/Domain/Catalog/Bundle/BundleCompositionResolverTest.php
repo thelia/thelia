@@ -141,6 +141,30 @@ final class BundleCompositionResolverTest extends ActionIntegrationTestCase
         }
     }
 
+    public function testSeveralCompositionsAreJudgedTogetherAndEveryVerdictIsReturned(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->service);
+        $other = $this->exampleBundle($this->factory, $this->service);
+        $bundleId = (int) $example['bundle']->getId();
+        $helmetMissing = BundleComposition::fromArray([['bundleItemId' => $example['bike']->getId(), 'quantity' => '1']]);
+
+        $verdicts = $this->resolver->resolveMany([
+            'valid' => [$bundleId, null],
+            'refused' => [$bundleId, $helmetMissing],
+            'other' => [(int) $other['bundle']->getId(), null],
+            'plain' => [(int) $example['bikeProduct']->getId(), null],
+        ]);
+
+        self::assertSame(['valid', 'refused', 'other', 'plain'], array_keys($verdicts));
+        self::assertInstanceOf(BundleComposition::class, $verdicts['valid']);
+        self::assertEquals($this->resolver->resolve($bundleId), $verdicts['valid']);
+        self::assertInstanceOf(InvalidBundleCompositionException::class, $verdicts['refused']);
+        self::assertSame((int) $example['helmet']->getId(), $verdicts['refused']->bundleItemId);
+        self::assertInstanceOf(BundleComposition::class, $verdicts['other']);
+        self::assertInstanceOf(InvalidBundleCompositionException::class, $verdicts['plain'], 'A product that is no bundle holds no composition.');
+        self::assertSame([], $this->resolver->resolveMany([]));
+    }
+
     public function testAnOptionalItemMayBeLeftOut(): void
     {
         $example = $this->exampleBundle($this->factory, $this->service);

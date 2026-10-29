@@ -26,7 +26,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleLineContents;
+use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\DiscountProration;
 use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
@@ -71,6 +73,8 @@ class AttributeAccessService
         private readonly CouponManager $couponManager, private readonly EventDispatcherInterface $eventDispatcher,
         private readonly OfferedCartLineService $offeredCartLineService,
         private readonly VatExemptionResolver $vatExemptionResolver,
+        private readonly BundleOrderPlanner $bundleOrderPlanner,
+        private readonly BundleCatalogState $bundleCatalogState,
     ) {
     }
 
@@ -467,16 +471,38 @@ class AttributeAccessService
      * "productId": 42, "title": "Helmet", "quantity": "2"}]`, the quantity of one bundle as a decimal
      * string. Read for the whole cart in a handful of queries, whatever the number of bundle lines.
      *
-     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float, bundle_components?: list<array{bundleItemId: int, productSaleElementsId: int, productId: int, title: string, quantity: string}>}>
+     * The same line says whether the order can still take it: `bundle_orderable` is false when the
+     * catalogue no longer holds the composition (a component deleted or offline, a required item added
+     * since, a bound that moved), and `bundle_refusal` is then the reason the order would give, already
+     * translated. The verdict is the one of the order (BundleOrderPlanner), reached through a single read
+     * for the whole cart; a cart with no bundle line asks the catalogue nothing for it. A line that is no
+     * bundle carries neither key.
+     *
+     * @return list<array{id: int, product_id: int, is_offered: int, offered_taxed_discount: float, bundle_components?: list<array{bundleItemId: int, productSaleElementsId: int, productId: int, title: string, quantity: string}>, bundle_orderable?: bool, bundle_refusal?: string}>
      */
     private function cartItems(Cart $cart, Country $taxCountry, ?State $taxState): array
     {
         $offeredDiscounts = $this->offeredTaxedDiscounts($cart, $taxCountry, $taxState);
         $bundleComponents = $this->bundleComponentsOf($cart);
+        $cartItems = $cart->getCartItems();
+        // A line with no composition is a pack line to judge too when the shop sells bundles: a pack a promotion
+        // offers, or a product turned into a pack after it was added. A shop without a bundle asks nothing.
+        $shopHasBundles = $this->bundleCatalogState->hasBundles();
+        $hasPackLine = false;
+
+        foreach ($cartItems as $cartItem) {
+            if ($shopHasBundles || null !== $cartItem->getBundleComposition()) {
+                $hasPackLine = true;
+
+                break;
+            }
+        }
+
+        $bundleRefusals = $hasPackLine ? $this->bundleOrderPlanner->refusalsOf($cartItems) : [];
 
         $items = [];
 
-        foreach ($cart->getCartItems() as $cartItem) {
+        foreach ($cartItems as $cartItem) {
             $item = [
                 'id' => (int) $cartItem->getId(),
                 'product_id' => (int) $cartItem->getProductId(),
@@ -484,8 +510,19 @@ class AttributeAccessService
                 'offered_taxed_discount' => $offeredDiscounts[(int) $cartItem->getId()] ?? 0.0,
             ];
 
-            if (isset($bundleComponents[(int) $cartItem->getId()])) {
-                $item['bundle_components'] = $bundleComponents[(int) $cartItem->getId()];
+            $refusal = $bundleRefusals[(int) $cartItem->getId()] ?? null;
+
+            if (null !== $cartItem->getBundleComposition()) {
+                // A pack with nothing left to list (every component gone) is a pack line all the same.
+                $item['bundle_components'] = $bundleComponents[(int) $cartItem->getId()] ?? [];
+                $item['bundle_orderable'] = null === $refusal;
+            } elseif (null !== $refusal) {
+                // A pack with no composition the order refuses (offered pack, product turned into a pack).
+                $item['bundle_orderable'] = false;
+            }
+
+            if (null !== $refusal) {
+                $item['bundle_refusal'] = $refusal->getMessage();
             }
 
             $items[] = $item;

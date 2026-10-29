@@ -16,9 +16,15 @@ namespace Thelia\Tests\Integration\Api\Service\DataAccess;
 
 use Thelia\Api\Service\DataAccess\AttributeAccessService;
 use Thelia\Core\Template\Loop\LoopExecutor;
+use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
+use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
+use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Model\CartItemQuery;
+use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Test\Trait\RecordsSqlQueries;
@@ -124,6 +130,160 @@ final class CartItemsBundleComponentsTest extends ActionIntegrationPromotionTest
             self::countSqlQueriesSelectingFrom($statementsForThree, 'product_sale_elements'),
             implode("\n", array_diff($statementsForThree, $statementsForOne)),
         );
+    }
+
+    public function testAValidBundleLineIsOrderableAndCarriesNoRefusal(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        $cart = $this->newEmptyCart();
+        $this->addBundle($cart, $example, 0);
+        $this->addItem($cart, $this->product());
+        AttributeAccessService::clearCache();
+
+        $items = $this->getService(AttributeAccessService::class)->attributeCart('cart_items');
+
+        self::assertTrue($items[0]['bundle_orderable']);
+        self::assertArrayNotHasKey('bundle_refusal', $items[0]);
+        self::assertArrayNotHasKey('bundle_orderable', $items[1], 'A line that is not a bundle says nothing of it.');
+    }
+
+    public function testABundleLineTheCatalogueNoLongerHoldsSaysSoWithTheReasonTheOrderWouldGive(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        $cart = $this->newEmptyCart();
+        $this->addBundle($cart, $example, 0);
+        $this->addItem($cart, $this->product());
+        // The product of the helmet is deleted after the bundle went into the cart: its item is orphaned.
+        $example['helmetProduct']->delete();
+        AttributeAccessService::clearCache();
+
+        $items = $this->getService(AttributeAccessService::class)->attributeCart('cart_items');
+
+        self::assertFalse($items[0]['bundle_orderable']);
+        self::assertStringContainsString((string) $example['bundle']->getRef(), $items[0]['bundle_refusal']);
+        self::assertArrayNotHasKey('bundle_orderable', $items[1]);
+        self::assertSame(
+            $this->getService(BundleOrderPlanner::class)->refusalsOf($cart->getCartItems())[(int) $items[0]['id']]->getMessage(),
+            $items[0]['bundle_refusal'],
+            'The reason is the one of the order.',
+        );
+    }
+
+    public function testABundleLineWhoseComponentsAreAllGoneIsStillAnUnorderableBundleLine(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        $cart = $this->newEmptyCart();
+        $this->addBundle($cart, $example, 0);
+        $example['bikeProduct']->delete();
+        $example['helmetProduct']->delete();
+        AttributeAccessService::clearCache();
+
+        $items = $this->getService(AttributeAccessService::class)->attributeCart('cart_items');
+
+        self::assertFalse($items[0]['bundle_orderable']);
+        self::assertSame([], $items[0]['bundle_components']);
+    }
+
+    public function testTheCartJudgesEachBundleLineAndAgreesWithTheStepOfTheCartOfTheCheckout(): void
+    {
+        $service = $this->getService(BundleCompositionService::class);
+        $broken = $this->exampleBundle($this->factory, $service);
+        $sound = $this->exampleBundle($this->factory, $service);
+        $cart = $this->newEmptyCart();
+        $this->addBundle($cart, $broken, 0);
+        $this->addBundle($cart, $sound, 0);
+        $broken['helmetProduct']->setVisible(0)->save();
+        AttributeAccessService::clearCache();
+        $cart = CartQuery::create()->findPk($cart->getId());
+
+        $items = $this->getService(AttributeAccessService::class)->attributeCart('cart_items');
+
+        self::assertSame([false, true], array_column($items, 'bundle_orderable'));
+
+        try {
+            $this->getService(CartGuard::class)->checkBundleLinesOrderable($cart);
+            self::fail('The step of the cart refuses the cart the page flags.');
+        } catch (BundleLineNotOrderableException $refusal) {
+            self::assertSame((int) $items[0]['id'], $refusal->cartItemId);
+            self::assertSame($refusal->getMessage(), $items[0]['bundle_refusal']);
+        }
+
+        $cart->getCartItems()->get(0)->delete();
+        AttributeAccessService::clearCache();
+        $cart = CartQuery::create()->findPk($cart->getId());
+        $this->getService(CartGuard::class)->checkBundleLinesOrderable($cart);
+        self::assertSame([true], array_column($this->getService(AttributeAccessService::class)->attributeCart('cart_items'), 'bundle_orderable'));
+    }
+
+    public function testAShopWithoutABundleAsksTheBundleTablesNothingForItsCart(): void
+    {
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+        $this->addItem($cart, $this->product());
+        ConfigQuery::write(BundleCatalogState::CONFIG_KEY, '0');
+        $attributes = $this->getService(AttributeAccessService::class);
+        AttributeAccessService::clearCache();
+        $cart->clearCartItems();
+
+        $statements = $this->recordSqlQueries(static fn () => $attributes->attributeCart('cart_items'));
+
+        self::assertSame(0, self::countSqlQueriesSelectingFrom($statements, 'product_bundle_item'));
+        self::assertSame([], array_values(array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'FROM `product`') && str_contains($statement, 'is_bundle'))));
+    }
+
+    public function testACartWithoutABundleLineOfAShopWithBundlesAsksTheBundleItemsNothing(): void
+    {
+        $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product());
+        $this->addItem($cart, $this->product());
+        $attributes = $this->getService(AttributeAccessService::class);
+        AttributeAccessService::clearCache();
+        $cart->clearCartItems();
+
+        $statements = $this->recordSqlQueries(static fn () => $attributes->attributeCart('cart_items'));
+
+        self::assertSame(0, self::countSqlQueriesSelectingFrom($statements, 'product_bundle_item'));
+    }
+
+    public function testAPackLineWithNoCompositionOfAShopWithBundlesIsFlaggedToo(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        $cart = $this->newEmptyCart();
+        $this->addBundle($cart, $example, 0);
+        $this->addItem($cart, $this->product());
+        // The product turned into a pack after the line was added: a line with no composition.
+        $packLineId = (int) $cart->getCartItems()->get(0)->getId();
+        CartItemQuery::create()->filterById($packLineId)->update(['BundleComposition' => null]);
+        AttributeAccessService::clearCache();
+
+        $items = $this->getService(AttributeAccessService::class)->attributeCart('cart_items');
+
+        self::assertSame($packLineId, $items[0]['id']);
+        self::assertFalse($items[0]['bundle_orderable']);
+        self::assertStringContainsString((string) $example['bundle']->getRef(), $items[0]['bundle_refusal']);
+        self::assertArrayNotHasKey('bundle_orderable', $items[1], 'A plain product line says nothing of it.');
+    }
+
+    public function testTheVerdictOfAllTheBundleLinesIsReadWithoutAQueryPerLine(): void
+    {
+        $service = $this->getService(BundleCompositionService::class);
+        $attributes = $this->getService(AttributeAccessService::class);
+        $cart = $this->newEmptyCart();
+        $this->addBundle($cart, $this->exampleBundle($this->factory, $service), 0);
+        // Once to warm what the container reads on its first call (the state of the catalog, the language).
+        $attributes->attributeCart('cart_items');
+        AttributeAccessService::clearCache();
+        $cart->clearCartItems();
+        $statementsForOne = $this->recordSqlQueries(static fn () => $attributes->attributeCart('cart_items'));
+
+        $this->addBundle($cart, $this->exampleBundle($this->factory, $service), 0);
+        $this->addBundle($cart, $this->exampleBundle($this->factory, $service), 0);
+        AttributeAccessService::clearCache();
+        $cart->clearCartItems();
+        $statementsForThree = $this->recordSqlQueries(static fn () => $attributes->attributeCart('cart_items'));
+
+        self::assertCount(\count($statementsForOne), $statementsForThree, implode("\n", array_diff($statementsForThree, $statementsForOne)));
     }
 
     /**

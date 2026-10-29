@@ -16,6 +16,7 @@ namespace Thelia\Domain\Order\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
+use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionResolver;
 use Thelia\Domain\Catalog\Bundle\BundleDecimal;
 use Thelia\Domain\Catalog\Bundle\BundleItemRepository;
@@ -59,45 +60,23 @@ final readonly class BundleOrderPlanner
      */
     public function componentsOf(iterable $cartItems): array
     {
-        $compositions = [];
-        $bundleProductIds = [];
+        $cartItems = \is_array($cartItems) ? $cartItems : iterator_to_array($cartItems, false);
+        [$refusals, $compositions] = $this->judge($cartItems);
 
         foreach ($cartItems as $cartItem) {
-            try {
-                $composition = $cartItem->getBundleCompositionValue();
-            } catch (InvalidBundleCompositionException $malformed) {
-                throw self::refusal($cartItem, $malformed);
+            if (isset($refusals[(int) $cartItem->getId()])) {
+                throw $refusals[(int) $cartItem->getId()];
             }
-
-            // The line a promotion offers is placed with no composition to choose from, and a
-            // bundle is never ordered as a product: it takes the composition it has by default.
-            // Any other line of a bundle holds its composition (CartItem refuses it otherwise), so
-            // only an offered line asks for its product: a cart without a bundle asks nothing.
-            $isOfferedBundle = null === $composition
-                && 1 === (int) $cartItem->getIsOffered()
-                && 1 === (int) $cartItem->getProduct()->getIsBundle();
-
-            if (null === $composition && !$isOfferedBundle) {
-                continue;
-            }
-
-            $bundleProductId = (int) $cartItem->getProductId();
-
-            try {
-                $composition = $this->bundleCompositionResolver->resolve($bundleProductId, $composition);
-            } catch (InvalidBundleCompositionException $invalid) {
-                throw self::refusal($cartItem, $invalid);
-            }
-
-            $compositions[(int) $cartItem->getId()] = [$cartItem, $composition];
-            $bundleProductIds[] = $bundleProductId;
         }
 
         if ([] === $compositions) {
             return [];
         }
 
-        $itemsByBundle = $this->bundleItemRepository->forBundles($bundleProductIds);
+        $itemsByBundle = $this->bundleItemRepository->forBundles(array_values(array_unique(array_map(
+            static fn (array $line): int => (int) $line[0]->getProductId(),
+            $compositions,
+        ))));
         $retainedByCartItem = [];
         $saleElementsIds = [];
 
@@ -109,12 +88,6 @@ final readonly class BundleOrderPlanner
 
                 if ('0' === $quantity) {
                     continue;
-                }
-
-                // Read again a moment after the resolver judged it: an item orphaned in
-                // between is refused like any other.
-                if (null === $item->getProductSaleElementsId()) {
-                    throw self::refusal($cartItem, InvalidBundleCompositionException::componentNotSellable((int) $item->getId()));
                 }
 
                 $saleElementsIds[] = (int) $item->getProductSaleElementsId();
@@ -156,6 +129,83 @@ final readonly class BundleOrderPlanner
     }
 
     /**
+     * The verdict of the order on every pack line of the cart at once, for a page that has to say which
+     * line the order will refuse: the pack lines the catalogue no longer holds, by the id of the cart line,
+     * with the refusal the order would answer. Empty when every pack can be ordered.
+     *
+     * The same judge as componentsOf() (judge()), plus assertNoBundleLineWithoutComposition(), the compositions
+     * resolved in one pass for the whole cart (BundleCompositionResolver::resolveMany) instead of
+     * stopping at the first refusal. A cart with no pack line asks the catalogue nothing.
+     *
+     * @param iterable<CartItem> $cartItems
+     *
+     * @return array<int, BundleLineNotOrderableException>
+     */
+    public function refusalsOf(iterable $cartItems): array
+    {
+        $cartItems = \is_array($cartItems) ? $cartItems : iterator_to_array($cartItems, false);
+        [$refusals] = $this->judge($cartItems);
+
+        foreach ($this->linesWithoutComposition($cartItems) as $cartItem) {
+            $refusals[(int) $cartItem->getId()] ??= self::withoutComposition($cartItem);
+        }
+
+        ksort($refusals);
+
+        return $refusals;
+    }
+
+    /**
+     * The one verdict of the order on the compositions of the cart lines: each line that holds one (or is
+     * an offered bundle) judged by BundleCompositionResolver in a single pass, the catalogue read once.
+     *
+     * @param list<CartItem> $cartItems
+     *
+     * @return array{0: array<int, BundleLineNotOrderableException>, 1: array<int, array{0: CartItem, 1: BundleComposition}>} the refusals and the resolved compositions, by cart line id
+     */
+    private function judge(array $cartItems): array
+    {
+        $refusals = [];
+        $requests = [];
+        $lines = [];
+
+        foreach ($cartItems as $cartItem) {
+            $cartItemId = (int) $cartItem->getId();
+
+            try {
+                $composition = $cartItem->getBundleCompositionValue();
+            } catch (InvalidBundleCompositionException $malformed) {
+                $refusals[$cartItemId] = self::refusal($cartItem, $malformed);
+
+                continue;
+            }
+
+            // The line a promotion offers is placed with no composition to choose from, and a
+            // bundle is never ordered as a product: it takes the composition it has by default.
+            // Any other line of a bundle holds its composition (CartItem refuses it otherwise), so
+            // only an offered line asks for its product: a cart without a bundle asks nothing.
+            if (null === $composition && !$this->isOfferedBundle($cartItem)) {
+                continue;
+            }
+
+            $requests[$cartItemId] = [(int) $cartItem->getProductId(), $composition];
+            $lines[$cartItemId] = $cartItem;
+        }
+
+        $compositions = [];
+
+        foreach ($this->bundleCompositionResolver->resolveMany($requests) as $cartItemId => $verdict) {
+            if ($verdict instanceof InvalidBundleCompositionException) {
+                $refusals[$cartItemId] = self::refusal($lines[$cartItemId], $verdict);
+            } else {
+                $compositions[$cartItemId] = [$lines[$cartItemId], $verdict];
+            }
+        }
+
+        return [$refusals, $compositions];
+    }
+
+    /**
      * A line of a bundle product that is neither offered nor holding a composition is no pack
      * the order can take from the stock: placed as a product it would be charged at the price of
      * the technical sale element and leave the stock of its components untouched. CartItem
@@ -172,8 +222,23 @@ final readonly class BundleOrderPlanner
      */
     public function assertNoBundleLineWithoutComposition(iterable $cartItems): void
     {
+        foreach ($this->linesWithoutComposition($cartItems) as $cartItem) {
+            throw self::withoutComposition($cartItem);
+        }
+    }
+
+    /**
+     * The lines of a bundle product that are neither offered nor hold a composition, in the order of the
+     * cart.
+     *
+     * @param iterable<CartItem> $cartItems
+     *
+     * @return list<CartItem>
+     */
+    private function linesWithoutComposition(iterable $cartItems): array
+    {
         if (!$this->bundleCatalogState->hasBundles()) {
-            return;
+            return [];
         }
 
         $candidates = [];
@@ -185,19 +250,29 @@ final readonly class BundleOrderPlanner
         }
 
         if ([] === $candidates) {
-            return;
+            return [];
         }
 
-        $bundleProductIds = ProductQuery::create()
+        $bundleProductIds = array_flip(array_map('intval', ProductQuery::create()
             ->filterById(array_keys($candidates), Criteria::IN)
             ->filterByIsBundle(1)
             ->select('Id')
             ->find()
-            ->toArray();
+            ->toArray()));
+        $lines = [];
 
-        foreach ($bundleProductIds as $bundleProductId) {
-            throw self::withoutComposition($candidates[(int) $bundleProductId][0]);
+        foreach ($candidates as $productId => $candidateLines) {
+            if (isset($bundleProductIds[$productId])) {
+                array_push($lines, ...$candidateLines);
+            }
         }
+
+        return $lines;
+    }
+
+    private function isOfferedBundle(CartItem $cartItem): bool
+    {
+        return 1 === (int) $cartItem->getIsOffered() && 1 === (int) $cartItem->getProduct()->getIsBundle();
     }
 
     /**

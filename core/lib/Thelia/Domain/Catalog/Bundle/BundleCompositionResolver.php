@@ -50,15 +50,71 @@ final readonly class BundleCompositionResolver
      */
     public function resolve(int $bundleProductId, ?BundleComposition $proposed = null): BundleComposition
     {
-        if ([] === $this->bundleItemRepository->bundleProductIds([$bundleProductId])) {
-            throw InvalidBundleCompositionException::notABundle($bundleProductId);
+        $verdict = $this->resolveMany([[$bundleProductId, $proposed]])[0];
+
+        if ($verdict instanceof InvalidBundleCompositionException) {
+            throw $verdict;
         }
 
-        $items = $this->bundleItemRepository->forBundles([$bundleProductId])[$bundleProductId] ?? [];
-        $saleElementsIds = array_map(static fn (ProductBundleItem $item): ?int => $item->getProductSaleElementsId(), $items);
+        return $verdict;
+    }
+
+    /**
+     * The same judgement for several compositions at once, the catalogue read once for all of them:
+     * the items of every bundle, the components they name and what the visitor may not see.
+     *
+     * A refusal is returned, never thrown, so that the caller sees the verdict of every request and
+     * not only of the first one that fails.
+     *
+     * @param array<int|string, array{0: int, 1: BundleComposition|null}> $requests bundle product id and proposed
+     *                                                                              composition (null for the default one), by the key the caller wants the answer under
+     *
+     * @return array<int|string, BundleComposition|InvalidBundleCompositionException> the same keys
+     */
+    public function resolveMany(array $requests): array
+    {
+        if ([] === $requests) {
+            return [];
+        }
+
+        $bundleProductIds = array_values(array_unique(array_map(static fn (array $request): int => $request[0], $requests)));
+        $areBundles = array_fill_keys($this->bundleItemRepository->bundleProductIds($bundleProductIds), true);
+        $itemsByBundle = $this->bundleItemRepository->forBundles(array_keys($areBundles));
+        $saleElementsIds = [];
+
+        foreach ($itemsByBundle as $items) {
+            foreach ($items as $item) {
+                $saleElementsIds[] = $item->getProductSaleElementsId();
+            }
+        }
+
         $components = $this->bundleComponentReader->read($saleElementsIds);
         $hidden = array_fill_keys($this->bundleComponentReader->hiddenFromVisitor($saleElementsIds), true);
 
+        $verdicts = [];
+
+        foreach ($requests as $key => [$bundleProductId, $proposed]) {
+            try {
+                $verdicts[$key] = isset($areBundles[$bundleProductId])
+                    ? $this->judge($bundleProductId, $itemsByBundle[$bundleProductId] ?? [], $proposed, $components, $hidden)
+                    : throw InvalidBundleCompositionException::notABundle($bundleProductId);
+            } catch (InvalidBundleCompositionException $refusal) {
+                $verdicts[$key] = $refusal;
+            }
+        }
+
+        return $verdicts;
+    }
+
+    /**
+     * @param list<ProductBundleItem>     $items
+     * @param array<int, BundleComponent> $components
+     * @param array<int, true>            $hidden
+     *
+     * @throws InvalidBundleCompositionException
+     */
+    private function judge(int $bundleProductId, array $items, ?BundleComposition $proposed, array $components, array $hidden): BundleComposition
+    {
         if (null === $proposed) {
             $effective = self::defaultComposition($items, $components, $hidden);
         } else {
