@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Security\CartItemVoter;
 use Thelia\Api\State\Processor\FrontCartItemProcessor;
@@ -114,6 +115,15 @@ class CartItem implements PropelResourceInterface
     // goods sold by weight carries grams, not units.
     public ?float $quantity = null;
 
+    // The components the customer chose for a bundle line, `[{"bundleItemId": 12, "quantity": "2"}]`;
+    // null on any other line. Written by the front addition only, where it is revalidated against the
+    // bundle (FrontCartItemProcessor): no admin write group carries it, so no line can be created
+    // through the admin operations with a composition nobody checked.
+    /** @var list<array{bundleItemId: int|string, quantity: int|float|string}>|null */
+    #[Column(propelFieldName: 'bundleCompositionLines')]
+    #[Groups([self::GROUP_ADMIN_READ, Cart::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, Cart::GROUP_FRONT_READ, self::GROUP_FRONT_WRITE])]
+    public ?array $bundleComposition = null;
+
     #[Relation(targetResource: Product::class)]
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public Product $product;
@@ -203,6 +213,24 @@ class CartItem implements PropelResourceInterface
     public function setQuantity(?float $quantity): self
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    /**
+     * @return list<array{bundleItemId: int|string, quantity: int|float|string}>|null
+     */
+    public function getBundleComposition(): ?array
+    {
+        return $this->bundleComposition;
+    }
+
+    /**
+     * @param list<array{bundleItemId: int|string, quantity: int|float|string}>|null $bundleComposition
+     */
+    public function setBundleComposition(?array $bundleComposition): self
+    {
+        $this->bundleComposition = $bundleComposition;
 
         return $this;
     }

@@ -16,6 +16,7 @@ namespace Thelia\Domain\Pricing;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\CatalogPriceRuleQuery;
@@ -24,7 +25,8 @@ use Thelia\Model\CatalogPriceRuleQuery;
  * Whether anything at all is pricing the catalog beyond `product_price`, so that a
  * shop without a single rule keeps the query plans and the caches it had before.
  *
- * Three indexed existence checks, each asked of the database once per request.
+ * Three indexed existence checks, each asked of the database once per request; the bundles
+ * are read from the configuration, without a query.
  */
 class PricingActivityChecker implements ResetInterface
 {
@@ -32,8 +34,10 @@ class PricingActivityChecker implements ResetInterface
 
     private ?bool $hasActiveNamedRule = null;
 
-    public function __construct(private readonly SaleAudienceChecker $saleAudienceChecker)
-    {
+    public function __construct(
+        private readonly SaleAudienceChecker $saleAudienceChecker,
+        private readonly BundleCatalogState $bundleCatalogState,
+    ) {
     }
 
     /**
@@ -62,6 +66,16 @@ class PricingActivityChecker implements ResetInterface
     public function hasVisitorDependentPricing(): bool
     {
         return $this->hasActiveNamedRule() || $this->saleAudienceChecker->hasActiveReservedSale();
+    }
+
+    /**
+     * A bundle priced by its components exists, so that the price of its sale element is not
+     * the one of the catalog. No query: the state of the catalog is a variable of the
+     * configuration.
+     */
+    public function hasComputedBundles(): bool
+    {
+        return $this->bundleCatalogState->hasComputedBundles();
     }
 
     public function reset(): void

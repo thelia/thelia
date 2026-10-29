@@ -22,9 +22,13 @@ use Thelia\Core\Event\Cart\CartItemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
+use Thelia\Domain\Catalog\Bundle\BundleComposition;
+use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\CartItem as BaseCartItem;
+use Thelia\Model\Map\CartItemTableMap;
 
 class CartItem extends BaseCartItem
 {
@@ -32,14 +36,81 @@ class CartItem extends BaseCartItem
 
     protected ?EventDispatcherInterface $dispatcher = null;
 
+    /**
+     * The components a customer chose for a bundle line; null on a line that is not a bundle.
+     *
+     * @throws InvalidBundleCompositionException when the stored JSON is not a composition
+     */
+    public function getBundleCompositionValue(): ?BundleComposition
+    {
+        $json = $this->getBundleComposition();
+
+        return null === $json || '' === $json ? null : BundleComposition::fromJson($json);
+    }
+
+    /**
+     * The composition as a list the API reads and writes: `[{"bundleItemId": 12, "quantity": "2"}]`,
+     * null on a line that is not a bundle.
+     *
+     * @return list<array{bundleItemId: int, quantity: string}>|null
+     */
+    public function getBundleCompositionLines(): ?array
+    {
+        return $this->getBundleCompositionValue()?->toArray();
+    }
+
+    /**
+     * @param list<array{bundleItemId: int|string, quantity: int|float|string}>|null $lines
+     *
+     * @throws InvalidBundleCompositionException when the lines are not a composition
+     */
+    public function setBundleCompositionLines(?array $lines): static
+    {
+        $this->setBundleComposition(null === $lines ? null : BundleComposition::fromArray($lines)->toCanonicalJson());
+
+        return $this;
+    }
+
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * A line is a bundle line when it holds a composition, and a product that is a bundle is only
+     * sold with one: a line that says otherwise, whoever writes it (the cart, the API, a module),
+     * would be priced, stocked and ordered as something it is not. A line a promotion offers is
+     * placed by the promotion, which has no composition to choose.
+     *
+     * @throws InvalidBundleCompositionException
+     */
+    protected function assertCompositionMatchesTheProduct(): void
+    {
+        if (1 === (int) $this->getIsOffered() || null === $this->getProductId()) {
+            return;
+        }
+
+        $hasComposition = null !== $this->getBundleComposition();
+
+        // A shop without a bundle needs no read of the product: none can be one. A line that
+        // carries a composition is read anyway, the flag may lag behind the product it describes.
+        $isBundle = ($hasComposition || (new BundleCatalogState())->hasBundles())
+            && 1 === (int) ProductQuery::create()->findPk($this->getProductId())?->getIsBundle();
+
+        if ($isBundle && !$hasComposition) {
+            throw InvalidBundleCompositionException::malformed(\sprintf('product %d is a bundle and a cart line for it needs a composition', $this->getProductId()));
+        }
+
+        if (!$isBundle && $hasComposition) {
+            throw InvalidBundleCompositionException::notABundle((int) $this->getProductId());
+        }
+    }
+
     public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
+
+        $this->assertCompositionMatchesTheProduct();
 
         if ($this->dispatcher) {
             $cartItemEvent = new CartItemEvent($this);
@@ -52,6 +123,14 @@ class CartItem extends BaseCartItem
     public function preUpdate(?ConnectionInterface $con = null): bool
     {
         parent::preUpdate($con);
+
+        // A line moved to another product or sale element, or given another composition (or none),
+        // must fit its product as a new line does.
+        if ($this->isColumnModified(CartItemTableMap::COL_PRODUCT_ID)
+            || $this->isColumnModified(CartItemTableMap::COL_PRODUCT_SALE_ELEMENTS_ID)
+            || $this->isColumnModified(CartItemTableMap::COL_BUNDLE_COMPOSITION)) {
+            $this->assertCompositionMatchesTheProduct();
+        }
 
         if ($this->dispatcher) {
             $cartItemEvent = new CartItemEvent($this);
@@ -92,7 +171,11 @@ class CartItem extends BaseCartItem
     /**
      * @param float|null $availableQuantity the stock to check against when it is not the
      *                                      national counter of the sale element (the stock
-     *                                      of the sale unit the visitor buys from)
+     *                                      of the sale unit the visitor buys from). A bundle line
+     *                                      is supplied by its components, so the caller says how
+     *                                      many it can supply (CartLineAvailability): the stock of
+     *                                      the sale element standing for the bundle is never read,
+     *                                      and without an answer nothing is checked
      *
      * @return $this
      *
@@ -110,8 +193,11 @@ class CartItem extends BaseCartItem
         if (ConfigQuery::checkAvailableStock()) {
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
+            $available = null === $this->getBundleComposition()
+                ? ($availableQuantity ?? $productSaleElements->getQuantity())
+                : ($availableQuantity ?? \INF);
 
-            if (0 === $product->getVirtual() && ($availableQuantity ?? $productSaleElements->getQuantity()) < $value) {
+            if (0 === $product->getVirtual() && $available < $value) {
                 $this->setQuantity($currentQuantity);
                 throw new NotEnoughStockException(Translator::getInstance()->trans('Not enough stock for product '.$product->getRef()));
             }
@@ -143,8 +229,11 @@ class CartItem extends BaseCartItem
         if (ConfigQuery::checkAvailableStock()) {
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
+            $available = null === $this->getBundleComposition()
+                ? ($availableQuantity ?? $productSaleElements->getQuantity())
+                : ($availableQuantity ?? \INF);
 
-            if (0 === $product->getVirtual() && ($availableQuantity ?? $productSaleElements->getQuantity()) < $newQuantity) {
+            if (0 === $product->getVirtual() && $available < $newQuantity) {
                 $newQuantity = $currentQuantity;
             }
         }

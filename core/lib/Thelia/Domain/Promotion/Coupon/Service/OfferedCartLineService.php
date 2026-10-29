@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Bundle\BundleAvailability;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
@@ -71,6 +72,7 @@ class OfferedCartLineService implements ResetInterface
         private readonly FacadeInterface $facade,
         private readonly RequestStack $requestStack,
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
+        private readonly ?BundleAvailability $bundleAvailability = null,
     ) {
     }
 
@@ -348,13 +350,20 @@ class OfferedCartLineService implements ResetInterface
 
     /**
      * How many units of the request the stock allows: all of them when the stock
-     * is not checked (config, virtual product), what is left when it is. Zero
-     * means the promotion cannot be granted at all.
+     * is not checked (config, virtual product), what is left when it is, for a bundle
+     * what its components supply. Zero means the promotion cannot be granted at all.
      */
     private function grantableQuantity(Product $product, ProductSaleElements $productSaleElements, int $requestedQuantity): int
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return $requestedQuantity;
+        }
+
+        // The sale element of a bundle holds no stock of its own: what the shop can offer is
+        // how many bundles its components supply (the default composition, the one an
+        // offered line is ordered with), asked where that is decided.
+        if (1 === (int) $product->getIsBundle() && null !== $this->bundleAvailability) {
+            return max(0, min($requestedQuantity, $this->bundleAvailability->forBundles([(int) $product->getId()])[(int) $product->getId()] ?? 0));
         }
 
         if (1 === (int) $product->getVirtual()) {

@@ -70,6 +70,7 @@ class EffectivePriceListener implements EventSubscriberInterface
         // session, and an API request in a shop where nothing prices beyond the
         // catalog must stay stateless.
         if (!$this->activityChecker->hasActivePublicRule()
+            && !$this->activityChecker->hasComputedBundles()
             && !$this->activityChecker->hasVisitorDependentPricing()
             && !$this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()) {
             return;
@@ -90,12 +91,19 @@ class EffectivePriceListener implements EventSubscriberInterface
                 continue;
             }
 
-            $price->setPromoPrice($effectivePrice->untaxedPromoPrice);
+            $settled = $effectivePrice->settle($price->getPrice());
+
+            // A bundle priced by its components says its price as well: nothing of the catalog stands.
+            if ($settled->priceReplaced) {
+                $price->setPrice($settled->untaxedPrice);
+            }
+
+            $price->setPromoPrice($settled->untaxedPromoPrice);
         }
 
         // The flag the theme reads to strike the catalog price through is now true
         // whatever the catalog says, and the rule decides whether the strike shows.
-        $resource->setPromo(true);
+        $resource->setPromo($effectivePrice->isPromo());
         $resource->setDisplayInitialPrice($effectivePrice->displayInitialPrice);
     }
 
