@@ -121,6 +121,21 @@ final class OpenAiAdapterTest extends AiProviderTestCase
         self::assertFalse($this->lastBody()['text']['format']['strict'], 'a nested object left open');
     }
 
+    public function testTheOutputLimitNeverGoesBelowTheMinimumOfTheResponsesApi(): void
+    {
+        $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('ok')]), Wire::responses([Wire::responsesMessage('ok')]), Wire::responses([Wire::responsesMessage('ok')])]), self::PINNED);
+        $target = $this->target(AiProvider::OpenAi, null);
+
+        $adapter->complete($this->request(maxOutputTokens: 8), $target);
+        self::assertSame(16, $this->lastBody()['max_output_tokens']);
+
+        $adapter->complete($this->request(maxOutputTokens: 16), $target);
+        self::assertSame(16, $this->lastBody()['max_output_tokens']);
+
+        $adapter->complete($this->request(maxOutputTokens: 300), $target);
+        self::assertSame(300, $this->lastBody()['max_output_tokens']);
+    }
+
     public function testTheRequestIdIsTheHeaderOfTheProviderElseTheIdOfTheResponse(): void
     {
         $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('ok')], headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID]), Wire::responses([Wire::responsesMessage('ok')])]), self::PINNED);
