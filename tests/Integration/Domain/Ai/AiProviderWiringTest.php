@@ -26,6 +26,7 @@ use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\Provider\OllamaAdapter;
 use Thelia\Domain\Ai\Provider\OpenAiAdapter;
 use Thelia\Domain\Ai\Provider\OpenAiCompatibleAdapter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -69,6 +70,16 @@ final class AiProviderWiringTest extends IntegrationTestCase
         self::assertInstanceOf(AiHttpClientFactory::class, $this->getService(AiHttpClientFactory::class));
         self::assertSame(60, static::getContainer()->getParameter('thelia.ai.http_timeout'));
         self::assertSame(300, static::getContainer()->getParameter('thelia.ai.http_max_duration'));
+    }
+
+    public function testTheValidatorReadsTheFlagOfTheAiLayerAndNotTheOneOfTheWebhooks(): void
+    {
+        $parameter = new \ReflectionParameter([AiBaseUrlValidator::class, '__construct'], 'allowInsecure');
+        $attributes = $parameter->getAttributes(Autowire::class);
+
+        self::assertCount(1, $attributes);
+        self::assertSame('%thelia.ai.allow_insecure_urls%', $attributes[0]->newInstance()->value);
+        self::assertTrue(static::getContainer()->hasParameter('thelia.ai.allow_insecure_urls'));
     }
 
     public function testPlainHttpToAPublicAddressIsOffUnlessTheFlagOfTheAiLayerAllowsIt(): void
