@@ -21,7 +21,8 @@ use Thelia\Model\Map\AiUsageLogTableMap;
 
 /**
  * What the AI spent over a period, summed from the usage log and grouped by usage, module, model or day. Amounts
- * are decimal strings in US dollars, as the log keeps them; calls count the model calls (a cost declared for a third-party API adds to the cost only). The period is made of whole days, both included; the
+ * are decimal strings in the currency of the prices they were computed with, as the log keeps them: a group spent
+ * in two currencies gives two rows, nothing is converted. Calls count the model calls (a cost declared for a third-party API adds to the cost only). The period is made of whole days, both included; the
  * grouping is chosen among a fixed list and the dates are bound parameters.
  *
  * @internal
@@ -45,7 +46,7 @@ final readonly class AiConsumptionReport
     /**
      * @param value-of<self::DIMENSIONS> $dimension
      *
-     * @return list<array{label: string, calls: int, cost: string}> the biggest spender first, the days oldest first
+     * @return list<array{label: string, currency: string, calls: int, cost: string}> the biggest spender first, the days oldest first
      */
     public function by(string $dimension, \DateTimeImmutable $from, \DateTimeImmutable $to): array
     {
@@ -55,10 +56,10 @@ final readonly class AiConsumptionReport
             ['label' => $expression],
             '`created_at` >= :from AND `created_at` < :to',
             [':from' => $from->format('Y-m-d 00:00:00'), ':to' => $to->modify('+1 day')->format('Y-m-d 00:00:00')],
-            self::BY_DAY === $dimension ? 'label ASC' : 'cost DESC, label ASC',
+            self::BY_DAY === $dimension ? 'label ASC, currency ASC' : 'cost DESC, label ASC, currency ASC',
         );
 
-        return array_map(static fn (array $row): array => ['label' => (string) $row['label'], 'calls' => $row['calls'], 'cost' => $row['cost']], $rows);
+        return array_map(static fn (array $row): array => ['label' => (string) $row['label'], 'currency' => (string) $row['currency'], 'calls' => $row['calls'], 'cost' => $row['cost']], $rows);
     }
 
     /**
@@ -68,7 +69,7 @@ final readonly class AiConsumptionReport
      * @param string|null $fromMonth first month included, written YYYY-MM
      * @param string|null $toMonth   last month included, written YYYY-MM
      *
-     * @return list<array{month: string, usage_id: string, module: string, calls: int, failures: int, external_calls: int, input_tokens: int, output_tokens: int, cost: string}>
+     * @return list<array{month: string, usage_id: string, module: string, currency: string, calls: int, failures: int, external_calls: int, input_tokens: int, output_tokens: int, cost: string}> one row per currency of a month and a usage
      */
     public function byMonthAndUsage(?string $month = null, ?string $fromMonth = null, ?string $toMonth = null, ?string $usageId = null, ?string $module = null): array
     {
@@ -95,23 +96,25 @@ final readonly class AiConsumptionReport
             ['month' => $monthOfRow, 'usage_id' => '`usage_id`', 'module' => '`module`'],
             [] === $conditions ? '1 = 1' : implode(' AND ', $conditions),
             $parameters,
-            'month DESC, `usage_id` ASC',
+            'month DESC, `usage_id` ASC, currency ASC',
         );
 
-        return array_map(static fn (array $row): array => ['month' => (string) $row['month'], 'usage_id' => (string) $row['usage_id'], 'module' => (string) $row['module']] + array_diff_key($row, ['month' => 0, 'usage_id' => 0, 'module' => 0]), $rows);
+        return array_map(static fn (array $row): array => ['month' => (string) $row['month'], 'usage_id' => (string) $row['usage_id'], 'module' => (string) $row['module'], 'currency' => (string) $row['currency']] + array_diff_key($row, ['month' => 0, 'usage_id' => 0, 'module' => 0, 'currency' => 0]), $rows);
     }
 
     /**
-     * The one aggregation of the log: the figures of every group, summed by the database. The cost is read back as
-     * the decimal string the database sums, never through a float.
+     * The one aggregation of the log: the figures of every group in each currency, summed by the database. The cost
+     * is read back as the decimal string the database sums, never through a float.
      *
      * @param array<string, string> $groups     alias => SQL expression, fixed by the callers, never user input
      * @param array<string, string> $parameters bound parameters of $where
      *
-     * @return list<array<string, mixed>> the group aliases as selected, then calls, failures, external_calls, input_tokens, output_tokens, cost
+     * @return list<array<string, mixed>> the group aliases as selected, currency, then calls, failures, external_calls, input_tokens, output_tokens, cost
      */
     private function aggregate(array $groups, string $where, array $parameters, string $order): array
     {
+        // Costs in two currencies are never added up.
+        $groups['currency'] = '`currency`';
         $selected = [];
 
         foreach ($groups as $alias => $expression) {

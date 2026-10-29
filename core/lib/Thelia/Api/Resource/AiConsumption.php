@@ -21,8 +21,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\State\Provider\AiConsumptionProvider;
 
 /**
- * What a usage consumed in a calendar month, summed from the AI log: calls, failures, tokens and cost. Amounts
- * are decimal strings in US dollars, as the log keeps them, with no conversion. Read only. Query parameters:
+ * What a usage consumed in a calendar month in one currency, summed from the AI log: calls, failures, tokens and
+ * cost. Amounts are decimal strings in `currency`, the currency of the prices of the models, as the log keeps them,
+ * with no conversion: a usage that spent in two currencies in a month has a row for each (`id` is
+ * `month/usageId/currency`). Read only. Query parameters:
  * `month` (YYYY-MM), `from` and `to` (YYYY-MM, both included), `usageId`, `module`. Administration only,
  * under the right `admin.configuration.ai`.
  *
@@ -75,5 +77,5 @@ final class AiConsumption
     public string $cost = '0.00000000';
 
     #[Groups([self::GROUP_ADMIN_READ])]
-    public string $currency = 'USD';
+    public string $currency = '';
 }

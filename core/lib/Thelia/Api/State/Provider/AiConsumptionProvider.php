@@ -49,7 +49,7 @@ final readonly class AiConsumptionProvider implements ProviderInterface
 
         foreach ($this->report->byMonthAndUsage($text('month'), $text('from'), $text('to'), $text('usageId'), $text('module')) as $row) {
             $consumption = new AiConsumption();
-            $consumption->id = $row['month'].'/'.$row['usage_id'];
+            $consumption->id = $row['month'].'/'.$row['usage_id'].'/'.$row['currency'];
             $consumption->month = $row['month'];
             $consumption->usageId = $row['usage_id'];
             $consumption->module = $row['module'];
@@ -59,6 +59,7 @@ final readonly class AiConsumptionProvider implements ProviderInterface
             $consumption->inputTokens = $row['input_tokens'];
             $consumption->outputTokens = $row['output_tokens'];
             $consumption->cost = $row['cost'];
+            $consumption->currency = $row['currency'];
             $rows[] = $consumption;
         }
 
