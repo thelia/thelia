@@ -17,6 +17,7 @@ namespace Thelia\Domain\OrderReturn\Service;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Config\DatabaseConfiguration;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -61,6 +62,12 @@ final class ReturnEligibilityChecker
      * not exist.
      */
     public const ORDER_PRODUCT_NOT_USABLE_MESSAGE = 'This product line does not belong to the order.';
+
+    /**
+     * The line of a component of a bundle: the bundle is what a customer returns, its line
+     * carries the refund. It is the key of the message in the core catalogs, translated where it is thrown.
+     */
+    public const BUNDLE_COMPONENT_NOT_RETURNABLE_MESSAGE = 'This item is part of a bundle and cannot be returned on its own.';
 
     /**
      * The order statuses a return may be opened on, as a comma separated list of
@@ -276,10 +283,16 @@ final class ReturnEligibilityChecker
      * shipped, so neither a virtual product nor a service the shop invoiced beside the
      * goods. A gift wrapping has nothing to send back, and offering to take it back
      * would promise a refund the return flow has no unit to count.
+     *
+     * A component of a bundle is not returnable on its own either: it was not sold on its
+     * own, the refund is the price of the pack, and the line that carries it is the one of
+     * the bundle. Returning the bundle line puts its components back in stock.
      */
     public function isProductReturnable(OrderProduct $orderProduct): bool
     {
-        return 1 !== (int) $orderProduct->getVirtual() && $orderProduct->isProductLine();
+        return 1 !== (int) $orderProduct->getVirtual()
+            && $orderProduct->isProductLine()
+            && !$orderProduct->isBundleComponentLine();
     }
 
     /**
@@ -418,6 +431,10 @@ final class ReturnEligibilityChecker
 
         if ((int) $orderProduct->getOrderId() !== (int) $order->getId()) {
             throw new ReturnNotAllowedException(self::ORDER_PRODUCT_NOT_USABLE_MESSAGE);
+        }
+
+        if ($orderProduct->isBundleComponentLine()) {
+            throw new ReturnNotAllowedException(Translator::getInstance()->trans(self::BUNDLE_COMPONENT_NOT_RETURNABLE_MESSAGE));
         }
 
         if (!$this->isProductReturnable($orderProduct)) {

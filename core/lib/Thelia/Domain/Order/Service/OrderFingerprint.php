@@ -82,7 +82,7 @@ final readonly class OrderFingerprint
         $lines = [];
 
         foreach ($cart->getCartItems() as $cartItem) {
-            $lines[] = $this->line(
+            $line = $this->line(
                 (int) $cartItem->getProductSaleElementsId(),
                 (float) $cartItem->getQuantity(),
                 (string) $cartItem->getPrice(),
@@ -90,6 +90,18 @@ final readonly class OrderFingerprint
                 (int) ($cartItem->getPromo() ?? 0),
                 (int) ($cartItem->getIsOffered() ?? 0),
             );
+
+            // What the buyer chose of a pack is what the order is made of, and two packs with
+            // the same price can hold other components: the composition is part of the line.
+            // Added only to a pack line, like the date below: the line of any other cart is
+            // the line it has always been, so is the fingerprint frozen on an unpaid order.
+            $bundleComposition = $cartItem->getBundleCompositionValue();
+
+            if (null !== $bundleComposition) {
+                $line['composition'] = $bundleComposition->toCanonicalJson();
+            }
+
+            $lines[] = $line;
         }
 
         $fingerprint = [
@@ -237,7 +249,7 @@ final readonly class OrderFingerprint
      */
     private function sorted(array $lines): array
     {
-        usort($lines, static fn (array $a, array $b): int => [$a['pse'], $a['price'], $a['promo_price']] <=> [$b['pse'], $b['price'], $b['promo_price']]);
+        usort($lines, static fn (array $a, array $b): int => [$a['pse'], $a['price'], $a['promo_price'], $a['composition'] ?? ''] <=> [$b['pse'], $b['price'], $b['promo_price'], $b['composition'] ?? '']);
 
         return $lines;
     }
