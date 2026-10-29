@@ -148,6 +148,18 @@ final class AiUsageApiTest extends ApiTestCase
         self::assertSame(422, $this->jsonRequest('GET', self::CONSUMPTION.'?month=september', token: $token)->getStatusCode());
     }
 
+    public function testTheConsumptionCostIsAnExactDecimal(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        AiUsageLogQuery::create()->deleteAll();
+        // A float reads this amount back as 88888888.88888890.
+        $this->log('probe.exact', '88888888.88888889', '2026-09-10 10:00:00', 'succeeded', 1, 1);
+
+        $members = json_decode((string) $this->jsonRequest('GET', self::CONSUMPTION.'?month=2026-09', token: $token)->getContent(), true)['hydra:member'];
+
+        self::assertSame('88888888.88888889', $members[0]['cost']);
+    }
+
     public function testNoTokenIsRefused(): void
     {
         foreach ([['GET', self::SETTINGS], ['POST', self::SETTINGS], ['DELETE', self::SETTINGS.'/1'], ['GET', self::USAGES], ['GET', self::USAGES.'/'.self::USAGE], ['GET', self::CONSUMPTION]] as [$method, $uri]) {

@@ -39,6 +39,34 @@ final class AiConsumptionReportTest extends IntegrationTestCase
         self::assertSame([['label' => '2031-03-01', 'calls' => 1, 'cost' => '0.30000000'], ['label' => '2031-03-02', 'calls' => 2, 'cost' => '0.35000000']], $report->by(AiConsumptionReport::BY_DAY, $from, $to));
     }
 
+    public function testTheSumsAreExactDecimalsNotFloats(): void
+    {
+        // A float reads this amount back as 88888888.88888890.
+        $this->row('rep.exact', 'rep', 'model-a', 'completion', '88888888.88888889', '2031-03-01 10:00:00');
+
+        $report = new AiConsumptionReport();
+
+        self::assertSame([['label' => 'rep.exact', 'calls' => 1, 'cost' => '88888888.88888889']], $report->by(AiConsumptionReport::BY_USAGE, new \DateTimeImmutable('2031-03-01'), new \DateTimeImmutable('2031-03-01')));
+        self::assertSame('88888888.88888889', $report->byMonthAndUsage(month: '2031-03')[0]['cost']);
+    }
+
+    public function testTheMonthAndUsageFiguresCountCallsFailuresAndTokens(): void
+    {
+        $this->row('rep.chat', 'rep', 'model-a', 'completion', '0.30000000', '2031-03-01 10:00:00', 'succeeded', 100, 10);
+        $this->row('rep.chat', 'rep', 'model-a', 'completion', '0.20000000', '2031-03-02 10:00:00', 'failed', 50, 0);
+        $this->row('rep.chat', 'rep', null, 'external', '0.05000000', '2031-04-02 10:00:00');
+        $this->row('rep.other', 'other', 'model-b', 'completion', '9.00000000', '2031-03-02 10:00:00');
+
+        $report = new AiConsumptionReport();
+
+        self::assertSame(
+            [['month' => '2031-03', 'usage_id' => 'rep.chat', 'module' => 'rep', 'calls' => 2, 'failures' => 1, 'external_calls' => 0, 'input_tokens' => 150, 'output_tokens' => 10, 'cost' => '0.50000000']],
+            $report->byMonthAndUsage(month: '2031-03', usageId: 'rep.chat'),
+        );
+        self::assertSame(['2031-04/rep.chat', '2031-03/rep.chat'], array_map(static fn (array $row): string => $row['month'].'/'.$row['usage_id'], $report->byMonthAndUsage(fromMonth: '2031-03', toMonth: '2031-04', module: 'rep')));
+        self::assertSame(1, $report->byMonthAndUsage(month: '2031-04')[0]['external_calls']);
+    }
+
     public function testAnUnknownDimensionIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -46,11 +74,12 @@ final class AiConsumptionReportTest extends IntegrationTestCase
         (new AiConsumptionReport())->by('`; DROP', new \DateTimeImmutable('2031-03-01'), new \DateTimeImmutable('2031-03-02'));
     }
 
-    private function row(string $usage, string $module, ?string $model, string $kind, string $cost, string $at): void
+    private function row(string $usage, string $module, ?string $model, string $kind, string $cost, string $at, string $status = 'succeeded', int $inputTokens = 0, int $outputTokens = 0): void
     {
         $row = (new AiUsageLog())
             ->setUsageId($usage)->setModule($module)->setModel($model)->setKind($kind)->setCost($cost)
-            ->setActorType('system')->setActorHash(str_repeat('a', 64))->setStatus('succeeded')
+            ->setInputTokens($inputTokens)->setOutputTokens($outputTokens)
+            ->setActorType('system')->setActorHash(str_repeat('a', 64))->setStatus($status)
             ->setCreatedAt(new \DateTimeImmutable($at));
         $row->save();
     }
