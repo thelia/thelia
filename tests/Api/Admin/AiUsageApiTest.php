@@ -129,7 +129,7 @@ final class AiUsageApiTest extends ApiTestCase
         $this->log('probe.beta', '0.50000000', '2026-09-11 10:00:00', 'succeeded', 1, 1, 'external');
 
         $all = json_decode((string) $this->jsonRequest('GET', self::CONSUMPTION, token: $token)->getContent(), true)['hydra:member'];
-        self::assertSame(['2026-10/probe.alpha', '2026-09/probe.alpha', '2026-09/probe.beta'], array_column($all, 'id'));
+        self::assertSame(['2026-10/probe.alpha/USD', '2026-09/probe.alpha/USD', '2026-09/probe.beta/USD'], array_column($all, 'id'));
 
         $september = json_decode((string) $this->jsonRequest('GET', self::CONSUMPTION.'?month=2026-09&usageId=probe.alpha', token: $token)->getContent(), true)['hydra:member'];
         self::assertCount(1, $september);
@@ -146,6 +146,18 @@ final class AiUsageApiTest extends ApiTestCase
         self::assertSame('0.50000000', $beta['cost']);
 
         self::assertSame(422, $this->jsonRequest('GET', self::CONSUMPTION.'?month=september', token: $token)->getStatusCode());
+    }
+
+    public function testTheConsumptionGivesOneRowPerCurrencyAndNamesIt(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        AiUsageLogQuery::create()->deleteAll();
+        $this->log('probe.alpha', '0.10000000', '2026-09-10 10:00:00', 'succeeded', 1, 1);
+        $this->log('probe.alpha', '0.20000000', '2026-09-11 10:00:00', 'succeeded', 1, 1, currency: 'EUR');
+
+        $members = json_decode((string) $this->jsonRequest('GET', self::CONSUMPTION.'?month=2026-09', token: $token)->getContent(), true)['hydra:member'];
+
+        self::assertSame([['2026-09/probe.alpha/EUR', 'EUR', '0.20000000'], ['2026-09/probe.alpha/USD', 'USD', '0.10000000']], array_map(static fn (array $row): array => [$row['id'], $row['currency'], $row['cost']], $members));
     }
 
     public function testTheConsumptionCostIsAnExactDecimal(): void
@@ -177,10 +189,10 @@ final class AiUsageApiTest extends ApiTestCase
         }
     }
 
-    private function log(string $usageId, string $cost, string $at, string $status, int $input, int $output, string $kind = 'completion'): void
+    private function log(string $usageId, string $cost, string $at, string $status, int $input, int $output, string $kind = 'completion', string $currency = 'USD'): void
     {
         (new AiUsageLog())
-            ->setUsageId($usageId)->setModule(explode('.', $usageId)[0])->setKind($kind)
+            ->setUsageId($usageId)->setModule(explode('.', $usageId)[0])->setKind($kind)->setCurrency($currency)
             ->setInputTokens($input)->setOutputTokens($output)
             ->setCost($cost)->setActorType('system')->setActorHash(str_repeat('a', 64))->setStatus($status)
             ->setCreatedAt(new \DateTimeImmutable($at))

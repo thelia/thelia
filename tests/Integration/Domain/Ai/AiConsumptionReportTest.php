@@ -33,10 +33,10 @@ final class AiConsumptionReportTest extends IntegrationTestCase
         $from = new \DateTimeImmutable('2031-03-01');
         $to = new \DateTimeImmutable('2031-03-02');
 
-        self::assertSame([['label' => 'rep.chat', 'calls' => 2, 'cost' => '0.50000000'], ['label' => 'rep.pages', 'calls' => 1, 'cost' => '0.15000000']], $report->by(AiConsumptionReport::BY_USAGE, $from, $to));
-        self::assertSame([['label' => 'rep', 'calls' => 3, 'cost' => '0.65000000']], $report->by(AiConsumptionReport::BY_MODULE, $from, $to));
-        self::assertSame([['label' => 'model-a', 'calls' => 2, 'cost' => '0.50000000'], ['label' => 'model-b', 'calls' => 1, 'cost' => '0.10000000'], ['label' => '-', 'calls' => 0, 'cost' => '0.05000000']], $report->by(AiConsumptionReport::BY_MODEL, $from, $to));
-        self::assertSame([['label' => '2031-03-01', 'calls' => 1, 'cost' => '0.30000000'], ['label' => '2031-03-02', 'calls' => 2, 'cost' => '0.35000000']], $report->by(AiConsumptionReport::BY_DAY, $from, $to));
+        self::assertSame([['label' => 'rep.chat', 'currency' => 'USD', 'calls' => 2, 'cost' => '0.50000000'], ['label' => 'rep.pages', 'currency' => 'USD', 'calls' => 1, 'cost' => '0.15000000']], $report->by(AiConsumptionReport::BY_USAGE, $from, $to));
+        self::assertSame([['label' => 'rep', 'currency' => 'USD', 'calls' => 3, 'cost' => '0.65000000']], $report->by(AiConsumptionReport::BY_MODULE, $from, $to));
+        self::assertSame([['label' => 'model-a', 'currency' => 'USD', 'calls' => 2, 'cost' => '0.50000000'], ['label' => 'model-b', 'currency' => 'USD', 'calls' => 1, 'cost' => '0.10000000'], ['label' => '-', 'currency' => 'USD', 'calls' => 0, 'cost' => '0.05000000']], $report->by(AiConsumptionReport::BY_MODEL, $from, $to));
+        self::assertSame([['label' => '2031-03-01', 'currency' => 'USD', 'calls' => 1, 'cost' => '0.30000000'], ['label' => '2031-03-02', 'currency' => 'USD', 'calls' => 2, 'cost' => '0.35000000']], $report->by(AiConsumptionReport::BY_DAY, $from, $to));
     }
 
     public function testTheSumsAreExactDecimalsNotFloats(): void
@@ -46,7 +46,7 @@ final class AiConsumptionReportTest extends IntegrationTestCase
 
         $report = new AiConsumptionReport();
 
-        self::assertSame([['label' => 'rep.exact', 'calls' => 1, 'cost' => '88888888.88888889']], $report->by(AiConsumptionReport::BY_USAGE, new \DateTimeImmutable('2031-03-01'), new \DateTimeImmutable('2031-03-01')));
+        self::assertSame([['label' => 'rep.exact', 'currency' => 'USD', 'calls' => 1, 'cost' => '88888888.88888889']], $report->by(AiConsumptionReport::BY_USAGE, new \DateTimeImmutable('2031-03-01'), new \DateTimeImmutable('2031-03-01')));
         self::assertSame('88888888.88888889', $report->byMonthAndUsage(month: '2031-03')[0]['cost']);
     }
 
@@ -60,11 +60,25 @@ final class AiConsumptionReportTest extends IntegrationTestCase
         $report = new AiConsumptionReport();
 
         self::assertSame(
-            [['month' => '2031-03', 'usage_id' => 'rep.chat', 'module' => 'rep', 'calls' => 2, 'failures' => 1, 'external_calls' => 0, 'input_tokens' => 150, 'output_tokens' => 10, 'cost' => '0.50000000']],
+            [['month' => '2031-03', 'usage_id' => 'rep.chat', 'module' => 'rep', 'currency' => 'USD', 'calls' => 2, 'failures' => 1, 'external_calls' => 0, 'input_tokens' => 150, 'output_tokens' => 10, 'cost' => '0.50000000']],
             $report->byMonthAndUsage(month: '2031-03', usageId: 'rep.chat'),
         );
         self::assertSame(['2031-04/rep.chat', '2031-03/rep.chat'], array_map(static fn (array $row): string => $row['month'].'/'.$row['usage_id'], $report->byMonthAndUsage(fromMonth: '2031-03', toMonth: '2031-04', module: 'rep')));
         self::assertSame(1, $report->byMonthAndUsage(month: '2031-04')[0]['external_calls']);
+    }
+
+    public function testCostsInTwoCurrenciesAreNeverAddedUp(): void
+    {
+        $this->row('rep.chat', 'rep', 'model-a', 'completion', '0.30000000', '2031-03-01 10:00:00');
+        $this->row('rep.chat', 'rep', 'model-eu', 'completion', '0.20000000', '2031-03-01 11:00:00', currency: 'EUR');
+        $this->row('rep.chat', 'rep', 'model-eu', 'completion', '0.05000000', '2031-03-02 11:00:00', currency: 'EUR');
+
+        $report = new AiConsumptionReport();
+        $day = new \DateTimeImmutable('2031-03-01');
+
+        self::assertSame([['label' => 'rep.chat', 'currency' => 'USD', 'calls' => 1, 'cost' => '0.30000000'], ['label' => 'rep.chat', 'currency' => 'EUR', 'calls' => 2, 'cost' => '0.25000000']], $report->by(AiConsumptionReport::BY_USAGE, $day, $day->modify('+1 day')));
+        self::assertSame([['label' => '2031-03-01', 'currency' => 'EUR', 'calls' => 1, 'cost' => '0.20000000'], ['label' => '2031-03-01', 'currency' => 'USD', 'calls' => 1, 'cost' => '0.30000000']], $report->by(AiConsumptionReport::BY_DAY, $day, $day));
+        self::assertSame([['EUR', '0.25000000'], ['USD', '0.30000000']], array_map(static fn (array $row): array => [$row['currency'], $row['cost']], $report->byMonthAndUsage(month: '2031-03')));
     }
 
     public function testAnUnknownDimensionIsRefused(): void
@@ -74,10 +88,10 @@ final class AiConsumptionReportTest extends IntegrationTestCase
         (new AiConsumptionReport())->by('`; DROP', new \DateTimeImmutable('2031-03-01'), new \DateTimeImmutable('2031-03-02'));
     }
 
-    private function row(string $usage, string $module, ?string $model, string $kind, string $cost, string $at, string $status = 'succeeded', int $inputTokens = 0, int $outputTokens = 0): void
+    private function row(string $usage, string $module, ?string $model, string $kind, string $cost, string $at, string $status = 'succeeded', int $inputTokens = 0, int $outputTokens = 0, string $currency = 'USD'): void
     {
         $row = (new AiUsageLog())
-            ->setUsageId($usage)->setModule($module)->setModel($model)->setKind($kind)->setCost($cost)
+            ->setUsageId($usage)->setModule($module)->setModel($model)->setKind($kind)->setCost($cost)->setCurrency($currency)
             ->setInputTokens($inputTokens)->setOutputTokens($outputTokens)
             ->setActorType('system')->setActorHash(str_repeat('a', 64))->setStatus($status)
             ->setCreatedAt(new \DateTimeImmutable($at));
