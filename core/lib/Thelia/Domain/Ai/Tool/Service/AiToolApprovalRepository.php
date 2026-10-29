@@ -208,11 +208,11 @@ final readonly class AiToolApprovalRepository
             $row->getAclAccess(),
             $row->getTarget(),
             $row->getSummary(),
-            $this->decode($row->getOriginalArguments()),
-            $this->decode($row->getArguments()),
+            self::decode($row->getOriginalArguments()),
+            self::decode($row->getArguments()),
             (bool) $row->getAmended(),
-            $this->decode($row->getBeforeState()),
-            $this->decode($row->getAfterState()),
+            self::decode($row->getBeforeState()),
+            self::decode($row->getAfterState()),
             AiToolApprovalStatus::from($row->getStatus()),
             AiToolChannel::from($row->getChannel()),
             $row->getUsageId(),
@@ -269,9 +269,20 @@ final readonly class AiToolApprovalRepository
     }
 
     /**
-     * @return array<string, mixed>
+     * The JSON stored in the columns of a proposal (arguments, states before and after): an empty array is stored as
+     * an object.
+     *
+     * @param array<mixed> $data
      */
-    private function decode(?string $json): array
+    public static function encode(array $data): string
+    {
+        return json_encode([] === $data ? new \stdClass() : $data, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @return array<string, mixed> empty when the column holds no JSON array
+     */
+    public static function decode(?string $json): array
     {
         $decoded = null === $json ? null : json_decode($json, true);
 

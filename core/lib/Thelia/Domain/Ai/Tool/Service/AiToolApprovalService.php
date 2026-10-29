@@ -109,7 +109,7 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         $tool = $this->instances->get($declaration->name());
         \assert($tool instanceof AiWriteToolInterface);
 
-        $amendment = null === $amendedArguments || self::normalized($amendedArguments) === self::normalized($this->decode($row->getArguments())) ? null : $this->amend($tool, $row, $approver, $amendedArguments);
+        $amendment = null === $amendedArguments || self::normalized($amendedArguments) === self::normalized(AiToolApprovalRepository::decode($row->getArguments())) ? null : $this->amend($tool, $row, $approver, $amendedArguments);
         $now = new \DateTimeImmutable();
 
         if (!$this->approvals->claim($approvalId, $approver->getId(), $approver->getLogin(), $amendment, $now)) {
@@ -266,9 +266,12 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
             throw new InvalidAiArgumentException('The amended arguments change what the proposal touches: reject it and ask for another one.');
         }
 
-        $encode = static fn (array $data): string => json_encode([] === $data ? new \stdClass() : $data, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES);
-
-        return ['arguments' => $encode($amendedArguments), 'summary' => $proposal->summary, 'before' => $encode($proposal->before), 'after' => $encode($proposal->after)];
+        return [
+            'arguments' => AiToolApprovalRepository::encode($amendedArguments),
+            'summary' => $proposal->summary,
+            'before' => AiToolApprovalRepository::encode($proposal->before),
+            'after' => AiToolApprovalRepository::encode($proposal->after),
+        ];
     }
 
     /**
@@ -280,9 +283,9 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
             $row->getId(),
             $row->getToolName(),
             $row->getTarget(),
-            $this->decode($row->getArguments()),
-            $this->decode($row->getBeforeState()),
-            $this->decode($row->getAfterState()),
+            AiToolApprovalRepository::decode($row->getArguments()),
+            AiToolApprovalRepository::decode($row->getBeforeState()),
+            AiToolApprovalRepository::decode($row->getAfterState()),
             $approver->getId(),
             AiActorType::from($row->getProposedByType()),
         );
@@ -396,12 +399,5 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         }
 
         return $data;
-    }
-
-    private function decode(?string $json): array
-    {
-        $decoded = null === $json ? null : json_decode($json, true);
-
-        return \is_array($decoded) ? $decoded : [];
     }
 }
