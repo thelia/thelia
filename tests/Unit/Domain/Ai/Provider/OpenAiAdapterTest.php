@@ -109,6 +109,18 @@ final class OpenAiAdapterTest extends AiProviderTestCase
         self::assertFalse($this->lastBody()['text']['format']['strict']);
     }
 
+    public function testAClosedSchemaWithAnOptionalPropertyOrAnOpenChildIsNotSentStrict(): void
+    {
+        $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('{"a":"b"}')]), Wire::responses([Wire::responsesMessage('{"a":"b"}')])]), self::PINNED);
+        $target = $this->target(AiProvider::OpenAi, null);
+
+        $adapter->complete($this->request(outputSchema: new AiOutputSchema('page', ['type' => 'object', 'properties' => ['a' => ['type' => 'string'], 'b' => ['type' => 'string']], 'required' => ['a'], 'additionalProperties' => false])), $target);
+        self::assertFalse($this->lastBody()['text']['format']['strict'], 'a closed root with an optional property');
+
+        $adapter->complete($this->request(outputSchema: new AiOutputSchema('page', ['type' => 'object', 'properties' => ['child' => ['type' => 'object', 'properties' => ['x' => ['type' => 'string']], 'required' => ['x']]], 'required' => ['child'], 'additionalProperties' => false])), $target);
+        self::assertFalse($this->lastBody()['text']['format']['strict'], 'a nested object left open');
+    }
+
     public function testTheRequestIdIsTheHeaderOfTheProviderElseTheIdOfTheResponse(): void
     {
         $adapter = $this->adapter(OpenAiAdapter::class, $this->transport([Wire::responses([Wire::responsesMessage('ok')], headers: ['x-request-id' => Wire::OPENAI_REQUEST_ID]), Wire::responses([Wire::responsesMessage('ok')])]), self::PINNED);
