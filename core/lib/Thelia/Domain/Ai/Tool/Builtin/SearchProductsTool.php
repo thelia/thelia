@@ -24,6 +24,7 @@ use Thelia\Domain\Ai\Tool\AsAiTool;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductI18nQuery;
+use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
@@ -79,16 +80,22 @@ final readonly class SearchProductsTool implements AiReadToolInterface
         }
 
         $currency = CurrencyQuery::create()->filterByByDefault(true)->findOne();
+        $found = iterator_to_array($query->orderByRef()->limit($limit)->find(), false);
+        $variants = $this->variantsByProduct(
+            array_map(static fn (Product $product): int => $product->getId(), $found),
+            $currency?->getId(),
+            $currency?->getCode(),
+        );
         $products = [];
 
         /** @var Product $product */
-        foreach ($query->orderByRef()->limit($limit)->find() as $product) {
+        foreach ($found as $product) {
             $product->setLocale($context->locale);
             $products[] = [
                 'id' => $product->getId(),
                 'ref' => $product->getRef(),
                 'title' => (string) $product->getTitle(),
-                'variants' => $this->variants($product->getId(), $currency?->getId(), $currency?->getCode()),
+                'variants' => $variants[$product->getId()] ?? [],
             ];
         }
 
@@ -96,23 +103,43 @@ final readonly class SearchProductsTool implements AiReadToolInterface
     }
 
     /**
-     * @return list<array<string, mixed>>
+     * Reads the variants of every product and their prices in two statements, whatever the number of products.
+     *
+     * @param list<int> $productIds
+     *
+     * @return array<int, list<array<string, mixed>>> the variants keyed by product id
      */
-    private function variants(int $productId, ?int $currencyId, ?string $currencyCode): array
+    private function variantsByProduct(array $productIds, ?int $currencyId, ?string $currencyCode): array
     {
+        if ([] === $productIds) {
+            return [];
+        }
+
+        $productSaleElements = ProductSaleElementsQuery::create()
+            ->filterByProductId($productIds, Criteria::IN)
+            ->orderById()
+            ->find();
+
+        $prices = [];
+
+        if (null !== $currencyId && 0 < $productSaleElements->count()) {
+            /** @var ProductPrice $price */
+            foreach (ProductPriceQuery::create()
+                ->filterByProductSaleElementsId($productSaleElements->getPrimaryKeys(false), Criteria::IN)
+                ->filterByCurrencyId($currencyId)
+                ->find() as $price) {
+                $prices[$price->getProductSaleElementsId()] = $price->getPrice();
+            }
+        }
+
         $variants = [];
 
         /** @var ProductSaleElements $pse */
-        foreach (ProductSaleElementsQuery::create()->filterByProductId($productId)->orderById()->find() as $pse) {
-            $price = null === $currencyId ? null : ProductPriceQuery::create()
-                ->filterByProductSaleElementsId($pse->getId())
-                ->filterByCurrencyId($currencyId)
-                ->findOne();
-
-            $variants[] = [
+        foreach ($productSaleElements as $pse) {
+            $variants[$pse->getProductId()][] = [
                 'pse_id' => $pse->getId(),
                 'ref' => $pse->getRef(),
-                'price' => $price?->getPrice(),
+                'price' => $prices[$pse->getId()] ?? null,
                 'currency' => $currencyCode,
                 'stock' => $pse->getQuantity(),
             ];
