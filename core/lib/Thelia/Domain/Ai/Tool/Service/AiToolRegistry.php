@@ -28,6 +28,7 @@ use Thelia\Domain\Ai\Service\AiActorHasher;
 use Thelia\Domain\Ai\Service\AiSettings;
 use Thelia\Domain\Ai\Tool\AiChangeProposal;
 use Thelia\Domain\Ai\Tool\AiReadToolInterface;
+use Thelia\Domain\Ai\Tool\AiToolApprovalStatus;
 use Thelia\Domain\Ai\Tool\AiToolCallStatus;
 use Thelia\Domain\Ai\Tool\AiToolChannel;
 use Thelia\Domain\Ai\Tool\AiToolContext;
@@ -217,7 +218,6 @@ final readonly class AiToolRegistry implements AiToolRegistryInterface
         $admin = AiActorType::Admin === $context->actor->type ? $context->actor : null;
         $adminRow = $admin instanceof AiActor ? AdminQuery::create()->findPk((int) $admin->identifier) : null;
         $token = null === $context->tokenId ? null : $this->accessChecker->tokenRow($context->tokenId);
-        $json = static fn (array $data): string => json_encode([] === $data ? new \stdClass() : $data, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES);
 
         $approval = (new AiToolApproval())
             ->setToolName($attribute->name)
@@ -227,12 +227,12 @@ final readonly class AiToolRegistry implements AiToolRegistryInterface
             ->setAclAccess($attribute->access)
             ->setTarget($proposal->target)
             ->setSummary($proposal->summary)
-            ->setOriginalArguments($json($call->arguments))
-            ->setArguments($json($call->arguments))
-            ->setBeforeState($json($proposal->before))
-            ->setAfterState($json($proposal->after))
+            ->setOriginalArguments(AiToolApprovalRepository::encode($call->arguments))
+            ->setArguments(AiToolApprovalRepository::encode($call->arguments))
+            ->setBeforeState(AiToolApprovalRepository::encode($proposal->before))
+            ->setAfterState(AiToolApprovalRepository::encode($proposal->after))
             ->setAmended(false)
-            ->setStatus('pending')
+            ->setStatus(AiToolApprovalStatus::Pending->value)
             ->setChannel($context->channel->value)
             ->setUsageId(AiToolChannel::Mcp === $context->channel ? null : $context->usageId)
             ->setCorrelationId($context->correlationId)
