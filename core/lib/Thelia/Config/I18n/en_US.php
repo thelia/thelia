@@ -321,6 +321,7 @@ return [
     'It is not allowed to delete the default currency' => 'It is not allowed to delete the default currency',
     'It is not allowed to delete the default language' => 'It is not allowed to delete the default language',
     'JavaScript' => 'JavaScript',
+    'Judges whether a message of a visitor stays on the subject of the feature it is sent to.' => 'Judges whether a message of a visitor stays on the subject of the feature it is sent to.',
     'Keep the most important part of your description in the first 150-160 characters.' => 'Keep the most important part of your description in the first 150-160 characters.',
     'Language' => 'Language',
     'Language name' => 'Language name',

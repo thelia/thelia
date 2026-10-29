@@ -77,7 +77,7 @@ final readonly class AiUsageRegister
         return [
             'id' => $usage->id,
             'module' => $usage->module(),
-            'purpose' => $usage->purpose,
+            'purpose' => $this->translator->trans($usage->purpose, [], $locale),
             'audience' => $usage->audience->value,
             'tier' => ($setting?->effectiveTier($usage->tier) ?? $usage->tier)->value,
             'declared_tier' => $usage->tier->value,

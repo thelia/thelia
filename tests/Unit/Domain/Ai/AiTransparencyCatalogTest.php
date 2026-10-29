@@ -18,13 +18,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Ai\Compliance\AiComplianceStatus;
 use Thelia\Domain\Ai\Guardrail\AiVerdictReasons;
+use Thelia\Domain\Ai\Guardrail\TopicGuardrail;
 use Thelia\Domain\Ai\Service\AiFailureExplainer;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
 use Thelia\Domain\Ai\Twig\AiTransparencyExtension;
 
 /**
  * Every text of the transparency layer (notice, compliance messages, mark label, reasons of the verdicts) is in
- * the core catalog of the shipped languages, and the French one keeps the placeholders of the source.
+ * the core catalog of the shipped languages (and so is the purpose of the usage the core declares itself), and the French one keeps the placeholders of the source.
  */
 final class AiTransparencyCatalogTest extends TestCase
 {
@@ -50,7 +51,7 @@ final class AiTransparencyCatalogTest extends TestCase
      */
     public static function texts(): iterable
     {
-        foreach (array_unique([AiUsageRegistry::TRANSPARENCY_NOTICE, ...AiComplianceStatus::sources(), ...AiVerdictReasons::sources(), ...AiFailureExplainer::sources(), ...AiTransparencyExtension::sources()]) as $source) {
+        foreach (array_unique([TopicGuardrail::PURPOSE, AiUsageRegistry::TRANSPARENCY_NOTICE, ...AiComplianceStatus::sources(), ...AiVerdictReasons::sources(), ...AiFailureExplainer::sources(), ...AiTransparencyExtension::sources()]) as $source) {
             yield $source => [$source];
         }
     }

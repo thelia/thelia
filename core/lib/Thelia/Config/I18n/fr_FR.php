@@ -323,6 +323,7 @@ return [
     'It is not allowed to delete the default currency' => 'Il n\'est pas possible de supprimer la devise par défaut',
     'It is not allowed to delete the default language' => 'Il n\'est pas possible de supprimer la langue par défaut',
     'JavaScript' => 'JavaScript',
+    'Judges whether a message of a visitor stays on the subject of the feature it is sent to.' => 'Juge si le message d\'un visiteur reste dans le sujet de la fonctionnalité à laquelle il est envoyé.',
     'Keep the most important part of your description in the first 150-160 characters.' => 'Votre description ne devrait pas dépasser 150 à 160 caractères',
     'Language' => 'Langue',
     'Language name' => 'Nom de la langue',
