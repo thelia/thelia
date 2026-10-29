@@ -24,10 +24,10 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\AiConnection as AiConnectionResource;
 use Thelia\Domain\Ai\Exception\AiExceptionInterface;
+use Thelia\Domain\Ai\Exception\AiResourceInUseException;
 use Thelia\Domain\Ai\Service\AiSettingsWriter;
 use Thelia\Model\AiConnection;
 use Thelia\Model\AiConnectionQuery;
-use Thelia\Model\AiTierAssignmentQuery;
 
 /**
  * Creates, updates and deletes a connection; the rules (key in the vault and never returned, address, jurisdiction)
@@ -51,11 +51,11 @@ final readonly class AiConnectionWriteProcessor implements ProcessorInterface
             : (AiConnectionQuery::create()->findPk((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException('AI connection not found.'));
 
         if ($operation instanceof DeleteOperationInterface) {
-            if (AiTierAssignmentQuery::create()->filterByConnectionId($connection->getId())->count() > 0) {
-                throw new ConflictHttpException('This connection is assigned to a tier: assign another one first.');
+            try {
+                $this->writer->deleteConnection($connection);
+            } catch (AiResourceInUseException $inUse) {
+                throw new ConflictHttpException($inUse->getMessage(), $inUse);
             }
-
-            $connection->delete();
 
             return null;
         }

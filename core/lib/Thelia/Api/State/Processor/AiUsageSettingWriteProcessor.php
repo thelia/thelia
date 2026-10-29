@@ -47,7 +47,7 @@ final readonly class AiUsageSettingWriteProcessor implements ProcessorInterface
             : (AiUsageSettingQuery::create()->findPk((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException('AI usage setting not found.'));
 
         if ($operation instanceof DeleteOperationInterface) {
-            $setting->delete();
+            $this->writer->deleteUsageSetting($setting);
 
             return null;
         }
