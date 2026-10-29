@@ -114,12 +114,20 @@ final readonly class AiToolAccessChecker
                 continue;
             }
 
-            if ((null !== $resource && ($scope['resource'] ?? null) === $resource) || (null !== $module && ($scope['module'] ?? null) === $module)) {
+            if ((null !== $resource && ($scope['resource'] ?? null) === $resource) || self::sameModule($scope['module'] ?? null, $module)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * A module code is read whatever its case, as SecurityContext::isUserGranted() reads it for the administrator.
+     */
+    private static function sameModule(mixed $scopeModule, ?string $module): bool
+    {
+        return \is_string($scopeModule) && null !== $module && '' !== $module && 0 === strcasecmp($scopeModule, $module);
     }
 
     /**
