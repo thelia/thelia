@@ -83,7 +83,7 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
     /** A public address: the anti-SSRF client accepts it without looking a name up. */
     public const string PUBLIC_URL = 'https://93.184.216.34';
 
-    /** @var list<array{method: string, url: string, body: array<string, mixed>|null, held: string}> */
+    /** @var list<array{method: string, url: string, body: array<string, mixed>|null, held: string, heldCurrency: string}> */
     protected array $sent = [];
 
     protected AiGateway $gateway;
@@ -163,7 +163,7 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
         $queue = $responses;
         $transport = new MockHttpClient(function (string $method, string $url, array $options) use (&$queue): MockResponse {
             $body = isset($options['body']) && \is_string($options['body']) ? json_decode($options['body'], true) : null;
-            $this->sent[] = ['method' => $method, 'url' => $url, 'body' => $body, 'held' => $this->heldAmount()];
+            $this->sent[] = ['method' => $method, 'url' => $url, 'body' => $body, 'held' => $this->heldAmount(), 'heldCurrency' => $this->heldCurrency()];
 
             return array_shift($queue) ?? throw new \LogicException('No more mock responses queued.');
         });
@@ -262,6 +262,14 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
     protected function logCount(): int
     {
         return AiUsageLogQuery::create()->count();
+    }
+
+    private function heldCurrency(): string
+    {
+        $statement = Propel::getConnection('TheliaMain')->prepare('SELECT COALESCE(MIN(`currency`), \'\') FROM `ai_budget_reservation`');
+        $statement->execute();
+
+        return (string) $statement->fetchColumn();
     }
 
     private function heldAmount(): string
