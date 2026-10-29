@@ -372,6 +372,110 @@ A Redis or AMQP queue is read by the workers as the shop's own: whoever can writ
 - `Thelia\Api\State\Processor\OrderReturnFrontCreateProcessor::__construct()` and `OrderReturnAdminCreateProcessor::__construct()` take a `Thelia\Domain\OrderReturn\Service\OrderReturnStatusEmailDispatcher` in place of the event dispatcher they took to send the status e-mail. Both classes are `final`: a project that builds one by hand passes the service at the same position. Both also take `Thelia\Domain\OrderReturn\Service\OrderReturnHistoryRecorder` as a last argument, without a default, and `Thelia\Domain\OrderReturn\EventListener\RecordOrderReturnHistoryListener::__construct()` takes it last as well. A module reading them from the container has nothing to do.
 - `Thelia\Domain\Order\Service\OrderHistoryActorResolver::__construct()` takes `Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface` as a second and last argument, without a default. A project that builds the resolver by hand passes it; the service is autowired.
 
+# 3.2.5
+
+Security and maintenance release of the 3.2 line. It stops a return request from taking over the return lines of another customer, and it keeps the history of an order in the order things happened. It ships `setup/update/sql/3.2.5.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.2.5 with this core; `thelia/config` does not change and stays at 3.2.0. The themes do not change.
+
+## Security
+
+- Opening a return, on the front API or from the administration, can no longer take over a return line that already exists, including one of another customer: such a request is refused with 422 and the line stays where it was.
+
+## Fixed
+
+- The history of an order reads in the order things happened. The line of a status change was written after the e-mails the change sends, so the confirmation of a cheque payment came before the status that caused it; it is now written right after the core listener persists the status, at priority 127 of `ORDER_UPDATE_STATUS`. The listener moves from priority 64 to 127, so a module listening between the two that stops the propagation of `ORDER_UPDATE_STATUS` no longer keeps the line from being written. A module that sends its e-mail at priority 128, `VirtualProductDelivery` for one, still comes first, and has to run below 127.
+- The same e-mail sent again after something else happened to the order, as `order_return_status_changed` on each step of a return, keeps its line in the history: a line is dropped as a duplicate only when it repeats the last line of the order. A status, a reference or a creation line repeated after the lines its own change wrote is still dropped. A free event type written by a module is compared with the last line of the order, and no longer with the last line of its own type; `OrderHistoryRecorder::recordAddressUpdated()` is not compared at all.
+- Two corrections of the same order address leave two history lines, each with its author, where the second used to pass for a duplicate of the first. A form submitted again with nothing changed writes no line.
+- A history line that the database refuses no longer takes the transaction of the caller with it. The line is now written by an INSERT of its own instead of `OrderHistory::save()`, whose rollback made the surrounding transaction impossible to commit, as in `OrderProcessor` when an administrator changes the status of an order through the API; the Propel model events of `order_history` (`propel.pre.save`, `pre.insert`, `post.insert`, `post.save`) are still dispatched around it, so a module listening to them is told of every line. A refusal (a foreign key on an order that is gone, a lock wait that ran out, a payload too big for the server) undoes that statement only, is logged, and the gesture of the caller commits. The label of the author is cut at the 255 characters of its column and an event type longer than 50 characters is refused before the database is asked. A deadlock stays the exception: InnoDB rolls back the whole transaction on the server whatever the client does next, and so does a module that rolls back the connection of the core from a listener; the failure is logged, with the fact that the transaction of the caller was lost when it was.
+
+## Breaking changes
+
+- The history line of opening a return, pointing its reception or moving it to another status precedes the e-mail that gesture sends. `Thelia\Action\OrderReturn` no longer dispatches `ORDER_RETURN_SEND_STATUS_EMAIL` from the end of `create()`, `receive()` and `updateStatus()`: a listener at priority 32 of `ORDER_RETURN_CREATE`, `ORDER_RETURN_RECEIVE` and `ORDER_RETURN_UPDATE_STATUS` does it, so a listener of those events between 32 and 128 now runs before the e-mail, and if it throws or stops the propagation the e-mail is not sent. Calling `create()`, `receive()` or `updateStatus()` directly, without dispatching the event, no longer sends the e-mail either.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+# 3.2.4
+
+Security release of the 3.2 line. It ships `setup/update/sql/3.2.4.sql`, which adds a configuration variable and records the new version, without any schema change. `thelia/setup` ships as 3.2.4 with this core; `thelia/config` does not change and stays at 3.2.0. The themes do not change.
+
+## Security
+
+- Coupon usage limits are now enforced on paid and pending orders. A coupon limited to a number of usages, overall or per customer, could be used more times than allowed. Taking a usage, and checking the usages left when an order is placed or recorded, now happen in a single guarded step, and the orders waiting for their payment hold the usages they were placed with.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+The update adds the `coupon_unpaid_order_hold_days` configuration variable (7 by default): the number of days an unpaid order holds the coupon usages it was placed with. Past that delay, or with 0, its usages are available to new orders again.
+
+# 3.2.3
+
+Security and maintenance release of the 3.2 line. It stops a customer from writing, through the front API, account fields the shop reserves to its administration, and it removes the published copies of a deleted image or document. It ships `setup/update/sql/3.2.3.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.2.3 with this core; `thelia/config` does not change and stays at 3.2.0. The themes do not change.
+
+## Security
+
+- [GHSA-q679-2j8v-rh79](https://github.com/thelia/thelia/security/advisories/GHSA-q679-2j8v-rh79) — the API wrote the fields a module adds to a native resource (its addons) straight from the request body, without the write groups of the operation. A signed-in customer updating their account with `PUT /api/front/account/customers/{id}` could set any addon field the shop reserves to its administration, such as the customer family of CustomerFamily, and with it the prices and payment conditions of another family. The same request replaced the whole customer, so the fields the customer cannot write came back empty, the e-mail among them, and the customer could no longer sign in. An addon field is now written only when it is in one of the write groups of the operation, and the front account update changes the customer in place: what the customer cannot write keeps its value.
+
+## Fixed
+
+- Deleting an image or a document, in the back office or with a DELETE on the API, removes what the shop published to serve it: the link or copy in the cache directory, the resized versions and the variants of the image filters. They used to stay served at the same address, and a deletion over the API also left the stored file on disk. A copy published in `copy` mode is removed only when it holds the content of the deleted file: a category image and a product image can both be stored as `logo-8.png`, and deleting one keeps the copy of the other.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+A module that adds fields to an API resource has them written only when they carry a `#[Groups]` attribute naming a write group of the operation, as the fields of the resource itself do. A field without such a group is no longer written by an operation that declares groups.
+
+# 3.2.2
+
+Maintenance release of the 3.2 line. It fixes coupons and automatic promotions, the refund of a return that carries the postage, and a reserved operation that showed to every visitor while it was not running. It ships `setup/update/sql/3.2.2.sql`, which changes no schema and records the new version. `thelia/setup` ships as 3.2.2 with this core; `thelia/config` does not change and stays at 3.2.0. The themes do not change.
+
+## Fixed
+
+- A return that carries the postage back refunds what the customer paid for it. The postage of an order is stored tax included, and the refund added its tax a second time: a 6.00 postage holding 1.00 of tax refunded 7.00.
+- A coupon that offers the postage no longer fails when the shop checks whether the postage is free: when the postage of a cart or an order is set, in the postage estimate, and in the `is_delivery_free` attribute of the API. Since 3.0.0-beta1 a coupon kept its countries and delivery modules as arrays of plain values, and `CouponManager::isCouponRemovingPostage()` and `CouponFreeShippingEvaluator::isCouponRemovingPostage()` failed on them with an `Error`. `getFreeShippingForCountries()` and `getFreeShippingForModules()` of `CouponInterface` now return the `CouponCountry` and `CouponModule` rows their callers read.
+- The coupons that remove an amount or a percentage on products, categories or attribute values, and the free product coupon, apply to every product, category or attribute value selected in the back-office. The back-office saved only the first entry of the list, and the ids it stored never matched a cart line because they were read back as strings, so such a coupon discounted nothing. A coupon of these types saved from the back-office kept only that first entry: open it, select the whole list again and save it.
+- The coupon conditions on products, categories, customers, delivery countries and billing countries match the ids saved from the back-office. Since 3.0.0 they compared the integer ids of the cart, the customer and its addresses with the ids the back-office stores as strings, so the "in" operator never matched and "not in" always did, even for a listed product. The ids are now read as integers, which also fixes the conditions already saved: there is nothing to save again.
+- The coupon conditions on the number of articles, the number of units and the cart total match with the "equal to" operator. Since 3.0.0 the comparison is strict, and the number the back-office saves is a string, so "equal to" never matched. The number is now read as an integer, or as a float for the total, which also fixes the conditions already saved.
+- A coupon condition on the number of units in the cart no longer fails with a `TypeError` as soon as the cart holds a line. Since 3.0.0, `BaseFacade::getNbArticlesInCartIncludeQuantity()` declared an `int` and returned the sum of the line quantities, which are floats: adding a product to the cart failed while such a coupon was in use or such an automatic promotion was enabled. It returns the exact sum again, as in Thelia 2, so a product sold by weight counts for its decimal quantity, and `FacadeInterface` declares `int|float` (an implementation that declares `int` stays compatible).
+- The delivery country condition of a coupon matches a cart by the country of its delivery address again. Since 3.0.0 it refused every cart, with or without a delivery address. `FacadeInterface::getDeliveryAddress()` now returns `null` when the cart has no delivery address yet, instead of failing with a `TypeError`.
+- A free product coupon whose effects hold no offered product or offered category, as the API can store them, is read without the two "Undefined array key" warnings it raised on every cart evaluation since 2.0.3. It offers nothing, as before.
+- `getExpirationDate()` of `CouponInterface` and `CouponAbstract` returns a `\DateTime`. Both declared a class that does not exist, so a call failed with a `TypeError`, and PHP refused to load a coupon type that implements the interface with a `\DateTime` return type.
+- A reserved operation that is not running stays out of the operations a front-office visitor can list, the `sale` loop with `active` at `0` or `*` included. While no reserved operation was running, `ReservedSaleVisibility::applyToSales()` left every operation in, so an operation being prepared for named customers showed to anybody.
+
+## Upgrade notes
+
+Update the code and the database as `UPDATE.md` describes, from the root of the project, then warm the cache up:
+
+```bash
+composer update thelia/thelia-skeleton --with-all-dependencies
+php local/setup/update.php
+php Thelia cache:warmup --env=prod
+```
+
+A coupon that removes an amount or a percentage on products, categories or attribute values, and a free product coupon, kept only the first entry of its list when it was saved from the back-office: open each of them, select the whole list again and save it. The coupon conditions need nothing: the values already saved are read correctly from now on.
+
+A module that calls `getFreeShippingForCountries()` or `getFreeShippingForModules()` on a coupon now gets `CouponCountry` and `CouponModule` rows instead of arrays of plain values. In `FacadeInterface`, `getDeliveryAddress()` may return `null` and `getNbArticlesInCartIncludeQuantity()` a float; an implementation that declares the former return types stays compatible.
+
 # 3.2.1
 
 Security and maintenance release of the 3.2 line, without any breaking change. It ships `setup/update/sql/3.2.1.sql`, which renames the tax types a shop migrated from Thelia 2 still stores under their Thelia 2 class, declares the back-office hooks the Twig templates call, and records the new version. `thelia/setup` ships as 3.2.1 with this core; `thelia/config` does not change and stays at 3.2.0. The core refuses a back-office theme `thelia/backoffice-default-twig-template` older than 1.2.2, which carries the same CSV export fix: update it to 1.2.2, and the front theme `thelia/flexy` to 1.2.1, at the same time.
