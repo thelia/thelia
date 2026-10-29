@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Provider;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Webhook\Exception\InvalidWebhookUrlException;
 use Thelia\Domain\Webhook\WebhookUrlValidator;
@@ -23,12 +24,22 @@ use Thelia\Domain\Webhook\WebhookUrlValidator;
  * private network (a self-hosted server), any http or https address. The HTTP client checks again where
  * the name resolves at the time of the call.
  *
+ * The public address is checked by the rules of the webhooks, but plain http to a public host is decided by
+ * `thelia.ai.allow_insecure_urls` alone: the flag of the webhooks says nothing about a connection that sends
+ * an API key.
+ *
  * @internal
  */
 final readonly class AiBaseUrlValidator
 {
-    public function __construct(private WebhookUrlValidator $publicUrlValidator)
-    {
+    private WebhookUrlValidator $publicUrlValidator;
+
+    public function __construct(
+        WebhookUrlValidator $publicUrlValidator,
+        #[Autowire(param: 'thelia.ai.allow_insecure_urls')]
+        bool $allowInsecure = false,
+    ) {
+        $this->publicUrlValidator = $publicUrlValidator->withInsecureUrls($allowInsecure);
     }
 
     /**

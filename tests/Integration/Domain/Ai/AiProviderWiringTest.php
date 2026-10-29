@@ -16,6 +16,8 @@ namespace Thelia\Tests\Integration\Domain\Ai;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Thelia\Domain\Ai\AiProvider;
+use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
+use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
 use Thelia\Domain\Ai\Provider\AiHttpClientFactory;
 use Thelia\Domain\Ai\Provider\AiProviderAdapters;
 use Thelia\Domain\Ai\Provider\AiTargetResolver;
@@ -67,5 +69,14 @@ final class AiProviderWiringTest extends IntegrationTestCase
         self::assertInstanceOf(AiHttpClientFactory::class, $this->getService(AiHttpClientFactory::class));
         self::assertSame(60, static::getContainer()->getParameter('thelia.ai.http_timeout'));
         self::assertSame(300, static::getContainer()->getParameter('thelia.ai.http_max_duration'));
+    }
+
+    public function testPlainHttpToAPublicAddressIsOffUnlessTheFlagOfTheAiLayerAllowsIt(): void
+    {
+        self::assertFalse(static::getContainer()->getParameter('thelia.ai.allow_insecure_urls'));
+
+        $this->expectException(InvalidAiArgumentException::class);
+
+        $this->getService(AiBaseUrlValidator::class)->validate('http://93.184.216.34/v1', false);
     }
 }
