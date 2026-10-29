@@ -28,15 +28,18 @@ use Thelia\Api\Resource\CartItem as CartItemResource;
 use Thelia\Api\Security\CartOwnership;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Cart\Bundle\CartCompositionResolver;
+use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Catalog\Bundle\BundleComposition;
+use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
-use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
@@ -60,8 +63,9 @@ use Thelia\Model\ProductSaleElementsQuery;
  * the addition reads from is the one the shop shows.
  *
  * Nothing about money is taken from the body: an addition names a cart, a sale
- * element and a quantity, a change names a quantity, and the price comes from the
- * catalogue. A refusal of the cart is the caller's business, answered with a 422.
+ * element and a quantity - and, for a bundle, the composition the customer chose,
+ * revalidated against the bundle - a change names a quantity, and the price comes
+ * from the catalogue. A refusal of the cart is the caller's business, answered with a 422.
  */
 final readonly class FrontCartItemProcessor implements ProcessorInterface
 {
@@ -71,7 +75,8 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         private ReservedSaleVisibility $reservedSaleVisibility,
         private ApiResourcePropelTransformerService $transformer,
         private EventDispatcherInterface $dispatcher,
-        private ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+        private CartLineAvailability $cartLineAvailability,
+        private CartCompositionResolver $cartCompositionResolver,
     ) {
     }
 
@@ -147,10 +152,17 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('A cart line needs a product sale element.');
         }
 
-        $joined = $this->lineTheCartJoins($cart, $saleElements);
+        $composition = $this->compositionOf($saleElements, $data);
+        $joined = $this->lineTheCartJoins($cart, $saleElements, $composition);
         $inLine = null === $joined ? 0.0 : (float) $joined->getQuantity();
         $quantity = self::wholeQuantity($data->quantity, $inLine);
-        $this->assertStockFor($saleElements, $inLine + $quantity);
+
+        // The stock of a bundle is judged once, by the guard of the addition, from the composition
+        // handed over below.
+        if (null === $composition) {
+            $this->assertStockFor($saleElements, $inLine + $quantity);
+        }
+
         $before = $this->quantitiesOfTheLines((int) $cart->getId());
 
         $cartItem = $this->cartFacade->addItem(new CartItemAddDTO(
@@ -158,6 +170,7 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
             (int) $saleElements->getProductId(),
             (int) $saleElements->getId(),
             $quantity,
+            bundleComposition: $composition,
         ));
 
         // The caller asked for a quantity and gets it whole or not at all: the cart keeps
@@ -172,21 +185,33 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
     }
 
     /**
+     * What the caller proposes for a bundle, revalidated against the bundle, or null for a
+     * product that is not one: a composition proposed for such a product is refused, and a
+     * bundle without composition takes its default one. A refusal is a 422.
+     *
+     * @throws InvalidBundleCompositionException
+     */
+    private function compositionOf(ProductSaleElements $saleElements, CartItemResource $data): ?BundleComposition
+    {
+        $proposed = null === $data->bundleComposition ? null : BundleComposition::fromArray($data->bundleComposition);
+
+        return $this->cartCompositionResolver->resolveAndHandOver((int) $saleElements->getProductId(), $proposed);
+    }
+
+    /**
      * Checked before the addition on what the line will hold once the addition
      * joins it, the way CartItem::addQuantity checks it, and refused out loud. The
-     * CartAdd form only compares the quantity added.
+     * CartAdd form only compares the quantity added. How many the shop can supply is
+     * decided in one place (CartLineAvailability); the lines of a bundle are judged by the guard
+     * of the addition, which holds the composition.
      */
     private function assertStockFor(ProductSaleElements $saleElements, float $quantity): void
     {
-        if (!ConfigQuery::checkAvailableStock() || 0 !== (int) $saleElements->getProduct()->getVirtual()) {
+        if (!ConfigQuery::checkAvailableStock()) {
             return;
         }
 
-        // The stock of the sale unit the visitor buys from when it keeps one, the
-        // national counter otherwise: what the checkout will decrement.
-        $available = $this->saleUnitAvailableStock?->availableQuantity($saleElements) ?? (float) $saleElements->getQuantity();
-
-        if ($available < $quantity) {
+        if ($this->cartLineAvailability->forLine($saleElements) < $quantity) {
             throw self::notEnoughStockFor($saleElements);
         }
     }
@@ -195,11 +220,12 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
      * The line the addition will join, asked of the cart the way the cart asks it
      * (CART_FINDITEM), so that a module picking the line is heard here too.
      */
-    private function lineTheCartJoins(Cart $cart, ProductSaleElements $saleElements): ?CartItem
+    private function lineTheCartJoins(Cart $cart, ProductSaleElements $saleElements, ?BundleComposition $composition): ?CartItem
     {
         $event = (new CartEvent($cart))
             ->setProductId((int) $saleElements->getProductId())
-            ->setProductSaleElementsId((int) $saleElements->getId());
+            ->setProductSaleElementsId((int) $saleElements->getId())
+            ->setBundleComposition($composition);
 
         $this->dispatcher->dispatch($event, TheliaEvents::CART_FINDITEM);
 
@@ -253,6 +279,12 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
     private function changeQuantity(CartItem $cartItem, CartItemResource $data): CartItem
     {
         if (isset($data->productSaleElements) && $data->productSaleElements->getId() !== (int) $cartItem->getProductSaleElementsId()) {
+            throw new UnprocessableEntityHttpException('A cart line changes its quantity only.');
+        }
+
+        // The composition is the one of the line: another choice is another line, added through the cart.
+        if (null !== $data->bundleComposition
+            && BundleComposition::fromArray($data->bundleComposition)->toCanonicalJson() !== $cartItem->getBundleComposition()) {
             throw new UnprocessableEntityHttpException('A cart line changes its quantity only.');
         }
 

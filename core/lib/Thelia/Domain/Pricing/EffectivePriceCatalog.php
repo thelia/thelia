@@ -148,6 +148,7 @@ class EffectivePriceCatalog implements ResetInterface
     public function pricesAnythingFor(?Customer $customer): bool
     {
         return $this->activityChecker->hasActivePublicRule()
+            || $this->activityChecker->hasComputedBundles()
             || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
             || (null !== $customer && ($this->activityChecker->hasActiveNamedRule() || $this->saleAudienceChecker->hasActiveReservedSale()));
     }
