@@ -67,6 +67,8 @@ The SQL files in `setup/` are generated, not edited by hand. If you change refer
 ddev exec php Thelia generate:sql
 ```
 
+A new configuration variable needs its purpose as well as its row: the variables screen shows `config_i18n.title`, and a variable seeded without one is listed with an empty purpose. Add the variable to the `config` block of `setup/insert.sql.tpl` and its `intl()` row to the `config_i18n` block, put the wording in the catalogs of `setup/I18n` (a key missing there is seeded `NULL`), and give the update script of the release the same titles for the shops that upgrade (the `config_title_seed` block of `setup/update/sql/3.3.0.sql` shows the form). `tests/Unit/Install/UpdateScriptTest.php` refuses a visible variable without a title on either path.
+
 If you change a Propel schema, regenerate the model classes and SQL as described in the database section of the [documentation](https://doc.thelia.net). For a module, `php Thelia module:generate:model` and `php Thelia module:generate:sql` rebuild its model and schema. Do not commit the generated `setup/insert.sql`, `setup/thelia.sql` or Propel base classes without the matching source change.
 
 ## Translations
