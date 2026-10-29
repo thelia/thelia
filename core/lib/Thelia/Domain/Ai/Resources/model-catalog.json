@@ -3,7 +3,7 @@
   "source_commit_or_date": "f6f49d16cc2422d2a83c93c074e0ac4d6a889cc5 2026-10-28T10:15:56Z",
   "license": "MIT",
   "attribution": "Copyright (c) 2023 Berri AI",
-  "generated_at": "2026-10-28T13:59:27+00:00",
+  "generated_at": "2026-10-29T09:52:14+00:00",
   "models": [
     {
       "provider": "anthropic",
@@ -1215,7 +1215,7 @@
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": false,
         "vision": null
       },
@@ -1232,7 +1232,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1249,7 +1249,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1266,7 +1266,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1283,7 +1283,7 @@
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1300,7 +1300,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1317,7 +1317,7 @@
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1334,7 +1334,7 @@
       "context_window": 163840,
       "max_output_tokens": 163840,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1351,7 +1351,7 @@
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1368,7 +1368,7 @@
       "context_window": 131072,
       "max_output_tokens": 131072,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1385,7 +1385,7 @@
       "context_window": 32768,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1402,7 +1402,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1419,7 +1419,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1436,7 +1436,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1453,7 +1453,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1470,7 +1470,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1487,7 +1487,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1504,7 +1504,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1521,7 +1521,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1538,7 +1538,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1555,7 +1555,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1572,7 +1572,7 @@
       "context_window": 8192,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1589,7 +1589,7 @@
       "context_window": 32768,
       "max_output_tokens": 32768,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1606,7 +1606,7 @@
       "context_window": 65536,
       "max_output_tokens": 8192,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1623,7 +1623,7 @@
       "context_window": 65536,
       "max_output_tokens": 65536,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1640,7 +1640,7 @@
       "context_window": 32768,
       "max_output_tokens": 32768,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1657,7 +1657,7 @@
       "context_window": 4096,
       "max_output_tokens": 4096,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -1674,7 +1674,7 @@
       "context_window": 262144,
       "max_output_tokens": 262144,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -1691,7 +1691,7 @@
       "context_window": 2048,
       "max_output_tokens": 2048,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": null,
         "vision": null
       },
@@ -2813,9 +2813,26 @@
       "context_window": 256000,
       "max_output_tokens": 32768,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": false
+      },
+      "deprecation_date": null
+    },
+    {
+      "provider": "scaleway",
+      "model": "gemma-4-26b-a4b-it",
+      "mode": "chat",
+      "input_usd_per_million": "0.25",
+      "output_usd_per_million": "0.50",
+      "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
+      "context_window": 256000,
+      "max_output_tokens": 32768,
+      "capabilities": {
+        "structured_output": true,
+        "tools": true,
+        "vision": true
       },
       "deprecation_date": null
     },
@@ -2830,7 +2847,7 @@
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": false
       },
@@ -2838,75 +2855,7 @@
     },
     {
       "provider": "scaleway",
-      "model": "google/gemma-4-26b-a4b-it",
-      "mode": "chat",
-      "input_usd_per_million": "0.25",
-      "output_usd_per_million": "0.50",
-      "cache_read_usd_per_million": null,
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 32768,
-      "capabilities": {
-        "structured_output": null,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "scaleway",
-      "model": "meta/llama-3.3-70b-instruct",
-      "mode": "chat",
-      "input_usd_per_million": "0.90",
-      "output_usd_per_million": "0.90",
-      "cache_read_usd_per_million": null,
-      "cache_write_usd_per_million": null,
-      "context_window": 128000,
-      "max_output_tokens": 16384,
-      "capabilities": {
-        "structured_output": null,
-        "tools": true,
-        "vision": null
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "scaleway",
-      "model": "mistralai/mistral-medium-3.5-128b",
-      "mode": "chat",
-      "input_usd_per_million": "1.50",
-      "output_usd_per_million": "7.50",
-      "cache_read_usd_per_million": null,
-      "cache_write_usd_per_million": null,
-      "context_window": 256000,
-      "max_output_tokens": 16384,
-      "capabilities": {
-        "structured_output": null,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "scaleway",
-      "model": "mistralai/mistral-small-3.2-24b-instruct-2506",
-      "mode": "chat",
-      "input_usd_per_million": "0.15",
-      "output_usd_per_million": "0.35",
-      "cache_read_usd_per_million": null,
-      "cache_write_usd_per_million": null,
-      "context_window": 128000,
-      "max_output_tokens": 32768,
-      "capabilities": {
-        "structured_output": null,
-        "tools": true,
-        "vision": true
-      },
-      "deprecation_date": null
-    },
-    {
-      "provider": "scaleway",
-      "model": "openai/gpt-oss-120b",
+      "model": "gpt-oss-120b",
       "mode": "chat",
       "input_usd_per_million": "0.15",
       "output_usd_per_million": "0.60",
@@ -2915,7 +2864,7 @@
       "context_window": 128000,
       "max_output_tokens": 32768,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -2923,7 +2872,58 @@
     },
     {
       "provider": "scaleway",
-      "model": "qwen/qwen3-235b-a22b-instruct-2507",
+      "model": "llama-3.3-70b-instruct",
+      "mode": "chat",
+      "input_usd_per_million": "0.90",
+      "output_usd_per_million": "0.90",
+      "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
+      "context_window": 128000,
+      "max_output_tokens": 16384,
+      "capabilities": {
+        "structured_output": true,
+        "tools": true,
+        "vision": null
+      },
+      "deprecation_date": null
+    },
+    {
+      "provider": "scaleway",
+      "model": "mistral-medium-3.5-128b",
+      "mode": "chat",
+      "input_usd_per_million": "1.50",
+      "output_usd_per_million": "7.50",
+      "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
+      "context_window": 256000,
+      "max_output_tokens": 16384,
+      "capabilities": {
+        "structured_output": true,
+        "tools": true,
+        "vision": true
+      },
+      "deprecation_date": null
+    },
+    {
+      "provider": "scaleway",
+      "model": "mistral-small-3.2-24b-instruct-2506",
+      "mode": "chat",
+      "input_usd_per_million": "0.15",
+      "output_usd_per_million": "0.35",
+      "cache_read_usd_per_million": null,
+      "cache_write_usd_per_million": null,
+      "context_window": 128000,
+      "max_output_tokens": 32768,
+      "capabilities": {
+        "structured_output": true,
+        "tools": true,
+        "vision": true
+      },
+      "deprecation_date": null
+    },
+    {
+      "provider": "scaleway",
+      "model": "qwen3-235b-a22b-instruct-2507",
       "mode": "chat",
       "input_usd_per_million": "0.75",
       "output_usd_per_million": "2.25",
@@ -2932,7 +2932,7 @@
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": null
       },
@@ -2940,7 +2940,7 @@
     },
     {
       "provider": "scaleway",
-      "model": "qwen/qwen3.5-397b-a17b",
+      "model": "qwen3.5-397b-a17b",
       "mode": "chat",
       "input_usd_per_million": "0.60",
       "output_usd_per_million": "3.60",
@@ -2949,7 +2949,7 @@
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": true
       },
@@ -2957,7 +2957,7 @@
     },
     {
       "provider": "scaleway",
-      "model": "qwen/qwen3.6-35b-a3b",
+      "model": "qwen3.6-35b-a3b",
       "mode": "chat",
       "input_usd_per_million": "0.25",
       "output_usd_per_million": "1.50",
@@ -2966,7 +2966,7 @@
       "context_window": 256000,
       "max_output_tokens": 16384,
       "capabilities": {
-        "structured_output": null,
+        "structured_output": true,
         "tools": true,
         "vision": true
       },
