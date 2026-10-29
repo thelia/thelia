@@ -66,10 +66,11 @@ through GitHub for vulnerabilities affecting released versions.
 
 | Series | Branch | Supported | End of support |
 |--------|--------|-----------|----------------|
-| 3.2 | `3.2` | Yes — security fixes | — |
-| 3.1 | `3.1` | Critical security fixes only — update to 3.2 | To be announced |
-| 3.0 | — | No — update to 3.2 | 16 September 2026, with the 3.1.0 release |
-| 2.6 | `2.6` | No — update to 3.2 | 6 October 2026, with the 3.2.1 release |
+| 3.3 | `3.3` | Yes — security fixes | — |
+| 3.2 | `3.2` | Critical security fixes only — update to 3.3 | To be announced |
+| 3.1 | `3.1` | Critical security fixes only — update to 3.3 | To be announced |
+| 3.0 | — | No — update to 3.3 | 16 September 2026, with the 3.1.0 release |
+| 2.6 | `2.6` | No — update to 3.3 | 6 October 2026, with the 3.2.1 release |
 | 2.5 and older | — | No | Ended |
 
 Thelia 3 is developed on a single trunk: a security fix ships in the next 3.x release, and
@@ -88,3 +89,6 @@ through the back-office theme 1.1.1, GHSA-j2c3-9c4q-c2ch. The 3.2.0 release fixe
 GHSA-cfvv-2jvw-x2hp together with the back-office theme 1.2.0. The 3.2.1 and 3.1.2
 releases fix GHSA-5524-qfxp-33v9, GHSA-7wrm-pcw6-4g9m and GHSA-gcgv-f8rf-w2wc; the
 back-office themes 1.2.2 and 1.1.2 also fix GHSA-gcgv-f8rf-w2wc in the newsletter export.
+The 3.2.3 and 3.1.4 releases fix GHSA-q679-2j8v-rh79, the 3.2.4 and 3.1.5 releases fix
+GHSA-pq5m-7g9w-ppg8, and the 3.2.5 and 3.1.6 releases fix GHSA-g996-jgxj-cgh4. The 3.3.0
+release carries all three.
