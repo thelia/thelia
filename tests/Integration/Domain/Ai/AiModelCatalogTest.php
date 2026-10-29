@@ -79,7 +79,9 @@ final class AiModelCatalogTest extends IntegrationTestCase
         self::assertSame('adaptive', $this->catalog()->find('anthropic', 'claude-fable-5')?->thinkingOff);
         self::assertSame('between_tools', $this->catalog()->find('anthropic', 'claude-sonnet-5-5')?->thinkingOff);
         self::assertSame('disabled', $this->catalog()->find('anthropic', 'claude-haiku-5-5')?->thinkingOff);
-        self::assertNull($this->catalog()->find('anthropic', 'claude-haiku-4-5')?->thinkingOff, 'not measured');
+        self::assertSame('adaptive', $this->catalog()->find('anthropic', 'claude-mythos-5-1')?->thinkingOff, 'from the documentation');
+        self::assertSame('disabled', $this->catalog()->find('anthropic', 'claude-opus-5')?->thinkingOff, 'from the documentation');
+        self::assertNull($this->catalog()->find('anthropic', 'claude-haiku-4-5')?->thinkingOff, 'thinks only when asked: the default applies');
 
         $this->row('anthropic', 'claude-opus-5-5', input: '3.000000');
 

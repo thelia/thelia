@@ -45,6 +45,9 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
 
     private const array THINKING_OFF = [self::THINKING_DISABLED, self::THINKING_BETWEEN_TOOLS, self::THINKING_ADAPTIVE];
 
+    /** The efforts at which the API refuses to turn thinking off (`disabled`, `between_tools`) on the models that think by default. */
+    private const array EFFORTS_THAT_KEEP_THINKING = ['xhigh', 'max'];
+
     /** A model does not take back a refusal; the lifetime only keeps the pool from holding names for ever. */
     private const int REMEMBERED_FOR = 30 * 86400;
 
@@ -83,6 +86,9 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
      * budget fully spent thinking, no text, stop reason `max_tokens`). A request that does not ask for thinking
      * (`['anthropic' => ['thinking' => ['type' => 'adaptive']]]`) gets the setting that turns it off for its model:
      * `disabled` for most, `between_tools` or, for a model that refuses both, `adaptive` at the lowest effort.
+     *
+     * A request at `xhigh` or `max` effort asks the model to think hard: the API refuses `disabled` and `between_tools`
+     * at these efforts, so no `thinking` is sent and the model keeps its own default.
      */
     protected function nativeOptions(array $native, AiTarget $target): array
     {
@@ -93,7 +99,7 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
             unset($native['effort']);
         }
 
-        if (!isset($native['thinking'])) {
+        if (!isset($native['thinking']) && !self::keepsThinking($native)) {
             $thinkingOff = $this->thinkingOff($target);
             $native['thinking'] = ['type' => $thinkingOff];
 
@@ -114,7 +120,9 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
      */
     protected function retries(DeferredResult $deferred, AiRequest $request, AiTarget $target): bool
     {
-        if (isset($request->optionsFor($target->provider)['thinking']) || self::THINKING_DISABLED !== $this->thinkingOff($target)) {
+        $native = $request->optionsFor($target->provider);
+
+        if (isset($native['thinking']) || self::keepsThinking($native) || self::THINKING_DISABLED !== $this->thinkingOff($target)) {
             return false;
         }
 
@@ -132,6 +140,16 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
     protected function refusal(array $body): ?AiProviderRefusal
     {
         return AiProviderRefusal::fromAnthropic($body);
+    }
+
+    /**
+     * @param array<string, mixed> $native the native options of the request, `effort` written either way
+     */
+    private static function keepsThinking(array $native): bool
+    {
+        $effort = $native['effort'] ?? (\is_array($native['output_config'] ?? null) ? ($native['output_config']['effort'] ?? null) : null);
+
+        return \in_array($effort, self::EFFORTS_THAT_KEEP_THINKING, true);
     }
 
     private function thinkingOff(AiTarget $target): string

@@ -211,6 +211,52 @@ final class AnthropicAdapterTest extends AiProviderTestCase
         self::assertSame('json_schema', $this->lastBody()['output_config']['format']['type'], 'the format of the answer sits next to the effort');
     }
 
+    /** @return iterable<string, array{string, string, array<string, mixed>}> */
+    public static function effortsThatKeepThinking(): iterable
+    {
+        foreach (['xhigh', 'max'] as $effort) {
+            yield 'disabled at '.$effort => ['claude-haiku-5-5', AnthropicAdapter::THINKING_DISABLED, ['effort' => $effort]];
+            yield 'between_tools at '.$effort => ['claude-sonnet-5-5', AnthropicAdapter::THINKING_BETWEEN_TOOLS, ['output_config' => ['effort' => $effort]]];
+            yield 'unknown model at '.$effort => ['claude-next', '', ['effort' => $effort]];
+        }
+    }
+
+    /**
+     * The thinking documentation of Anthropic: `disabled` (Haiku 5.5, Opus 5) and `between_tools` (Sonnet 5.5) are
+     * refused with a 400 at `xhigh` and `max` effort, while no `thinking` field is accepted at every effort.
+     *
+     * @param array<string, mixed> $native
+     */
+    #[DataProvider('effortsThatKeepThinking')]
+    public function testARequestAtAnEffortAboveHighSendsNoThinkingSoTheModelKeepsItsDefault(string $model, string $thinkingOff, array $native): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport([Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => 'ok']])]));
+        $target = $this->target(AiProvider::Anthropic, model: $model, thinkingOff: '' === $thinkingOff ? null : $thinkingOff);
+        $effort = $native['effort'] ?? $native['output_config']['effort'];
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => $native]), $target);
+
+        self::assertArrayNotHasKey('thinking', $this->lastBody());
+        self::assertSame($effort, $this->lastBody()['output_config']['effort']);
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => ['effort' => 'high']]), $target);
+
+        self::assertSame('' === $thinkingOff ? AnthropicAdapter::THINKING_DISABLED : $thinkingOff, $this->lastBody()['thinking']['type'], 'at high effort thinking is still turned off');
+    }
+
+    public function testARefusalAtAnEffortAboveHighIsNotTriedAgain(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicMeasured('claude-fable-5-1', 'disabled')));
+
+        $this->expectException(AiProviderUnavailableException::class);
+
+        try {
+            $adapter->complete($this->request(providerOptions: ['anthropic' => ['effort' => 'max']]), $this->target(AiProvider::Anthropic, model: 'claude-next'));
+        } finally {
+            self::assertCount(1, $this->sent);
+        }
+    }
+
     /** @return iterable<string, array{string, string}> */
     public static function refusalsOfDisabled(): iterable
     {

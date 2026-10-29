@@ -19,11 +19,14 @@ PROVIDERS = {"mistral": "mistral", "anthropic": "anthropic", "openai": "openai",
              "scaleway": "scaleway", "ovhcloud": "ovhcloud", "albert": None, "ollama": "ollama"}
 MODES = {"chat", "completion"}
 # What LiteLLM does not say: the `thinking` setting that keeps an Anthropic model from thinking before it answers,
-# measured on the API on 2026-10-29. "adaptive" marks a model that refuses "disabled" and has no off switch: the
-# adapter asks it for the lowest effort. A model left out is sent "disabled", and the adapter learns from a refusal.
+# measured on the API on 2026-10-29 (fable-5, fable-5-1, opus-5-5, sonnet-5-5, haiku-5-5), the others from the table
+# of the thinking documentation of Anthropic. "adaptive" marks a model that refuses "disabled" and has no off switch:
+# the adapter asks it for the lowest effort. A model left out is sent "disabled", and the adapter learns from a refusal.
 THINKING_OFF = {("anthropic", "claude-fable-5"): "adaptive", ("anthropic", "claude-fable-5-1"): "adaptive",
+                ("anthropic", "claude-mythos-5"): "adaptive", ("anthropic", "claude-mythos-5-1"): "adaptive",
                 ("anthropic", "claude-opus-5-5"): "adaptive", ("anthropic", "claude-sonnet-5-5"): "between_tools",
-                ("anthropic", "claude-haiku-5-5"): "disabled"}
+                ("anthropic", "claude-haiku-5-5"): "disabled", ("anthropic", "claude-opus-5"): "disabled",
+                ("anthropic", "claude-sonnet-5"): "disabled"}
 
 
 def money(per_token):
