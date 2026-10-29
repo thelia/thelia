@@ -23,6 +23,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiActorType;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
+use Thelia\Domain\Ai\Guardrail\AiSchemaValidator;
 use Thelia\Domain\Ai\Tool\AiApprovedChange;
 use Thelia\Domain\Ai\Tool\AiToolApprovalServiceInterface;
 use Thelia\Domain\Ai\Tool\AiToolApprovalStatus;
@@ -67,7 +68,7 @@ final readonly class AiToolApprovalService implements AiToolApprovalServiceInter
         private AiToolDeclarations $declarations,
         private AiToolInstances $instances,
         private AiToolAccessChecker $accessChecker,
-        private AiToolArgumentValidator $validator,
+        private AiSchemaValidator $validator,
         private AiToolExecutionGuard $guard,
         private SecurityContext $securityContext,
         private RequestStack $requests,

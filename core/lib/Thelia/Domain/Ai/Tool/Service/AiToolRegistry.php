@@ -22,6 +22,7 @@ use Thelia\Domain\Ai\AiToolCall;
 use Thelia\Domain\Ai\AiToolDefinition;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
 use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
+use Thelia\Domain\Ai\Guardrail\AiSchemaValidator;
 use Thelia\Domain\Ai\Internal\AiAssert;
 use Thelia\Domain\Ai\Service\AiActorHasher;
 use Thelia\Domain\Ai\Service\AiSettings;
@@ -63,7 +64,7 @@ final readonly class AiToolRegistry implements AiToolRegistryInterface
         private AiToolInstances $instances,
         private AiUsageRegistryInterface $usages,
         private AiToolAccessChecker $accessChecker,
-        private AiToolArgumentValidator $validator,
+        private AiSchemaValidator $validator,
         private AiToolRateLimiter $limiter,
         private AiToolExecutionGuard $guard,
         private AiToolCallLogWriter $log,
