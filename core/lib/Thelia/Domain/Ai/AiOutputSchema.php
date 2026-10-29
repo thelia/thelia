@@ -25,7 +25,10 @@ use Thelia\Domain\Ai\Internal\AiAssert;
 final readonly class AiOutputSchema
 {
     /**
-     * @param array<string, mixed> $schema JSON schema, `"type": "object"` at the root
+     * @param array<string, mixed> $schema JSON schema, `"type": "object"` at the root. It is sent to the provider with
+     *                                     `strict: true` only when every object of it, nested ones included, has
+     *                                     `additionalProperties: false` and lists all its properties in `required`
+     *                                     (the rules of OpenAI Structured Outputs); otherwise with `strict: false`
      */
     public function __construct(
         public string $name,

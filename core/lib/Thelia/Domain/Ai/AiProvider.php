@@ -36,7 +36,8 @@ enum AiProvider: string
     /**
      * Where the provider processes the data when reached at this base URL, or null when it depends on where
      * the endpoint runs: the administrator declares it on the connection. OpenAI is outside the EU unless the
-     * project uses its European endpoint `https://eu.api.openai.com`.
+     * project uses its European endpoint `https://eu.api.openai.com`, where the models are named with their date
+     * (`gpt-5.4-nano-2026-03-17`): OpenAI lists the dated snapshots there and no alias such as `chat-latest`.
      */
     public function defaultJurisdiction(?string $baseUrl = null): ?AiJurisdiction
     {

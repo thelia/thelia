@@ -162,6 +162,23 @@ the AI settings and a module declares a usage that needs it. The back-office scr
 If the shop is served on a host other than the one in `url_site`, set `THELIA_MCP_ALLOWED_HOSTS` to the
 comma-separated host names the endpoint must accept.
 
+#### AI layer: models and OpenAI
+
+The price list embedded in the core no longer holds the models the providers do not serve: 13 Mistral names
+(among them `codestral-mamba-latest`, `mistral-tiny`, `devstral-latest`, `devstral-medium-latest`,
+`devstral-small-latest`, `mistral-small`, `mistral-large-3`, `open-mistral-nemo`, `pixtral-large-latest`) and the
+OpenAI entries `daybreak-blue-latest`, `daybreak-red-latest`, `gpt-5.5-cyber`, `gpt-5.5-cyber-preview`,
+`gpt-4o-search-preview` and `gpt-4o-mini-search-preview`. A range or a usage that already points at one of them keeps
+working from its row in `ai_model` (price and settings are kept); pick another model when the provider answers that
+the model does not exist. The Scaleway models are listed without their vendor prefix (`llama-3.3-70b-instruct`, not
+`meta/llama-3.3-70b-instruct`), the identifier `api.scaleway.ai/v1` expects: a shop that set up a Scaleway range on a
+prefixed name before 3.3.0 picks the model again.
+
+OpenAI is now sent `store: false`: it no longer keeps the responses of the Responses API for 30 days. A connection
+to the European region (`https://eu.api.openai.com`) must use dated model names, `gpt-5.4-nano-2026-03-17` for
+instance: the table of OpenAI for that region lists the dated snapshots for the Responses API and does not list an
+alias such as `chat-latest`.
+
 ### Moving from 3.1.x to 3.2.0
 
 #### What the update script does now
