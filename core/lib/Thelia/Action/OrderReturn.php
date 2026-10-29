@@ -452,12 +452,12 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         }
 
         $saleUnitId = $return->getOrder()?->getSaleUnitId();
+        $quantities = [];
 
         foreach ($return->getOrderReturnLines() as $line) {
-            $productSaleElementsId = $line->getProductSaleElementsId();
             $quantity = (float) $line->getQuantityReceived();
 
-            if (null === $productSaleElementsId || $quantity <= 0) {
+            if ($quantity <= 0) {
                 continue;
             }
 
@@ -465,8 +465,24 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
                 continue;
             }
 
-            $this->stockIncrementer->increment((int) $productSaleElementsId, $quantity, $connection, $saleUnitId);
+            // A pack goes back as its components: the sale element of the pack holds no stock.
+            // The line of the order is the one the refund reads right after: asking it costs nothing more.
+            $orderProduct = $line->getOrderProduct();
+
+            if ($orderProduct instanceof OrderProduct && $orderProduct->isBundleLine()) {
+                array_push($quantities, ...$this->stockIncrementer->componentsOfBundle($orderProduct, $quantity, $connection));
+
+                continue;
+            }
+
+            $productSaleElementsId = $line->getProductSaleElementsId();
+
+            if (null !== $productSaleElementsId) {
+                $quantities[] = [(int) $productSaleElementsId, $quantity];
+            }
         }
+
+        $this->stockIncrementer->incrementInAscendingId($quantities, $connection, $saleUnitId);
     }
 
     public static function getSubscribedEvents(): array

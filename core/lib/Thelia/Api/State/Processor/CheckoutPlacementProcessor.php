@@ -29,14 +29,18 @@ use Thelia\Api\Resource\CheckoutPlacementOutput;
 use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
+use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Service\CheckoutPlacementService;
 use Thelia\Domain\Checkout\Service\ExpressPaymentCheckoutGuard;
+use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
+use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
 use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Model\Cart;
+use Thelia\Model\CheckoutStep;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 
@@ -123,6 +127,17 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
             // than a 409 telling a client to retry something that will never work and
             // handing it a sentence written for a log.
             throw new ConflictHttpException($shortage->getMessage(), $shortage);
+        } catch (BundleLineNotOrderableException $refusal) {
+            // The step of the cart reports a pack the catalogue changed under it before the
+            // placement starts; this is the same refusal met while the order was written,
+            // the pack changed in between. Answered in the shape and with the code the
+            // validation would have given a moment later, naming the pack.
+            return $this->refusalResponse(new CheckoutRefusedException([CheckoutViolation::fromRefusal(CheckoutStep::CODE_CART, $refusal)], previous: $refusal));
+        } catch (OrderPlacementConflictException $conflict) {
+            // Another order placed at the same moment on the same stock, and the database
+            // broke the tie: nothing was written, and the same request posted again is
+            // judged on the stock the other order left.
+            throw new ConflictHttpException($conflict->getMessage(), $conflict);
         }
 
         return new JsonResponse(CheckoutPlacementOutput::fromResult($result)->toArray());
