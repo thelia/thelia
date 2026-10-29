@@ -55,7 +55,7 @@ use Thelia\Domain\Ai\UntrustedSource;
  */
 #[AsAiUsage(
     id: TopicGuardrail::USAGE,
-    purpose: 'Judges whether a message of a visitor stays on the subject of the feature it is sent to.',
+    purpose: TopicGuardrail::PURPOSE,
     audience: AiAudience::System,
     tier: AiTier::Fast,
     transparency: AiTransparency::None,
@@ -65,6 +65,9 @@ final readonly class TopicGuardrail implements AiGuardrailInterface, AiGuardrail
     public const string NAME = 'topic';
 
     public const string USAGE = 'core.guardrail_topic';
+
+    /** In the core catalog: the register shows it in the language of the reader. */
+    public const string PURPOSE = 'Judges whether a message of a visitor stays on the subject of the feature it is sent to.';
 
     /** The answer is one word. */
     private const int ANSWER_TOKENS = 8;
