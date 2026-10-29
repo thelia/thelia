@@ -19,6 +19,7 @@ use Thelia\Domain\Ai\AiMessage;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\AiTokenUsage;
 use Thelia\Domain\Ai\AiToolDefinition;
+use Thelia\Domain\Ai\Exception\AiProviderUnavailableException;
 use Thelia\Domain\Ai\Provider\MistralAdapter;
 use Thelia\Domain\Ai\UntrustedContent;
 use Thelia\Domain\Ai\UntrustedSource;
@@ -76,6 +77,27 @@ final class MistralAdapterTest extends AiProviderTestCase
         self::assertSame('Go on.', $messages[3]['content']);
         self::assertStringContainsString('<untrusted_content', $messages[1]['content']);
         self::assertSame(1, substr_count($messages[1]['content'], "\n</untrusted_content>"), 'the injected closing tag is neutralised');
+    }
+
+    public function testAnAnswerStoppedAtTheLengthOfTheModelIsATruncationNotAFailure(): void
+    {
+        $adapter = $this->adapter(MistralAdapter::class, $this->transport([Wire::chat('Half of', null, 21, 20, 0, [], 'model_length'), Wire::chat('Half of', null, 21, 20, 0, [], 'length')]), self::PINNED);
+
+        $result = $adapter->complete($this->request(), $this->target(AiProvider::Mistral, null));
+
+        self::assertSame(AiFinishReason::MaxTokens, $result->finishReason);
+        self::assertSame('Half of', $result->text);
+        self::assertEquals(new AiTokenUsage(21, 20), $result->tokenUsage);
+        self::assertSame(AiFinishReason::MaxTokens, $adapter->complete($this->request(), $this->target(AiProvider::Mistral, null))->finishReason, 'the documented reason still works');
+    }
+
+    public function testAnErrorFinishReasonStaysAFailure(): void
+    {
+        $adapter = $this->adapter(MistralAdapter::class, $this->transport(Wire::chat('', null, 21, 0, 0, [], 'error')), self::PINNED);
+
+        $this->expectException(AiProviderUnavailableException::class);
+
+        $adapter->complete($this->request(), $this->target(AiProvider::Mistral, null));
     }
 
     public function testTheRequestIdIsTheIdOfTheCompletionWhenTheProviderSendsNoHeader(): void
