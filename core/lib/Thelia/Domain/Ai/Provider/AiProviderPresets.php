@@ -57,10 +57,12 @@ final readonly class AiProviderPresets
     }
 
     /**
-     * Whether a call without a key can work: a self-hosted server or a compatible endpoint may not ask for one.
+     * Whether a call without a key can work: a self-hosted server or a compatible endpoint may not ask for one, and
+     * OVHcloud AI Endpoints answers an anonymous caller (2 requests a minute per IP and per model, 400 with a key:
+     * https://docs.ovhcloud.com/en/guides/public-cloud/ai-machine-learning/ai-endpoints-getting-started).
      */
     public function keyIsOptional(AiProvider $provider): bool
     {
-        return AiProvider::Ollama === $provider || AiProvider::OpenAiCompatible === $provider;
+        return \in_array($provider, [AiProvider::Ollama, AiProvider::OpenAiCompatible, AiProvider::OvhCloud], true);
     }
 }
