@@ -80,7 +80,7 @@ final class AiTopicGuardrailTest extends AiGatewayTestCase
         self::assertContains('topic', array_map(static fn (GuardrailVerdict $verdict): string => $verdict->guardrail, $response->guardrailVerdicts));
 
         $judge = $this->sent[0]['body'];
-        self::assertSame(8, $judge['max_tokens'] ?? $judge['max_completion_tokens'] ?? null);
+        self::assertSame(1024, $judge['max_tokens'] ?? $judge['max_completion_tokens'] ?? null);
         $prompts = json_encode($judge['messages'], \JSON_THROW_ON_ERROR);
         // The subject is the purpose of the controlled usage; what the visitor wrote is data, never part of the instructions.
         self::assertStringContainsString('Answers the visitors.', (string) $judge['messages'][0]['content']);
@@ -136,6 +136,26 @@ final class AiTopicGuardrailTest extends AiGatewayTestCase
             self::fail('A sentence is not an answer.');
         } catch (AiGuardrailBlockedException $blocked) {
             self::assertSame('unavailable', $blocked->verdict->reason);
+        }
+    }
+
+    public function testAJudgeThatRanOutOfTokensBeforeAnsweringSaysSoInTheLog(): void
+    {
+        $this->setting('aiprobe.assistant', '5', guardrails: '{"topic":"block"}');
+        $gateway = $this->gateway([Wire::chat('', null, 40, 1024, 0, [], 'length'), Wire::chat('', null, 40, 3)]);
+
+        try {
+            $gateway->complete($this->request('aiprobe.assistant', 'Hello', actor: AiActor::visitor('s1')));
+            self::fail('Block mode: a judge that gave no word gives no verdict.');
+        } catch (AiGuardrailBlockedException $blocked) {
+            self::assertSame('truncated', $blocked->verdict->reason);
+        }
+
+        try {
+            $gateway->complete($this->request('aiprobe.assistant', 'Hello again', actor: AiActor::visitor('s2')));
+            self::fail('An empty answer is no answer either.');
+        } catch (AiGuardrailBlockedException $blocked) {
+            self::assertSame('unavailable', $blocked->verdict->reason, 'an empty answer that was not cut short keeps the generic reason');
         }
     }
 

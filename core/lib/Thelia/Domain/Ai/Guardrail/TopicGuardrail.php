@@ -16,6 +16,7 @@ namespace Thelia\Domain\Ai\Guardrail;
 
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiAudience;
+use Thelia\Domain\Ai\AiFinishReason;
 use Thelia\Domain\Ai\AiGatewayInterface;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiMessage;
@@ -69,8 +70,12 @@ final readonly class TopicGuardrail implements AiGuardrailInterface, AiGuardrail
     /** In the core catalog: the register shows it in the language of the reader. */
     public const string PURPOSE = 'Judges whether a message of a visitor stays on the subject of the feature it is sent to.';
 
-    /** The answer is one word. */
-    private const int ANSWER_TOKENS = 8;
+    /**
+     * The answer is one word, but a model that reasons counts its reasoning in the output limit (and answers nothing
+     * when it is spent), and the Responses API of OpenAI refuses a limit under 16. This leaves room for a short
+     * reasoning on a model of the fast tier: a call that runs out costs a fraction of a cent.
+     */
+    private const int ANSWER_TOKENS = 1024;
 
     /** How many of the last turns the judge reads, to understand a short follow-up like "and the price?". */
     private const int CONTEXT_MESSAGES = 6;
@@ -142,17 +147,18 @@ final readonly class TopicGuardrail implements AiGuardrailInterface, AiGuardrail
         );
 
         try {
-            $answer = $this->gateway->complete($judge)->text;
+            $response = $this->gateway->complete($judge);
         } catch (AiJurisdictionRefusedException) {
             return GuardrailVerdict::fail(self::NAME, $stage, GuardrailAvailability::JURISDICTION);
         } catch (InactiveAiUsageException|AiBudgetExceededException|AiRateLimitExceededException|AiProviderUnavailableException|AiGuardrailBlockedException) {
             return GuardrailVerdict::fail(self::NAME, $stage, GuardrailAvailability::UNAVAILABLE);
         }
 
-        return match (preg_replace('/[^a-z_]/', '', strtolower($answer))) {
+        return match (preg_replace('/[^a-z_]/', '', strtolower($response->text))) {
             'on_topic' => GuardrailVerdict::pass(self::NAME, $stage),
             'off_topic' => GuardrailVerdict::fail(self::NAME, $stage, 'off_topic'),
-            default => GuardrailVerdict::fail(self::NAME, $stage, GuardrailAvailability::UNAVAILABLE),
+            // The limit was spent before the word came out: said as such in the log, still no verdict.
+            default => GuardrailVerdict::fail(self::NAME, $stage, AiFinishReason::MaxTokens === $response->finishReason ? 'truncated' : GuardrailAvailability::UNAVAILABLE),
         };
     }
 
