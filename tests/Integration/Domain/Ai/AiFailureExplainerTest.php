@@ -24,6 +24,7 @@ use Thelia\Domain\Ai\Exception\AiJurisdictionRefusedException;
 use Thelia\Domain\Ai\Exception\AiKeyDecryptionException;
 use Thelia\Domain\Ai\Exception\AiProviderUnavailableException;
 use Thelia\Domain\Ai\Exception\AiRateLimitExceededException;
+use Thelia\Domain\Ai\Exception\AiResourceInUseException;
 use Thelia\Domain\Ai\Exception\AiUsageViolationException;
 use Thelia\Domain\Ai\Exception\InactiveAiUsageException;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
@@ -38,6 +39,7 @@ use Thelia\Domain\Ai\Service\AiSettings;
 use Thelia\Domain\Ai\Service\AiSettingsWriter;
 use Thelia\Domain\Ai\Service\AiTextTranslator;
 use Thelia\Domain\Ai\Service\AiUsageRegistry;
+use Thelia\Domain\Ai\Vault\AiEnvironmentKey;
 use Thelia\Domain\Ai\Vault\AiKeyCipher;
 use Thelia\Domain\Ai\Vault\AiKeyVault;
 use Thelia\Domain\Localization\Service\LangService;
@@ -106,6 +108,19 @@ final class AiFailureExplainerTest extends IntegrationTestCase
     public function testTheFixedRefusalsOfTheSettingsAreTold(): void
     {
         self::assertSame('Une autre connexion porte déjà ce code.', $this->explainer()->explain(new InvalidAiArgumentException('Another connection already has this code.'), 'fr_FR'));
+    }
+
+    public function testTheRefusalsOfADeletionAreToldWithTheUsageTheyName(): void
+    {
+        self::assertSame('L\'usage « aiprobe.pinned » est épinglé sur ce modèle : épinglez-le d\'abord ailleurs.', $this->explainer()->explain(new AiResourceInUseException(\sprintf(AiSettingsWriter::MODEL_PINNED, 'aiprobe.pinned')), 'fr_FR'));
+        self::assertSame('Cette connexion est attribuée à une gamme : attribuez-en d\'abord une autre.', $this->explainer()->explain(new AiResourceInUseException(AiSettingsWriter::CONNECTION_IN_TIER), 'fr_FR'));
+        self::assertSame('D\'autres réglages s\'appuient encore sur ce modèle : libérez-le d\'abord.', $this->explainer()->explain(new AiResourceInUseException(AiSettingsWriter::MODEL_STILL_USED), 'fr_FR'));
+    }
+
+    public function testTheRefusalsOfTheVariableOfTheKeyAreTold(): void
+    {
+        self::assertStringStartsWith('La variable d\'environnement qui contient une clé d\'API doit commencer par « THELIA_AI_ »', $this->explainer()->explain(new InvalidAiArgumentException(AiEnvironmentKey::NOT_ALLOWED), 'fr_FR'));
+        self::assertStringStartsWith('La variable d\'environnement habituelle du fournisseur', $this->explainer()->explain(new InvalidAiArgumentException(AiEnvironmentKey::OTHER_ADDRESS), 'fr_FR'));
     }
 
     public function testTheRefusalsOfTheWriterWithAVariablePartAreToldInBothLanguagesWithTheirParts(): void

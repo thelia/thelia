@@ -31,7 +31,9 @@ use Thelia\Model\AiConnection;
 use Thelia\Model\AiConnectionQuery;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiModelQuery;
+use Thelia\Model\AiTierAssignment;
 use Thelia\Model\AiTierAssignmentQuery;
+use Thelia\Model\AiUsageSetting;
 use Thelia\Model\AiUsageSettingQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -341,6 +343,64 @@ final class AiSettingsWriterTest extends IntegrationTestCase
             ConfigQuery::write('ai_mcp_enabled', '0');
             ConfigQuery::resetCache();
         }
+    }
+
+    public function testAConnectionOrAModelAUsageIsPinnedToIsNotDeleted(): void
+    {
+        $connection = $this->connection('mistral-main');
+        $model = $this->model($connection, 'ministral-a');
+        $bound = $this->model($connection, 'ministral-own', $connection->getId());
+        $pinned = (new AiUsageSetting())->setUsageId('aiprobe.pinned')->setPinnedModelId($model->getId());
+        $pinned->save();
+
+        try {
+            $this->writer->deleteModel($model);
+            self::fail('A usage is pinned to the model.');
+        } catch (AiResourceInUseException $refusal) {
+            self::assertSame('This model is pinned for the usage "aiprobe.pinned": pin the usage elsewhere first.', $refusal->getMessage());
+        }
+
+        $pinned->setPinnedModelId($bound->getId())->save();
+
+        try {
+            $this->writer->deleteConnection($connection);
+            self::fail('A usage is pinned to a model bound to the connection.');
+        } catch (AiResourceInUseException $refusal) {
+            self::assertSame('This connection is pinned for the usage "aiprobe.pinned": pin the usage elsewhere first.', $refusal->getMessage());
+        }
+
+        $pinned->setPinnedModelId(null)->setPinnedConnectionId($connection->getId())->save();
+
+        try {
+            $this->writer->deleteConnection($connection);
+            self::fail('A usage is pinned to the connection.');
+        } catch (AiResourceInUseException $refusal) {
+            self::assertStringContainsString('"aiprobe.pinned"', $refusal->getMessage());
+        }
+
+        $pinned->reload();
+        self::assertSame([$connection->getId(), null], [$pinned->getPinnedConnectionId(), $pinned->getPinnedModelId()], 'the usage keeps its pin');
+        self::assertNotNull(AiModelQuery::create()->findPk($model->getId()));
+        self::assertNotNull(AiModelQuery::create()->findPk($bound->getId()));
+    }
+
+    public function testADeletionTheDatabaseRefusesIsAResourceInUseAndLeavesEverythingInPlace(): void
+    {
+        $connection = $this->connection('mistral-main');
+        $other = $this->connection('mistral-other');
+        $bound = $this->model($connection, 'ministral-own', $connection->getId());
+        // A range of another connection on a model bound to this one: the checks do not look there, the foreign key does.
+        (new AiTierAssignment())->setTier('fast')->setConnectionId($other->getId())->setModelId($bound->getId())->save();
+
+        try {
+            $this->writer->deleteConnection($connection);
+            self::fail('The database refuses the deletion.');
+        } catch (AiResourceInUseException $refusal) {
+            self::assertSame('Other settings still rely on this connection: free it first.', $refusal->getMessage());
+        }
+
+        self::assertNotNull(AiConnectionQuery::create()->findPk($connection->getId()));
+        self::assertNotNull(AiModelQuery::create()->findPk($bound->getId()));
     }
 
     public function testTheGlobalSettingsAreWritten(): void

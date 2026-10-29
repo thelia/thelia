@@ -65,6 +65,10 @@ final readonly class AiFailureExplainer
         'The base URL is not allowed: it must be an absolute http or https address.',
         'The base URL is not allowed: it must not carry credentials.',
         'The application secret (APP_SECRET) is empty: API keys cannot be encrypted with it.',
+        AiSettingsWriter::CONNECTION_IN_TIER,
+        AiSettingsWriter::MODEL_IN_TIER,
+        AiSettingsWriter::CONNECTION_STILL_USED,
+        AiSettingsWriter::MODEL_STILL_USED,
     ];
 
     /**
@@ -79,6 +83,8 @@ final readonly class AiFailureExplainer
         '/^(?<field>The limit per minute|The limit per day|The output limit|The input limit|The prompt retention) must be a positive number\.$/' => '%field% must be a positive number.',
         '/^(?<field>The monthly budget) must be a non-negative decimal string like "0\.05421000", "(?<value>.*)" given\.$/' => '%field% must be a non-negative decimal like "25.00", "%value%" given.',
         '/^"(?<value>.*)" is not an ISO 4217 currency code\.$/' => '"%value%" is not an ISO 4217 currency code.',
+        '/^This connection is pinned for the usage "(?<usage>[^"]+)": pin the usage elsewhere first\.$/' => 'This connection is pinned for the usage "%usage%": pin the usage elsewhere first.',
+        '/^This model is pinned for the usage "(?<usage>[^"]+)": pin the usage elsewhere first\.$/' => 'This model is pinned for the usage "%usage%": pin the usage elsewhere first.',
         '/^(?<field>A guardrail name) "(?<value>.*)" must hold at most 64 letters, digits, ".", "_", ":" or "-"\.$/' => '%field% "%value%" must hold at most 64 letters, digits, ".", "_", ":" or "-".',
     ];
 
