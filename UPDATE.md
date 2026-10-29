@@ -129,6 +129,39 @@ largest ones over several windows.
 
 ## Release notes
 
+### Moving from 3.2.x to 3.3.0
+
+Follow the steps above: `composer update`, `php local/setup/update.php`, then `php Thelia module:refresh`. The sections below cover the AI layer; the other changes are in `CHANGELOG.md`.
+
+#### AI layer: tables, dependencies and recipes
+
+`php local/setup/update.php` runs `setup/update/sql/3.3.0.sql`, which creates nine tables
+(`ai_connection`, `ai_model`, `ai_tier_assignment`, `ai_usage_setting`, `ai_usage_log`,
+`ai_budget_reservation`, `ai_tool_token`, `ai_tool_approval`, `ai_tool_call_log`), the rights
+`admin.configuration.ai` and `admin.configuration.ai-mcp`, and the settings `ai_enabled`,
+`ai_monthly_cap`, `ai_eu_only`, `ai_log_retention_days`, `ai_mcp_enabled`,
+`ai_tool_approval_ttl_hours` and `ai_tool_token_max_days`. A setting the shop already holds is left alone.
+
+The core now requires `symfony/ai-platform` and the bridges `symfony/ai-anthropic-platform`,
+`symfony/ai-generic-platform`, `symfony/ai-mistral-platform`, `symfony/ai-ollama-platform` and
+`symfony/ai-open-ai-platform` (all `^0.15`), `symfony/mcp-bundle` (`^0.15`) and `nyholm/psr7`
+(`^1.8`). A project that pins any of them must allow these versions.
+
+Composer may apply the Symfony recipes of these packages and write files such as
+`config/packages/ai_*_platform.yaml` (an `ai:` key) and `config/packages/mcp.yaml`. They do no harm:
+the core accepts and ignores the `ai:` key, since the shop reads its connections from the database and
+`symfony/ai-bundle` is not installed, and it replaces the `default` MCP server of the recipe by its own.
+You can delete these files.
+
+#### The AI layer stays off until you set it up
+
+A shop updated to 3.3.0 calls no model. Nothing happens until an administrator adds a connection in
+the AI settings and a module declares a usage that needs it. The back-office screens come with the
+`default-twig` theme: update it together with the core. The MCP server on `/api/mcp` is off by default
+(`ai_mcp_enabled` is `0`); an administrator switches it on in the AI settings and creates the tokens.
+If the shop is served on a host other than the one in `url_site`, set `THELIA_MCP_ALLOWED_HOSTS` to the
+comma-separated host names the endpoint must accept.
+
 ### Moving from 3.1.x to 3.2.0
 
 #### What the update script does now
