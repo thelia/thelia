@@ -62,6 +62,17 @@ final class OpenAiAdapter extends AbstractPlatformAdapter
         return new Gpt($target->model->name, $capabilities);
     }
 
+    /**
+     * OpenAI keeps what the Responses API answers for 30 days unless the call says `store: false`. The layer keeps its
+     * own log and never reads that copy back, so the option is always sent as false and no module can turn it on.
+     */
+    protected function nativeOptions(array $native, AiTarget $target): array
+    {
+        $native['store'] = false;
+
+        return $native;
+    }
+
     protected function outputLimit(int $tokens): array
     {
         return parent::outputLimit(max(self::MINIMUM_OUTPUT_TOKENS, $tokens));
