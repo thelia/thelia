@@ -31,6 +31,23 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class AiTextTranslatorLocaleTest extends IntegrationTestCase
 {
+    /** A static flag of the request: the tests that run after this one must find it as it was. */
+    private bool $wasAdminEnv = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->wasAdminEnv = Request::$isAdminEnv;
+    }
+
+    protected function tearDown(): void
+    {
+        Request::$isAdminEnv = $this->wasAdminEnv;
+
+        parent::tearDown();
+    }
+
     public function testWithoutARequestTheDefaultLanguageIsUsed(): void
     {
         self::assertSame(Lang::getDefaultLanguage()->getLocale(), $this->translator(new RequestStack())->locale());

@@ -19,6 +19,7 @@ use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartSaleUnitSwitchedEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
@@ -56,10 +57,13 @@ final class SaleUnitCartSwitchTest extends ActionIntegrationTestCase
 
     private ?\Closure $listener = null;
 
+    private bool $wasAdminEnv = false;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->wasAdminEnv = Request::$isAdminEnv;
         ConfigQuery::write('check-available-stock', '1');
 
         $this->currency = $this->factory->currency();
@@ -78,6 +82,7 @@ final class SaleUnitCartSwitchTest extends ActionIntegrationTestCase
         $this->getService(SaleUnitContext::class)->reset();
         $this->getService(SaleUnitActivityChecker::class)->reset();
         ConfigQuery::resetCache();
+        Request::$isAdminEnv = $this->wasAdminEnv;
 
         parent::tearDown();
     }
@@ -269,7 +274,7 @@ final class SaleUnitCartSwitchTest extends ActionIntegrationTestCase
         $cart = $this->cartOn($this->first);
         $this->line($cart, $this->product(), 1);
         $this->buyFrom($this->second);
-        \Thelia\Core\HttpFoundation\Request::$isAdminEnv = true;
+        Request::$isAdminEnv = true;
 
         $this->follow($cart);
 
