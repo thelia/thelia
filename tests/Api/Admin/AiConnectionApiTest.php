@@ -114,6 +114,22 @@ final class AiConnectionApiTest extends ApiTestCase
         self::assertSame(0, AiConnectionQuery::create()->count());
     }
 
+    public function testAVariableOfTheServerCannotBeNamedAsTheKeyOfAConnectionToAnotherServer(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $created = $this->jsonRequest('POST', self::URI, $this->body(['baseUrl' => 'https://93.184.216.34', 'jurisdiction' => 'eu', 'apiKey' => null, 'apiKeyEnv' => 'STRIPE_SECRET_KEY']), $token);
+        self::assertSame(422, $created->getStatusCode(), (string) $created->getContent());
+        self::assertStringContainsString('THELIA_AI_', (string) $created->getContent());
+        self::assertSame(0, AiConnectionQuery::create()->count());
+
+        $id = json_decode((string) $this->jsonRequest('POST', self::URI, $this->body(['apiKey' => null, 'apiKeyEnv' => 'MISTRAL_API_KEY']), $token)->getContent(), true)['id'];
+        $moved = $this->jsonRequest('PATCH', self::URI.'/'.$id, ['baseUrl' => 'https://93.184.216.34', 'jurisdiction' => 'eu'], $token, 'merge-patch+json');
+        self::assertSame(422, $moved->getStatusCode(), (string) $moved->getContent());
+        self::assertStringContainsString('only sent to the address of the provider', (string) $moved->getContent());
+        self::assertNull(AiConnectionQuery::create()->findPk($id)?->getBaseUrl());
+    }
+
     public function testAPrivateAddressNeedsTheExplicitAllowance(): void
     {
         $token = $this->authenticateAsAdmin();

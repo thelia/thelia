@@ -17,6 +17,7 @@ namespace Thelia\Domain\Ai\Guardrail\Moderation;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\Exception\AiKeyDecryptionException;
+use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Ai\Guardrail\GuardrailAvailability;
 use Thelia\Domain\Ai\Provider\AiProviderPresets;
 use Thelia\Domain\Ai\Repository\AiRoutingRepository;
@@ -76,7 +77,8 @@ final readonly class AiModerationConnections
     {
         try {
             $key = $this->vault->resolve($connection);
-        } catch (AiKeyDecryptionException) {
+        } catch (AiKeyDecryptionException|InvalidAiArgumentException) {
+            // A key that cannot be read, or a variable the vault refuses for this connection: no moderation through it.
             return null;
         }
 

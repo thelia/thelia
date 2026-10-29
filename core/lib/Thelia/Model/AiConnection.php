@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Ai\Vault\AiEnvironmentKey;
 use Thelia\Model\Base\AiConnection as BaseAiConnection;
@@ -44,7 +45,7 @@ class AiConnection extends BaseAiConnection
         }
 
         try {
-            return null !== AiEnvironmentKey::read($name);
+            return null !== AiEnvironmentKey::read($name, AiProvider::tryFrom((string) $this->getProvider()), $this->getBaseUrl());
         } catch (InvalidAiArgumentException) {
             // A name the vault refuses to read is no key, whatever the variable holds.
             return false;

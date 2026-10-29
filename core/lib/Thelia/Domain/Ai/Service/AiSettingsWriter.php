@@ -116,7 +116,8 @@ final readonly class AiSettingsWriter
         $apiKeyEnv = null === $apiKeyEnv || '' === trim($apiKeyEnv) ? null : trim($apiKeyEnv);
 
         if (null !== $apiKeyEnv) {
-            $this->vault->assertEnvironmentVariableName($apiKeyEnv);
+            // The variable is checked with the address it would be sent to: the usual one of a provider never leaves for another server.
+            $this->vault->assertEnvironmentVariableName($apiKeyEnv, $provider, $baseUrl);
         }
 
         if (null !== $connection->getId() && $connection->getProvider() !== $provider->value) {
