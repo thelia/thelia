@@ -14,9 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Bundle\Exception;
 
-use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\InvalidCartException;
-use Thelia\Model\ProductBundleItemQuery;
 
 /**
  * A composition a cart line cannot hold: refused like any cart line the cart cannot take.
@@ -39,7 +37,7 @@ final class InvalidBundleCompositionException extends InvalidCartException
 
     public static function notABundle(int $productId): self
     {
-        return new self(self::translate('This product is sold on its own: it takes no choice of components.'), productId: $productId);
+        return new self(BundleExceptionMessage::translate('This product is sold on its own: it takes no choice of components.'), productId: $productId);
     }
 
     /**
@@ -47,84 +45,49 @@ final class InvalidBundleCompositionException extends InvalidCartException
      */
     public static function malformed(string $reason): self
     {
-        return new self(self::translate('The choice of components of this bundle cannot be read.'), reason: $reason);
+        return new self(BundleExceptionMessage::translate('The choice of components of this bundle cannot be read.'), reason: $reason);
     }
 
     public static function unknownItem(int $bundleItemId, int $bundleProductId): self
     {
-        return new self(self::translate('A component chosen is not part of this bundle.'), productId: $bundleProductId, bundleItemId: $bundleItemId);
+        return new self(BundleExceptionMessage::translate('A component chosen is not part of this bundle.'), productId: $bundleProductId, bundleItemId: $bundleItemId);
     }
 
     public static function quantityOutOfBounds(int $bundleItemId, string $quantity, string $lowest, string $highest): self
     {
-        $reference = self::referenceOfTheComponent($bundleItemId);
+        $reference = BundleExceptionMessage::referenceOfTheComponent($bundleItemId);
 
         $message = null === $reference
-            ? self::translate('A quantity chosen is outside what this bundle allows: between %min and %max.', ['%min' => $lowest, '%max' => $highest])
-            : self::translate('Choose between %min and %max of product %ref in this bundle.', ['%min' => $lowest, '%max' => $highest, '%ref' => $reference]);
+            ? BundleExceptionMessage::translate('A quantity chosen is outside what this bundle allows: between %min and %max.', ['%min' => $lowest, '%max' => $highest])
+            : BundleExceptionMessage::translate('Choose between %min and %max of product %ref in this bundle.', ['%min' => $lowest, '%max' => $highest, '%ref' => $reference]);
 
         return new self($message, bundleItemId: $bundleItemId, reason: \sprintf('quantity %s out of [%s, %s]', $quantity, $lowest, $highest));
     }
 
     public static function requiredItemMissing(int $bundleItemId): self
     {
-        $reference = self::referenceOfTheComponent($bundleItemId);
+        $reference = BundleExceptionMessage::referenceOfTheComponent($bundleItemId);
 
         $message = null === $reference
-            ? self::translate('A component this bundle requires is missing from the choice.')
-            : self::translate('Product %ref is required in this bundle.', ['%ref' => $reference]);
+            ? BundleExceptionMessage::translate('A component this bundle requires is missing from the choice.')
+            : BundleExceptionMessage::translate('Product %ref is required in this bundle.', ['%ref' => $reference]);
 
         return new self($message, bundleItemId: $bundleItemId);
     }
 
     public static function componentNotSellable(int $bundleItemId): self
     {
-        $reference = self::referenceOfTheComponent($bundleItemId);
+        $reference = BundleExceptionMessage::referenceOfTheComponent($bundleItemId);
 
         $message = null === $reference
-            ? self::translate('A component of this bundle cannot be sold at the moment.')
-            : self::translate('Product %ref of this bundle cannot be sold at the moment.', ['%ref' => $reference]);
+            ? BundleExceptionMessage::translate('A component of this bundle cannot be sold at the moment.')
+            : BundleExceptionMessage::translate('Product %ref of this bundle cannot be sold at the moment.', ['%ref' => $reference]);
 
         return new self($message, bundleItemId: $bundleItemId);
     }
 
     public static function bundleHoldsNothing(int $bundleProductId): self
     {
-        return new self(self::translate('This bundle has no component to sell: it cannot be added to a cart.'), productId: $bundleProductId);
-    }
-
-    /**
-     * Read on a refusal only, which a buyer meets once: the reference of the product of the
-     * component, null when the item or its sale element is gone.
-     */
-    private static function referenceOfTheComponent(int $bundleItemId): ?string
-    {
-        /** @var string|null $reference a single selected column */
-        $reference = ProductBundleItemQuery::create()
-            ->filterById($bundleItemId)
-            ->useProductSaleElementsQuery()
-                ->joinProduct()
-            ->endUse()
-            ->withColumn('Product.Ref', 'ComponentReference')
-            ->select(['ComponentReference'])
-            ->findOne();
-
-        return null !== $reference && '' !== $reference ? $reference : null;
-    }
-
-    /**
-     * The English sentence where no translator is up yet (a composition read before the kernel boots).
-     *
-     * @param array<string, string> $parameters
-     */
-    private static function translate(string $key, array $parameters = []): string
-    {
-        try {
-            $translator = Translator::getInstance();
-        } catch (\RuntimeException) {
-            return strtr($key, $parameters);
-        }
-
-        return $translator->trans($key, $parameters);
+        return new self(BundleExceptionMessage::translate('This bundle has no component to sell: it cannot be added to a cart.'), productId: $bundleProductId);
     }
 }
