@@ -18,41 +18,26 @@ use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\AiModel as AiModelResource;
-use Thelia\Domain\Ai\AiProvider;
-use Thelia\Domain\Ai\AiTier;
-use Thelia\Domain\Ai\AiUsageRegistryInterface;
-use Thelia\Domain\Ai\Catalog\AiModelSpecification;
 use Thelia\Domain\Ai\Exception\AiExceptionInterface;
-use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
-use Thelia\Domain\Ai\Internal\AiAssert;
-use Thelia\Model\AiConnectionQuery;
+use Thelia\Domain\Ai\Exception\AiResourceInUseException;
+use Thelia\Domain\Ai\Service\AiSettingsWriter;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiModelQuery;
-use Thelia\Model\AiTierAssignmentQuery;
-use Thelia\Model\AiUsageSetting;
-use Thelia\Model\AiUsageSettingQuery;
 
 /**
- * Creates, updates and deletes a model row. The unicity of (provider, name, connection) is checked here, not
- * left to the index: MySQL does not compare NULLs, so two rows of the catalogue of a provider (no connection)
- * would pass it. A row written through the API is `manual`. A refusal is a 422, a model still assigned to a
- * tier is a 409 on deletion, and it keeps the provider and the connection its tiers and usages reach it by.
+ * Creates, updates and deletes a model row by the rules of {@see AiSettingsWriter}. A refusal is a 422, and a
+ * model still assigned to a tier is a 409 on deletion.
  */
 final readonly class AiModelWriteProcessor implements ProcessorInterface
 {
-    private const string NAME_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9._:\/@+-]{0,127}$/';
-
-    private const array PRICES = ['inputPrice' => 'The input price', 'outputPrice' => 'The output price', 'cacheReadPrice' => 'The cache read price', 'cacheWritePrice' => 'The cache write price'];
-
     public function __construct(
         private ApiResourcePropelTransformerService $transformer,
-        private AiUsageRegistryInterface $usages,
+        private AiSettingsWriter $writer,
     ) {
     }
 
@@ -63,11 +48,11 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
             : (AiModelQuery::create()->findPk((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException('AI model not found.'));
 
         if ($operation instanceof DeleteOperationInterface) {
-            if (AiTierAssignmentQuery::create()->filterByModelId($model->getId())->count() > 0) {
-                throw new ConflictHttpException('This model is assigned to a tier: assign another one first.');
+            try {
+                $this->writer->deleteModel($model);
+            } catch (AiResourceInUseException $inUse) {
+                throw new ConflictHttpException($inUse->getMessage(), $inUse);
             }
-
-            $model->delete();
 
             return null;
         }
@@ -77,143 +62,33 @@ final readonly class AiModelWriteProcessor implements ProcessorInterface
         }
 
         try {
-            $this->apply($model, $data);
+            $model = $this->writer->saveModel(
+                $model,
+                (string) $data->getProvider(),
+                (string) $data->getName(),
+                $data->getConnectionId(),
+                $data->getTitle(),
+                $data->getInputPrice(),
+                $data->getOutputPrice(),
+                $data->getCacheReadPrice(),
+                $data->getCacheWritePrice(),
+                $data->getCurrency(),
+                $data->getContextWindow(),
+                $data->getMaxOutputTokens(),
+                $data->getSupportsStructuredOutput() ?? false,
+                $data->getSupportsTools() ?? false,
+                $data->getSupportsVision() ?? false,
+                $data->getSupportsStreaming() ?? true,
+                $data->getActive() ?? true,
+            );
         } catch (AiExceptionInterface $refusal) {
             throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
         }
-
-        $model->save();
 
         return $this->transformer->modelToResource(
             resourceClass: AiModelResource::class,
             propelModel: $model,
             context: $context,
         );
-    }
-
-    private function apply(AiModel $model, AiModelResource $data): void
-    {
-        $provider = AiProvider::tryFrom((string) $data->getProvider())
-            ?? throw new UnprocessableEntityHttpException(\sprintf('The provider must be one of: %s.', implode(', ', array_column(AiProvider::cases(), 'value'))));
-        $name = trim((string) $data->getName());
-
-        if (1 !== preg_match(self::NAME_PATTERN, $name)) {
-            throw new UnprocessableEntityHttpException('The model name is the identifier the provider gives it: letters, digits and . _ : / @ + -, 128 characters at most.');
-        }
-
-        $connectionId = $data->getConnectionId();
-
-        if (null !== $connectionId) {
-            $connection = AiConnectionQuery::create()->findPk($connectionId)
-                ?? throw new UnprocessableEntityHttpException('The connection does not exist.');
-
-            if ($connection->getProvider() !== $provider->value) {
-                throw new UnprocessableEntityHttpException('The provider of the model is not the one of its connection.');
-            }
-        }
-
-        if (null !== $model->getId() && ($model->getProvider() !== $provider->value || $model->getConnectionId() !== $connectionId)) {
-            $this->assertItsTiersAndUsagesStillReachIt($model, $provider, $connectionId);
-        }
-
-        $taken = AiModelQuery::create()->filterByProvider($provider->value)->filterByName($name);
-        null === $connectionId ? $taken->filterByConnectionId(null, Criteria::ISNULL) : $taken->filterByConnectionId($connectionId);
-
-        if (null !== $model->getId()) {
-            $taken->filterById($model->getId(), Criteria::NOT_EQUAL);
-        }
-
-        if ($taken->count() > 0) {
-            throw new UnprocessableEntityHttpException('This model already exists for this provider and connection.');
-        }
-
-        $currency = strtoupper(trim($data->getCurrency() ?? 'USD'));
-        AiAssert::currency($currency);
-
-        $prices = [];
-
-        foreach (self::PRICES as $property => $label) {
-            $value = $data->{'get'.ucfirst($property)}();
-            $value = null === $value || '' === trim($value) ? null : trim($value);
-
-            if (null !== $value) {
-                AiAssert::decimal($value, $label);
-            }
-
-            $prices[$property] = $value;
-        }
-
-        $model
-            ->setProvider($provider->value)
-            ->setName($name)
-            ->setConnectionId($connectionId)
-            ->setTitle(null === $data->getTitle() || '' === trim($data->getTitle()) ? null : trim($data->getTitle()))
-            ->setInputPrice($prices['inputPrice'] ?? '0')
-            ->setOutputPrice($prices['outputPrice'] ?? '0')
-            ->setCacheReadPrice($prices['cacheReadPrice'])
-            ->setCacheWritePrice($prices['cacheWritePrice'])
-            ->setCurrency($currency)
-            ->setContextWindow($this->positive($data->getContextWindow(), 'The context window'))
-            ->setMaxOutputTokens($this->positive($data->getMaxOutputTokens(), 'The output limit'))
-            ->setSupportsStructuredOutput((int) ($data->getSupportsStructuredOutput() ?? false))
-            ->setSupportsTools((int) ($data->getSupportsTools() ?? false))
-            ->setSupportsVision((int) ($data->getSupportsVision() ?? false))
-            ->setSupportsStreaming((int) ($data->getSupportsStreaming() ?? true))
-            ->setSource(AiModelSpecification::SOURCE_MANUAL)
-            ->setActive((int) ($data->getActive() ?? true));
-    }
-
-    /**
-     * A tier or a pinned usage reaches the model through a connection: that connection must still serve it
-     * once the provider or the connection of the model changes. A usage pinned to the model without a connection
-     * of its own reaches it through the connection of the model, else through the one of its tier.
-     */
-    private function assertItsTiersAndUsagesStillReachIt(AiModel $model, AiProvider $provider, ?int $connectionId): void
-    {
-        $connectionIds = [];
-
-        foreach (AiTierAssignmentQuery::create()->filterByModelId($model->getId())->find() as $assignment) {
-            $connectionIds[] = $assignment->getConnectionId();
-        }
-
-        foreach (AiUsageSettingQuery::create()->filterByPinnedModelId($model->getId())->find() as $setting) {
-            $connectionIds[] = $setting->getPinnedConnectionId() ?? (null === $connectionId ? $this->tierConnectionIdOf($setting) : null);
-        }
-
-        $connectionIds = array_filter($connectionIds, static fn (?int $id): bool => null !== $id);
-
-        if ([] === $connectionIds) {
-            return;
-        }
-
-        foreach (AiConnectionQuery::create()->filterById(array_values(array_unique($connectionIds)), Criteria::IN)->find() as $connection) {
-            if ($connection->getProvider() !== $provider->value || (null !== $connectionId && $connectionId !== $connection->getId())) {
-                throw new UnprocessableEntityHttpException('A tier or a usage reaches this model through a connection that would no longer serve it: give them another model first.');
-            }
-        }
-    }
-
-    /**
-     * The connection of the tier a usage runs at: the tier chosen for it, else the one its module declares (only
-     * the chosen one when the module is not installed).
-     */
-    private function tierConnectionIdOf(AiUsageSetting $setting): ?int
-    {
-        try {
-            $tier = $setting->effectiveTier($this->usages->get((string) $setting->getUsageId())->tier);
-        } catch (UnknownAiUsageException) {
-            $tier = AiTier::tryFrom((string) $setting->getTier());
-        }
-
-        return null === $tier ? null : AiTierAssignmentQuery::create()->filterByTier($tier->value)->findOne()?->getConnectionId();
-    }
-
-    private function positive(?int $value, string $label): ?int
-    {
-        if (null !== $value && $value < 1) {
-            throw new UnprocessableEntityHttpException($label.' must be a positive number.');
-        }
-
-        return $value;
     }
 }

@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Ai;
 
 use AiProbeModule\ProbeWriter;
 use Thelia\Domain\Ai\Catalog\AiModelSpecification;
+use Thelia\Domain\Ai\Exception\AiResourceInUseException;
 use Thelia\Domain\Ai\Exception\InvalidAiArgumentException;
 use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Provider\AiBaseUrlValidator;
@@ -29,6 +30,7 @@ use Thelia\Domain\Webhook\WebhookUrlValidator;
 use Thelia\Model\AiConnection;
 use Thelia\Model\AiConnectionQuery;
 use Thelia\Model\AiModel;
+use Thelia\Model\AiModelQuery;
 use Thelia\Model\AiTierAssignmentQuery;
 use Thelia\Model\AiUsageSettingQuery;
 use Thelia\Model\ConfigQuery;
@@ -198,6 +200,80 @@ final class AiSettingsWriterTest extends IntegrationTestCase
         $this->expectExceptionMessage('The model is not served by this connection.');
 
         $this->writer->assignTier(null, 'standard', $other->getId(), $this->model($connection, 'bound', connectionId: $connection->getId())->getId());
+    }
+
+    public function testAModelIsWrittenAsManualAndItsRulesAreTheWritersOwn(): void
+    {
+        $connection = $this->connection('mistral-main');
+
+        $model = $this->saveModel(null, 'mistral', ' ministral-x ', title: ' Ministral X ', inputPrice: '0.10', currency: 'eur', contextWindow: 32000);
+
+        self::assertSame(['ministral-x', 'Ministral X', '0.10', '0', 'EUR', 32000, AiModelSpecification::SOURCE_MANUAL], [$model->getName(), $model->getTitle(), $model->getInputPrice(), $model->getOutputPrice(), $model->getCurrency(), $model->getContextWindow(), $model->getSource()]);
+        self::assertSame($model->getId(), $this->saveModel($model, 'mistral', 'ministral-x', title: 'Renamed')->getId());
+
+        $refusals = [
+            'The provider must be one of' => fn () => $this->saveModel(null, 'nobody', 'a-model'),
+            'The model name is the identifier' => fn () => $this->saveModel(null, 'mistral', 'a model with spaces'),
+            'The connection does not exist.' => fn () => $this->saveModel(null, 'mistral', 'a-model', connectionId: 999999),
+            'is not the one of its connection' => fn () => $this->saveModel(null, 'openai', 'a-model', connectionId: $connection->getId()),
+            'already exists for this provider and connection' => fn () => $this->saveModel(null, 'mistral', 'ministral-x'),
+            'The input price' => fn () => $this->saveModel(null, 'mistral', 'priced', inputPrice: '-1'),
+            'The context window must be a positive number.' => fn () => $this->saveModel(null, 'mistral', 'sized', contextWindow: 0),
+        ];
+
+        foreach ($refusals as $message => $attempt) {
+            try {
+                $attempt();
+                self::fail('Refused: '.$message);
+            } catch (InvalidAiArgumentException $refusal) {
+                self::assertStringContainsString($message, $refusal->getMessage());
+            }
+        }
+    }
+
+    public function testAModelOrAConnectionARangeUsesIsNotDeleted(): void
+    {
+        $connection = $this->connection('mistral-main');
+        $model = $this->model($connection, 'ministral-a');
+        $this->writer->assignTier(null, 'fast', $connection->getId(), $model->getId());
+
+        try {
+            $this->writer->deleteModel($model);
+            self::fail('A range uses the model.');
+        } catch (AiResourceInUseException $refusal) {
+            self::assertSame('This model is assigned to a tier: assign another one first.', $refusal->getMessage());
+        }
+
+        try {
+            $this->writer->deleteConnection($connection);
+            self::fail('A range uses the connection.');
+        } catch (AiResourceInUseException $refusal) {
+            self::assertSame('This connection is assigned to a tier: assign another one first.', $refusal->getMessage());
+        }
+
+        $this->writer->deleteTierAssignment(AiTierAssignmentQuery::create()->findOneByTier('fast'));
+        $this->writer->deleteModel($model);
+        $this->writer->deleteConnection($connection);
+
+        self::assertNull(AiModelQuery::create()->findPk($model->getId()));
+        self::assertNull(AiConnectionQuery::create()->findPk($connection->getId()));
+    }
+
+    public function testAModelKeepsTheProviderAndTheConnectionItsRangeReachesItBy(): void
+    {
+        $connection = $this->connection('mistral-main');
+        $model = $this->model($connection, 'ministral-a');
+        $this->writer->assignTier(null, 'fast', $connection->getId(), $model->getId());
+
+        $this->expectException(InvalidAiArgumentException::class);
+        $this->expectExceptionMessage('would no longer serve it');
+
+        $this->saveModel($model, 'openai', 'ministral-a');
+    }
+
+    private function saveModel(?AiModel $model, string $provider, string $name, ?int $connectionId = null, ?string $title = null, ?string $inputPrice = null, ?string $currency = null, ?int $contextWindow = null): AiModel
+    {
+        return $this->writer->saveModel($model, $provider, $name, $connectionId, $title, $inputPrice, null, null, null, $currency, $contextWindow, null, false, false, false, true, true);
     }
 
     public function testAUsageSettingKeepsTheTierTheBudgetTheSwitchesAndTheNoticeAndMarkChoices(): void

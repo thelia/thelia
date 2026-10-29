@@ -46,7 +46,7 @@ final readonly class AiTierAssignmentWriteProcessor implements ProcessorInterfac
             : (AiTierAssignmentQuery::create()->findPk((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException('AI tier assignment not found.'));
 
         if ($operation instanceof DeleteOperationInterface) {
-            $assignment->delete();
+            $this->writer->deleteTierAssignment($assignment);
 
             return null;
         }
