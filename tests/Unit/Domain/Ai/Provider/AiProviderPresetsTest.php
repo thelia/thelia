@@ -66,4 +66,34 @@ final class AiProviderPresetsTest extends TestCase
         self::assertFalse($presets->keyIsOptional(AiProvider::Anthropic));
         self::assertFalse($presets->keyIsOptional(AiProvider::Scaleway));
     }
+
+    public function testEveryProbeModelIsInTheEmbeddedCatalogueAndOpenAiOnesAreDated(): void
+    {
+        $presets = new AiProviderPresets();
+        $path = \dirname(__DIR__, 5).'/core/lib/Thelia/Domain/Ai/Resources/model-catalog.json';
+        $names = [];
+
+        foreach (json_decode((string) file_get_contents($path), true, flags: \JSON_THROW_ON_ERROR)['models'] as $entry) {
+            $names[$entry['provider']][$entry['model']] = true;
+        }
+
+        $probed = 0;
+
+        foreach (AiProvider::cases() as $provider) {
+            $probe = $presets->probeModel($provider);
+
+            if (null === $probe) {
+                continue;
+            }
+
+            ++$probed;
+            self::assertArrayHasKey($probe, $names[$provider->value] ?? [], $provider->value.' probes a model its catalogue does not hold');
+        }
+
+        self::assertGreaterThanOrEqual(4, $probed);
+        // The undated aliases of OpenAI are not served by /v1/responses in the European region.
+        self::assertMatchesRegularExpression('/-\d{4}-\d{2}-\d{2}$/', (string) $presets->probeModel(AiProvider::OpenAi));
+        self::assertNull($presets->probeModel(AiProvider::Ollama));
+        self::assertNull($presets->probeModel(AiProvider::OpenAiCompatible));
+    }
 }
