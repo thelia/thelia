@@ -51,6 +51,9 @@ final class ConstrainedQuantitySelectorTest extends WebIntegrationTestCase
 
     private const CHECKOUT_CONTROLLER = 'src/Controller/CheckoutController.php';
 
+    /** The identification page leaves a prefetched request alone, which the cart page already did. */
+    private const GUEST_CHECKOUT_CONTROLLER = 'src/Controller/GuestCheckoutController.php';
+
     /** The cart page brings the lines of a cart read again to their rule. */
     private const RESTORED_LINES_MARKER = 'RestoredCartLines';
 
@@ -121,6 +124,33 @@ final class ConstrainedQuantitySelectorTest extends WebIntegrationTestCase
 
         self::assertStringContainsString('The quantity of A case of six in your cart was adjusted.', html_entity_decode($content, \ENT_QUOTES));
         self::assertSame(6.0, (float) CartItemQuery::create()->findPk($line->getId())?->getQuantity(), 'seven is brought down to the lot below it');
+    }
+
+    public function testAPageFetchedAheadOfAClickNeitherAdjustsTheLineNorSpendsTheMessage(): void
+    {
+        $this->skipUnlessTheThemeCarries(self::GUEST_CHECKOUT_CONTROLLER, 'PrefetchRequest');
+        $product = $this->productSoldBy(new QuantityRule(minQuantity: 2, step: 6), self::LOT_URL, 'A case of six');
+        $cart = $this->openASessionWithACart();
+        $line = $this->fixtures()->cartItem($cart, $product, $this->saleElementOf($product), ['quantity' => 7]);
+        CartTableMap::clearInstancePool();
+        CartTableMap::clearRelatedInstancePool();
+        $prefetch = ['HTTP_X_SEC_PURPOSE' => 'prefetch'];
+
+        $this->client->request('GET', '/checkout/identify', [], [], $prefetch);
+        self::assertSame(7.0, (float) CartItemQuery::create()->findPk($line->getId())?->getQuantity(), 'a prefetched identification page leaves the line alone');
+
+        $this->client->request('GET', '/checkout/cart', [], [], $prefetch);
+        self::assertStringNotContainsString('was adjusted', html_entity_decode((string) $this->client->getResponse()->getContent(), \ENT_QUOTES));
+
+        $this->client->request('GET', '/checkout/identify');
+        CartTableMap::clearInstancePool();
+        self::assertSame(6.0, (float) CartItemQuery::create()->findPk($line->getId())?->getQuantity(), 'the real visit brings it to the lot');
+
+        $this->client->request('GET', '/checkout/cart', [], [], $prefetch);
+        self::assertStringNotContainsString('was adjusted', html_entity_decode((string) $this->client->getResponse()->getContent(), \ENT_QUOTES), 'a prefetch tells nobody');
+
+        $this->assertPageRenders('/checkout/cart');
+        self::assertStringContainsString('The quantity of A case of six in your cart was adjusted.', html_entity_decode((string) $this->client->getResponse()->getContent(), \ENT_QUOTES), 'the page really opened still has its message');
     }
 
     private function productSoldBy(QuantityRule $rule, string $url, string $title): Product
