@@ -193,6 +193,10 @@ POST /api/front/cart_items
 
 `BundleCatalogState` keeps the variable `catalog_has_bundles` of the configuration: `0` no bundle, `1` bundles none of which is computed, `2` at least one computed bundle. The configuration cache loads it once per request, so reading it costs no query, and a shop on `0` runs the queries it ran before. It is kept up to date by itself: `Thelia\Model\Product` recounts it whenever a product becomes or stops being a bundle or changes its price mode, so the admin API, the back office, the clone and the imports are all covered. The recount is written inside the transaction of the product; the shared configuration cache entry is dropped at the end of the request, of the command or of the job of a worker, handled or failed (`ModelConfigListener`), after the commit, so the next request rebuilds the state from what is committed. A cart line that holds a composition does not depend on this variable. A database that never had the variable has no bundle. The variable is seeded to `0` on install and update, and hidden.
 
+## Shared cache
+
+The page of a bundle is shared like the page of any product when the shared cache is enabled: `/api/front/product_bundle_items` is on the list of resources every visitor reads the same (`SharedCacheKeyCollector::READABLE_PREFIXES`), and a page that reads it is tagged `product_bundle_items`. Any change of a product purges that key, so a bundle follows the price, the visibility and the title of its components; a component added, changed, moved or deleted purges the bundle product, whichever way it was written (admin API, back office, clone of a bundle, module): the purge hangs on the Propel events `POST_SAVE` and `POST_DELETE` of `product_bundle_item`, not on the `PRODUCT_BUNDLE_ITEM_*` events, which the admin API does not dispatch. As the purge of any product also purges the `product_bundle_items` key, it reaches every bundle page of the shop, not only the pages of the product that changed. As for any product, the stock an order takes raises no catalogue event: the availability a shared page shows is bound by `shared_cache_ttl`.
+
 ## Deleting a component
 
 `product_bundle_item.product_sale_elements_id` is `ON DELETE SET NULL`: deleting a sale element leaves the line in place and the API shows `productSaleElements: null`. A bundle whose required line lost its sale element is no longer sellable, and the back office flags it. Deleting the bundle product deletes its lines (`CASCADE`).
@@ -207,4 +211,4 @@ POST /api/front/cart_items
 - **The cart total still counts an invalid pack line.** A line flagged `bundle_orderable = false` stays in the total of the cart until the buyer removes it; only the cart step and the order refuse it.
 - **A bundle holds no bundle.**
 - A bundle offered by a coupon with no kept component is not checked against stock.
-- The PDF and e-mail templates show the component lines with a price of 0; a "included in the bundle" mention is left to the templates.
+- The default PDF template prints the components under their bundle, with no price, from the release of the template that reads `LINE_TYPE` and `PARENT`; an older PDF template and the e-mail templates still list them as lines at 0.
