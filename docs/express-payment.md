@@ -155,7 +155,7 @@ reads the same rule to decide when to give its place to the wallet.
 `express_payment_zones`, a comma-separated list of zones, empty by default. `checkout` turns
 express payment on. Unknown entries are dropped rather than refused, so a value written by
 another version degrades to the zones this one knows. Fresh installs get the row from
-`setup/insert.sql`. Updated shops get it from `setup/update/sql/3.3.0.sql` with
+`setup/insert.sql`. Updated shops get it from `setup/update/sql/3.4.0.sql` with
 `INSERT IGNORE`, which leaves alone a shop that already set it.
 
 ## API
@@ -190,7 +190,7 @@ hand, with the shop's routes and token, for a decoupled front.
 | Ordinary placement guard | `core/lib/Thelia/Domain/Checkout/Service/CheckoutPaymentOffer.php`, `ExpressPaymentCheckoutGuard.php` |
 | Routes and controller | `core/lib/Thelia/Config/Resources/routing/routes.php`, `core/lib/Thelia/Controller/Front/ExpressCheckoutController.php` |
 | API | `core/lib/Thelia/Api/Resource/ExpressPaymentButton.php`, `Api/State/Provider/ExpressPaymentButtonProvider.php` |
-| Setting | `setup/insert.sql.tpl`, `setup/update/sql/3.3.0.sql` |
+| Setting | `setup/insert.sql.tpl`, `setup/update/sql/3.4.0.sql` |
 | Theme | Flexy: `checkout-payment.html.twig`, `checkout-onepage.html.twig`, `components/Organisms/NextButton/`, `components/Organisms/Summary/Checkout.php`, `assets/controllers/express_payment_dock_controller.js` |
 
 ## Test suites

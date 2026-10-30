@@ -1593,4 +1593,5 @@ return [
     'Open (1) or close (0) the MCP server through which external assistants call the AI tools with a token' => 'Ouvrir (1) ou fermer (0) le serveur MCP par lequel des assistants externes appellent les outils d\'IA avec un jeton',
     'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)' => 'Nombre d\'heures pendant lesquelles une proposition d\'écriture d\'un outil d\'IA attend l\'approbation d\'un administrateur avant d\'expirer (24 si invalide)',
     'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)' => 'Durée de vie maximale, en jours, d\'un jeton remis à un assistant externe pour le serveur MCP (365 si invalide)',
+    'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Emplacements où s\'affichent les boutons de paiement express des modules de paiement, séparés par des virgules parmi checkout (vide : nulle part)',
 ];
