@@ -599,6 +599,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_UPDATE_STATUS => ['orderStatusChange', 10],
             TheliaEvents::CART_ADDITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_UPDATEITEM => ['updateOrderDiscount', 10],
+            // A line the rules of its combination brought down or removed, on a cart
+            // read back (restored, checked before the checkout): the buyer did not touch it.
+            TheliaEvents::CART_ITEM_QUANTITY_ADJUSTED => ['updateOrderDiscount', 10],
             TheliaEvents::CART_DELETEITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_SALE_UNIT_SWITCHED => ['updateOrderDiscount', 10],
             TheliaEvents::CART_LINES_REPRICED => ['updateOrderDiscount', 10],
