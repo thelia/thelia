@@ -53,10 +53,22 @@ async function addComponent(
   const required = page.getByTestId('product-bundle-required');
   if ((await required.isChecked()) !== fields.required) await required.setChecked(fields.required);
   await Promise.all([
-    page.waitForURL(/\/admin\/products\/update/),
+    formPosted(page, '/admin/products/bundle/items/add'),
     page.getByTestId('product-bundle-add').click(),
   ]);
   await expect(page.getByTestId('product-bundle-tab')).toBeVisible();
+}
+
+/**
+ * The form of the product sheet answers on the same /admin/products/update URL it was posted from: waiting
+ * for that URL resolves at once and the database is read before the post is handled. Wait for the post.
+ */
+async function formPosted(page: Page, path: string): Promise<void> {
+  const response = await page.waitForResponse(
+    (candidate) => candidate.request().method() === 'POST' && new URL(candidate.url()).pathname === path,
+  );
+  await response.finished();
+  await page.waitForLoadState('load');
 }
 
 async function itemRow(page: Page, component: Component) {
@@ -99,7 +111,7 @@ for (const { name, viewport } of VIEWPORTS) {
       await page.getByTestId('product-edit-bundle-discount').fill('10');
       await page.getByTestId('product-edit-bundle-discount-type').selectOption('percent');
       await Promise.all([
-        page.waitForURL(/\/admin\/products\/update/),
+        formPosted(page, '/admin/products/save'),
         page.getByTestId('product-edit-save-stay').click(),
       ]);
 
@@ -160,7 +172,7 @@ for (const { name, viewport } of VIEWPORTS) {
       await expect(page.getByTestId('product-bundle-edit-max')).toHaveValue('3');
       await page.getByTestId('product-bundle-edit-max').fill('5');
       await Promise.all([
-        page.waitForURL(/\/admin\/products\/update/),
+        formPosted(page, '/admin/products/bundle/items/update'),
         page.getByTestId('product-bundle-edit-submit').click(),
       ]);
       expect(await ddevMysql(`SELECT max_quantity FROM product_bundle_item WHERE product_sale_elements_id = ${world.lock.saleElementsId};`)).toMatch(/^5(\.0+)?$/);
@@ -170,7 +182,7 @@ for (const { name, viewport } of VIEWPORTS) {
       await (await itemRow(page, world.lock)).locator('[data-item-id]').first().click();
       await page.getByTestId('product-bundle-edit-max').fill('3');
       await Promise.all([
-        page.waitForURL(/\/admin\/products\/update/),
+        formPosted(page, '/admin/products/bundle/items/update'),
         page.getByTestId('product-bundle-edit-submit').click(),
       ]);
       expect(await ddevMysql(`SELECT max_quantity FROM product_bundle_item WHERE product_sale_elements_id = ${world.lock.saleElementsId};`)).toMatch(/^3(\.0+)?$/);
@@ -202,7 +214,7 @@ for (const { name, viewport } of VIEWPORTS) {
         select.closest('.d-none')?.classList.remove('d-none');
       }, strangerBundle.saleElementsId);
       await Promise.all([
-        page.waitForURL(/\/admin\/products\/update/),
+        formPosted(page, '/admin/products/bundle/items/add'),
         page.getByTestId('product-bundle-add').click(),
       ]);
       const refusal = page.locator('.alert-danger, [role="alert"].alert-danger, .toast-danger').first();
