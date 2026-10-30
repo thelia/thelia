@@ -34,6 +34,7 @@ use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Event\OrderProductEvent;
 use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -356,6 +357,29 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
         foreach (CartQuery::create()->findPk($cart->getId())?->getCartItems() ?? [] as $item) {
             $item->getProductSaleElements()?->setQuantity(0)->save($this->getPropelConnection());
         }
+
+        $this->confirm($this->tokenFor($cart));
+
+        $this->jsonAnswer(409);
+    }
+
+    /**
+     * Another order took the same stock at the same moment and the database broke the tie:
+     * nothing was written, and the wallet is told to try again rather than that it was refused.
+     */
+    public function testALockConflictWithAnotherOrderIsAConflictNotARefusal(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+
+        $deadlock = new \PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock');
+        $deadlock->errorInfo = ['40001', 1213, 'Deadlock found when trying to get lock'];
+        $this->getService('event_dispatcher')->addListener(
+            OrderProductEvent::PRE_INSERT,
+            static function () use ($deadlock): never {
+                throw $deadlock;
+            },
+        );
 
         $this->confirm($this->tokenFor($cart));
 
