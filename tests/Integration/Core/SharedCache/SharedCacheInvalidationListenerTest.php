@@ -44,6 +44,9 @@ use Thelia\Core\SharedCache\SharedCacheKey;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Core\SharedCache\SharedCachePurgeQueue;
 use Thelia\Core\SharedCache\SharedCachePurgerInterface;
+use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
+use Thelia\Domain\Catalog\Bundle\BundleDiscountType;
+use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Media\ProductMediaOrder;
 use Thelia\Model\Area;
 use Thelia\Model\Brand;
@@ -59,11 +62,13 @@ use Thelia\Model\ContentDocument;
 use Thelia\Model\ContentImage;
 use Thelia\Model\Event\ChoiceFilterEvent;
 use Thelia\Model\Event\ConfigEvent;
+use Thelia\Model\Event\ProductBundleItemEvent;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
 use Thelia\Model\MetaData;
 use Thelia\Model\Product;
+use Thelia\Model\ProductBundleItemQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
@@ -72,6 +77,7 @@ use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductVideo;
 use Thelia\Model\RewritingUrl;
+use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Unit\Core\SharedCache\RecordingSharedCachePurger;
 
@@ -105,7 +111,82 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onCatalogueChange(new ProductEvent((new Product())->setId(42)), TheliaEvents::PRODUCT_UPDATE);
         $this->listener->flush();
 
-        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'tfilters']], $this->purger->calls);
+        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'product_bundle_items', 'tfilters']], $this->purger->calls);
+    }
+
+    public function testAComponentAddedToABundlePurgesTheBundleProductThroughPropel(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $service = $this->getService(BundleCompositionService::class);
+        $factory = $this->createFixtureFactory();
+        $bundle = $this->aBundle($factory, $service);
+        $component = $this->aComponent($factory);
+        $this->flushTheContainerListener($purger);
+
+        $service->addItem((int) $bundle->getId(), (int) $component->getDefaultSaleElements()->getId(), '1');
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $bundle->getId())], $purger->calls);
+    }
+
+    public function testAMovedComponentPurgesItsBundle(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $service = $this->getService(BundleCompositionService::class);
+        $factory = $this->createFixtureFactory();
+        $bundle = $this->aBundle($factory, $service);
+        $item = $service->addItem((int) $bundle->getId(), (int) $this->aComponent($factory)->getDefaultSaleElements()->getId(), '1');
+        $this->flushTheContainerListener($purger);
+
+        $service->updatePosition((int) $item->getId(), 4);
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $bundle->getId())], $purger->calls);
+    }
+
+    public function testADeletedComponentPurgesTheBundleItBelongedTo(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $service = $this->getService(BundleCompositionService::class);
+        $factory = $this->createFixtureFactory();
+        $bundle = $this->aBundle($factory, $service);
+        $item = $service->addItem((int) $bundle->getId(), (int) $this->aComponent($factory)->getDefaultSaleElements()->getId(), '1');
+        $this->flushTheContainerListener($purger);
+
+        $service->removeItem((int) $item->getId());
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertNull(ProductBundleItemQuery::create()->findPk($item->getId()));
+        self::assertSame([SharedCacheKey::forChange('product', (int) $bundle->getId())], $purger->calls);
+    }
+
+    public function testTheComponentsCopiedToAClonedBundlePurgeThatBundle(): void
+    {
+        $purger = $this->recordThroughTheContainer();
+        $service = $this->getService(BundleCompositionService::class);
+        $factory = $this->createFixtureFactory();
+        $source = $this->aBundle($factory, $service);
+        $service->addItem((int) $source->getId(), (int) $this->aComponent($factory)->getDefaultSaleElements()->getId(), '1');
+        $target = $this->aBundle($factory, $service);
+        $this->flushTheContainerListener($purger);
+
+        $service->copyItems((int) $source->getId(), (int) $target->getId());
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+
+        self::assertSame([SharedCacheKey::forChange('product', (int) $target->getId())], $purger->calls);
+    }
+
+    public function testTheComponentsOfABundleAreSubscribedThroughPropelOnly(): void
+    {
+        $subscribed = SharedCacheInvalidationListener::getSubscribedEvents();
+
+        foreach ([ProductBundleItemEvent::POST_SAVE, ProductBundleItemEvent::POST_DELETE] as $eventName) {
+            self::assertSame('onWrite', $subscribed[$eventName][0]);
+        }
+
+        foreach ([TheliaEvents::PRODUCT_BUNDLE_ITEM_ADD, TheliaEvents::PRODUCT_BUNDLE_ITEM_UPDATE, TheliaEvents::PRODUCT_BUNDLE_ITEM_DELETE, TheliaEvents::PRODUCT_BUNDLE_ITEM_UPDATE_POSITION] as $eventName) {
+            self::assertArrayNotHasKey($eventName, $subscribed, 'the write of the line purges, a second purge on the action event would double it');
+        }
     }
 
     public function testAFeatureValueChangePurgesThatProductOnly(): void
@@ -395,7 +476,7 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         $this->listener->onResourceChange(new ResourcePersistedEvent(\stdClass::class, (new Product())->setId(42), ResourcePersistedEvent::OPERATION_WRITE));
         $this->listener->flush();
 
-        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'tfilters']], $this->purger->calls);
+        self::assertSame([['product-42', 'products', 'product_sale_elements', 'product_images', 'product_sale_elements_product_image', 'product_videos', 'product_sale_elements_product_video', 'product_associations', 'product_bundle_items', 'tfilters']], $this->purger->calls);
     }
 
     public function testADeletionThroughTheApiPurgesToo(): void
@@ -641,6 +722,18 @@ final class SharedCacheInvalidationListenerTest extends IntegrationTestCase
         static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
 
         self::assertSame([SharedCacheKey::forChange('folder', (int) $folder->getId())], $purger->calls);
+    }
+
+    private function aBundle(FixtureFactory $factory, BundleCompositionService $service): Product
+    {
+        $bundle = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['basePrice' => 999.0, 'baseQuantity' => 0]);
+
+        return $service->setBundleSettings((int) $bundle->getId(), true, BundlePriceMode::Computed, '10', BundleDiscountType::Percent);
+    }
+
+    private function aComponent(FixtureFactory $factory): Product
+    {
+        return $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['basePrice' => 20.0, 'baseQuantity' => 10]);
     }
 
     private function recordThroughTheContainer(): RecordingSharedCachePurger

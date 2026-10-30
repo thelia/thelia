@@ -16,6 +16,9 @@ namespace Thelia\Tests\Api\Admin;
 
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\SharedCache\SharedCacheInvalidationListener;
+use Thelia\Core\SharedCache\SharedCacheKey;
+use Thelia\Core\SharedCache\SharedCachePurgerInterface;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Model\Map\ProductBundleItemTableMap;
 use Thelia\Model\Product;
@@ -23,6 +26,7 @@ use Thelia\Model\ProductBundleItemQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Integration\Domain\Catalog\Bundle\BuildsBundles;
+use Thelia\Tests\Unit\Core\SharedCache\RecordingSharedCachePurger;
 
 /**
  * The components of a bundle and the bundle settings of a product, through the admin API.
@@ -295,6 +299,34 @@ final class ProductBundleItemApiTest extends ApiTestCase
         $this->assertRefusedTo([AdminResources::PRODUCT => [AccessManager::VIEW]]);
     }
 
+    public function testAPatchOfAComponentPurgesTheSharedCacheOfItsBundle(): void
+    {
+        $purger = new RecordingSharedCachePurger();
+        static::getContainer()->set(SharedCachePurgerInterface::class, $purger);
+        $token = $this->authenticateAsAdmin();
+        $example = $this->exampleBundle($this->createFixtureFactory(), $this->service());
+        $this->sendWhatTheFixturesPurged($purger);
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/product_bundle_items/'.$example['lock']->getId(), ['maxQuantity' => 5], $token, 'merge-patch+json');
+
+        self::assertJsonResponseSuccessful($response);
+        self::assertContains(SharedCacheKey::forChange('product', (int) $example['bundle']->getId()), $purger->calls);
+    }
+
+    public function testADeleteOfAComponentPurgesTheSharedCacheOfItsBundle(): void
+    {
+        $purger = new RecordingSharedCachePurger();
+        static::getContainer()->set(SharedCachePurgerInterface::class, $purger);
+        $token = $this->authenticateAsAdmin();
+        $example = $this->exampleBundle($this->createFixtureFactory(), $this->service());
+        $this->sendWhatTheFixturesPurged($purger);
+
+        $response = $this->jsonRequest('DELETE', '/api/admin/product_bundle_items/'.$example['lock']->getId(), token: $token);
+
+        self::assertSame(204, $response->getStatusCode());
+        self::assertContains(SharedCacheKey::forChange('product', (int) $example['bundle']->getId()), $purger->calls);
+    }
+
     public function testAnAdministratorWhoMayEditTheCatalogueWritesComponents(): void
     {
         $factory = $this->createFixtureFactory();
@@ -337,6 +369,12 @@ final class ProductBundleItemApiTest extends ApiTestCase
         yield 'item added' => ['POST', '/api/admin/product_bundle_items', ['bundleProduct' => '/api/admin/products/'.$bundle->getId(), 'quantity' => 1], 'jsonld'];
         yield 'item changed' => ['PATCH', '/api/admin/product_bundle_items/'.$itemId, ['maxQuantity' => 5], 'merge-patch+json'];
         yield 'item removed' => ['DELETE', '/api/admin/product_bundle_items/'.$itemId, [], 'jsonld'];
+    }
+
+    private function sendWhatTheFixturesPurged(RecordingSharedCachePurger $purger): void
+    {
+        static::getContainer()->get(SharedCacheInvalidationListener::class)->flush();
+        $purger->calls = [];
     }
 
     private function service(): BundleCompositionService

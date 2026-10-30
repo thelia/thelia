@@ -29,6 +29,7 @@ final class SharedCacheKeyCollector implements ResetInterface
         '/api/front/product_associations',
         '/api/front/product_videos',
         '/api/front/product_sale_elements_product_video',
+        '/api/front/product_bundle_items',
         '/api/front/tfilters',
         '/api/front/categories',
         '/api/front/contents',
