@@ -12,11 +12,9 @@ name: phpstan-botwig
 # were found"). A .env.test.local points it at the runner's MySQL.
 on:
   push:
-    branches: [ main ]
+    branches: [ '3.3' ]
   pull_request:
-    branches: [ main ]
-  # Required by a merge queue: it runs the checks on the queued merge commit.
-  merge_group:
+    branches: [ '3.3' ]
 
 permissions:
   contents: read

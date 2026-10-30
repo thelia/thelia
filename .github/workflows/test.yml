@@ -2,11 +2,9 @@ name: test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ '3.3' ]
   pull_request:
-    branches: [ main ]
-  # Required by a merge queue: it runs the checks on the queued merge commit.
-  merge_group:
+    branches: [ '3.3' ]
 
 # A new push to a pull request makes its previous run pointless: cancel it and
 # give the runners back (the organisation shares a pool of concurrent jobs).
