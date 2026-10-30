@@ -273,11 +273,12 @@ class Order extends BaseOrder
         // The rounding mode and the reading of the promotional price are part of the key: they decide what the query computes.
         $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
         $textPromoPrice = ConfigQuery::isOrderWithTextPromoPrice((int) $this->getId());
-        $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice;
+        $floatLineRounding = ConfigQuery::isOrderWithFloatLineRounding((int) $this->getId());
+        $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice.'-'.(int) $floatLineRounding;
 
         if (!isset(self::$totalsCache[$id]) || null === self::$totalsCache[$id]) {
             $con = Propel::getConnection();
-            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice));
+            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice, $floatLineRounding));
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
                 throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
@@ -359,7 +360,7 @@ class Order extends BaseOrder
      * text, the price of a line that is not on promotion included, and ROUND() then
      * reads it as a floating point number.
      */
-    private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice): string
+    private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice, bool $floatLineRounding): string
     {
         $roundingOfSums = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode;
 
@@ -380,9 +381,15 @@ class Order extends BaseOrder
         $taxedLineTotal = self::storedQuantity().' * ('.$unitPrice.' + '.$unitTaxes.')';
         $untaxedLineTotal = self::storedQuantity().' * '.$unitPrice;
 
+        // The quantity is a DOUBLE, and so is the line total: 1.25 x 14.82 is 18.524999…,
+        // which ROUND() would bring down to 18.52 where the cart, rounding in PHP, charges
+        // 18.53. The line is brought back to a decimal at six places before it is rounded.
+        // An order read with a text promotional price, or placed before the line totals
+        // were rounded so (ConfigQuery::isOrderWithFloatLineRounding()), was invoiced on the
+        // floating point figure, and keeps it.
         if ($roundingOfSums) {
-            $taxedLineTotal = 'ROUND('.$taxedLineTotal.', 2)';
-            $untaxedLineTotal = 'ROUND('.$untaxedLineTotal.', 2)';
+            $taxedLineTotal = 'ROUND('.self::asDecimalUnless($taxedLineTotal, $textPromoPrice || $floatLineRounding).', 2)';
+            $untaxedLineTotal = 'ROUND('.self::asDecimalUnless($untaxedLineTotal, $textPromoPrice || $floatLineRounding).', 2)';
         }
 
         return '
@@ -404,6 +411,11 @@ class Order extends BaseOrder
     private static function storedQuantity(): string
     {
         return 'ROUND('.OrderProductTableMap::COL_QUANTITY.', '.QuantityScale::MAXIMUM_DECIMALS.')';
+    }
+
+    private static function asDecimalUnless(string $lineTotal, bool $invoicedOnTheFloatingPointFigure): string
+    {
+        return $invoicedOnTheFloatingPointFigure ? $lineTotal : 'CAST('.$lineTotal.' AS DECIMAL(20,6))';
     }
 
     private function promoPriceOperand(bool $textPromoPrice): string

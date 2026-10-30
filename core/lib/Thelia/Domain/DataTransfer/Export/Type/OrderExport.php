@@ -146,6 +146,7 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
         $stmt->bindValue('legacy_rounding_pivot', (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
         $stmt->bindValue('sum_of_roundings_pivot', (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
         $stmt->bindValue('text_promo_price_pivot', (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
+        $stmt->bindValue('float_line_rounding_pivot', (int) ConfigQuery::read('last_float_line_rounding_order_id', 0), \PDO::PARAM_INT);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
@@ -335,9 +336,22 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
         // The quantity read back as sold: see Order::storedQuantity().
         $lineTotal = 'ROUND(order_product.quantity, '.QuantityScale::MAXIMUM_DECIMALS.') * '.$unitAmount;
 
-        return ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode
-            ? 'ROUND('.$lineTotal.', 2)'
-            : $lineTotal;
+        if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS !== $roundingMode) {
+            return $lineTotal;
+        }
+
+        // A DOUBLE line total is rounded as a decimal (18.524999… is 18.53), as
+        // Order::getTotalAmount() rounds it, except on a frozen line or on an order placed
+        // before the line totals were rounded so: their order was invoiced on the floating
+        // point figure.
+        if (self::UNIT_PRICE_AS_TEXT === $unitPrice) {
+            return 'ROUND('.$lineTotal.', 2)';
+        }
+
+        return 'CASE
+                                WHEN `order`.id <= :float_line_rounding_pivot THEN ROUND('.$lineTotal.', 2)
+                                ELSE ROUND(CAST('.$lineTotal.' AS DECIMAL(20,6)), 2)
+                            END';
     }
 
     /**

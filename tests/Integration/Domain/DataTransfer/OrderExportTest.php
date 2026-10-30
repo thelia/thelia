@@ -174,6 +174,54 @@ final class OrderExportTest extends IntegrationTestCase
     }
 
     /**
+     * Under rounding of sums each line total is rounded, and 1.25 x 14.82 is 18.524999…
+     * as a DOUBLE: the export, like the order, rounds it as a decimal, 18.53.
+     */
+    public function testUnderRoundingOfSumsAWeighedOrderIsExportedWithTheAmountItWasChargedInCents(): void
+    {
+        $this->optIn();
+
+        $order = $this->weighedOrder(1.25, '12.350000', '2.470000');
+
+        self::assertEqualsWithDelta(18.53, $this->invoicedTotal($order), 0.0001);
+        self::assertEqualsWithDelta(18.53, (float) $this->exportedRow($order->getRef())['order_total_taxed_price'], 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * The same binary error on a whole quantity: three at 1.005 taxed is 3.015, 3.02.
+     */
+    public function testUnderRoundingOfSumsAWholeQuantityIsExportedWithTheAmountItWasChargedInCents(): void
+    {
+        $this->optIn();
+
+        $order = $this->weighedOrder(3.0, '0.837500', '0.167500');
+
+        self::assertEqualsWithDelta(3.02, $this->invoicedTotal($order), 0.0001);
+        self::assertEqualsWithDelta(3.02, (float) $this->exportedRow($order->getRef())['order_total_taxed_price'], 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * An order placed before the line totals were rounded as decimals is exported with
+     * the 3.01 it was invoiced, the orders after the pivot with 3.02.
+     */
+    public function testUnderRoundingOfSumsAnOrderPlacedBeforeTheDecimalRoundingIsExportedWithItsInvoicedTotal(): void
+    {
+        $this->optIn();
+
+        $invoiced = $this->weighedOrder(3.0, '0.837500', '0.167500');
+        ConfigQuery::write('last_float_line_rounding_order_id', (string) $invoiced->getId());
+        $placedAfter = $this->weighedOrder(3.0, '0.837500', '0.167500');
+
+        self::assertEqualsWithDelta(3.01, $this->invoicedTotal($invoiced), 0.0001);
+        self::assertEqualsWithDelta(3.01, (float) $this->exportedRow($invoiced->getRef())['order_total_taxed_price'], 0.0001);
+        self::assertEqualsWithDelta(3.02, (float) $this->exportedRow($placedAfter->getRef())['order_total_taxed_price'], 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($invoiced);
+        $this->assertExportedTotalsMatchTheInvoice($placedAfter);
+    }
+
+    /**
      * The quantity column keeps 1234.565 as 1234.5649: 1234.565 kg at 1.00 is charged
      * 1234.57, and exported so, not 1234.56.
      */
