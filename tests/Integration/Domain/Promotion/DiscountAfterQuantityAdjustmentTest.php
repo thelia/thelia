@@ -18,10 +18,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\Checkout\Exception\CartQuantitiesAdjustedException;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Product;
 
@@ -93,6 +95,52 @@ final class DiscountAfterQuantityAdjustmentTest extends ActionIntegrationPromoti
 
         self::assertSame($this->cart->getId(), $restored->getId());
         self::assertEqualsWithDelta($sevenUnits * 6 / 7, $this->discount(), 0.01, 'Ten per cent of six units, not of seven.');
+    }
+
+    /**
+     * The cart of a signed-in customer restored from its cookie is duplicated, and the
+     * source is deleted (Model\Cart::duplicate()). The discount is priced again on the
+     * duplicate, without restoring the cart a second time nor saving the deleted one.
+     */
+    public function testTheDiscountFollowsALineBroughtDownOnTheCartDuplicatedForASignedInCustomer(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $ownCart = $this->factory->cart($customer, ['currency' => $this->cart->getCurrency()]);
+        $this->factory->cartItem($ownCart, $this->product, $this->defaultPseFor($this->product), ['quantity' => 7, 'price' => '10.000000']);
+        $this->sellBySix();
+
+        $this->session()->setSessionCart(null);
+        $this->session()->setCustomerUser($customer);
+        $this->getService(RequestStack::class)->getMainRequest()?->cookies->set(
+            ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
+            $ownCart->getToken(),
+        );
+
+        $restorations = 0;
+        $countRestorations = static function () use (&$restorations): void {
+            ++$restorations;
+        };
+        $this->dispatcher->addListener(TheliaEvents::CART_RESTORE_CURRENT, $countRestorations, 1000);
+
+        try {
+            $restored = $this->session()->getSessionCart($this->dispatcher);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::CART_RESTORE_CURRENT, $countRestorations);
+        }
+
+        self::assertSame(1, $restorations, 'The cart is restored once.');
+        self::assertNotSame($ownCart->getId(), $restored->getId(), 'The cart of a signed-in customer is duplicated.');
+        self::assertSame([6.0], array_map(static fn ($line): float => (float) $line->getQuantity(), iterator_to_array(CartItemQuery::create()->filterByCartId($restored->getId())->find())));
+        self::assertSame($restored->getId(), $this->session()->getSessionCart($this->dispatcher)->getId());
+
+        $restored->reload();
+        $priced = (float) $restored->getDiscount();
+        $restored->clearCartItems();
+        $this->recomputeDiscount();
+        $restored->reload();
+
+        self::assertGreaterThan(0.0, $priced);
+        self::assertEqualsWithDelta((float) $restored->getDiscount(), $priced, 0.01, 'The discount of the duplicate is the one of its six units.');
     }
 
     public function testTheDiscountLeavesALineTheCheckoutRemoved(): void
