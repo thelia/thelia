@@ -115,6 +115,34 @@ final class CouponListEffectsCartTest extends ActionIntegrationPromotionTestCase
         self::assertSame(6.0, $this->cartDiscount($cart));
     }
 
+    /**
+     * Rules stored around their validation tell nothing of how the line is sold: the
+     * amount comes off every unit, as before the rules existed, and the cart is priced.
+     */
+    public function testAnAmountPerArticleOnRulesThatCannotDecideAQuantityComesOffEveryUnit(): void
+    {
+        $category = $this->factory->category();
+        $product = $this->productIn($category);
+
+        $this->automaticPromotion(
+            type: 'thelia.coupon.type.remove_amount_on_products',
+            effects: $this->effectsSavedByTheBackOffice('thelia.coupon.type.remove_amount_on_products', [
+                'amount' => '3',
+                'category_id' => (string) $category->getId(),
+                'products' => [(string) $product->getId()],
+            ]),
+            conditions: $this->atLeastLines(1),
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $product, quantity: 2);
+        $this->defaultPseFor($product)->setMinQuantity('0.000000')->save();
+
+        $this->recomputeDiscount();
+
+        self::assertSame(6.0, $this->cartDiscount($cart));
+    }
+
     public function testACategoryDiscountAppliesToEveryCategoryOfTheList(): void
     {
         $firstCategory = $this->factory->category();

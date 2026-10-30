@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
 use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
@@ -196,7 +197,7 @@ class CartAdd extends BaseForm
 
         try {
             ($this->quantityPolicy ?? new QuantityPolicy())->assertAcceptable((float) $value, $productSaleElements);
-        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException|InvalidQuantityRuleException $refusal) {
             $context->addViolation($refusal->getMessage());
         }
     }

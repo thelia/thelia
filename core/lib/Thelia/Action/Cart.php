@@ -47,6 +47,7 @@ use Thelia\Domain\Cart\Service\CartQuantityReconciler;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
 use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
@@ -682,7 +683,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ($this->quantityPolicy ?? new QuantityPolicy())->assertAcceptable($quantity, $productSaleElements);
         } catch (QuantityRefusedException $refusal) {
             throw CartQuantityRefusedException::byTheRules($refusal);
-        } catch (NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+        } catch (NotPositiveQuantityException|UnreadableQuantityException|InvalidQuantityRuleException $refusal) {
             throw new CartQuantityRefusedException($refusal->getMessage(), previous: $refusal);
         }
     }

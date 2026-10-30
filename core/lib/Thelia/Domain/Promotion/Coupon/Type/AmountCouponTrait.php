@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Domain\Promotion\Coupon\Type;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
 use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Model\CartItem;
+use Thelia\Model\ProductSaleElements;
 
 /**
  * A trait to manage a coupon which removes a constant amount from the order total.
@@ -40,17 +42,28 @@ trait AmountCouponTrait
 
     /**
      * The amount comes off every unit of a line sold by the piece, and once off a line
-     * sold by measure: 1.25 kg is one article, not one and a quarter.
+     * sold by measure: 1.25 kg is one article, not one and a quarter. Rules that cannot
+     * decide a quantity (written around the validation of the combination) say nothing of
+     * how the line is sold: it is taken as sold by the piece, as before the rules existed.
      */
     public function getCartItemDiscount(CartItem $cartItem): float
     {
         $productSaleElements = $cartItem->getProductSaleElements();
 
-        if (null !== $productSaleElements && QuantityRule::fromProductSaleElements($productSaleElements)->isSoldByMeasure()) {
+        if (null !== $productSaleElements && self::isSoldByMeasure($productSaleElements)) {
             return $this->amount;
         }
 
         return $cartItem->getQuantity() * $this->amount;
+    }
+
+    private static function isSoldByMeasure(ProductSaleElements $productSaleElements): bool
+    {
+        try {
+            return QuantityRule::fromProductSaleElements($productSaleElements)->isSoldByMeasure();
+        } catch (InvalidQuantityRuleException) {
+            return false;
+        }
     }
 
     public function callDrawBackOfficeInputs($templateName): string

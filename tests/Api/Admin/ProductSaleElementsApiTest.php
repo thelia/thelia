@@ -177,6 +177,10 @@ final class ProductSaleElementsApiTest extends ApiTestCase
         yield 'a unit quantity of zero' => [['unitQuantity' => 0], 'unitQuantity'];
         yield 'a negative reference unit quantity' => [['referenceUnitQuantity' => -1], 'referenceUnitQuantity'];
         yield 'an unknown unit code' => [['unitCode' => 'furlong'], 'unitCode'];
+        yield 'a minimum below a millionth' => [['minQuantity' => 0.0000001], 'minQuantity'];
+        yield 'a step below a millionth' => [['quantityStep' => 0.0000001], 'quantityStep'];
+        yield 'a unit quantity below a millionth' => [['unitQuantity' => 0.0000001], 'unitQuantity'];
+        yield 'a reference unit quantity below a millionth' => [['referenceUnitQuantity' => 0.0000001], 'referenceUnitQuantity'];
     }
 
     /**
