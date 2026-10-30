@@ -69,7 +69,29 @@ async function expectNoHorizontalScroll(page: Page): Promise<void> {
 }
 
 async function addToCart(page: Page): Promise<void> {
-  await page.locator(SUBMIT).first().click();
+  await addedToCart(page, () => page.locator(SUBMIT).first().click());
+}
+
+/**
+ * Runs the gesture that adds to the cart, then waits for the live action and the components it wakes (cart
+ * button, toast): Firefox and WebKit report the network idle before they answer, and leaving the page then
+ * aborts them with a page error. The live actions may also leave together as one `_batch` request.
+ */
+async function addedToCart(page: Page, gesture: () => Promise<void>): Promise<void> {
+  const answered = (component: string, action: string, timeout: number) =>
+    page
+      .waitForResponse((response) => {
+        const path = new URL(response.url()).pathname;
+        return response.request().method() === 'POST'
+          && (path.endsWith(`/${component}/${action}`) || path.endsWith(`/${component}/_batch`));
+      }, { timeout })
+      .then((response) => response.finished())
+      .catch(() => null);
+  const saved = answered('Layouts:ProductDetails:Base', 'save', 15_000);
+  const summary = answered('Organisms:CartButton:Base', 'getSummary', 5_000);
+  const toast = answered('Organisms:AddToCartToast:Base', 'addToCart', 5_000);
+  await gesture();
+  await Promise.all([saved, summary, toast]);
   await page.waitForLoadState('networkidle').catch(() => {});
 }
 
@@ -426,3 +448,123 @@ for (const { name, viewport } of VIEWPORTS) {
     });
   });
 }
+
+/**
+ * A quantity typed above its bound is brought back within it by the page. WebKit then fires no `change`,
+ * neither when the field is left nor on Enter, so the page has to say it: the pack added and the line kept
+ * are the ones the shopper sees.
+ */
+test.describe('Front-office bundles, quantities typed past their bound', () => {
+  test.describe.configure({ mode: 'serial' });
+  test.use({ viewport: VIEWPORTS[0].viewport });
+
+  let world: BundleWorld;
+
+  test.beforeAll(async () => {
+    await purgeLeftovers().catch(() => 0);
+    world = await createBundleWorld('FOK');
+  });
+
+  test.afterAll(async () => {
+    await cleanupBundleWorld(world);
+  });
+
+  test('4 locks typed then Enter prices and adds the pack with 3, and the cart line keeps the bounded quantity', async ({ page }) => {
+    const console = watchConsole(page);
+    await openPack(page, world);
+
+    // The composition sits outside the add-to-cart form: Enter submits nothing, the price follows the field.
+    const input = lockInput(page, world);
+    await input.click();
+    await input.press('Control+a');
+    await input.pressSequentially('4');
+    await expect(input).toHaveValue('3');
+    await input.press('Enter');
+    await expectPrice(page, 669.6, 744, 74.4);
+    await addToCart(page);
+
+    await gotoCart(page);
+    const line = page.locator('[data-live-name-value="Organisms:Cart:Base"] .CartItem').first();
+    await expect(line.getByTestId('bundle-included-item').nth(2)).toHaveText(new RegExp(`3\\s*×\\s*${world.lock.title}`));
+
+    // The line: a quantity above the stock the pack can supply comes back to it, and the cart follows.
+    const quantity = line.locator('input[type="number"]');
+    const max = Number(await quantity.getAttribute('max'));
+    expect(max).toBeGreaterThan(1);
+    // The line answers, then the summaries it wakes: leaving before them aborts them with a page error.
+    const answered = (component: string) =>
+      page.waitForResponse((response) => new URL(response.url()).pathname.includes(component)).then((response) => response.finished());
+    const updated = answered('Organisms:Cart:Base');
+    const summaries = Promise.all([answered('Organisms:Summary:Checkout'), answered('Organisms:Summary:Mini')]);
+    await quantity.click();
+    await quantity.press('Control+a');
+    await quantity.pressSequentially(String(max + 5));
+    await expect(quantity).toHaveValue(String(max));
+    await quantity.press('Tab');
+    await updated;
+    await summaries;
+
+    await page.reload();
+    await expect(page.locator('[data-live-name-value="Organisms:Cart:Base"] .CartItem input[type="number"]').first()).toHaveValue(String(max));
+    expect(console.errors, console.errors.join('\n')).toEqual([]);
+  });
+
+  test('a product quantity typed above the stock then Enter adds the stock, not the quantity shown before', async ({ page }) => {
+    const console = watchConsole(page);
+    await setStock(world.bike, 3);
+    await page.goto(`/${world.bike.slug}.html`);
+    await page.waitForLoadState('networkidle').catch(() => {});
+
+    // Enter submits the add-to-cart form itself: the quantity it posts has to be the one the field shows.
+    const input = page.locator('form[name="thelia_cart_add"] input[type="number"]').first();
+    await expect(input).toHaveAttribute('max', '3');
+    await input.click();
+    await input.press('Control+a');
+    await input.pressSequentially('5');
+    await expect(input).toHaveValue('3');
+    await addedToCart(page, () => input.press('Enter'));
+
+    await gotoCart(page);
+    const line = page.locator('[data-live-name-value="Organisms:Cart:Base"] .CartItem').filter({ hasText: world.bike.title });
+    await expect(line.locator('input[type="number"]')).toHaveValue('3');
+    expect(console.errors, console.errors.join('\n')).toEqual([]);
+  });
+
+  test('a cart line quantity typed above the stock then Enter moves the line once, to the stock', async ({ page }) => {
+    const console = watchConsole(page);
+    await setStock(world.bike, 3);
+    await page.goto(`/${world.bike.slug}.html`);
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await addToCart(page);
+
+    await gotoCart(page);
+    // The controller that keeps the field within its bounds is fetched lazily: let it arrive before typing.
+    await page.waitForLoadState('networkidle').catch(() => {});
+    const quantity = page.locator('[data-live-name-value="Organisms:Cart:Base"] .CartItem').filter({ hasText: world.bike.title }).locator('input[type="number"]');
+    await expect(quantity).toHaveValue('1');
+
+    // Every call of the line action, alone or in a batch: the browser's own change and the page's must not both move it.
+    const calls: string[] = [];
+    page.on('request', (request) => {
+      const path = new URL(request.url()).pathname;
+      if (request.method() === 'POST' && path.includes('Organisms:Cart:Base')) {
+        calls.push(`${path} ${request.postData() ?? ''}`);
+      }
+    });
+    const answered = (component: string) =>
+      page.waitForResponse((response) => new URL(response.url()).pathname.includes(component)).then((response) => response.finished());
+    const summaries = Promise.all([answered('Organisms:Summary:Checkout'), answered('Organisms:Summary:Mini')]);
+    await quantity.click();
+    await quantity.press('Control+a');
+    await quantity.pressSequentially('5');
+    await expect(quantity).toHaveValue('3');
+    await quantity.press('Enter');
+    await summaries;
+    await page.waitForTimeout(1_000);
+
+    expect(calls.join('\n').match(/onQuantityChanged/g) ?? [], calls.join('\n')).toHaveLength(1);
+    await page.reload();
+    await expect(page.locator('[data-live-name-value="Organisms:Cart:Base"] .CartItem input[type="number"]').first()).toHaveValue('3');
+    expect(console.errors, console.errors.join('\n')).toEqual([]);
+  });
+});
