@@ -134,7 +134,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (123, 'accounting_customer_account', '', 0, 0, NOW(), NOW()),
 (124, 'accounting_shipping_account', '', 0, 0, NOW(), NOW()),
 (125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
-(126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW())
+(126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW()),
+(127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW())
 
 ;
 

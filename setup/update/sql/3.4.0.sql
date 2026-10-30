@@ -1218,4 +1218,18 @@ PREPARE quantity_to_double_statement FROM @statement;
 EXECUTE quantity_to_double_statement;
 DEALLOCATE PREPARE quantity_to_double_statement;
 
+-- ---------------------------------------------------------------------
+-- Line totals rounded as decimals under the rounding of sums
+-- ---------------------------------------------------------------------
+-- The quantity is a binary floating point number, and so is a line total: 3 x 1.005 is
+-- 3.01499…, which ROUND() brought down to 3.01 where the cart charges 3.02. The line totals
+-- are now rounded as decimals. The orders already placed keep the total of their invoice:
+-- the highest order id is stored in last_float_line_rounding_order_id, and the orders up to
+-- it are totalled as they always were. INSERT IGNORE keeps the first value when the script
+-- is run again, so the pivot never moves past the orders placed since. A new shop has 0.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`)
+SELECT 'last_float_line_rounding_order_id', COALESCE(MAX(`id`), 0), 1, 1, NOW(), NOW() FROM `order`;
+
 SET FOREIGN_KEY_CHECKS = 1;
