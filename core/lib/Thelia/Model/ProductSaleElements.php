@@ -14,9 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
+use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Product\Identifier\Gtin;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
@@ -247,13 +251,66 @@ class ProductSaleElements extends BaseProductSaleElements
         return $this->getManufacturerBrandId() ?? $this->getProduct()?->getBrandId();
     }
 
+    /**
+     * The product row is locked before the sale elements of the product are looked at: two
+     * writers adding a sale element to the same bundle meet on that row, and the second one
+     * sees what the first committed (verrous d'abord, an index on product_id would lock a range).
+     *
+     * @throws BundleDefinitionException a second sale element for a bundle, whoever writes it (the API, an action, a module)
+     */
+    private function assertABundleKeepsOneSaleElement(?ConnectionInterface $con): void
+    {
+        // A shop without a bundle needs no read of the product: none can be one.
+        if (null === $this->getProductId() || !(new BundleCatalogState())->hasBundles()) {
+            return;
+        }
+
+        $con ??= Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+        $statement = $con->prepare('SELECT `is_bundle` FROM `product` WHERE `id` = :id FOR UPDATE');
+        $statement->bindValue(':id', $this->getProductId(), \PDO::PARAM_INT);
+        $statement->execute();
+        $isBundle = $statement->fetchColumn();
+        $statement->closeCursor();
+
+        if (1 !== (int) $isBundle) {
+            return;
+        }
+
+        $otherSaleElements = ProductSaleElementsQuery::create()->filterByProductId($this->getProductId());
+
+        if (!$this->isNew()) {
+            $otherSaleElements->filterById($this->getId(), Criteria::NOT_EQUAL);
+        }
+
+        if ($otherSaleElements->exists($con)) {
+            throw BundleDefinitionException::bundleHasOneSaleElement((int) $this->getProductId());
+        }
+    }
+
+    /**
+     * @throws BundleDefinitionException a second sale element for a bundle, whoever writes it (the API, an action, a module)
+     */
     public function preInsert(?ConnectionInterface $con = null): bool
     {
+        $this->assertABundleKeepsOneSaleElement($con);
+
         $this->setPosition($this->getNextPosition());
 
         parent::preInsert($con);
 
         return true;
+    }
+
+    /**
+     * @throws BundleDefinitionException a sale element moved to a bundle that already has one
+     */
+    public function preUpdate(?ConnectionInterface $con = null): bool
+    {
+        if ($this->isColumnModified(ProductSaleElementsTableMap::COL_PRODUCT_ID)) {
+            $this->assertABundleKeepsOneSaleElement($con);
+        }
+
+        return parent::preUpdate($con);
     }
 
     public function preDelete(?ConnectionInterface $con = null): bool

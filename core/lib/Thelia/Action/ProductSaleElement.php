@@ -31,6 +31,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
 use Thelia\Core\Template\Loop\ProductSaleElementsImage;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Product\Identifier\Gtin;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
@@ -79,6 +80,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findOne($con);
 
             if (null === $salesElement) {
+                // A bundle has a single sale element: no other can be created for it.
+                if (1 === (int) $event->getProduct()->getIsBundle()
+                    && ProductSaleElementsQuery::create()->filterByProductId($event->getProduct()->getId())->exists($con)) {
+                    throw BundleDefinitionException::bundleHasOneSaleElement((int) $event->getProduct()->getId());
+                }
+
                 // Create a new default product sale element
                 $salesElement = $event->getProduct()->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), false);
             } else {
@@ -301,6 +308,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
+            if (1 === (int) $event->getProduct()->getIsBundle() && \count($event->getCombinations()) > 1) {
+                throw BundleDefinitionException::bundleHasOneSaleElement((int) $event->getProduct()->getId());
+            }
+
             // Delete all product's productSaleElement
             ProductSaleElementsQuery::create()->filterByProductId($event->product->getId())->delete();
 

@@ -105,7 +105,11 @@ final readonly class ProductFacade
             ->setVirtualDocumentId($dto->virtualDocumentId)
             ->setShippingSurcharge($dto->shippingSurcharge)
             ->setShippingSurchargeMode($dto->shippingSurchargeMode)
-            ->setFreeShipping($dto->freeShipping);
+            ->setFreeShipping($dto->freeShipping)
+            ->setIsBundle($dto->isBundle)
+            ->setBundlePriceMode($dto->bundlePriceMode)
+            ->setBundleDiscount($dto->bundleDiscount)
+            ->setBundleDiscountType($dto->bundleDiscountType);
 
         $this->dispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE);
 

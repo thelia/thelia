@@ -24,6 +24,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
@@ -70,6 +71,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         protected readonly ReservedSaleVisibility $reservedSaleVisibility,
         protected readonly EffectivePriceCatalog $effectivePriceCatalog,
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+        protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
     ) {
     }
 
@@ -283,6 +285,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
         $effectivePrices = $this->effectivePricesOf($loopResult);
         $saleUnitQuantities = $this->saleUnitQuantitiesOf($loopResult);
+        // What the components allow for the bundles of the page: nothing is asked in the back office,
+        // which edits the national counter, nor in a shop without a bundle.
+        $bundleStocks = $this->getBackendContext() ? [] : ($this->bundleDisplayedStock?->forModels($loopResult->getResultDataCollection()) ?? []);
 
         /** @var \Thelia\Model\ProductSaleElements $PSEValue */
         foreach ($loopResult->getResultDataCollection() as $PSEValue) {
@@ -299,8 +304,14 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $effectivePrice = $effectivePrices[(int) $PSEValue->getId()] ?? null;
 
             if (null !== $effectivePrice) {
-                $PSEValue->setVirtualColumn('price_PROMO_PRICE', $effectivePrice->untaxedPromoPrice);
-                $isPromo = 1;
+                $settled = $effectivePrice->settle((float) $PSEValue->getVirtualColumn('price_PRICE'));
+
+                if ($settled->priceReplaced) {
+                    $PSEValue->setVirtualColumn('price_PRICE', $settled->untaxedPrice);
+                }
+
+                $PSEValue->setVirtualColumn('price_PROMO_PRICE', $settled->untaxedPromoPrice);
+                $isPromo = $settled->isPromo ? 1 : 0;
             }
 
             $price = $PSEValue->getPrice('price_PRICE', $discount);
@@ -329,7 +340,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
             $loopResultRow
                 ->set('ID', $PSEValue->getId())
-                ->set('QUANTITY', $saleUnitQuantities[(int) $PSEValue->getId()] ?? $PSEValue->getQuantity())
+                ->set('QUANTITY', $bundleStocks[(int) $PSEValue->getProductId()] ?? $saleUnitQuantities[(int) $PSEValue->getId()] ?? $PSEValue->getQuantity())
                 ->set('IS_PROMO', $isPromo)
                 ->set('VISIBLE', $PSEValue->getVisible())
                 ->set('POSITION', $PSEValue->getPosition())

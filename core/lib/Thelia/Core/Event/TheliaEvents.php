@@ -196,6 +196,14 @@ final class TheliaEvents
      */
     public const PRODUCT_EXCLUDE_DELIVERY_MODULE = 'action.productExcludeDeliveryModule';
     public const PRODUCT_ALLOW_DELIVERY_MODULE = 'action.productAllowDeliveryModule';
+    /**
+     * The components of a product bundle: ProductBundleItemEvent for the first three,
+     * ProductBundleItemPositionEvent for the position.
+     */
+    public const PRODUCT_BUNDLE_ITEM_ADD = 'action.productBundleItemAdd';
+    public const PRODUCT_BUNDLE_ITEM_UPDATE = 'action.productBundleItemUpdate';
+    public const PRODUCT_BUNDLE_ITEM_DELETE = 'action.productBundleItemDelete';
+    public const PRODUCT_BUNDLE_ITEM_UPDATE_POSITION = 'action.productBundleItemUpdatePosition';
     public const PRODUCT_UPDATE_CONTENT_POSITION = 'action.updateProductContentPosition';
     public const PRODUCT_ADD_PRODUCT_SALE_ELEMENT = 'action.addProductSaleElement';
     public const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = 'action.deleteProductSaleElement';
