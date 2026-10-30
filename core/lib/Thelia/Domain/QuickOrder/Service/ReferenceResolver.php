@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\QuickOrder\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
@@ -75,6 +76,7 @@ final readonly class ReferenceResolver
         private TaxEngine $taxEngine,
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
         private LangService $langService,
+        private BundleDisplayedStock $bundleDisplayedStock,
     ) {
     }
 
@@ -124,6 +126,7 @@ final readonly class ReferenceResolver
         );
         $attributes = $this->attributesOf(array_keys($ambiguous), $locales);
         $prices = $this->untaxedUnitPricesOf($chosen, $customer, $currency);
+        $bundleStocks = $this->bundleDisplayedStock->forModels($chosen);
         $this->warmTaxRulesOf($chosen);
         // Read once: it goes through the session cart and, for a signed-in customer
         // without a delivery address yet, their default address.
@@ -132,7 +135,7 @@ final readonly class ReferenceResolver
         $tableLines = [];
 
         foreach ($decisions as $decision) {
-            $tableLines[] = $this->lineOf($decision['line'], $decision['chosen'], $decision['candidates'], $titles, $attributes, $prices, $deliveryCountry);
+            $tableLines[] = $this->lineOf($decision['line'], $decision['chosen'], $decision['candidates'], $titles, $attributes, $prices, $deliveryCountry, $bundleStocks);
         }
 
         return new QuickOrderTable($tableLines);
@@ -143,6 +146,7 @@ final readonly class ReferenceResolver
      * @param array<int, string>                                        $titles
      * @param array<int, list<array{attribute: string, value: string}>> $attributes
      * @param array<int, array{untaxed: float, promo: bool}|null>       $prices
+     * @param array<int, int>                                           $bundleStocks what the components of a bundle supply, by product id
      */
     private function lineOf(
         ReferenceQuantity $line,
@@ -152,6 +156,7 @@ final readonly class ReferenceResolver
         array $attributes,
         array $prices,
         ?Country $deliveryCountry,
+        array $bundleStocks = [],
     ): QuickOrderLine {
         if (null === $chosen) {
             if (\count($candidates) < 2 || null !== $line->productSaleElementsId) {
@@ -175,9 +180,12 @@ final readonly class ReferenceResolver
             return new QuickOrderLine($line->reference, $line->quantity, LineStatus::Unavailable, $saleElementsId, $productId, $title);
         }
 
-        // A virtual product is never short of stock, as on its product page.
-        if (ConfigQuery::checkAvailableStock() && 0 === (int) $chosen->getProduct()->getVirtual()) {
-            $stock = (float) $chosen->getQuantity();
+        // A virtual product is never short of stock, as on its product page. A bundle is
+        // supplied by its components, never by the stock of its own sale element.
+        $isBundle = isset($bundleStocks[$productId]);
+
+        if (ConfigQuery::checkAvailableStock() && ($isBundle || 0 === (int) $chosen->getProduct()->getVirtual())) {
+            $stock = $isBundle ? (float) $bundleStocks[$productId] : (float) $chosen->getQuantity();
 
             if ($stock <= 0) {
                 return new QuickOrderLine($line->reference, $line->quantity, LineStatus::Unavailable, $saleElementsId, $productId, $title, availableQuantity: 0.0);
@@ -471,15 +479,18 @@ final readonly class ReferenceResolver
 
             $promo = (bool) $saleElementsRow->getPromo();
             $promoPrice = (float) $row->getPromoPrice() * $rate * $factor;
+            $price = (float) $row->getPrice() * $rate * $factor;
             $effectivePrice = $effectivePrices[$id] ?? null;
 
             if (null !== $effectivePrice) {
-                $promoPrice = $effectivePrice->untaxedPromoPrice * $factor;
-                $promo = true;
+                $settled = $effectivePrice->settle($price, (float) $customer->getDiscount());
+                $price = $settled->untaxedPrice;
+                $promoPrice = $settled->untaxedPromoPrice;
+                $promo = $settled->isPromo;
             }
 
             $prices[$id] = [
-                'untaxed' => $promo ? $promoPrice : (float) $row->getPrice() * $rate * $factor,
+                'untaxed' => $promo ? $promoPrice : $price,
                 'promo' => $promo,
             ];
         }

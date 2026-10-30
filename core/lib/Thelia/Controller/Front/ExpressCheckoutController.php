@@ -28,6 +28,7 @@ use Thelia\Domain\Checkout\Exception\ExpressCheckoutConfirmationDeniedException;
 use Thelia\Domain\Checkout\Exception\ExpressCheckoutRefusedException;
 use Thelia\Domain\Checkout\Service\ExpressCheckoutAmountService;
 use Thelia\Domain\Checkout\Service\ExpressCheckoutConfirmationService;
+use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
 use Thelia\Domain\Order\Exception\StockShortageException;
 
 /**
@@ -79,7 +80,7 @@ final readonly class ExpressCheckoutController
             $result = $this->confirmationService->confirm($request, $moduleCode, $this->tokenOf($request));
         } catch (ExpressCheckoutConfirmationDeniedException $denied) {
             return new JsonResponse(['error' => $denied->getMessage()], Response::HTTP_FORBIDDEN);
-        } catch (CheckoutPlacementInProgressException|StockShortageException $conflict) {
+        } catch (CheckoutPlacementInProgressException|StockShortageException|OrderPlacementConflictException $conflict) {
             // As the checkout API answers them: a state of the shop rather than a bad
             // request — the same confirmation a moment earlier or later may go through.
             return new JsonResponse(['error' => $conflict->getMessage()], Response::HTTP_CONFLICT);

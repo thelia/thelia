@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Core\Event\Cart;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 
@@ -27,6 +28,8 @@ class CartEvent extends ActionEvent
     protected ?int $productId = null;
     protected ?CartItem $cartItem = null;
     protected ?int $cartItemId = null;
+    protected ?BundleComposition $bundleComposition = null;
+    protected ?float $bundleAvailability = null;
 
     public function __construct(
         protected Cart $cart,
@@ -134,6 +137,39 @@ class CartEvent extends ActionEvent
     public function getQuantity(): ?int
     {
         return $this->quantity;
+    }
+
+    /**
+     * The components the customer chose for a bundle: null for the default composition, and for a
+     * product that is not a bundle. The guard on CART_ADDITEM replaces it with the composition the
+     * bundle will hold.
+     */
+    public function setBundleComposition(?BundleComposition $bundleComposition): static
+    {
+        $this->bundleComposition = $bundleComposition;
+
+        return $this;
+    }
+
+    public function getBundleComposition(): ?BundleComposition
+    {
+        return $this->bundleComposition;
+    }
+
+    /**
+     * How many bundles of the composition the components can supply, once the guard on
+     * CART_ADDITEM has asked: the cart reads it instead of asking again. Null when nobody asked.
+     */
+    public function setBundleAvailability(?float $bundleAvailability): static
+    {
+        $this->bundleAvailability = $bundleAvailability;
+
+        return $this;
+    }
+
+    public function getBundleAvailability(): ?float
+    {
+        return $this->bundleAvailability;
     }
 
     public function getCart(): Cart

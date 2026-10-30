@@ -54,6 +54,7 @@ class EffectivePriceCollectionWarmer implements EventSubscriberInterface
         // session, and an API request in a shop where nothing prices beyond the
         // catalog must stay stateless.
         if (!$this->activityChecker->hasActivePublicRule()
+            && !$this->activityChecker->hasComputedBundles()
             && !$this->activityChecker->hasVisitorDependentPricing()
             && !$this->saleUnitPricingActivityChecker->currentSaleUnitPricesAnything()) {
             return;

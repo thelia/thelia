@@ -465,10 +465,18 @@ class Order extends BaseAction implements EventSubscriberInterface
         if ($operationEvent->getOperation() === $operationEvent::DO_NOTHING) {
             return;
         }
-        $orderProductList = $order->getOrderProducts();
+        // In the ascending id of the sale element, the order the placement locked the stock rows
+        // in: two orders moving the same rows the other way round would wait for each other.
+        $orderProductList = $order->getOrderProducts()->getData();
+        usort($orderProductList, static fn (OrderProduct $first, OrderProduct $second): int => (int) $first->getProductSaleElementsId() <=> (int) $second->getProductSaleElementsId());
 
-        /** @var OrderProduct $orderProduct */
         foreach ($orderProductList as $orderProduct) {
+            // The sale element of a pack holds no stock: what the pack took is carried by
+            // its component lines, which come through here like any other line.
+            if (!$orderProduct->movesStockOfItsOwn()) {
+                continue;
+            }
+
             $productSaleElementsId = $orderProduct->getProductSaleElementsId();
 
             if ($this->movesSaleUnitStock($order, $productSaleElementsId)) {

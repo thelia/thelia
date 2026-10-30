@@ -19,6 +19,7 @@ use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernel;
@@ -27,6 +28,7 @@ use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\ConfigTableMap;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Tools\URL;
 use Twig\Environment;
@@ -112,6 +114,15 @@ abstract class WebIntegrationTestCase extends WebTestCase
         }
 
         $this->connection = null;
+
+        // The configuration is kept in a cache shared between processes, which the next request
+        // of the test rebuilt from rows the rollback has taken back since (a bundle the test
+        // created sets `catalog_has_bundles`): the next process would read it. The pool of
+        // instances is forgotten first: it still holds the row as the test saved it.
+        if (static::$booted && static::getContainer()->has(ConfigCacheService::class)) {
+            ConfigTableMap::clearInstancePool();
+            static::getContainer()->get(ConfigCacheService::class)->initCacheConfigs(true);
+        }
 
         $this->forgetTheVisitorSession();
         $this->forgetTheSaleUnitActivity();

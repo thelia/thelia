@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Catalog\Bundle\BundleAvailability;
+use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
@@ -36,6 +38,7 @@ use Thelia\Model\Lang;
 use Thelia\Model\Product;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Tests\Integration\Domain\Catalog\Bundle\BuildsBundles;
 use Thelia\Tests\Integration\Domain\Promotion\ActionIntegrationPromotionTestCase;
 
 /**
@@ -45,6 +48,8 @@ use Thelia\Tests\Integration\Domain\Promotion\ActionIntegrationPromotionTestCase
  */
 final class OfferedCartLineServiceTest extends ActionIntegrationPromotionTestCase
 {
+    use BuildsBundles;
+
     public function testAnOfferMissingFromTheCartIsAddedAtTheCatalogPriceAndReportedAsAChange(): void
     {
         $promotion = $this->factory->coupon();
@@ -496,6 +501,46 @@ final class OfferedCartLineServiceTest extends ActionIntegrationPromotionTestCas
         self::assertSame([], $service->getUnavailablePromotions());
     }
 
+    /**
+     * The sale element of a bundle holds no stock: what a promotion can offer of one is what its
+     * components supply (bike 7, helmets 5 for 2 each: two bundles).
+     */
+    public function testABundleIsOfferedUpToWhatItsComponentsSupplyNotWhatItsOwnSaleElementHolds(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        $promotion = $this->factory->coupon();
+        $example = $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        self::assertSame(0.0, (float) $this->defaultPseFor($example['bundle'])->getQuantity(), 'Control: the sale element of the bundle holds nothing.');
+        $cart = $this->factory->cart();
+        $service = $this->service($this->requestStackWithSession());
+
+        self::assertTrue($service->reconcile([$this->offer($promotion, $example['bundle'], 5)], $cart));
+
+        $lines = $this->offeredLines($cart);
+        self::assertCount(1, $lines);
+        self::assertSame(2.0, $lines[0]->getQuantity());
+        self::assertSame([], $service->getUnavailablePromotions());
+    }
+
+    public function testAnOfferedBundleLineFollowsTheStockOfItsComponents(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        $promotion = $this->factory->coupon();
+        $example = $this->exampleBundle($this->factory, $this->getService(BundleCompositionService::class));
+        $cart = $this->factory->cart();
+        $line = $this->factory->cartItem($cart, $example['bundle'], $this->defaultPseFor($example['bundle']), ['quantity' => 1.0, 'isOffered' => 1, 'offeredByCouponId' => $promotion->getId()]);
+        $service = $this->service($this->requestStackWithSession());
+
+        self::assertTrue($service->reconcile([$this->offer($promotion, $example['bundle'], 5)], $cart));
+        self::assertSame(2.0, (float) CartItemQuery::create()->findPk($line->getId())?->getQuantity());
+
+        $this->saleElementsOf($example['bikeProduct'])->setQuantity(0)->save();
+
+        self::assertTrue($service->reconcile([$this->offer($promotion, $example['bundle'], 5)], $cart));
+        self::assertSame([], $this->offeredLines($cart), 'No bike left: no bundle to offer.');
+        self::assertCount(1, $service->getUnavailablePromotions());
+    }
+
     public function testACouponThatOffersNothingDoesNotStopTheOffersKeptAfterIt(): void
     {
         $promotion = $this->factory->coupon();
@@ -521,7 +566,7 @@ final class OfferedCartLineServiceTest extends ActionIntegrationPromotionTestCas
 
     private function service(RequestStack $requestStack): OfferedCartLineService
     {
-        return new OfferedCartLineService($this->createStub(FacadeInterface::class), $requestStack);
+        return new OfferedCartLineService($this->createStub(FacadeInterface::class), $requestStack, null, $this->getService(BundleAvailability::class));
     }
 
     private function requestStackWithSession(): RequestStack

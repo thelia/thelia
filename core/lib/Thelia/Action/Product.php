@@ -48,6 +48,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
+use Thelia\Domain\Catalog\Bundle\BundleDiscountType;
+use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Product\Exception\ProductAssociationTypeNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\SelfAssociationException;
@@ -110,6 +113,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
         private readonly ReservedSaleVisibility $reservedSaleVisibility,
+        private readonly BundleCompositionService $bundleCompositionService,
     ) {
     }
 
@@ -182,6 +186,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $this->cloneAssociatedContent($event);
             $this->cloneDeliveryModuleExclusions($event);
+            $this->cloneBundleItems($event);
 
             $this->cloneAccessories($event);
 
@@ -251,6 +256,10 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setShippingSurcharge((float) $event->getOriginalProduct()->getShippingSurcharge())
                 ->setShippingSurchargeMode(ShippingSurchargeMode::tryFrom((int) $event->getOriginalProduct()->getShippingSurchargeMode()) ?? ShippingSurchargeMode::PerLine)
                 ->setFreeShipping((bool) $event->getOriginalProduct()->getFreeShipping())
+                ->setIsBundle((bool) $event->getOriginalProduct()->getIsBundle())
+                ->setBundlePriceMode(BundlePriceMode::tryFrom((string) $event->getOriginalProduct()->getBundlePriceMode()) ?? BundlePriceMode::Fixed)
+                ->setBundleDiscount((string) $event->getOriginalProduct()->getBundleDiscount())
+                ->setBundleDiscountType(BundleDiscountType::tryFrom((string) $event->getOriginalProduct()->getBundleDiscountType()) ?? BundleDiscountType::Percent)
                 ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId());
 
             $this->eventDispatcher->dispatch($clonedProductUpdateEvent, TheliaEvents::PRODUCT_UPDATE);
@@ -336,6 +345,13 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function cloneBundleItems(ProductCloneEvent $event): void
+    {
+        if ($event->getOriginalProduct()->getIsBundle()) {
+            $this->bundleCompositionService->copyItems((int) $event->getOriginalProduct()->getId(), (int) $event->getClonedProduct()->getId());
+        }
+    }
+
     public function cloneAccessories(ProductCloneEvent $event): void
     {
         $this->resolvingAssociationTypesOnce(function () use ($event): void {
@@ -391,6 +407,13 @@ class Product extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
+            // Before the first plain read of the transaction (the translations below are one): the
+            // picture of the database is taken there, and the decision to turn the product into a
+            // bundle is taken on what other writers committed up to the moment this row is held.
+            if (true === $event->getIsBundle()) {
+                $this->bundleCompositionService->lockProduct((int) $product->getId());
+            }
+
             $prevRef = $product->getRef();
 
             $product
@@ -420,6 +443,14 @@ class Product extends BaseAction implements EventSubscriberInterface
             if (null !== $event->getFreeShipping()) {
                 $product->setFreeShipping((int) $event->getFreeShipping());
             }
+
+            $this->bundleCompositionService->applySettings(
+                $product,
+                $event->getIsBundle(),
+                $event->getBundlePriceMode(),
+                $event->getBundleDiscount(),
+                $event->getBundleDiscountType(),
+            );
 
             $product->save($con);
 

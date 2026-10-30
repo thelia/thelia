@@ -29,6 +29,8 @@ use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Checkout\Exception\MissingAddressException;
 use Thelia\Domain\Legal\CompanyIdentifierRules;
+use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
+use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateGuard;
 use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
 use Thelia\Domain\Shipping\DestinationRestriction\Destination;
@@ -53,6 +55,7 @@ class CartGuard
         private readonly DeliveryDateGuard $deliveryDateGuard,
         private readonly CartShippingRules $cartShippingRules,
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
+        private readonly ?BundleOrderPlanner $bundleOrderPlanner = null,
     ) {
     }
 
@@ -65,6 +68,26 @@ class CartGuard
         if (!$cart || $cart->countCartItems() === 0) {
             throw new EmptyCartException('Cart is empty or contains no items');
         }
+    }
+
+    /**
+     * A pack of the cart whose composition the catalogue no longer holds, a component
+     * deleted or taken offline, an item removed or made required since, is told to the
+     * buyer at the cart, before the payment: the same judge the order is placed by, so the
+     * cart passes here exactly when its packs can be ordered.
+     *
+     * @throws BundleLineNotOrderableException
+     */
+    public function checkBundleLinesOrderable(?Cart $cart): void
+    {
+        if (null === $cart || null === $this->bundleOrderPlanner) {
+            return;
+        }
+
+        $cartItems = $cart->getCartItems();
+
+        $this->bundleOrderPlanner->componentsOf($cartItems);
+        $this->bundleOrderPlanner->assertNoBundleLineWithoutComposition($cartItems);
     }
 
     /**

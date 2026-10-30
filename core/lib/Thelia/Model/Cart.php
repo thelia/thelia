@@ -21,6 +21,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Cart\Bundle\CartLineAvailability;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
+use Thelia\Domain\Catalog\Bundle\BundleLineContents;
+use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
@@ -83,6 +87,7 @@ class Cart extends BaseCart
         ?Currency $currency = null,
         ?EventDispatcherInterface $dispatcher = null,
         ?SaleUnitStockResolver $saleUnitStockResolver = null,
+        ?CartLineAvailability $cartLineAvailability = null,
     ): self|bool {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
@@ -134,13 +139,16 @@ class Cart extends BaseCart
             if ($product
                 && $productSaleElements
                 && 1 === (int) $product->getVisible()
-                && (($saleUnitQuantities[(int) $productSaleElements->getId()] ?? (float) $productSaleElements->getQuantity()) >= $cartItem->getQuantity() || 1 === $product->getVirtual() || !ConfigQuery::checkAvailableStock())
+                && $this->holdsTheShapeOfItsProduct($cartItem, $product)
+                && $this->isStillSupplied($cartItem, $productSaleElements, $saleUnitQuantities, $cartLineAvailability)
             ) {
                 $item = new CartItem();
                 $item->setCart($cart);
                 $item->setProductId($cartItem->getProductId());
                 $item->setQuantity($cartItem->getQuantity());
                 $item->setProductSaleElements($productSaleElements);
+                // The composition the customer chose is part of the line.
+                $item->setBundleComposition($cartItem->getBundleComposition());
                 $prices = $productSaleElements->getPricesByCurrency($currency, $discount);
                 $item
                     ->setPrice((string) $prices->getPrice())
@@ -162,6 +170,46 @@ class Cart extends BaseCart
         }
 
         return $cart;
+    }
+
+    /**
+     * Whether a line is still what its product sells: a bundle line carries a composition and
+     * a line of any other product carries none. A product turned into a bundle (or back) under
+     * a cart, or a composition that no longer reads, leaves a line CartItem refuses to write:
+     * the copy of a cart skips it, it never fails on it.
+     */
+    private function holdsTheShapeOfItsProduct(CartItem $cartItem, Product $product): bool
+    {
+        try {
+            $composition = $cartItem->getBundleCompositionValue();
+        } catch (InvalidBundleCompositionException) {
+            return false;
+        }
+
+        return (1 === (int) $product->getIsBundle()) === (null !== $composition);
+    }
+
+    /**
+     * Whether the shop can still supply a line it is asked to copy: the stock of the sale
+     * element (of its sale unit when the cart has one), and for a bundle line what its
+     * components can supply - the stock of the sale element standing for the bundle is never read.
+     *
+     * @param array<int, float> $saleUnitQuantities
+     */
+    private function isStillSupplied(CartItem $cartItem, ProductSaleElements $productSaleElements, array $saleUnitQuantities, ?CartLineAvailability $cartLineAvailability): bool
+    {
+        if (!ConfigQuery::checkAvailableStock()) {
+            return true;
+        }
+
+        $composition = $cartItem->getBundleCompositionValue();
+
+        if (null !== $composition) {
+            return null === $cartLineAvailability || $cartLineAvailability->forLine($productSaleElements, $composition) >= $cartItem->getQuantity();
+        }
+
+        return ($saleUnitQuantities[(int) $productSaleElements->getId()] ?? (float) $productSaleElements->getQuantity()) >= $cartItem->getQuantity()
+            || 1 === $productSaleElements->getProduct()->getVirtual();
     }
 
     /**
@@ -304,14 +352,23 @@ class Cart extends BaseCart
     /**
      * Retrieve the total weight for all products in cart.
      *
+     * A bundle weighs what its own sale element says when it says something, and what its
+     * retained components weigh otherwise.
+     *
      * @throws PropelException
      */
     public function getWeight(): float
     {
         $weight = 0;
+        $bundleWeights = $this->bundleLineContents(true);
 
         foreach ($this->getCartItems() as $cartItem) {
             $itemWeight = $cartItem->getProductSaleElements()->getWeight();
+
+            if ($itemWeight <= 0 && isset($bundleWeights[(int) $cartItem->getId()])) {
+                $itemWeight = $bundleWeights[(int) $cartItem->getId()]['weight'];
+            }
+
             $itemWeight *= $cartItem->getQuantity();
 
             $weight += $itemWeight;
@@ -323,13 +380,26 @@ class Cart extends BaseCart
     /**
      * Tell if the cart contains only virtual products.
      *
+     * A bundle is virtual when its own sale element weighs nothing and every component it
+     * retained is a virtual product.
+     *
      * @throws PropelException
      */
     public function isVirtual(): bool
     {
+        $bundleLines = $this->bundleLineContents(false);
+
         foreach ($this->getCartItems() as $cartItem) {
             if (0 < $cartItem->getProductSaleElements()->getWeight()) {
                 return false;
+            }
+
+            if (isset($bundleLines[(int) $cartItem->getId()])) {
+                if (!$bundleLines[(int) $cartItem->getId()]['virtual'] || 0.0 < $bundleLines[(int) $cartItem->getId()]['weight']) {
+                    return false;
+                }
+
+                continue;
             }
 
             $product = $cartItem->getProductSaleElements()->getProduct();
@@ -341,6 +411,41 @@ class Cart extends BaseCart
 
         // An empty cart is not virtual.
         return $this->getCartItems()->count() > 0;
+    }
+
+    /**
+     * What the bundle lines of the cart are made of, read for all of them at once.
+     *
+     * @param bool $onlyWeightless only the lines whose own sale element weighs nothing, the ones that weigh what their components weigh
+     *
+     * @return array<int, array{weight: float, virtual: bool, components: list<array{bundleItemId: int, productSaleElementsId: int, productId: int, quantity: string}>}> by line id
+     */
+    private function bundleLineContents(bool $onlyWeightless): array
+    {
+        $lines = [];
+
+        foreach ($this->getCartItems() as $cartItem) {
+            $composition = $cartItem->getBundleCompositionValue();
+
+            // A bundle a promotion offers has no composition: it weighs what its default one does.
+            if (null === $composition && !(new BundleCatalogState())->hasBundles()) {
+                continue;
+            }
+
+            // Only a line a promotion offers can be a bundle with no composition (CartItem refuses any
+            // other), so the product is read for those alone: a line sold as it is asks nothing.
+            if (null === $composition && (1 !== (int) $cartItem->getIsOffered() || 1 !== (int) $cartItem->getProduct()->getIsBundle())) {
+                continue;
+            }
+
+            if ($onlyWeightless && $cartItem->getProductSaleElements()->getWeight() > 0) {
+                continue;
+            }
+
+            $lines[(int) $cartItem->getId()] = [(int) $cartItem->getProductId(), $composition];
+        }
+
+        return BundleLineContents::of($lines);
     }
 
     public function setDiscount(?string $discount = null): static

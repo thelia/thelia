@@ -78,6 +78,7 @@ use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductAssociatedContent;
 use Thelia\Api\Resource\ProductAssociation;
 use Thelia\Api\Resource\ProductAssociationType;
+use Thelia\Api\Resource\ProductBundleItem;
 use Thelia\Api\Resource\ProductCategory;
 use Thelia\Api\Resource\ProductDestinationRestriction;
 use Thelia\Api\Resource\ProductDocument;
@@ -177,6 +178,7 @@ final readonly class AdminApiResourcePermissions
         ProductExcludedDeliveryModule::class => AdminResources::PRODUCT,
         ProductImage::class => AdminResources::PRODUCT,
         ProductPrice::class => AdminResources::PRODUCT,
+        ProductBundleItem::class => AdminResources::PRODUCT,
         ProductSaleElements::class => AdminResources::PRODUCT,
         ProductSaleElementsProductImage::class => AdminResources::PRODUCT,
         ProductSaleElementsProductVideo::class => AdminResources::PRODUCT,

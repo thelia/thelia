@@ -98,6 +98,13 @@ enum CheckoutViolationCode: string
     case GuestCheckoutNotAllowed = 'guest-checkout-not-allowed';
 
     /**
+     * A pack of the cart whose composition the catalogue no longer holds (a component gone
+     * or offline, an item removed or made required since). Details: `productReference` of
+     * the pack and `cartItemId` of its line, which the buyer has to remove and add again.
+     */
+    case BundleLineNotOrderable = 'bundle-line-not-orderable';
+
+    /**
      * A refusal of the checkout that names no family of its own — a module's step, or a
      * core exception a later version has not given a code to yet.
      */

@@ -18,6 +18,8 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
+use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
@@ -36,6 +38,7 @@ use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\CartTableMap;
+use Thelia\Model\ProductQuery;
 
 /**
  * Ordering by reference: the one entry point the API and the theme call.
@@ -65,6 +68,7 @@ final readonly class QuickOrderFacade
         private PurchaseListFacade $purchaseListFacade,
         private QuickOrderLimiter $limiter,
         private ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
+        private ?BundleDisplayedStock $bundleDisplayedStock = null,
     ) {
     }
 
@@ -136,12 +140,26 @@ final readonly class QuickOrderFacade
                     continue;
                 }
 
-                $item = $this->cartFacade->addItem(new CartItemAddDTO(
-                    $cart,
-                    (int) $line->productId,
-                    (int) $line->productSaleElementsId,
-                    $line->quantity,
-                ));
+                try {
+                    $item = $this->cartFacade->addItem(new CartItemAddDTO(
+                        $cart,
+                        (int) $line->productId,
+                        (int) $line->productSaleElementsId,
+                        $line->quantity,
+                    ));
+                } catch (NotEnoughStockException $refusal) {
+                    // A bundle line is refused out loud by the cart (nothing is capped): the
+                    // control table tells what is left of the components. Any other line is
+                    // judged by the resolver before, and its refusal stays an error.
+                    if (1 !== (int) ProductQuery::create()->findPk((int) $line->productId)?->getIsBundle()) {
+                        throw $refusal;
+                    }
+
+                    $tableLines[] = $line->refusedByTheCart($this->bundleStockLeftFor($cart, $line));
+
+                    continue;
+                }
+
                 $before = $inCart[(int) $item->getId()] ?? 0.0;
                 $inCart[(int) $item->getId()] = (float) $item->getQuantity();
 
@@ -158,6 +176,28 @@ final readonly class QuickOrderFacade
         }
 
         return new QuickOrderTable($tableLines);
+    }
+
+    /**
+     * What the components of a bundle can still supply for a line the cart refused: the
+     * bundles they allow, less the ones the cart already holds of it.
+     */
+    private function bundleStockLeftFor(Cart $cart, QuickOrderLine $line): float
+    {
+        if (null === $this->bundleDisplayedStock) {
+            return 0.0;
+        }
+
+        $held = 0.0;
+
+        foreach (CartItemQuery::create()
+            ->filterByCartId($cart->getId())
+            ->filterByProductSaleElementsId((int) $line->productSaleElementsId)
+            ->find() as $item) {
+            $held += (float) $item->getQuantity();
+        }
+
+        return (float) ($this->bundleDisplayedStock->forProducts([(int) $line->productId])[(int) $line->productId] ?? 0) - $held;
     }
 
     /**

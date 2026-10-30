@@ -46,6 +46,10 @@ CREATE TABLE `product`
     `shipping_surcharge` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'fixed amount added to the carrier postage, untaxed, in the default currency',
     `shipping_surcharge_mode` TINYINT DEFAULT 0 NOT NULL COMMENT '0: the surcharge is charged once per cart line, 1: once per unit',
     `free_shipping` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product is left out of the postage the carrier quotes',
+    `is_bundle` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product is a bundle: a sellable product made of the sale elements of other products',
+    `bundle_price_mode` VARCHAR(16) DEFAULT 'fixed' NOT NULL COMMENT 'fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount',
+    `bundle_discount` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'discount of a computed bundle, in percent or in the currency amount (see bundle_discount_type)',
+    `bundle_discount_type` VARCHAR(16) DEFAULT 'percent' NOT NULL COMMENT 'percent or amount',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -974,11 +978,11 @@ CREATE TABLE `order_product`
     `mpn` VARCHAR(255) COMMENT 'the manufacturer part number of the combination, copied when the order is placed so the documents keep the value sold',
     `tax_rule_title` VARCHAR(255),
     `tax_rule_description` LONGTEXT,
-    `parent` INTEGER COMMENT 'not managed yet',
+    `parent` INTEGER COMMENT 'on the line of a bundle component, the id of the bundle line (line_type bundle) that brought it; null on every other line. A component line carries the stock and the weight of one component, never a price',
     `virtual` TINYINT DEFAULT 0 NOT NULL,
     `virtual_document` VARCHAR(255),
     `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT 'the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone',
-    `line_type` VARCHAR(32) DEFAULT 'product' NOT NULL COMMENT 'what the line stands for: a good taken off the catalogue, or a service the shop invoices beside them such as a gift wrapping',
+    `line_type` VARCHAR(32) DEFAULT 'product' NOT NULL COMMENT 'what the line stands for: a good taken off the catalogue (product), a service the shop invoices beside them such as a gift wrapping (service), the priced line of a bundle (bundle), or one component of a bundle, with no price (bundle_component). Everything that walks the lines of an order reads this to know whether it is looking at something to pick, to ship or to count as stock.',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -2294,6 +2298,7 @@ CREATE TABLE `cart_item`
     `promo` INTEGER,
     `is_offered` TINYINT DEFAULT 0 NOT NULL COMMENT 'the line was put in the cart by a promotion, not by the customer, and the customer may neither change nor remove it',
     `offered_by_coupon_id` INTEGER COMMENT 'the coupon that offers the line, read to take the line back when the promotion no longer applies',
+    `bundle_composition` TEXT COMMENT 'the components a customer chose for a bundle line, as canonical JSON; null outside a bundle',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -2649,6 +2654,40 @@ CREATE TABLE `product_destination_restriction`
         REFERENCES `destination_restriction` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- product_bundle_item
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_bundle_item`;
+
+CREATE TABLE `product_bundle_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `bundle_product_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER COMMENT 'null once the sale element is deleted: the line stays, the bundle is no longer sellable if the line was required',
+    `quantity` DECIMAL(16,6) DEFAULT 1.000000 NOT NULL COMMENT 'quantity of the component in one bundle; the fixed quantity when min and max are null',
+    `min_quantity` DECIMAL(16,6) COMMENT 'lowest quantity a customer may choose for an optional component',
+    `max_quantity` DECIMAL(16,6) COMMENT 'highest quantity a customer may choose for an optional component',
+    `required` TINYINT DEFAULT 1 NOT NULL COMMENT 'a required component is always part of the bundle',
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uniq_product_bundle_item_bundle_product_sale_elements` (`bundle_product_id`, `product_sale_elements_id`),
+    INDEX `idx_product_bundle_item_bundle_product_position` (`bundle_product_id`, `position`),
+    INDEX `idx_product_bundle_item_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_product_bundle_item_bundle_product_id`
+        FOREIGN KEY (`bundle_product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_bundle_item_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -4871,6 +4910,10 @@ CREATE TABLE `product_version`
     `shipping_surcharge` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'fixed amount added to the carrier postage, untaxed, in the default currency',
     `shipping_surcharge_mode` TINYINT DEFAULT 0 NOT NULL COMMENT '0: the surcharge is charged once per cart line, 1: once per unit',
     `free_shipping` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product is left out of the postage the carrier quotes',
+    `is_bundle` TINYINT DEFAULT 0 NOT NULL COMMENT 'the product is a bundle: a sellable product made of the sale elements of other products',
+    `bundle_price_mode` VARCHAR(16) DEFAULT 'fixed' NOT NULL COMMENT 'fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount',
+    `bundle_discount` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'discount of a computed bundle, in percent or in the currency amount (see bundle_discount_type)',
+    `bundle_discount_type` VARCHAR(16) DEFAULT 'percent' NOT NULL COMMENT 'percent or amount',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

@@ -41,6 +41,7 @@ use Thelia\Model\Event\ContentDocumentEvent;
 use Thelia\Model\Event\ContentImageEvent;
 use Thelia\Model\Event\FolderDocumentEvent;
 use Thelia\Model\Event\FolderImageEvent;
+use Thelia\Model\Event\ProductBundleItemEvent;
 use Thelia\Model\Event\ProductDocumentEvent;
 use Thelia\Model\Event\ProductImageEvent;
 use Thelia\Model\Event\ProductSaleElementsProductDocumentEvent;
@@ -49,6 +50,7 @@ use Thelia\Model\Event\ProductSaleElementsProductVideoEvent;
 use Thelia\Model\Event\ProductVideoEvent;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
+use Thelia\Model\ProductBundleItem;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductSaleElementsProductDocument;
@@ -270,11 +272,14 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     /**
      * Writes the back office makes straight to a table, with no catalogue event: the move of
      * a category in the tree, the reorder of the media of a product, the quick edit of the
-     * title of a medium and the association of a medium with a combination. Propel still
-     * dispatches them.
+     * title of a medium, the association of a medium with a combination and the components of a
+     * bundle (the admin API writes them through the service, with no catalogue event). Propel
+     * still dispatches them.
      */
     private const WRITES = [
         CategoryEvent::POST_UPDATE,
+        ProductBundleItemEvent::POST_SAVE,
+        ProductBundleItemEvent::POST_DELETE,
         ProductImageEvent::POST_SAVE,
         ProductImageEvent::POST_DELETE,
         ProductDocumentEvent::POST_SAVE,
@@ -409,6 +414,7 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
         match (true) {
             $model instanceof Category => $this->purge(self::CATEGORY, null === $model->getId() ? null : (int) $model->getId()),
+            $model instanceof ProductBundleItem => $this->purge(self::PRODUCT, (int) $model->getBundleProductId()),
             $model instanceof ProductSaleElementsProductImage,
             $model instanceof ProductSaleElementsProductDocument,
             $model instanceof ProductSaleElementsProductVideo => $this->purge(self::PRODUCT, ProductSaleElementsQuery::create()->findPk($model->getProductSaleElementsId())?->getProductId()),

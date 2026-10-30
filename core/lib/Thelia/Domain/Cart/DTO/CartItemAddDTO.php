@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Cart\DTO;
 
+use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
 use Thelia\Model\Cart;
 
@@ -26,6 +27,7 @@ readonly class CartItemAddDTO implements DTOEventActionInterface, CartDTOInterfa
         private int $quantity = 1,
         private bool $append = true,
         private bool $newness = true,
+        private ?BundleComposition $bundleComposition = null,
     ) {
     }
 
@@ -38,6 +40,7 @@ readonly class CartItemAddDTO implements DTOEventActionInterface, CartDTOInterfa
             'quantity' => $this->quantity,
             'append' => $this->append,
             'newness' => $this->newness,
+            'bundleComposition' => $this->bundleComposition,
         ];
     }
 

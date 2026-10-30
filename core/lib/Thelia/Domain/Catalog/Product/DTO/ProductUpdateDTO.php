@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Product\DTO;
 
+use Thelia\Domain\Catalog\Bundle\BundleDiscountType;
+use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Shared\Contract\DTOEventActionInterface;
 use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
 
@@ -40,6 +42,10 @@ readonly class ProductUpdateDTO implements DTOEventActionInterface
         public ?float $shippingSurcharge = null,
         public ?ShippingSurchargeMode $shippingSurchargeMode = null,
         public ?bool $freeShipping = null,
+        public ?bool $isBundle = null,
+        public ?BundlePriceMode $bundlePriceMode = null,
+        public ?string $bundleDiscount = null,
+        public ?BundleDiscountType $bundleDiscountType = null,
     ) {
     }
 
@@ -66,6 +72,10 @@ readonly class ProductUpdateDTO implements DTOEventActionInterface
             'shipping_surcharge' => $this->shippingSurcharge,
             'shipping_surcharge_mode' => $this->shippingSurchargeMode?->value,
             'free_shipping' => $this->freeShipping,
+            'is_bundle' => $this->isBundle,
+            'bundle_price_mode' => $this->bundlePriceMode?->value,
+            'bundle_discount' => $this->bundleDiscount,
+            'bundle_discount_type' => $this->bundleDiscountType?->value,
         ];
     }
 }

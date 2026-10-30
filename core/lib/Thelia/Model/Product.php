@@ -19,8 +19,10 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\File\FileModelParentInterface;
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\Product as BaseProduct;
+use Thelia\Model\Map\CartItemTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -30,6 +32,19 @@ class Product extends BaseProduct implements FileModelParentInterface
     use PositionManagementTrait;
     use TaxCalculatorResolverTrait;
     use UrlRewritingTrait;
+
+    /**
+     * Whether this save makes the catalog gain, lose or change a bundle. Read before the save
+     * because Propel forgets what was modified before postSave().
+     */
+    private bool $changesTheBundlesOfTheCatalog = false;
+
+    /**
+     * Whether this save turns an existing product into a bundle, or a bundle into a product: a
+     * line of a cart written for the one form is wrong in the other (a bundle without composition,
+     * a simple line with one).
+     */
+    private bool $changesTheFormOfTheProduct = false;
 
     public function getRewrittenUrlViewName()
     {
@@ -284,6 +299,25 @@ class Product extends BaseProduct implements FileModelParentInterface
         parent::postDelete($con);
 
         $this->markRewrittenUrlObsolete();
+
+        // The product no longer exists, but its flag still says what it was.
+        if (1 === $this->getIsBundle()) {
+            (new BundleCatalogState())->refresh();
+        }
+    }
+
+    public function preSave(?ConnectionInterface $con = null): bool
+    {
+        // A product that is not a bundle and does not become one never moves the answer; the
+        // price mode of a product that is not a bundle is not read by anything.
+        $this->changesTheBundlesOfTheCatalog = $this->isNew()
+            ? 1 === $this->getIsBundle()
+            : $this->isColumnModified(ProductTableMap::COL_IS_BUNDLE)
+                || (1 === $this->getIsBundle() && $this->isColumnModified(ProductTableMap::COL_BUNDLE_PRICE_MODE));
+
+        $this->changesTheFormOfTheProduct = !$this->isNew() && $this->isColumnModified(ProductTableMap::COL_IS_BUNDLE);
+
+        return parent::preSave($con);
     }
 
     /**
@@ -313,6 +347,19 @@ class Product extends BaseProduct implements FileModelParentInterface
         }
 
         parent::postSave();
+
+        // In the transaction of the write, so that no cart is left holding a line of the other
+        // form: the one point that covers the API, the back office, the actions and the service.
+        if ($this->changesTheFormOfTheProduct) {
+            $this->changesTheFormOfTheProduct = false;
+            CartItemQuery::create()->filterByProductId($this->getId())->delete($con);
+            CartItemTableMap::clearInstancePool();
+        }
+
+        if ($this->changesTheBundlesOfTheCatalog) {
+            $this->changesTheBundlesOfTheCatalog = false;
+            (new BundleCatalogState())->refresh();
+        }
     }
 
     /**

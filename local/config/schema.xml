@@ -61,6 +61,10 @@
     <column defaultValue="0" description="fixed amount added to the carrier postage, untaxed, in the default currency" name="shipping_surcharge" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0" description="0: the surcharge is charged once per cart line, 1: once per unit" name="shipping_surcharge_mode" required="true" type="TINYINT" />
     <column defaultValue="0" description="the product is left out of the postage the carrier quotes" name="free_shipping" required="true" type="TINYINT" />
+    <column defaultValue="0" description="the product is a bundle: a sellable product made of the sale elements of other products" name="is_bundle" required="true" type="TINYINT" />
+    <column defaultValue="fixed" description="fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount" name="bundle_price_mode" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="0" description="discount of a computed bundle, in percent or in the currency amount (see bundle_discount_type)" name="bundle_discount" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="percent" description="percent or amount" name="bundle_discount_type" required="true" size="16" type="VARCHAR" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -882,11 +886,11 @@
     <column description="the manufacturer part number of the combination, copied when the order is placed so the documents keep the value sold" name="mpn" size="255" type="VARCHAR" />
     <column name="tax_rule_title" size="255" type="VARCHAR" />
     <column name="tax_rule_description" type="CLOB" />
-    <column description="not managed yet" name="parent" type="INTEGER" />
+    <column description="on the line of a bundle component, the id of the bundle line (line_type bundle) that brought it; null on every other line. A component line carries the stock and the weight of one component, never a price" name="parent" type="INTEGER" />
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column name="virtual_document" size="255" type="VARCHAR" />
     <column defaultValue="0" description="the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone" name="is_offered" required="true" type="TINYINT" />
-    <column defaultValue="product" description="what the line stands for: a good taken off the catalogue, or a service the shop invoices beside them such as a gift wrapping. Everything that walks the lines of an order reads this to know whether it is looking at something to pick, to ship or to count as stock." name="line_type" required="true" size="32" type="VARCHAR" />
+    <column defaultValue="product" description="what the line stands for: a good taken off the catalogue (product), a service the shop invoices beside them such as a gift wrapping (service), the priced line of a bundle (bundle), or one component of a bundle, with no price (bundle_component). Everything that walks the lines of an order reads this to know whether it is looking at something to pick, to ship or to count as stock." name="line_type" required="true" size="32" type="VARCHAR" />
     <foreign-key foreignTable="order" name="fk_order_product_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
@@ -1750,6 +1754,7 @@
     <column name="promo" type="INTEGER" />
     <column defaultValue="0" description="the line was put in the cart by a promotion, not by the customer, and the customer may neither change nor remove it" name="is_offered" required="true" type="TINYINT" />
     <column description="the coupon that offers the line, read to take the line back when the promotion no longer applies" name="offered_by_coupon_id" type="INTEGER" />
+    <column description="the components a customer chose for a bundle line, as canonical JSON; null outside a bundle" name="bundle_composition" type="LONGVARCHAR" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
@@ -2032,6 +2037,34 @@
     </unique>
     <index name="idx_product_destination_restriction_restriction_id">
       <index-column name="destination_restriction_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="product_bundle_item" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="bundle_product_id" required="true" type="INTEGER" />
+    <column description="null once the sale element is deleted: the line stays, the bundle is no longer sellable if the line was required" name="product_sale_elements_id" type="INTEGER" />
+    <column defaultValue="1.000000" description="quantity of the component in one bundle; the fixed quantity when min and max are null" name="quantity" required="true" scale="6" size="16" type="DECIMAL" />
+    <column description="lowest quantity a customer may choose for an optional component" name="min_quantity" scale="6" size="16" type="DECIMAL" />
+    <column description="highest quantity a customer may choose for an optional component" name="max_quantity" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="1" description="a required component is always part of the bundle" name="required" required="true" type="TINYINT" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="product" name="fk_product_bundle_item_bundle_product_id" onDelete="CASCADE" onUpdate="RESTRICT" phpName="BundleProduct" refPhpName="BundleItem">
+      <reference foreign="id" local="bundle_product_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_product_bundle_item_product_sale_elements_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <unique name="uniq_product_bundle_item_bundle_product_sale_elements">
+      <unique-column name="bundle_product_id" />
+      <unique-column name="product_sale_elements_id" />
+    </unique>
+    <index name="idx_product_bundle_item_bundle_product_position">
+      <index-column name="bundle_product_id" />
+      <index-column name="position" />
+    </index>
+    <index name="idx_product_bundle_item_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
     </index>
     <behavior name="timestampable" />
   </table>

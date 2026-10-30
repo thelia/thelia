@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Form\Exception\StockNotFoundException;
@@ -38,6 +39,7 @@ class CartAdd extends BaseForm
 {
     public function __construct(
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+        protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
     ) {
     }
 
@@ -131,6 +133,19 @@ class CartAdd extends BaseForm
                 ->findOne();
 
             $product = $productSaleElements->getProduct();
+
+            // A bundle is supplied by its components, never by the stock of the sale element
+            // that stands for it: the form has no composition to offer, so it is judged on the
+            // default one (the guard of the cart addition judges the one the line will hold).
+            $bundleStock = $this->bundleDisplayedStock?->forProducts([(int) $product->getId()])[(int) $product->getId()] ?? null;
+
+            if (null !== $bundleStock) {
+                if (ConfigQuery::checkAvailableStock() && $bundleStock < $value) {
+                    $context->addViolation(Translator::getInstance()->trans('quantity value is not valid'));
+                }
+
+                return;
+            }
 
             // The stock of the sale unit the visitor buys from, when it keeps one, is the
             // one the cart and the checkout judge on.

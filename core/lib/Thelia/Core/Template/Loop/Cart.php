@@ -22,6 +22,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
@@ -40,6 +41,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
     public function __construct(
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+        protected readonly ?CartLineAvailability $cartLineAvailability = null,
     ) {
     }
 
@@ -91,6 +93,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = (int) ConfigQuery::read('default-available-stock', 100);
         $saleUnitQuantities = $checkAvailability ? $this->saleUnitQuantitiesOf($loopResult) : [];
+        $bundleAvailabilities = $checkAvailability ? $this->bundleAvailabilitiesOf($loopResult) : [];
 
         /** @var CartItemModel $cartItem */
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
@@ -106,7 +109,11 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set('PRODUCT_ID', $product->getId());
             $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->getMainRequest()->getSession()->getLang()->getLocale()));
 
-            if (!$checkAvailability || 1 === $product->getVirtual()) {
+            if (isset($bundleAvailabilities[(int) $cartItem->getId()])) {
+                // A bundle line is supplied by its components, never by the stock of the sale element that stands for it.
+                $available = $bundleAvailabilities[(int) $cartItem->getId()];
+                $loopResultRow->set('STOCK', $available >= CartLineAvailability::UNLIMITED ? $defaultAvailability : (int) $available);
+            } elseif (!$checkAvailability || 1 === $product->getVirtual() || null !== $cartItem->getBundleComposition()) {
                 $loopResultRow->set('STOCK', $defaultAvailability);
             } else {
                 $loopResultRow->set('STOCK', $saleUnitQuantities[(int) $productSaleElement->getId()] ?? $productSaleElement->getQuantity());
@@ -146,6 +153,29 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function getDispatcher(): EventDispatcher
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * What the components allow for the bundle lines of the cart, asked together.
+     *
+     * @return array<int, float> keyed by line id, the bundle lines only
+     */
+    private function bundleAvailabilitiesOf(LoopResult $loopResult): array
+    {
+        if (null === $this->cartLineAvailability) {
+            return [];
+        }
+
+        $lines = [];
+
+        /** @var CartItemModel $cartItem */
+        foreach ($loopResult->getResultDataCollection() as $cartItem) {
+            if (null !== $composition = $cartItem->getBundleCompositionValue()) {
+                $lines[(int) $cartItem->getId()] = [$cartItem->getProductSaleElements(), $composition];
+            }
+        }
+
+        return $this->cartLineAvailability->forBundleLines($lines);
     }
 
     /**

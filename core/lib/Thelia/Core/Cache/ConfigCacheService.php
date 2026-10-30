@@ -93,6 +93,14 @@ class ConfigCacheService
     }
 
     /**
+     * Drops the shared entry and nothing else: the next request rebuilds it from what is committed.
+     */
+    public function dropSharedEntry(): void
+    {
+        $this->cache->deleteItem(self::CACHE_KEY);
+    }
+
+    /**
      * @return array<string, string|null>
      */
     private static function loadConfigs(): array

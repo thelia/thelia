@@ -343,6 +343,10 @@ class ProductFacadeTest extends TestCase
                 'shipping_surcharge' => null,
                 'shipping_surcharge_mode' => null,
                 'free_shipping' => null,
+                'is_bundle' => null,
+                'bundle_price_mode' => null,
+                'bundle_discount' => null,
+                'bundle_discount_type' => null,
             ],
             $dto->toArray(),
         );

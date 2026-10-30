@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Pricing;
 
+use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\SaleAudienceChecker;
 use Thelia\Model\CatalogPriceRule;
@@ -90,6 +91,6 @@ final class PricingActivityCheckerTest extends ActionIntegrationTestCase
         $saleAudienceChecker = $this->createStub(SaleAudienceChecker::class);
         $saleAudienceChecker->method('hasActiveReservedSale')->willReturn($hasActiveReservedSale);
 
-        return new PricingActivityChecker($saleAudienceChecker);
+        return new PricingActivityChecker($saleAudienceChecker, new BundleCatalogState());
     }
 }

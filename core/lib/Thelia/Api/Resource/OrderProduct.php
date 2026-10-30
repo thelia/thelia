@@ -316,7 +316,11 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
     public ?string $taxRuleDescription = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    /**
+     * The id of the bundle line this line is a component of; null on every other line. The
+     * front reads it to group the components under their pack, and cannot write it.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, Order::GROUP_ADMIN_WRITE, Order::GROUP_FRONT_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
     public ?int $parent = null;
 
     #[Groups([
@@ -347,9 +351,10 @@ class OrderProduct implements PropelResourceInterface
     public bool $isOffered = false;
 
     /**
-     * What the line stands for: a good taken off the catalogue, or a service the shop
-     * invoiced beside them. Read only, for the reason isOffered is: the order says what
-     * was sold, and no caller turns a wrapping into a product after the fact.
+     * What the line stands for: a good taken off the catalogue, a service the shop
+     * invoiced beside them, a bundle or one of its components. Read only, for the reason
+     * isOffered is: the order says what was sold, and no caller turns a wrapping into a
+     * product after the fact.
      *
      * A theme reads it to leave the service lines out of the list of things to ship, and
      * to state them where it states the postage instead.

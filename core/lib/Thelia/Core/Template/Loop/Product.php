@@ -27,6 +27,7 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\PricingActivityChecker;
@@ -109,6 +110,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         protected readonly ReservedSaleVisibility $reservedSaleVisibility,
         protected readonly EffectivePriceCatalog $effectivePriceCatalog,
         protected readonly PricingActivityChecker $pricingActivityChecker,
+        protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
     ) {
     }
 
@@ -262,6 +264,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $securityContext = $this->securityContext;
         $effectivePrices = $this->effectivePricesOf($loopResult);
+        // What the components allow for the bundles of the page: nothing is asked in the back office,
+        // which edits the national counter, nor in a shop without a bundle.
+        $bundleStocks = $this->getBackendContext() ? [] : ($this->bundleDisplayedStock?->forModels($loopResult->getResultDataCollection()) ?? []);
 
         /** @var ProductModel $product */
         foreach ($loopResult->getResultDataCollection() as $product) {
@@ -280,9 +285,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $effectivePrice = $effectivePrices[(int) $product->getVirtualColumn('pse_id')] ?? null;
 
             if (null !== $effectivePrice) {
-                $product->setVirtualColumn('promo_price', $effectivePrice->untaxedPromoPrice);
-                $product->setVirtualColumn('is_promo', 1);
-                $product->setVirtualColumn('display_initial_price', $effectivePrice->displayInitialPrice ? 1 : 0);
+                $settled = $effectivePrice->settle((float) $product->getVirtualColumn('price'));
+
+                if ($settled->priceReplaced) {
+                    $product->setVirtualColumn('price', $settled->untaxedPrice);
+                }
+
+                $product->setVirtualColumn('promo_price', $settled->untaxedPromoPrice);
+                $product->setVirtualColumn('is_promo', $settled->isPromo ? 1 : 0);
+                $product->setVirtualColumn('display_initial_price', $settled->displayInitialPrice ? 1 : 0);
             }
 
             $price = $product->getVirtualColumn('price');
@@ -325,7 +336,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $loopResultRow
                 ->set('WEIGHT', $product->getVirtualColumn('weight'))
-                ->set('QUANTITY', $product->getVirtualColumn('quantity'))
+                ->set('QUANTITY', $bundleStocks[(int) $product->getId()] ?? $product->getVirtualColumn('quantity'))
                 ->set('EAN_CODE', $product->getVirtualColumn('ean_code'))
                 ->set('BEST_PRICE', $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
                 ->set('BEST_PRICE_TAX', $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
@@ -375,9 +386,17 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             // it — either may well cover one combination out of five.
             $lowestEffectivePrice = $lowestEffectivePrices[(int) $product->getId()] ?? null;
 
-            if (null !== $lowestEffectivePrice && $lowestEffectivePrice->untaxedPromoPrice < (float) $price) {
-                $price = $lowestEffectivePrice->untaxedPromoPrice;
-                $isPromo = 1;
+            if (null !== $lowestEffectivePrice) {
+                $settled = $lowestEffectivePrice->settle((float) $price);
+
+                if ($settled->priceReplaced) {
+                    // A bundle priced by its components: its price is nowhere in the catalog.
+                    $price = $settled->isPromo ? $settled->untaxedPromoPrice : $settled->untaxedPrice;
+                    $isPromo = $settled->isPromo ? 1 : 0;
+                } elseif ($settled->untaxedPromoPrice < (float) $price) {
+                    $price = $settled->untaxedPromoPrice;
+                    $isPromo = 1;
+                }
             }
 
             if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {

@@ -42,6 +42,7 @@ use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Bridge\Propel\Validator\BundleSettingsConstraint;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
@@ -163,6 +164,7 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'updatedAt' => 'include_null_before_and_after',
     ]
 )]
+#[BundleSettingsConstraint(groups: [self::GROUP_ADMIN_WRITE])]
 class Product extends AbstractTranslatableResource
 {
     use UrlRewritingTrait;
@@ -238,6 +240,30 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE])]
     #[ApiProperty(description: 'The product is left out of the postage the carrier quotes')]
     public ?bool $freeShipping = null;
+
+    /**
+     * A bundle is a product sold as a composition of the sale elements of other products
+     * (see ProductBundleItem). Null leaves what is stored: a PUT that leaves these out
+     * does not turn a bundle back into a product.
+     */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ])]
+    #[ApiProperty(description: 'The product is a bundle: a sellable product made of the sale elements of other products')]
+    public ?bool $isBundle = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[ApiProperty(description: 'fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount')]
+    #[Choice(choices: ['fixed', 'computed'])]
+    public ?string $bundlePriceMode = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[ApiProperty(description: 'Discount of a computed bundle, in percent or in the default currency (see bundleDiscountType)')]
+    #[PositiveOrZero]
+    public ?float $bundleDiscount = null;
+
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_ADMIN_WRITE, self::GROUP_FRONT_READ_SINGLE])]
+    #[ApiProperty(description: 'percent or amount')]
+    #[Choice(choices: ['percent', 'amount'])]
+    public ?string $bundleDiscountType = null;
 
     #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ])]
     public ?\DateTime $createdAt = null;
@@ -400,6 +426,54 @@ class Product extends AbstractTranslatableResource
     public function setShippingSurchargeMode(?int $shippingSurchargeMode): self
     {
         $this->shippingSurchargeMode = $shippingSurchargeMode;
+
+        return $this;
+    }
+
+    public function getIsBundle(): ?bool
+    {
+        return $this->isBundle;
+    }
+
+    public function setIsBundle(?bool $isBundle): self
+    {
+        $this->isBundle = $isBundle;
+
+        return $this;
+    }
+
+    public function getBundlePriceMode(): ?string
+    {
+        return $this->bundlePriceMode;
+    }
+
+    public function setBundlePriceMode(?string $bundlePriceMode): self
+    {
+        $this->bundlePriceMode = $bundlePriceMode;
+
+        return $this;
+    }
+
+    public function getBundleDiscount(): ?float
+    {
+        return $this->bundleDiscount;
+    }
+
+    public function setBundleDiscount(?float $bundleDiscount): self
+    {
+        $this->bundleDiscount = $bundleDiscount;
+
+        return $this;
+    }
+
+    public function getBundleDiscountType(): ?string
+    {
+        return $this->bundleDiscountType;
+    }
+
+    public function setBundleDiscountType(?string $bundleDiscountType): self
+    {
+        $this->bundleDiscountType = $bundleDiscountType;
 
         return $this;
     }
