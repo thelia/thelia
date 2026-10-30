@@ -45,6 +45,7 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\Order as OrderModel;
@@ -410,7 +411,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
         // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
-        if (OrderVersionQuery::create()->groupByStatusId()->filterById($order->getId())->count() > 1) {
+        if (OrderVersionQuery::create()->filterById($order->getId())->select(OrderVersionTableMap::COL_STATUS_ID)->distinct()->count() > 1) {
             // A status change occured. Ignore $manageStockOnCreation
             $manageStockOnCreation = false;
         } else {

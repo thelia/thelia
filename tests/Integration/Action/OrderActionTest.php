@@ -37,6 +37,33 @@ final class OrderActionTest extends ActionIntegrationTestCase
         self::assertSame($paidStatus->getId(), OrderQuery::create()->findPk($order->getId())->getStatusId());
     }
 
+    /**
+     * The kernel drops ONLY_FULL_GROUP_BY from the session of a MySQL server, so a query
+     * that breaks under it goes unnoticed until a connection that skipped that correction
+     * (a process booted with a verdict cached for another server, a MariaDB configured
+     * with the mode) runs it.
+     */
+    public function testUpdateStatusRunsUnderOnlyFullGroupBy(): void
+    {
+        $connection = $this->getPropelConnection();
+        $originalMode = (string) $connection->query('SELECT @@SESSION.sql_mode')->fetchColumn();
+        $order = $this->factory->order();
+        $paidStatus = OrderStatusQuery::create()->findOneByCode('paid');
+        self::assertNotNull($paidStatus);
+
+        try {
+            $connection->query("SET SESSION sql_mode=CONCAT(@@SESSION.sql_mode, ',ONLY_FULL_GROUP_BY')");
+
+            $event = new OrderEvent($order);
+            $event->setStatus($paidStatus->getId());
+            $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+        } finally {
+            $connection->query("SET SESSION sql_mode='".$originalMode."'");
+        }
+
+        self::assertSame($paidStatus->getId(), OrderQuery::create()->findPk($order->getId())->getStatusId());
+    }
+
     public function testUpdateDeliveryRefPersistsTheGivenReference(): void
     {
         $order = $this->factory->order();
