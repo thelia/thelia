@@ -73,6 +73,8 @@ export async function auditPage(page: Page, name: string, testInfo: TestInfo): P
 
   expect(rulesChecked, `axe checked no rule on ${name}`).toBeGreaterThan(0);
   expect.soft(blocking, `serious or critical accessibility violations on ${name}`).toEqual([]);
+  // RGAA 9.1, which axe only checks as a best practice: the outline starts with a level 1 heading.
+  expect.soft(await page.locator('h1').count(), `no h1 on ${name}`).toBeGreaterThan(0);
 
   return summary;
 }
