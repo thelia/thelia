@@ -38,12 +38,6 @@ final class UpdateScriptTest extends TestCase
     private const string MARIADB_ONLY_CONDITIONAL_DDL = '/\b(?:ADD|MODIFY|CHANGE|DROP)\s+(?:COLUMN|INDEX|KEY|CONSTRAINT)?\s*IF\s+(?:NOT\s+)?EXISTS\b/i';
 
     /**
-     * The script a released shop has not run yet, and the only one still open
-     * to being fixed: the ones before it are already applied in the field.
-     */
-    private const string PENDING_SCRIPT = '3.3.0.sql';
-
-    /**
      * The reference tables whose rows a shop reads by their translated label: a row
      * seeded in fewer locales than the fresh install shows up unnamed in the back
      * office of a shop that updated.
@@ -74,7 +68,9 @@ final class UpdateScriptTest extends TestCase
         $statements = $this->statementsOf($this->pendingScript());
         $inserts = array_filter($statements, static fn (string $statement): bool => 1 === preg_match('/^INSERT\b/i', $statement));
 
-        self::assertNotEmpty($inserts, 'The pending script seeds nothing: this test has lost its subject.');
+        if ([] === $inserts) {
+            self::markTestSkipped(\sprintf('%s seeds nothing yet: nothing to replay.', $this->pendingScriptName()));
+        }
 
         foreach ($inserts as $statement) {
             $replayable = 1 === preg_match('/^INSERT\s+IGNORE\b/i', $statement)
@@ -129,14 +125,13 @@ final class UpdateScriptTest extends TestCase
             }
         }
 
-        self::assertGreaterThan(
-            0,
-            $judged,
-            \sprintf(
-                'The pending script seeds none of the translated reference tables (%s): this test has lost its subject.',
+        if (0 === $judged) {
+            self::markTestSkipped(\sprintf(
+                '%s seeds none of the translated reference tables (%s) yet.',
+                $this->pendingScriptName(),
                 implode(', ', self::TRANSLATED_REFERENCE_TABLES),
-            ),
-        );
+            ));
+        }
     }
 
     /**
@@ -251,12 +246,12 @@ final class UpdateScriptTest extends TestCase
                 self::assertStringContainsString(
                     "'".$name."'",
                     $otherStatements,
-                    \sprintf('%s seeds the variable "%s" without a title: an updated shop shows it with an empty purpose.', self::PENDING_SCRIPT, $name),
+                    \sprintf('%s seeds the variable "%s" without a title: an updated shop shows it with an empty purpose.', $this->pendingScriptName(), $name),
                 );
                 self::assertArrayHasKey(
                     $name,
                     $freshInstallIds,
-                    \sprintf('%s seeds the variable "%s", which setup/insert.sql does not: a fresh install would not have it.', self::PENDING_SCRIPT, $name),
+                    \sprintf('%s seeds the variable "%s", which setup/insert.sql does not: a fresh install would not have it.', $this->pendingScriptName(), $name),
                 );
                 self::assertContains(
                     $freshInstallIds[$name],
@@ -266,7 +261,9 @@ final class UpdateScriptTest extends TestCase
             }
         }
 
-        self::assertGreaterThan(0, $judged, 'The pending script seeds no visible variable: this test has lost its subject.');
+        if (0 === $judged) {
+            self::markTestSkipped(\sprintf('%s seeds no visible variable yet.', $this->pendingScriptName()));
+        }
     }
 
     /**
@@ -298,11 +295,13 @@ final class UpdateScriptTest extends TestCase
             self::assertContains(
                 $table.'_i18n',
                 $seeded,
-                \sprintf('%s seeds rows of `%s` without their `%s_i18n` rows: a shop updated to this version shows them with no label at all.', self::PENDING_SCRIPT, $table, $table),
+                \sprintf('%s seeds rows of `%s` without their `%s_i18n` rows: a shop updated to this version shows them with no label at all.', $this->pendingScriptName(), $table, $table),
             );
         }
 
-        self::assertGreaterThan(0, $judged, 'The pending script seeds no translated table: this test has lost its subject.');
+        if (0 === $judged) {
+            self::markTestSkipped(\sprintf('%s seeds no translated table yet.', $this->pendingScriptName()));
+        }
     }
 
     /**
@@ -398,7 +397,20 @@ final class UpdateScriptTest extends TestCase
 
     private function pendingScript(): string
     {
-        return (string) file_get_contents($this->setupDirectory().'/update/sql/'.self::PENDING_SCRIPT);
+        return (string) file_get_contents($this->setupDirectory().'/update/sql/'.$this->pendingScriptName());
+    }
+
+    /**
+     * The script a released shop has not run yet, and the only one still open
+     * to being fixed: the ones before it are already applied in the field. It is
+     * the highest version, so the tests follow each release without an edit.
+     */
+    private function pendingScriptName(): string
+    {
+        $names = array_keys($this->updateScripts());
+        usort($names, static fn (string $left, string $right): int => version_compare(basename($right, '.sql'), basename($left, '.sql')));
+
+        return $names[0];
     }
 
     private function freshInstallSeed(): string

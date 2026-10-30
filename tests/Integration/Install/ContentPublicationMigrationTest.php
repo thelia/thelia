@@ -31,8 +31,8 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class ContentPublicationMigrationTest extends IntegrationTestCase
 {
-    /** The pending script, the one UpdateScriptTest names: it moves on at each release. */
-    private const string PENDING_SCRIPT = '3.3.0.sql';
+    /** The update script that ships the publication dates: 3.3.0, released, so it no longer moves. */
+    private const string UPDATE_SCRIPT = '3.3.0.sql';
 
     private const string BLOCK_TITLE = '-- Publication of contents and folders';
 
@@ -194,9 +194,9 @@ final class ContentPublicationMigrationTest extends IntegrationTestCase
      */
     private function blockStatements(): array
     {
-        $script = (string) file_get_contents(THELIA_SETUP_DIRECTORY.'update'.\DIRECTORY_SEPARATOR.'sql'.\DIRECTORY_SEPARATOR.self::PENDING_SCRIPT);
+        $script = (string) file_get_contents(THELIA_SETUP_DIRECTORY.'update'.\DIRECTORY_SEPARATOR.'sql'.\DIRECTORY_SEPARATOR.self::UPDATE_SCRIPT);
         $start = strpos($script, self::BLOCK_TITLE);
-        self::assertIsInt($start, 'The pending update script gives no publication dates to the contents.');
+        self::assertIsInt($start, 'The 3.3.0 update script gives no publication dates to the contents.');
 
         // The block runs up to the header of the next block, or to the end of the script.
         $headerEnd = strpos($script, "\n-- ----", $start);
