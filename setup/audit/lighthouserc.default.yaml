@@ -17,16 +17,16 @@ ci:
         - "accessibility"
         - "best-practices"
         - "seo"
-    # Url list
+    # Url list, also audited by tests/Playwright/specs/accessibility.spec.ts (account pages signed in;
+    # the sign-in and sign-up forms are audited signed out)
     url:
       - "http://__DOMAIN__"
       - "http://__DOMAIN__/contact"
-      - "http://__DOMAIN__/register"
       - "http://__DOMAIN__/a-propos.html"
       - "http://__DOMAIN__/search?query=t"
       - "http://__DOMAIN__/chairs.html"
       - "http://__DOMAIN__/barbara-1.html"
       - "http://__DOMAIN__/account"
-      - "http://__DOMAIN__/account/update"
-      - "http://__DOMAIN__/account-orders"
-      - "http://__DOMAIN__/account-address"
+      - "http://__DOMAIN__/account/addresses"
+      - "http://__DOMAIN__/account/orders"
+      - "http://__DOMAIN__/account/purchase-lists"

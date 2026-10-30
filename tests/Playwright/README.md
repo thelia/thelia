@@ -83,6 +83,34 @@ serves `?view=…` links where French serves slugs.
 npx playwright test specs/rtl.spec.ts
 ```
 
+## Accessibility
+
+`specs/accessibility.spec.ts` runs [axe](https://github.com/dequelabs/axe-core)
+with the WCAG 2.1 A and AA rules (the base of RGAA 4.1) on the sign-in and
+sign-up forms, on every page listed in `setup/audit/lighthouserc.default.yaml`
+(signed in) and on each step of the checkout tunnel up to the confirmation. It
+fails on any serious or critical violation that is not a derogation listed in
+`helpers/a11y.ts`. Each page logs how many rules axe really checked: a page
+where nothing applied fails, it does not pass. The Symfony debug toolbar is left
+out of the audit.
+
+It also checks that the first tab stop is a skip link that moves the focus to
+`#main-content`, and that no element sticks out of a 320px viewport (RGAA 10.11).
+That last check reads the element boxes, not the document scroll width: Flexy
+clips the body horizontally, so an overflow never shows as a scrollbar.
+
+```bash
+npx playwright test specs/accessibility.spec.ts
+```
+
+The `accessibility` workflow runs it on every pull request against a demo shop
+served by `php -S`. Outside DDEV, point the SQL helpers at the shop database:
+
+```bash
+BASE_URL=http://127.0.0.1:8000 MYSQL_COMMAND="mysql -h127.0.0.1 -uroot -proot thelia" \
+  npx playwright test specs/accessibility.spec.ts
+```
+
 ## Reports
 
 After a run, open `playwright-report/index.html` (`npm run report`).
