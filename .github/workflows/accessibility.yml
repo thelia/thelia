@@ -1,0 +1,110 @@
+name: accessibility
+
+# Serves a demo shop and runs tests/Playwright/specs/accessibility.spec.ts against it: axe on
+# the pages of setup/audit/lighthouserc.default.yaml and the checkout tunnel (WCAG 2.1 AA, the
+# base of RGAA 4.1), the skip link and the 320px reflow. Each audited page logs how many rules
+# axe really checked, so an empty audit cannot pass for a clean one.
+on:
+  pull_request:
+    branches: [ main ]
+  merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  storefront:
+    name: Storefront accessibility (axe, WCAG 2.1 AA)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+      COMPOSER_NO_INTERACTION: '1'
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: '3306'
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: thelia
+      BASE_URL: http://127.0.0.1:8000
+      # helpers/db.ts runs its SQL through this client instead of `ddev exec mysql`.
+      MYSQL_COMMAND: mysql -h127.0.0.1 -uroot -proot thelia
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.3'
+          ini-values: post_max_size=20M
+          coverage: none
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+
+      - name: Resolve the themes from their development branch
+        # Same contract as test.yml: the tip of the core against the tip of the themes.
+        run: |
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
+
+      - name: Install Composer dependencies
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Drop the files the official recipes write
+        # See test.yml: goes once thelia/thelia-recipes#14 is merged.
+        run: rm -f src/Schedule.php config/packages/messenger.yaml
+
+      - name: Install the demo shop
+        run: >-
+          php bin/install
+          --frontoffice_theme=flexy --backoffice_theme=default-twig
+          --pdf_theme=default --email_theme=default
+          --with-demo --with-admin
+          --admin_login=thelia --admin_password=thelia
+          --admin_first_name=Admin --admin_last_name=User
+          --admin_email=admin@example.com
+
+      - name: Serve the storefront
+        run: |
+          php -S 127.0.0.1:8000 -t public > "$RUNNER_TEMP/server.log" 2>&1 &
+          for _ in $(seq 1 30); do curl -s -o /dev/null "$BASE_URL/" && break; sleep 1; done
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/")
+          echo "/ -> $code"
+          [ "$code" = "200" ] || { echo "::error::the storefront answered $code"; tail -n 50 "$RUNNER_TEMP/server.log"; exit 1; }
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/Playwright/package-lock.json
+
+      - name: Install Playwright and Chromium
+        working-directory: tests/Playwright
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run the accessibility suite
+        working-directory: tests/Playwright
+        run: npx playwright test specs/accessibility.spec.ts
+
+      - name: Keep the report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: accessibility-report
+          path: |
+            tests/Playwright/playwright-report
+            tests/Playwright/test-results
+          retention-days: 7
