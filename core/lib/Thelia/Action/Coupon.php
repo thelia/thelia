@@ -23,6 +23,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForEveryone;
+use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\Cart\CartItemQuantityAdjustedEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
@@ -67,6 +69,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     private const DISCOUNT_PRICED_FOR = 'thelia.coupon.discount_priced_for';
 
     protected readonly CouponExclusionWriter $couponExclusionWriter;
+
+    /** @var array<int, true> the carts the rules adjusted while they were being restored */
+    private array $adjustedWhileRestored = [];
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -219,6 +224,44 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         $session->getOrder()
             ->setDiscount((string) $discount);
+    }
+
+    /**
+     * A line the rules of its combination brought down or removed, on a cart read back:
+     * the buyer did not touch it, the discount is priced again all the same. A cart being
+     * restored is not in the session yet, and every coupon reads the cart of the session:
+     * asking for it would restore it a second time, and a cart duplicated at sign-in would
+     * be restored from a cookie whose cart is deleted. That cart is priced once the session
+     * holds it (priceACartAdjustedWhileRestored()).
+     */
+    public function updateDiscountOfAnAdjustedCart(CartItemQuantityAdjustedEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $cartId = (int) $event->getCartItem()->getCartId();
+        $session = $this->getSession();
+
+        if ($session instanceof Session && (int) $session->get(Session::SESSION_CART_ID_NAME) !== $cartId) {
+            $this->adjustedWhileRestored[$cartId] = true;
+
+            return;
+        }
+
+        $this->updateOrderDiscount($event, $eventName, $dispatcher);
+    }
+
+    /**
+     * Session::getSessionCart() hands every cart out through CART_FOLLOW_SALE_UNIT, a
+     * restored one once the session holds it.
+     */
+    public function priceACartAdjustedWhileRestored(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        $cartId = (int) $event->getCart()->getId();
+
+        if (!isset($this->adjustedWhileRestored[$cartId])) {
+            return;
+        }
+
+        unset($this->adjustedWhileRestored[$cartId]);
+        $this->updateOrderDiscount($event, $eventName, $dispatcher);
     }
 
     public function reconcileWithVatExemption(): void
@@ -601,7 +644,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_UPDATEITEM => ['updateOrderDiscount', 10],
             // A line the rules of its combination brought down or removed, on a cart
             // read back (restored, checked before the checkout): the buyer did not touch it.
-            TheliaEvents::CART_ITEM_QUANTITY_ADJUSTED => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_ITEM_QUANTITY_ADJUSTED => ['updateDiscountOfAnAdjustedCart', 10],
+            // After Action\Cart::followSaleUnit() (128), which may reprice the cart.
+            TheliaEvents::CART_FOLLOW_SALE_UNIT => ['priceACartAdjustedWhileRestored', 10],
             TheliaEvents::CART_DELETEITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_SALE_UNIT_SWITCHED => ['updateOrderDiscount', 10],
             TheliaEvents::CART_LINES_REPRICED => ['updateOrderDiscount', 10],
