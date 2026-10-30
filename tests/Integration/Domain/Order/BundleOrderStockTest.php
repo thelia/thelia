@@ -100,6 +100,32 @@ final class BundleOrderStockTest extends ActionIntegrationTestCase
         self::assertSame(0.0, $this->stockOfProduct($example['bundle']), 'The pack was never given anything back: its sale element holds no stock.');
     }
 
+    public function testRefundingAnOrderTakenAtItsPlacementGivesTheComponentsBack(): void
+    {
+        $this->manageTheStockWhenTheOrderIsPlaced();
+        [$example, $order] = $this->orderOfThePlan();
+
+        self::assertSame([6.0, 3.0, 8.0], $this->stocksOf($example));
+
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertSame([7.0, 5.0, 10.0], $this->stocksOf($example), 'The components are back to what they were.');
+        self::assertSame(0.0, $this->stockOfProduct($example['bundle']), 'The pack was never given anything back: its sale element holds no stock.');
+    }
+
+    public function testRefundingAPaidOrderTakenAtItsPaymentGivesTheComponentsBack(): void
+    {
+        [$example, $order] = $this->orderOfThePlan();
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame([6.0, 3.0, 8.0], $this->stocksOf($example));
+
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertSame([7.0, 5.0, 10.0], $this->stocksOf($example));
+        self::assertSame(0.0, $this->stockOfProduct($example['bundle']));
+    }
+
     public function testPayingThenUnpayingAnOrderTakenAtItsPaymentMovesTheComponentsOnly(): void
     {
         [$example, $order] = $this->orderOfThePlan();
