@@ -56,7 +56,7 @@ final class OrderPlacedBeforeBundlesInvoiceTest extends IntegrationTestCase
 
         // Written the way a line was before bundles: the line_type column is not named.
         $insert = $this->getPropelConnection()->prepare(
-            'INSERT INTO order_product (order_id, product_ref, product_sale_elements_ref, product_sale_elements_id, title, quantity, price, promo_price, was_new, was_in_promo, virtual) '
+            'INSERT INTO order_product (order_id, product_ref, product_sale_elements_ref, product_sale_elements_id, title, quantity, price, promo_price, was_new, was_in_promo, `virtual`) '
             .'VALUES (:order, :reference, :saleElementsReference, :saleElements, :title, 2, 15, 15, 1, 0, 0)',
         );
 
