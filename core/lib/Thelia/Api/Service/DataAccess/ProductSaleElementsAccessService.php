@@ -22,6 +22,7 @@ use Thelia\Core\Event\ProductSaleElement\PseByProductEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
@@ -47,6 +48,7 @@ class ProductSaleElementsAccessService
         private readonly LangService $langService,
         private readonly ReservedSaleVisibility $reservedSaleVisibility,
         private readonly EffectivePriceCatalog $effectivePriceCatalog,
+        private readonly BundleDisplayedStock $bundleDisplayedStock,
     ) {
         $this->request = $requestStack->getMainRequest();
     }
@@ -90,6 +92,10 @@ class ProductSaleElementsAccessService
             $this->reservedSaleVisibility->currentCustomer(),
         );
 
+        // A bundle is supplied by its components: the stock of its own sale element, which stays at
+        // zero, is never the answer (the default composition is the one a page shows).
+        $bundleQuantity = $this->bundleDisplayedStock->forProducts([(int) $productId])[(int) $productId] ?? null;
+
         foreach ($pses as $pse) {
             $attributes = [];
             $isPromo = (bool) $pse->getPromo();
@@ -111,17 +117,26 @@ class ProductSaleElementsAccessService
             $displayInitialPrice = null;
 
             if (null !== $effectivePrice) {
-                $chargedPrice = $effectivePrice->untaxedPromoPrice * (1 - ((float) $discount / 100));
-                $pse->setVirtualColumn('price_PROMO_PRICE', $chargedPrice);
-                $displayInitialPrice = $effectivePrice->displayInitialPrice;
-
                 if (EffectivePrice::SOURCE_SALE_UNIT === $effectivePrice->source) {
                     // A sale unit's own price is the price of the sale element there, not a
                     // promotion of the national one: nothing is struck through.
+                    $chargedPrice = $effectivePrice->untaxedPromoPrice * (1 - ((float) $discount / 100));
+                    $pse->setVirtualColumn('price_PROMO_PRICE', $chargedPrice);
                     $pse->setVirtualColumn('price_PRICE', $chargedPrice);
                     $isPromo = false;
+                    $displayInitialPrice = $effectivePrice->displayInitialPrice;
                 } else {
-                    $isPromo = true;
+                    // The customer discount is applied to what the effective price says, as it is
+                    // to the catalog prices read above.
+                    $settled = $effectivePrice->settle((float) $prices->getPrice(), (float) $discount);
+
+                    if ($settled->priceReplaced) {
+                        $pse->setVirtualColumn('price_PRICE', $settled->untaxedPrice);
+                    }
+
+                    $pse->setVirtualColumn('price_PROMO_PRICE', $settled->untaxedPromoPrice);
+                    $isPromo = $settled->isPromo;
+                    $displayInitialPrice = $settled->displayInitialPrice;
                 }
             }
 
@@ -140,7 +155,7 @@ class ProductSaleElementsAccessService
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),
                 'mpn' => $pse->getMpn(),
-                'quantity' => $pse->getQuantity(),
+                'quantity' => $bundleQuantity ?? $pse->getQuantity(),
                 'weight' => $pse->getWeight(),
                 'price' => $pse->getTaxedPrice($taxCountry),
                 'untaxedPrice' => $pse->getPrice(),

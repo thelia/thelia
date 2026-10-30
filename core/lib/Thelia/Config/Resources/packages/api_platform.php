@@ -17,6 +17,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException as ApiPlatformInvalidArgumentException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Thelia\Core\TheliaKernel;
+use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
+use Thelia\Domain\Catalog\Bundle\Exception\BundleWriteConflictException;
+use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Payment\Exception\CancelledOrderPaymentRefusedException;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Payment\Exception\GuestCannotStorePaymentMethodException;
@@ -65,6 +68,12 @@ return static function (ContainerConfigurator $container): void {
             GuestCannotStorePaymentMethodException::class => 403,
             StoredMethodPaymentRateLimitedException::class => 429,
             CustomerPaymentMethodException::class => 422,
+            // A bundle refused by the model whoever writes it: a second sale element for a bundle,
+            // a cart line whose composition does not fit its product. The front operations catch
+            // them and answer on their own; the admin ones let them through.
+            BundleDefinitionException::class => 422,
+            BundleWriteConflictException::class => 409,
+            InvalidBundleCompositionException::class => 422,
         ],
         'defaults' => [
             'pagination_client_items_per_page' => true,

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\Product;
 
+use Thelia\Domain\Catalog\Bundle\BundleDiscountType;
+use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Shipping\ProductRule\ShippingSurchargeMode;
 
 class ProductUpdateEvent extends ProductCreateEvent
@@ -27,6 +29,10 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected ?float $shippingSurcharge = null;
     protected ?ShippingSurchargeMode $shippingSurchargeMode = null;
     protected ?bool $freeShipping = null;
+    protected ?bool $isBundle = null;
+    protected ?BundlePriceMode $bundlePriceMode = null;
+    protected ?string $bundleDiscount = null;
+    protected ?BundleDiscountType $bundleDiscountType = null;
 
     /**
      * @param int $product_id
@@ -172,6 +178,67 @@ class ProductUpdateEvent extends ProductCreateEvent
     public function setFreeShipping(?bool $freeShipping): static
     {
         $this->freeShipping = $freeShipping;
+
+        return $this;
+    }
+
+    /**
+     * Null leaves the column untouched.
+     */
+    public function getIsBundle(): ?bool
+    {
+        return $this->isBundle;
+    }
+
+    public function setIsBundle(?bool $isBundle): static
+    {
+        $this->isBundle = $isBundle;
+
+        return $this;
+    }
+
+    /**
+     * Null leaves the column untouched.
+     */
+    public function getBundlePriceMode(): ?BundlePriceMode
+    {
+        return $this->bundlePriceMode;
+    }
+
+    public function setBundlePriceMode(?BundlePriceMode $bundlePriceMode): static
+    {
+        $this->bundlePriceMode = $bundlePriceMode;
+
+        return $this;
+    }
+
+    /**
+     * A non-negative decimal string, in percent or in the default currency according to the
+     * discount type. Null leaves the column untouched.
+     */
+    public function getBundleDiscount(): ?string
+    {
+        return $this->bundleDiscount;
+    }
+
+    public function setBundleDiscount(?string $bundleDiscount): static
+    {
+        $this->bundleDiscount = $bundleDiscount;
+
+        return $this;
+    }
+
+    /**
+     * Null leaves the column untouched.
+     */
+    public function getBundleDiscountType(): ?BundleDiscountType
+    {
+        return $this->bundleDiscountType;
+    }
+
+    public function setBundleDiscountType(?BundleDiscountType $bundleDiscountType): static
+    {
+        $this->bundleDiscountType = $bundleDiscountType;
 
         return $this;
     }
