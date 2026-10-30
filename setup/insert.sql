@@ -2366,6 +2366,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'cs_CZ', NULL, NULL, NULL, NULL),
     (112, 'cs_CZ', NULL, NULL, NULL, NULL),
     (113, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (114, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2457,6 +2458,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'de_DE', 'Den MCP-Server öffnen (1) oder schließen (0), über den externe Assistenten die KI-Werkzeuge mit einem Token aufrufen', NULL, NULL, NULL),
     (112, 'de_DE', 'Stunden, die ein Schreibvorschlag eines KI-Werkzeugs auf die Freigabe eines Administrators wartet, bevor er verfällt (24 bei ungültigem Wert)', NULL, NULL, NULL),
     (113, 'de_DE', 'Längste Gültigkeit, in Tagen, eines Tokens, das einem externen Assistenten für den MCP-Server ausgestellt wird (365 bei ungültigem Wert)', NULL, NULL, NULL),
+    (114, 'de_DE', 'Wo die Express-Zahlungsschaltflächen der Zahlungsmodule erscheinen, kommagetrennt aus checkout (leer: nirgends)', NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2548,6 +2550,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'en_US', 'Open (1) or close (0) the MCP server through which external assistants call the AI tools with a token', NULL, NULL, NULL),
     (112, 'en_US', 'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)', NULL, NULL, NULL),
     (113, 'en_US', 'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)', NULL, NULL, NULL),
+    (114, 'en_US', 'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2639,6 +2642,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'es_ES', 'Abrir (1) o cerrar (0) el servidor MCP por el que los asistentes externos llaman a las herramientas de IA con un token', NULL, NULL, NULL),
     (112, 'es_ES', 'Horas que una propuesta de escritura de una herramienta de IA espera la aprobación de un administrador antes de caducar (24 si no es válido)', NULL, NULL, NULL),
     (113, 'es_ES', 'Vida máxima, en días, de un token entregado a un asistente externo para el servidor MCP (365 si no es válido)', NULL, NULL, NULL),
+    (114, 'es_ES', 'Dónde aparecen los botones de pago exprés de los módulos de pago, separados por comas entre checkout (vacío: en ningún sitio)', NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2730,6 +2734,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'fr_FR', 'Ouvrir (1) ou fermer (0) le serveur MCP par lequel des assistants externes appellent les outils d\'IA avec un jeton', NULL, NULL, NULL),
     (112, 'fr_FR', 'Nombre d\'heures pendant lesquelles une proposition d\'écriture d\'un outil d\'IA attend l\'approbation d\'un administrateur avant d\'expirer (24 si invalide)', NULL, NULL, NULL),
     (113, 'fr_FR', 'Durée de vie maximale, en jours, d\'un jeton remis à un assistant externe pour le serveur MCP (365 si invalide)', NULL, NULL, NULL),
+    (114, 'fr_FR', 'Emplacements où s\'affichent les boutons de paiement express des modules de paiement, séparés par des virgules parmi checkout (vide : nulle part)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2821,6 +2826,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'it_IT', NULL, NULL, NULL, NULL),
     (112, 'it_IT', NULL, NULL, NULL, NULL),
     (113, 'it_IT', NULL, NULL, NULL, NULL),
+    (114, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -2912,6 +2918,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, 'nl_NL', 'De MCP-server openen (1) of sluiten (0) waarmee externe assistenten de AI-tools met een token aanroepen', NULL, NULL, NULL),
     (112, 'nl_NL', 'Uren dat een schrijfvoorstel van een AI-tool op de goedkeuring van een beheerder wacht voordat het vervalt (24 bij een ongeldige waarde)', NULL, NULL, NULL),
     (113, 'nl_NL', 'Langste levensduur, in dagen, van een token dat aan een externe assistent voor de MCP-server wordt gegeven (365 bij een ongeldige waarde)', NULL, NULL, NULL),
+    (114, 'nl_NL', 'Waar de expresbetaalknoppen van de betaalmodules verschijnen, door komma\'s gescheiden uit checkout (leeg: nergens)', NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -3002,7 +3009,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (110, 'ru_RU', 'Дней хранения записи журнала использования ИИ до её удаления при обслуживании (400 при недопустимом значении)', NULL, NULL, NULL),
     (111, 'ru_RU', 'Открыть (1) или закрыть (0) сервер MCP, через который внешние ассистенты вызывают инструменты ИИ по токену', NULL, NULL, NULL),
     (112, 'ru_RU', 'Часов, в течение которых предложение записи от инструмента ИИ ждёт одобрения администратора до истечения срока (24 при недопустимом значении)', NULL, NULL, NULL),
-    (113, 'ru_RU', 'Максимальный срок жизни, в днях, токена, выданного внешнему ассистенту для сервера MCP (365 при недопустимом значении)', NULL, NULL, NULL)
+    (113, 'ru_RU', 'Максимальный срок жизни, в днях, токена, выданного внешнему ассистенту для сервера MCP (365 при недопустимом значении)', NULL, NULL, NULL),
+    (114, 'ru_RU', 'Где показываются кнопки экспресс-оплаты платёжных модулей, через запятую из checkout (пусто: нигде)', NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks

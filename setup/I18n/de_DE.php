@@ -1153,4 +1153,5 @@ return [
     'Open (1) or close (0) the MCP server through which external assistants call the AI tools with a token' => 'Den MCP-Server öffnen (1) oder schließen (0), über den externe Assistenten die KI-Werkzeuge mit einem Token aufrufen',
     'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)' => 'Stunden, die ein Schreibvorschlag eines KI-Werkzeugs auf die Freigabe eines Administrators wartet, bevor er verfällt (24 bei ungültigem Wert)',
     'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)' => 'Längste Gültigkeit, in Tagen, eines Tokens, das einem externen Assistenten für den MCP-Server ausgestellt wird (365 bei ungültigem Wert)',
+    'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Wo die Express-Zahlungsschaltflächen der Zahlungsmodule erscheinen, kommagetrennt aus checkout (leer: nirgends)',
 ];

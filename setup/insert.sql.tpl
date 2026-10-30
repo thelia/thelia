@@ -2366,7 +2366,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (110, '{{ locale }}', {{ intl('Days a row of the AI usage log is kept before the maintenance purge deletes it (400 when invalid)', locale) }}, NULL, NULL, NULL),
     (111, '{{ locale }}', {{ intl('Open (1) or close (0) the MCP server through which external assistants call the AI tools with a token', locale) }}, NULL, NULL, NULL),
     (112, '{{ locale }}', {{ intl('Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)', locale) }}, NULL, NULL, NULL),
-    (113, '{{ locale }}', {{ intl('Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (113, '{{ locale }}', {{ intl('Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)', locale) }}, NULL, NULL, NULL),
+    (114, '{{ locale }}', {{ intl('Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
