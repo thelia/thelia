@@ -35,6 +35,7 @@ import { login } from '../helpers/customer';
  */
 
 const CAPTURES = new URL('../../../var/t204/recette/', import.meta.url).pathname;
+const AXE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js';
 const SUBMIT = 'form[name="thelia_cart_add"] button[type="submit"]';
 
 const lockOf = (page: Page, world: BundleWorld) => page.locator(`[data-bundle-item="${world.itemIds.lock}"]`);
@@ -224,6 +225,35 @@ for (const { name, viewport } of VIEWPORTS) {
       await expect(page.getByTestId('bundle-composition')).toContainText(/cannot be sold as chosen|default one is shown/i);
 
       expect(console.errors, console.errors.join('\n')).toEqual([]);
+    });
+
+    test('accessibility: no serious or critical WCAG 2.1 A/AA violation in the composition of the pack', async ({ page }) => {
+      await openPack(page, world);
+      await page.addScriptTag({ url: AXE_URL });
+
+      const scan = (selector: string, excluded: string[]) =>
+        page.evaluate(
+          async ({ selector, excluded, tags }) => {
+            // axe-core is injected as a global by the script tag above.
+            const results = await (window as unknown as { axe: { run: (context: unknown, options: unknown) => Promise<{ violations: Array<{ id: string; impact: string; help: string; nodes: Array<{ target: unknown[] }> }> }> } }).axe.run(
+              { include: [[selector]], exclude: excluded.map((target) => [target]) },
+              { runOnly: { type: 'tag', values: tags } },
+            );
+            return results.violations
+              .filter((violation) => violation.impact === 'serious' || violation.impact === 'critical')
+              .map((violation) => `${violation.id} (${violation.impact}): ${violation.help} -> ${violation.nodes.map((node) => node.target.join(' ')).join(' | ')}`);
+          },
+          { selector, excluded, tags: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
+        );
+
+      // The "Optional" tag is the neutral Tag of the theme (brand orange on its light tint, under 4.5:1): the
+      // component is not ours to restyle here, it is reported by the sheet scan below instead.
+      expect(await scan('[data-testid="bundle-composition"]', ['.Tag']), 'violations in the composition block').toEqual([]);
+
+      // The whole sheet is read too, so that a violation of a component the pack only borrows (selector, button)
+      // is reported with the block that owns it rather than blamed on the composition.
+      const sheet = await scan('#infos', []);
+      test.info().annotations.push({ type: 'sheet violations (not the composition)', description: sheet.join('\n') || 'none' });
     });
 
     test('cart: the pack line with its included components, no price on them, the total', async ({ page }) => {
