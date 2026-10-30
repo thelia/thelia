@@ -41,6 +41,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\GtinConstraint;
 use Thelia\Api\State\Processor\ProductSaleElementsStockProcessor;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Quantity\UnitCode;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
@@ -806,6 +808,11 @@ class ProductSaleElements implements PropelResourceInterface
      * of the combination, or no quantity would ever be a multiple of it. The stock neither:
      * 12.5 of a combination sold by the piece is a unit it does not sell in. The stock is
      * held to no minimum nor step, and may be zero or below.
+     *
+     * Each value of the rules is judged by a QuantityRule carrying it alone, on its own
+     * property: what the rule refuses here (a minimum below the millionth a quantity is
+     * counted in) never reaches a cart that could not read it. Zero and below are left to
+     * #[Positive].
      */
     #[Callback(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
     public function validateQuantityRules(ExecutionContextInterface $context): void
@@ -814,10 +821,22 @@ class ProductSaleElements implements PropelResourceInterface
             return;
         }
 
-        foreach (['quantityStep' => $this->quantityStep, 'minQuantity' => $this->minQuantity] as $property => $value) {
-            if ($value > 0 && !QuantityScale::fits($value, $this->quantityDecimals)) {
-                $context->buildViolation('This value cannot carry more decimals than quantityDecimals ({{ decimals }}).')
-                    ->setParameter('{{ decimals }}', (string) $this->quantityDecimals)
+        $rules = [
+            'minQuantity' => [$this->minQuantity, fn (): QuantityRule => new QuantityRule(minQuantity: $this->minQuantity, decimals: $this->quantityDecimals)],
+            'quantityStep' => [$this->quantityStep, fn (): QuantityRule => new QuantityRule(step: $this->quantityStep, decimals: $this->quantityDecimals)],
+            'unitQuantity' => [$this->unitQuantity, fn (): QuantityRule => new QuantityRule(unitQuantity: $this->unitQuantity)],
+            'referenceUnitQuantity' => [$this->referenceUnitQuantity, fn (): QuantityRule => new QuantityRule(referenceUnitQuantity: $this->referenceUnitQuantity)],
+        ];
+
+        foreach ($rules as $property => [$value, $rule]) {
+            if (null === $value || $value <= 0) {
+                continue;
+            }
+
+            try {
+                $rule();
+            } catch (InvalidQuantityRuleException $invalid) {
+                $context->buildViolation($invalid->getMessage())
                     ->atPath($property)
                     ->addViolation();
             }

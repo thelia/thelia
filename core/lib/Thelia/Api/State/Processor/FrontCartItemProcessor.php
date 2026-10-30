@@ -39,6 +39,7 @@ use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
 use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
@@ -363,7 +364,7 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
     {
         try {
             $this->quantityPolicy->assertAcceptable($quantity, $saleElements);
-        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException $refusal) {
+        } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException|InvalidQuantityRuleException $refusal) {
             throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
         }
     }

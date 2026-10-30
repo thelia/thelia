@@ -177,6 +177,48 @@ final class CartQuantityRulesTest extends ActionIntegrationTestCase
         ));
     }
 
+    /**
+     * Rules written around their validation (a minimum below the millionth a quantity
+     * is counted in) cannot decide any quantity: the buyer is refused the way any other
+     * quantity is refused, never shown a server error.
+     */
+    public function testRulesThatCannotDecideAQuantityRefuseTheAddition(): void
+    {
+        $this->unreadableRule();
+
+        try {
+            $this->add(1);
+            self::fail('Rules that decide nothing cannot sell one.');
+        } catch (CartQuantityRefusedException $refusal) {
+            self::assertSame('The minimum quantity of a combination must be greater than zero.', $refusal->getMessage());
+        }
+
+        self::assertSame([], $this->quantities(), 'Nothing is added.');
+    }
+
+    public function testTheCartFormRefusesAQuantityOfRulesThatCannotDecideOne(): void
+    {
+        $this->unreadableRule();
+
+        $form = $this->getService(TheliaFormFactory::class)
+            ->createForm(CartAdd::class, FormType::class, [], ['csrf_protection' => false])
+            ->getForm();
+
+        $form->submit([
+            'product' => (string) $this->product->getId(),
+            'product_sale_elements_id' => (string) $this->productSaleElements->getId(),
+            'quantity' => '1',
+            'append' => '1',
+            'newness' => '0',
+        ]);
+
+        self::assertFalse($form->isValid());
+        self::assertSame(['The minimum quantity of a combination must be greater than zero.'], array_map(
+            static fn ($error): string => $error->getMessage(),
+            iterator_to_array($form->get('quantity')->getErrors()),
+        ));
+    }
+
     public function testARestoredLineOffTheStepIsBroughtDownAndTold(): void
     {
         $line = $this->line(7);
@@ -280,6 +322,14 @@ final class CartQuantityRulesTest extends ActionIntegrationTestCase
     {
         $rule->applyTo($this->productSaleElements);
         $this->productSaleElements->save($this->getPropelConnection());
+    }
+
+    /**
+     * A minimum stored as zero, written around the validation of the combination.
+     */
+    private function unreadableRule(): void
+    {
+        $this->productSaleElements->setMinQuantity('0.000000')->save($this->getPropelConnection());
     }
 
     private function add(float $quantity): void

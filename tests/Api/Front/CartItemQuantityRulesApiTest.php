@@ -81,6 +81,25 @@ final class CartItemQuantityRulesApiTest extends ApiTestCase
     }
 
     /**
+     * Rules stored around their validation decide no quantity: the caller is refused,
+     * not shown a server error.
+     */
+    public function testAnAdditionToRulesThatCannotDecideAQuantityIsRefused(): void
+    {
+        [$customer, $cart, $saleElements] = $this->cartAndCombination(new QuantityRule());
+        $saleElements->setMinQuantity('0.000000')->save($this->getPropelConnection());
+
+        $response = $this->jsonRequest('POST', '/api/front/cart_items', [
+            'cart' => '/api/front/carts/'.$cart->getId(),
+            'productSaleElements' => '/api/front/product_sale_elements/'.$saleElements->getId(),
+            'quantity' => 1,
+        ], $this->authenticateAsCustomer($customer));
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame([], $this->quantitiesOf($cart));
+    }
+
+    /**
      * @return iterable<string, array{QuantityRule, float|int, float}>
      */
     public static function changes(): iterable
