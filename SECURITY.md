@@ -67,11 +67,16 @@ through GitHub for vulnerabilities affecting released versions.
 | Series | Branch | Supported | End of support |
 |--------|--------|-----------|----------------|
 | 3.3 | `3.3` | Yes — security fixes | — |
-| 3.2 | `3.2` | Critical security fixes only — update to 3.3 | To be announced |
-| 3.1 | `3.1` | Critical security fixes only — update to 3.3 | To be announced |
+| 3.2 | `3.2` | Critical security fixes only — update to 3.3 | With the 3.4.0 release |
+| 3.1 | `3.1` | No — update to 3.3 | 29 October 2026, with the 3.3.0 release |
 | 3.0 | — | No — update to 3.3 | 16 September 2026, with the 3.1.0 release |
 | 2.6 | `2.6` | No — update to 3.3 | 6 October 2026, with the 3.2.1 release |
 | 2.5 and older | — | No | Ended |
+
+Only the two latest minor series are supported. The latest one gets every security fix, the
+one before it gets critical security fixes only, and a series reaches its end of support when
+the second minor release after it ships. Bug fixes that are not security fixes ship in the
+latest series only.
 
 Thelia 3 is developed on a single trunk: a security fix ships in the next 3.x release, and
 every 3.x release updates a 3.0.0 shop in place (see `UPDATE.md`). A maintenance branch is
