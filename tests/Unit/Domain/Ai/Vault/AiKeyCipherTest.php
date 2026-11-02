@@ -57,7 +57,11 @@ final class AiKeyCipherTest extends TestCase
         self::assertNull($cipher->decrypt('v1:'.base64_encode('too short')), 'too short');
 
         $blob = $cipher->encrypt('sk-live-1234567890');
-        $tampered = 'v1:'.base64_encode(substr_replace((string) base64_decode(substr($blob, 3), true), 'X', 30, 1));
+        // Flipping every bit of one byte always alters it: writing a fixed letter left the
+        // blob unchanged once in 256 runs, when the random byte already held that letter.
+        $sealed = (string) base64_decode(substr($blob, 3), true);
+        $sealed[30] = \chr(\ord($sealed[30]) ^ 0xFF);
+        $tampered = 'v1:'.base64_encode($sealed);
 
         self::assertNull($cipher->decrypt($tampered), 'altered');
     }
