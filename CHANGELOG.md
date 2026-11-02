@@ -11,6 +11,7 @@
 
 - A form whose file field sits at the top level of the request (`<input type="file" name="archive">`) and is left empty no longer answers a 500: the request taken over from Symfony leaves the empty field out instead of refusing it.
 - An anonymous visitor of a `public` AI usage is counted by his IP address as well as by his session. A session starts with each request that comes without its cookie, so a visitor who never sent the cookie back started a new count at each request, past the limits of the usage (10 requests a minute and 100 a day by default) and up to its monthly budget. The address is the one `Request::getClientIp()` gives, behind the trusted proxies, kept as an HMAC like the session, and both counts take the figures of the usage: visitors behind one shared address (an office, a mobile network) share its count. `AiActor::visitor()` takes the HMAC of the address as an optional second argument (`AiActor::$addressHash`); an actor a module sets in `AiRequest::$actor`, a command and a worker are counted as before.
+- A `pattern` of the JSON Schema of an AI answer or of the arguments of an AI tool no longer accepts a line break after the value it ends on: `$` matched before a final `\n`, which JSON Schema does not allow, so `"14.90\n"` passed the pattern of the price `thelia_update_product_price` takes.
 
 ## Breaking changes
 

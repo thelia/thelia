@@ -143,6 +143,14 @@ final class AiSchemaValidatorTest extends TestCase
         self::assertSame(['/slug: pattern'], (new AiSchemaValidator())->validate($schema, ['slug' => 'A']));
     }
 
+    public function testTheEndAnchorOfAPatternRefusesATrailingLineBreak(): void
+    {
+        $schema = ['type' => 'object', 'properties' => ['price' => ['type' => 'string', 'pattern' => '^[0-9]{1,10}(\\.[0-9]{1,6})?$']]];
+
+        self::assertSame([], (new AiSchemaValidator())->validate($schema, ['price' => '14.90']));
+        self::assertSame(['/price: pattern'], (new AiSchemaValidator())->validate($schema, ['price' => "14.90\n"]));
+    }
+
     public function testASchemaThatRecursesStopsAtADepthInsteadOfLoopingForever(): void
     {
         $schema = ['type' => 'object', 'properties' => ['next' => ['$ref' => '#']]];
