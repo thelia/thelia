@@ -244,7 +244,7 @@ final class CustomerGroupTest extends IntegrationTestCase
     }
 
     /**
-     * The fresh install reads `setup/thelia.sql`, an updated shop the 3.3.0
+     * The fresh install reads `setup/thelia.sql`, an updated shop the 3.4.0
      * script: both have to land on the same columns.
      */
     #[DataProvider('columns')]

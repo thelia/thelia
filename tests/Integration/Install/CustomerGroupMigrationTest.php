@@ -33,7 +33,7 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class CustomerGroupMigrationTest extends IntegrationTestCase
 {
-    /** The pending script, the one UpdateScriptTest names: it moves on at each release. */
+    /** The pending script, the newest one, which UpdateScriptTest judges too: it moves on at each release. */
     private const PENDING_SCRIPT = '3.4.0.sql';
 
     private const BLOCK_TITLE = '-- Customer groups';
