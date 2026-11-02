@@ -125,7 +125,7 @@ jobs:
       - name: Make the dependencies read-only
         run: |
           chmod -R a-w vendor
-          chmod u+w vendor vendor/thelia vendor/thelia/modules
+          chmod u+w vendor/thelia/modules
 
       - name: Mutate the domain
         run: |
