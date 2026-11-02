@@ -121,8 +121,11 @@ jobs:
       # A mutant of a computed path can point a cleanup at the project root (the purge test
       # sweeps the real import storage, and dist archives keep old dates): read-only
       # dependencies make such a mutant fail, where it used to delete vendor/ under the run.
+      # vendor/thelia/modules stays open to new directories: a module test unpacks one there.
       - name: Make the dependencies read-only
-        run: chmod -R a-w vendor
+        run: |
+          chmod -R a-w vendor
+          chmod u+w vendor vendor/thelia vendor/thelia/modules
 
       - name: Mutate the domain
         run: |
