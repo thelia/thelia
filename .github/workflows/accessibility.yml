@@ -75,8 +75,20 @@ jobs:
           --admin_email=admin@example.com
 
       - name: Serve the storefront
+        # The built-in server answers 404 itself for a missing file with an extension, so a
+        # rewritten URL (/a-propos.html) would never reach Symfony without this router.
         run: |
-          php -S 127.0.0.1:8000 -t public > "$RUNNER_TEMP/server.log" 2>&1 &
+          cat > "$RUNNER_TEMP/router.php" <<'PHP'
+          <?php
+          $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+          if ('/' !== $path && is_file($_SERVER['DOCUMENT_ROOT'].$path)) {
+              return false;
+          }
+          $_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].'/index.php';
+          $_SERVER['SCRIPT_NAME'] = '/index.php';
+          require $_SERVER['SCRIPT_FILENAME'];
+          PHP
+          php -S 127.0.0.1:8000 -t public "$RUNNER_TEMP/router.php" > "$RUNNER_TEMP/server.log" 2>&1 &
           for _ in $(seq 1 30); do curl -s -o /dev/null "$BASE_URL/" && break; sleep 1; done
           code=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/")
           echo "/ -> $code"
