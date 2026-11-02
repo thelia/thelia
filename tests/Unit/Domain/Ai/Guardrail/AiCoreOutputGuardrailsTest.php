@@ -152,7 +152,7 @@ final class AiCoreOutputGuardrailsTest extends TestCase
 
     private function guardrails(): AiCoreOutputGuardrails
     {
-        return new AiCoreOutputGuardrails(new AiSchemaValidator(), new AiHtmlSanitizer());
+        return new AiCoreOutputGuardrails(new AiSchemaValidator(), new AiHtmlSanitizer(['example.com']));
     }
 
     /**
