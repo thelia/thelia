@@ -307,6 +307,17 @@ final class SharedCacheListenerTest extends IntegrationTestCase
         self::assertSame($before, $this->snapshot($response), \sprintf('The project listed "%s" as never shared, yet /wishlist/mine is shared.', $prefix));
     }
 
+    public function testAnAddressThatIsNeverSharedStaysPersonalWhenALetterIsEncoded(): void
+    {
+        $this->mode(SharedCacheMode::ENABLED);
+        $response = $this->sessionResponse();
+        $before = $this->snapshot($response);
+
+        $this->handle($this->request('/%77ishlist/mine', 'product'), $response, neverSharedPrefixes: [...SharedCachePolicy::SENSITIVE_PREFIXES, 'wishlist']);
+
+        self::assertSame($before, $this->snapshot($response), 'The router reads /%77ishlist/mine as /wishlist/mine, so it is never shared either.');
+    }
+
     /**
      * @return iterable<string, array{string}>
      */
