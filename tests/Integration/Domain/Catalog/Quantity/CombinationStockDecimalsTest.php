@@ -61,6 +61,39 @@ final class CombinationStockDecimalsTest extends ActionIntegrationTestCase
     }
 
     /**
+     * The back office posts the stock it shows with every write: a combination holding
+     * 37.75 can be sold by the piece from then on, its stock left as it is.
+     */
+    public function testAStockLeftAsItIsIsNotJudgedOnTheDecimalsTheWriteGivesTheCombination(): void
+    {
+        [$product, $combination] = $this->combination(new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2));
+        $combination->setQuantity(37.75)->save($this->getPropelConnection());
+
+        $this->update($product, $combination, stock: 37.75, rule: new QuantityRule());
+
+        $combination = $this->reloaded($combination);
+        self::assertSame(37.75, (float) $combination->getQuantity());
+        self::assertEquals(new QuantityRule(), QuantityRule::fromProductSaleElements($combination));
+    }
+
+    public function testAStockChangedByTheSameWriteIsJudgedOnTheDecimalsItGivesTheCombination(): void
+    {
+        [$product, $combination] = $this->combination(new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2));
+        $combination->setQuantity(37.75)->save($this->getPropelConnection());
+
+        try {
+            $this->update($product, $combination, stock: 37.5, rule: new QuantityRule());
+            self::fail('A stock typed with half a piece is refused to a combination sold by the piece.');
+        } catch (QuantityRefusedException $refusal) {
+            self::assertSame('The quantity must be a whole number.', $refusal->getMessage());
+        }
+
+        $combination = $this->reloaded($combination);
+        self::assertSame(37.75, (float) $combination->getQuantity());
+        self::assertSame(2, $combination->getQuantityDecimals());
+    }
+
+    /**
      * A stock below the minimum, or off the step, is a stock all the same: the rules of a
      * cart line do not hold there.
      */

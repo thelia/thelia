@@ -17,6 +17,7 @@ namespace Thelia\Tests\Api\Admin;
 use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\Map\CartItemTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -71,6 +72,30 @@ final class DecimalQuantityAdminApiTest extends ApiTestCase
         self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
         self::assertContains('quantity', array_column(self::decodeJson($response)['violations'] ?? [], 'propertyPath'));
         self::assertEqualsWithDelta(10.0, (float) ProductSaleElementsQuery::create()->findPk($combination->getId())?->getQuantity(), 0.0001);
+    }
+
+    /**
+     * A combination holding 37.75 can be sold by the piece from then on, its stock left as
+     * it is; a stock changed by the same write is judged on the decimals it gives.
+     */
+    public function testAStockLeftAsItIsIsNotJudgedOnTheDecimalsTheWriteGives(): void
+    {
+        $combination = $this->combination(new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2));
+        $combination->setQuantity(37.75)->save($this->getPropelConnection());
+        $piece = ['quantityDecimals' => 0, 'minQuantity' => 1, 'quantityStep' => 1];
+
+        $changed = $this->jsonRequest('PATCH', '/api/admin/product_sale_elements/'.$combination->getId(), $piece + ['quantity' => 37.5], $this->authenticateAsAdmin(), 'merge-patch+json');
+
+        self::assertSame(422, $changed->getStatusCode(), (string) $changed->getContent());
+        self::assertContains('quantity', array_column(self::decodeJson($changed)['violations'] ?? [], 'propertyPath'));
+
+        $kept = $this->jsonRequest('PATCH', '/api/admin/product_sale_elements/'.$combination->getId(), $piece, $this->authenticateAsAdmin(), 'merge-patch+json');
+
+        self::assertJsonResponseSuccessful($kept);
+        ProductSaleElementsTableMap::clearInstancePool();
+        $stored = ProductSaleElementsQuery::create()->findPk($combination->getId());
+        self::assertSame(0, $stored?->getQuantityDecimals());
+        self::assertEqualsWithDelta(37.75, (float) $stored?->getQuantity(), 0.0001);
     }
 
     public function testAStockOffTheStepIsAStockAllTheSame(): void
