@@ -61,6 +61,14 @@ final class QuantityScale
     }
 
     /**
+     * Whether two quantities are the same to the millionth, what a quantity is stored to.
+     */
+    public static function isTheSameQuantity(float $quantity, float $other): bool
+    {
+        return self::micro($quantity) === self::micro($other);
+    }
+
+    /**
      * Whether a combination sold with these decimals is sold by measure (1,25 kg) rather
      * than by the piece.
      */
