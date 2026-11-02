@@ -25,8 +25,10 @@ use Thelia\Domain\Ai\Provider\AiProviderPresets;
  * of the server (APP_SECRET, a payment key) would otherwise leave it as the key of a provider. Only two kinds
  * of variable are read:
  *
- * - one named THELIA_AI_…_KEY or THELIA_AI_…_TOKEN, set for the AI layer and sent to the address of the
- *   connection (THELIA_AI_PREVIOUS_SECRET, the former application secret, has neither ending);
+ * - one named THELIA_AI_…_KEY or THELIA_AI_…_TOKEN, set for the AI layer (THELIA_AI_PREVIOUS_SECRET, the former
+ *   application secret, has neither ending), only while the connection calls the address of its provider or the
+ *   base URL the server sets next to the key, THELIA_AI_…_BASE_URL: whoever sets the key on the server also says
+ *   where it may go, as an administrator who changes the address of a stored key has to type it again;
  * - the usual variable of the provider (ANTHROPIC_API_KEY, MISTRAL_API_KEY, OPENAI_API_KEY), only while the
  *   connection calls the address of that provider.
  *
@@ -43,7 +45,9 @@ final class AiEnvironmentKey
 
     public const string NOT_ALLOWED = 'The environment variable that holds an API key must start with "THELIA_AI_" and end with "_KEY" or "_TOKEN", or be the usual one of the provider (ANTHROPIC_API_KEY, MISTRAL_API_KEY, OPENAI_API_KEY).';
 
-    public const string OTHER_ADDRESS = 'The usual environment variable of the provider is only sent to the address of the provider: for another base URL, name a variable that starts with "THELIA_AI_".';
+    public const string OTHER_ADDRESS = 'The usual environment variable of the provider is only sent to the address of the provider: for another base URL, name a variable that starts with "THELIA_AI_" and set its base URL next to it on the server (THELIA_AI_X_BASE_URL for THELIA_AI_X_KEY).';
+
+    public const string ADDRESS_NOT_SET = 'The environment variable that holds an API key is only sent to the address of the provider, or to the base URL the server sets next to it: for THELIA_AI_X_KEY or THELIA_AI_X_TOKEN, set THELIA_AI_X_BASE_URL to the base URL of this connection on the server.';
 
     private const string NAME_PATTERN = '/^[A-Za-z_][A-Za-z0-9_]*$/';
 
@@ -65,11 +69,17 @@ final class AiEnvironmentKey
             throw new InvalidAiArgumentException(self::INVALID_NAME);
         }
 
+        $presets = new AiProviderPresets();
+
         if (1 === preg_match(self::LAYER_NAME_PATTERN, $name)) {
+            $defaultBaseUrl = null === $provider ? null : $presets->defaultBaseUrl($provider);
+
+            if (!self::isTheAddressOfTheProvider($baseUrl, $defaultBaseUrl) && !self::isTheAddressSetNextTo($name, (string) $baseUrl)) {
+                throw new InvalidAiArgumentException(self::ADDRESS_NOT_SET);
+            }
+
             return;
         }
-
-        $presets = new AiProviderPresets();
 
         if (null === $provider || $presets->apiKeyEnvironmentVariable($provider) !== $name) {
             throw new InvalidAiArgumentException(self::NOT_ALLOWED);
@@ -89,9 +99,25 @@ final class AiEnvironmentKey
     {
         self::assertName($name, $provider, $baseUrl);
 
+        return self::environment($name);
+    }
+
+    private static function environment(string $name): ?string
+    {
         $value = $_SERVER[$name] ?? $_ENV[$name] ?? getenv($name);
 
         return \is_string($value) && '' !== trim($value) ? trim($value) : null;
+    }
+
+    /**
+     * THELIA_AI_X_BASE_URL for THELIA_AI_X_KEY and THELIA_AI_X_TOKEN, compared without its final slash.
+     */
+    private static function isTheAddressSetNextTo(string $name, string $baseUrl): bool
+    {
+        $variable = preg_replace('/_(KEY|TOKEN)$/D', '_BASE_URL', $name, 1, $replaced);
+        $allowed = 1 === $replaced && \is_string($variable) ? self::environment($variable) : null;
+
+        return null !== $allowed && '' !== trim($baseUrl) && 0 === strcasecmp(rtrim(trim($baseUrl), '/'), rtrim($allowed, '/'));
     }
 
     private static function isTheAddressOfTheProvider(?string $baseUrl, ?string $defaultBaseUrl): bool
