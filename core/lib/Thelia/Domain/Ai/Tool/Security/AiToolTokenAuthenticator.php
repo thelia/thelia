@@ -34,7 +34,8 @@ use Thelia\Model\Admin;
  * Authenticates a request to the MCP endpoint (`^/api/mcp`) with `Authorization: Bearer <token>` (the scheme is read whatever its case, RFC 7235).
  *
  * The token is a dedicated one (never the JWT of an administrator): it is looked up by its fingerprint, and the
- * request is turned away with a 401 when it is unknown, revoked or expired, or when its administrator is gone.
+ * request is turned away with a 401 when it is unknown, revoked or expired, or when its administrator is gone or no
+ * longer holds the right to create a token.
  * With the MCP server off, every request gets a 404 before anything else is read. The administrator is loaded
  * from the database on each request, and the id of the token rides on the authenticated token of the firewall
  * (attribute {@see self::TOKEN_ID_ATTRIBUTE}), for the MCP handler that builds `AiToolContext::forMcp()`.

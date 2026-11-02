@@ -27,6 +27,7 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProfileResourceQuery;
+use Thelia\Model\ResourceQuery;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -209,7 +210,8 @@ final class AiMcpServerTest extends ApiTestCase
     public function testTheRightsOfTheAdministratorAreReadAtEachCall(): void
     {
         $session = $this->session($this->token($this->editor, [['resource' => 'admin.product', 'access' => 'VIEW'], ['resource' => 'admin.product', 'access' => 'UPDATE']]));
-        ProfileResourceQuery::create()->filterByProfileId($this->editor->getProfileId())->delete();
+        $product = ResourceQuery::create()->findOneByCode(AdminResources::PRODUCT) ?? self::fail('No resource admin.product.');
+        ProfileResourceQuery::create()->filterByProfileId($this->editor->getProfileId())->filterByResourceId($product->getId())->delete();
 
         $response = $this->decode($this->call($session, 'tools/call', ['name' => 'thelia_search_products', 'arguments' => ['query' => 'mug']], 3));
 
