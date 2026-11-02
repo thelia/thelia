@@ -177,6 +177,17 @@ final class AiActorResolverTest extends IntegrationTestCase
         self::assertStringNotContainsString($session->getId(), $actor->identifier);
     }
 
+    public function testAVisitorIsAlsoKnownByAnIpHashForTheRateLimitNeverByTheAddress(): void
+    {
+        $this->requestWithSession()->start();
+
+        $actor = $this->resolver()->resolve();
+
+        self::assertSame(hash_hmac('sha256', 'visitor:ip:203.0.113.7', self::SECRET), $actor->addressHash);
+        self::assertStringNotContainsString('203.0.113.7', (string) $actor->addressHash);
+        self::assertNull(AiActor::visitor('chosen-by-a-module')->addressHash, 'an actor a module sets is counted as it is');
+    }
+
     public function testTheSameVisitorIsTheSameActorAndAnotherOneIsNot(): void
     {
         $first = $this->requestWithSession();

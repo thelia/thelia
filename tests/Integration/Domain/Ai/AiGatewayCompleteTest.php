@@ -15,6 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Ai\AiActor;
 use Thelia\Domain\Ai\AiActorType;
 use Thelia\Domain\Ai\AiAudience;
@@ -37,6 +42,7 @@ use Thelia\Domain\Ai\Exception\UnknownAiUsageException;
 use Thelia\Domain\Ai\Guardrail\GuardrailMode;
 use Thelia\Domain\Ai\Guardrail\GuardrailStage;
 use Thelia\Domain\Ai\Guardrail\GuardrailVerdict;
+use Thelia\Domain\Ai\Service\AiActorResolver;
 use Thelia\Model\AiModel;
 use Thelia\Model\AiTierAssignment;
 use Thelia\Model\ConfigQuery;
@@ -364,6 +370,41 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         // Another actor has its own count.
         $gateway->complete($this->request(actor: AiActor::admin(8)));
         self::assertCount(2, $this->sent);
+    }
+
+    public function testAVisitorWhoComesBackWithoutHisSessionIsStillCountedByHisAddress(): void
+    {
+        $requests = new RequestStack();
+        $this->actorResolver = new AiActorResolver($requests, new SecurityContext($requests), self::PROBE_ACTOR_SECRET);
+        $this->setting('aiprobe.assistant', '5', guardrails: '{}', requestsPerMinute: 2);
+        $gateway = $this->gatewayAnswering([Wire::chat('one'), Wire::chat('two'), Wire::chat('three')]);
+
+        // Each request comes without the cookie: a new session each time, from the same address.
+        $ask = function (string $address) use ($requests, $gateway): void {
+            $session = new Session(new MockArraySessionStorage());
+            $session->start();
+            $request = Request::create('/', server: ['REMOTE_ADDR' => $address]);
+            $request->setSession($session);
+            $requests->pop();
+            $requests->push($request);
+
+            $gateway->complete($this->request('aiprobe.assistant', actor: null));
+        };
+
+        $ask('203.0.113.7');
+        $ask('203.0.113.7');
+
+        try {
+            $ask('203.0.113.7');
+            self::fail('Two requests a minute from one address, whatever the session.');
+        } catch (AiRateLimitExceededException) {
+        }
+
+        self::assertSame(['rejected', 'rate_limit', 'visitor'], [$this->lastLog()->getStatus(), $this->lastLog()->getError(), $this->lastLog()->getActorType()]);
+
+        // Another address has its own count.
+        $ask('198.51.100.4');
+        self::assertCount(3, $this->sent);
     }
 
     public function testAnInputGuardrailInBlockModeRefusesBeforeTheCallAndTheRefusalIsLogged(): void

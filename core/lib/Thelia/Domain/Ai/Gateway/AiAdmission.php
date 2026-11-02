@@ -143,7 +143,8 @@ final readonly class AiAdmission
 
         $verdicts[] = GuardrailVerdict::pass(CoreGuardrail::Limits->value, GuardrailStage::Input);
 
-        $retryAfter = $this->rateLimiter->consume($usage->id, $actorHash, $usage->audience, $setting?->getRequestsPerMinute(), $setting?->getRequestsPerDay());
+        $retryAfter = $this->rateLimiter->consume($usage->id, $actorHash, $usage->audience, $setting?->getRequestsPerMinute(), $setting?->getRequestsPerDay())
+            ?? (null === $actor->addressHash ? null : $this->rateLimiter->consume($usage->id, 'address-'.$actor->addressHash, $usage->audience, $setting?->getRequestsPerMinute(), $setting?->getRequestsPerDay()));
 
         if (null !== $retryAfter) {
             $refuse(AiUsageLogStatus::Rejected, 'rate_limit', [...$verdicts, GuardrailVerdict::fail(CoreGuardrail::RateLimit->value, GuardrailStage::Input, 'rate_limit')]);
