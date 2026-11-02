@@ -20,6 +20,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Thelia\Domain\Ai\AiActor;
+use Thelia\Domain\Ai\AiActorResolverInterface;
 use Thelia\Domain\Ai\AiMessage;
 use Thelia\Domain\Ai\AiRequest;
 use Thelia\Domain\Ai\AiTier;
@@ -94,6 +95,9 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
     protected AiActorHasher $hasher;
 
     protected CountingActorResolver $resolver;
+
+    /** The resolver the gateway asks in place of the counting one, for a test that needs the real one. */
+    protected ?AiActorResolverInterface $actorResolver = null;
 
     protected AiConnection $connection;
 
@@ -203,7 +207,7 @@ abstract class AiGatewayTestCase extends IntegrationTestCase
             $settings,
             $globalSettings,
             new AiTargetResolver($registry, $settings, new AiRoutingRepository(), new AiModelCatalog(), $this->vault),
-            $this->resolver,
+            $this->actorResolver ?? $this->resolver,
             $this->hasher,
             new AiRequestMeasure(),
             new AiRateLimiter(new ArrayAdapter()),
