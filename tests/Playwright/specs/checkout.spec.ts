@@ -3,6 +3,8 @@ import { addCurrentProductToCart, gotoCart, gotoProduct } from '../helpers/cart'
 import {
   acceptMandatoryConsents,
   clickNextOrder,
+  expectOrderPlaced,
+  ORDER_PLACED_URL,
   gotoCheckoutDelivery,
   gotoCheckoutPayment,
   selectFirstDeliveryMethod,
@@ -33,12 +35,8 @@ test.describe('Checkout', () => {
     // The payment step asks for the shop's mandatory consents before it lets the order
     // through — the happy path has to answer them like a buyer would.
     await acceptMandatoryConsents(authedPage);
-    // /checkout/pay renders the checkout-confirm template directly when the gateway
-    // returns no redirect (Cheque just returns null), so the URL may not change away from /pay.
-    await clickNextOrder(authedPage, /\/checkout\/(pay|confirm|invoice)/);
-
-    // Whatever the URL, the confirm page advertises the order placement.
-    await expect(authedPage.locator('body')).toContainText(/thank|merci|payment|order/i, { timeout: 15_000 });
+    await clickNextOrder(authedPage, ORDER_PLACED_URL);
+    await expectOrderPlaced(authedPage);
 
     // And the order must exist in the database.
     const orderCount = await ddevMysql(`SELECT COUNT(*) FROM \`order\` o JOIN customer c ON c.id = o.customer_id WHERE c.email = '${freshCustomer.email}'`);
