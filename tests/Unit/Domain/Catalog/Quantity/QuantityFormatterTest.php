@@ -29,7 +29,8 @@ final class QuantityFormatterTest extends TestCase
         yield 'kilograms in French' => [1.25, 2, UnitCode::KILOGRAM, 'fr_FR', '1,25 kg'];
         yield 'kilograms in English' => [1.25, 2, UnitCode::KILOGRAM, 'en_US', '1.25 kg'];
         yield 'pieces without a unit' => [6.0, 0, null, null, '6'];
-        yield 'pieces with their unit' => [6.0, 0, UnitCode::PIECE, 'en_US', '6 pc'];
+        yield 'pieces without their unit' => [6.0, 0, UnitCode::PIECE, 'en_US', '6'];
+        yield 'a bottle of 0.75 l sold by the piece' => [1.0, 0, UnitCode::LITRE, 'fr_FR', '1'];
         yield 'the decimals of the combination are kept' => [1.0, 2, UnitCode::LITRE, 'fr_FR', '1,00 l'];
         yield 'square metres' => [2.5, 1, UnitCode::SQUARE_METRE, 'en_US', '2.5 m²'];
         yield 'grams of a kilogram' => [0.125, 3, UnitCode::KILOGRAM, 'en_US', '0.125 kg'];
@@ -41,5 +42,20 @@ final class QuantityFormatterTest extends TestCase
     public function testAQuantityIsWrittenTheWayTheLanguageReadsIt(float $quantity, int $decimals, ?UnitCode $unitCode, ?string $locale, string $expected): void
     {
         self::assertSame($expected, (new QuantityFormatter())->format($quantity, $decimals, $unitCode, $locale));
+    }
+
+    /**
+     * @return iterable<string, array{float, int, UnitCode, string}>
+     */
+    public static function measures(): iterable
+    {
+        yield 'a reference unit without decimals' => [100.0, 0, UnitCode::GRAM, '100 g'];
+        yield 'the content of a bottle' => [0.75, 2, UnitCode::LITRE, '0,75 l'];
+    }
+
+    #[DataProvider('measures')]
+    public function testAMeasureAlwaysCarriesItsUnit(float $quantity, int $decimals, UnitCode $unitCode, string $expected): void
+    {
+        self::assertSame($expected, (new QuantityFormatter())->formatMeasure($quantity, $decimals, $unitCode, 'fr_FR'));
     }
 }

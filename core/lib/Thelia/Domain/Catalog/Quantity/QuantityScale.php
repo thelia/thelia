@@ -60,6 +60,15 @@ final class QuantityScale
         return intdiv(self::micro($quantity), self::microPerUnit($decimals));
     }
 
+    /**
+     * Whether a combination sold with these decimals is sold by measure (1,25 kg) rather
+     * than by the piece.
+     */
+    public static function isSoldByMeasure(int $decimals): bool
+    {
+        return $decimals > 0;
+    }
+
     public static function unscaled(int $scaledQuantity, int $decimals): float
     {
         return $scaledQuantity / 10 ** $decimals;
