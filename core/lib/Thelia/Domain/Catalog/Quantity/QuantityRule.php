@@ -100,7 +100,7 @@ final readonly class QuantityRule
 
     public function isSoldByMeasure(): bool
     {
-        return $this->decimals > 0;
+        return QuantityScale::isSoldByMeasure($this->decimals);
     }
 
     public function hasReferencePrice(): bool
