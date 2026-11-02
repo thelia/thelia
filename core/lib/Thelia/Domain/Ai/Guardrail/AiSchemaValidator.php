@@ -260,7 +260,7 @@ final readonly class AiSchemaValidator
         }
 
         if (isset($schema['pattern']) && \is_string($schema['pattern'])) {
-            $matched = @preg_match('~'.str_replace('~', '\~', $schema['pattern']).'~u', $data);
+            $matched = @preg_match('~'.str_replace('~', '\~', $schema['pattern']).'~uD', $data);
 
             if (1 !== $matched) {
                 $errors[] = self::at($path, 'pattern');
