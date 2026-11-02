@@ -22,6 +22,8 @@ return static function (ContainerConfigurator $container): void {
         ->set('thelia.ai.http_max_duration', 300)
         // Allows `http` (not only `https`) for the base URL of a connection to a public host. Off: a key is sent over https. Independent of `thelia.webhook.allow_insecure_urls`.
         ->set('thelia.ai.allow_insecure_urls', false)
+        // Hosts an image, a video or a sound written by a model may come from, besides those of the shop (a CDN on its own domain), their subdomains included.
+        ->set('thelia.ai.media_hosts', [])
         // The models of the moderation guardrails (docs.mistral.ai/capabilities/guardrailing, developers.openai.com/api/docs/guides/moderation).
         ->set('thelia.ai.moderation.mistral_model', 'mistral-moderation-2603')
         ->set('thelia.ai.moderation.openai_model', 'omni-moderation-latest')

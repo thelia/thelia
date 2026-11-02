@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Ai\Guardrail;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Thelia\Domain\Ai\Internal\AiSchemaReference;
@@ -38,8 +39,8 @@ use Thelia\Model\SaleUnitQuery;
  * A browser loads an image, a video or a sound as soon as the page shows, and sends its address to the host that
  * serves it: a model that writes data into that address hands it to a third party without anyone clicking. Media
  * come only from a relative address or from a host of the shop (the host of `url_site`, of each sale unit, and of
- * each language when every language has its own domain), and `srcset`, which the sanitizer does not check, is
- * dropped. The hosts are read from the settings when the first page is sanitized, never when the container is
+ * each language when every language has its own domain, plus the hosts a project lists in `thelia.ai.media_hosts`,
+ * a CDN on its own domain for instance), and `srcset`, which the sanitizer does not check, is dropped. The hosts are read from the settings when the first page is sanitized, never when the container is
  * built.
  *
  * @internal
@@ -53,10 +54,14 @@ final class AiHtmlSanitizer
     private ?HtmlSanitizer $sanitizer = null;
 
     /**
-     * @param list<string>|null $mediaHosts the hosts a media may come from, their subdomains included; null for the hosts of the shop
+     * @param list<string>|null $mediaHosts      the hosts a media may come from, their subdomains included; null for the hosts of the shop
+     * @param list<string>      $addedMediaHosts the hosts a project adds to those, `thelia.ai.media_hosts`
      */
-    public function __construct(private readonly ?array $mediaHosts = null)
-    {
+    public function __construct(
+        private readonly ?array $mediaHosts = null,
+        #[Autowire(param: 'thelia.ai.media_hosts')]
+        private readonly array $addedMediaHosts = [],
+    ) {
     }
 
     public function sanitize(string $html): string
@@ -98,13 +103,23 @@ final class AiHtmlSanitizer
             ->dropElement('form')
             ->allowLinkSchemes(['http', 'https', 'mailto'])
             ->allowMediaSchemes(['http', 'https'])
-            ->allowMediaHosts($this->mediaHosts ?? self::shopHosts())
+            ->allowMediaHosts($this->mediaHosts())
             ->dropAttribute('srcset', '*')
             ->allowRelativeLinks()
             ->allowRelativeMedias()
             ->forceAttribute('a', 'rel', 'noopener noreferrer')
             // The length of what the model wrote is bounded by its output limit: never cut a page short.
             ->withMaxInputLength(-1);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function mediaHosts(): array
+    {
+        $added = array_map(static fn (string $host): string => strtolower(trim($host)), $this->addedMediaHosts);
+
+        return array_values(array_unique(array_filter([...($this->mediaHosts ?? self::shopHosts()), ...$added], static fn (string $host): bool => '' !== $host)));
     }
 
     /**

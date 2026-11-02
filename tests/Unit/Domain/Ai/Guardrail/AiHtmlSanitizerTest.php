@@ -80,6 +80,18 @@ final class AiHtmlSanitizerTest extends TestCase
         self::assertStringNotContainsString('example.com', (new AiHtmlSanitizer([]))->sanitize('<img src="https://example.com/media/a.png">'), 'a shop without an address of its own keeps the relative media only');
     }
 
+    public function testAHostTheProjectAddsServesMediaAsTheShopDoes(): void
+    {
+        $sanitizer = new AiHtmlSanitizer(['example.com'], ['CDN.example.net']);
+
+        $clean = $sanitizer->sanitize('<img src="https://cdn.example.net/a.png"><img src="https://img.cdn.example.net/b.png"><img src="https://example.com/c.png"><img src="https://elsewhere.test/d.png">');
+
+        self::assertStringContainsString('https://cdn.example.net/a.png', $clean, 'a host of `thelia.ai.media_hosts`');
+        self::assertStringContainsString('https://img.cdn.example.net/b.png', $clean, 'one of its subdomains');
+        self::assertStringContainsString('https://example.com/c.png', $clean, 'the hosts of the shop are kept');
+        self::assertStringNotContainsString('elsewhere.test', $clean);
+    }
+
     public function testEveryLinkOpensWithoutAccessToThePageThatOpenedIt(): void
     {
         $clean = (new AiHtmlSanitizer(['example.com']))->sanitize('<a href="https://example.com" target="_blank" rel="opener">x</a>');
