@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { expectContentFitsViewport } from '../helpers/a11y';
 import {
   LTR_LANG,
   MOBILE_VIEWPORT,
   RTL_LANG,
   WIDE_VIEWPORT,
-  expectNoHorizontalOverflow,
   expectReadsInOrder,
   headerLogoCenter,
   priceReadingOrders,
@@ -37,7 +37,7 @@ test.describe('Right-to-left', () => {
       for (const lang of [RTL_LANG, LTR_LANG]) {
         for (const stop of await shopStops(page, lang)) {
           await page.goto(stop.url);
-          await expectNoHorizontalOverflow(page, `${stop.name} in ${lang} at ${viewport.width}px`);
+          await expectContentFitsViewport(page, `${stop.name} in ${lang} at ${viewport.width}px`);
         }
       }
     }
