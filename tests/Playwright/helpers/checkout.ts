@@ -45,6 +45,16 @@ export async function clickNextOrder(page: Page, expectedNextUrl: RegExp): Promi
   ]);
 }
 
+// The step after payment: /checkout/pay renders the confirmation itself when the gateway
+// returns no redirect (Cheque), so the pattern must not also match /checkout/payment.
+export const ORDER_PLACED_URL = /\/checkout\/(pay|confirm|invoice)(?=[/?#]|$)/;
+
+/** Waits for the confirmation page itself, not any page that mentions an order. */
+export async function expectOrderPlaced(page: Page): Promise<void> {
+  await expect(page).toHaveURL(ORDER_PLACED_URL, { timeout: 20_000 });
+  await expect(page.getByRole('heading', { name: /thanks for your order|merci pour votre commande/i })).toBeVisible({ timeout: 15_000 });
+}
+
 export async function gotoCheckoutPayment(page: Page): Promise<void> {
   await page.goto('/checkout/payment');
   await expect(page).toHaveURL(/\/checkout\/payment/);

@@ -90,21 +90,26 @@ with the WCAG 2.1 A and AA rules (the base of RGAA 4.1) on the sign-in and
 sign-up forms, on every page listed in `setup/audit/lighthouserc.default.yaml`
 (signed in) and on each step of the checkout tunnel up to the confirmation. It
 fails on any serious or critical violation that is not a derogation listed in
-`helpers/a11y.ts`. Each page logs how many rules axe really checked: a page
-where nothing applied fails, it does not pass. The Symfony debug toolbar is left
-out of the audit.
+`helpers/a11y.ts`. axe starts once Turbo has cleared `aria-busy` and no live
+component is still faded by its loading state. Each page logs how many rules axe
+checked, and how many of them reached the content rather than `<html>` and
+`<head>`: a page where none did fails, it does not pass. The Symfony debug toolbar
+is left out of the audit. Two tests are expected to fail, and turn red if they
+pass: a URL of the sample that is gone, and an audit with the body excluded.
 
 It also checks that the first tab stop is a skip link that moves the focus to
-`#main-content`, and that no element sticks out of a 320px viewport (RGAA 10.11).
-That last check reads the element boxes, not the document scroll width: Flexy
-clips the body horizontally, so an overflow never shows as a scrollbar.
+`#main-content`, that an order can be placed from the product page to the
+confirmation with Tab, Enter and Space only, and that no element sticks out of a
+320px viewport (RGAA 10.11). That last check reads the element boxes, not the
+document scroll width: Flexy clips the body horizontally, so an overflow never
+shows as a scrollbar. `specs/rtl.spec.ts` uses the same check.
 
 ```bash
 npx playwright test specs/accessibility.spec.ts
 ```
 
 The `accessibility` workflow runs it on every pull request against a demo shop
-served by `php -S`. Outside DDEV, point the SQL helpers at the shop database:
+served by `php -S` and a router that sends rewritten URLs to Symfony. Outside DDEV, point the SQL helpers at the shop database:
 
 ```bash
 BASE_URL=http://127.0.0.1:8000 MYSQL_COMMAND="mysql -h127.0.0.1 -uroot -proot thelia" \
