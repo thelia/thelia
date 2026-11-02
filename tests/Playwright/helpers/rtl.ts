@@ -43,22 +43,6 @@ export function stopNamed(stops: ShopStop[], name: string): string {
   return stop.url;
 }
 
-/**
- * The document must fit its own scrolling box. No tolerance: a few pixels of
- * overflow is exactly the defect a right-to-left layout regresses into.
- */
-export async function expectNoHorizontalOverflow(page: Page, context: string): Promise<void> {
-  const { scrollWidth, clientWidth } = await page.evaluate(() => {
-    const element = document.scrollingElement ?? document.documentElement;
-    return { scrollWidth: element.scrollWidth, clientWidth: element.clientWidth };
-  });
-
-  expect(
-    scrollWidth,
-    `${context} scrolls horizontally: scrollWidth ${scrollWidth} > clientWidth ${clientWidth}`,
-  ).toBeLessThanOrEqual(clientWidth);
-}
-
 /** Horizontal centre of the header logo, in viewport pixels. */
 export async function headerLogoCenter(page: Page): Promise<number> {
   const box = await page.locator('.Header-logo').first().boundingBox();
