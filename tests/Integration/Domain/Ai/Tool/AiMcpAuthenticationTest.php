@@ -23,6 +23,7 @@ use Thelia\Model\Admin;
 use Thelia\Model\AiToolTokenQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProfileResourceQuery;
+use Thelia\Model\ResourceQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Support\Kernel\McpProbeKernel;
 
@@ -180,11 +181,21 @@ final class AiMcpAuthenticationTest extends ApiTestCase
         $token = $this->createToken([['resource' => 'admin.product', 'access' => 'VIEW']]);
         self::assertTrue($this->decode($this->probe($token->token, null, 'admin.product'))['adminHolds']);
 
-        ProfileResourceQuery::create()->filterByProfileId($this->admin->getProfileId())->delete();
+        $this->withdraw(AdminResources::PRODUCT);
 
         $after = $this->decode($this->probe($token->token, null, 'admin.product'));
         self::assertFalse($after['adminHolds']);
         self::assertTrue($after['tokenCovers']);
+    }
+
+    public function testATokenOfAnAdministratorWhoLostTheRightToCreateTokensIs401(): void
+    {
+        $token = $this->createToken([], true);
+        self::assertSame(Response::HTTP_OK, $this->probe($token->token)->getStatusCode());
+
+        $this->withdraw(AdminResources::AI_MCP);
+
+        self::assertSame(Response::HTTP_UNAUTHORIZED, $this->probe($token->token)->getStatusCode());
     }
 
     public function testTheTokenOpensNothingButTheMcpEndpoint(): void
@@ -242,6 +253,16 @@ final class AiMcpAuthenticationTest extends ApiTestCase
     private function createToken(array $scopes, bool $allRights = false): \Thelia\Domain\Ai\Tool\AiCreatedToolToken
     {
         return static::getContainer()->get(AiToolTokenService::class)->create($this->admin->getId(), 'test', $scopes, $allRights);
+    }
+
+    /**
+     * Takes a resource out of the profile of the administrator.
+     */
+    private function withdraw(string $resourceCode): void
+    {
+        $resource = ResourceQuery::create()->findOneByCode($resourceCode) ?? self::fail('No resource '.$resourceCode.'.');
+
+        ProfileResourceQuery::create()->filterByProfileId($this->admin->getProfileId())->filterByResourceId($resource->getId())->delete();
     }
 
     private function probe(?string $token, ?string $header = null, string $resource = 'admin.product', string $access = 'VIEW'): Response

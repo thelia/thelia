@@ -148,7 +148,7 @@ final readonly class AiToolTokenService
 
     /**
      * The token a presented secret designates, when it is stored, neither revoked nor expired, and its
-     * administrator still exists.
+     * administrator still exists and still holds the right a token is created with.
      */
     public function authenticate(#[\SensitiveParameter] string $presented): ?AiToolToken
     {
@@ -164,8 +164,10 @@ final readonly class AiToolTokenService
         }
 
         $token = $this->access->usableToken($row->getId());
+        $admin = $token instanceof AiToolToken ? $this->administratorOf($token) : null;
 
-        if (!$token instanceof AiToolToken || !$this->administratorOf($token) instanceof Admin) {
+        // An administrator who lost the right to create a token loses the use of those he created before.
+        if (!$token instanceof AiToolToken || !$admin instanceof Admin || !$this->access->adminHoldsRight($admin, AdminResources::AI_MCP, null, AccessManager::CREATE)) {
             return null;
         }
 
