@@ -89,7 +89,7 @@ class EffectivePriceCatalog implements ResetInterface
     }
 
     /**
-     * @deprecated since 3.3.0, to be removed in 4.0: resolve through
+     * @deprecated since 3.4.0, to be removed in 4.0: resolve through
      *             {@see CustomerPrice\CustomerPriceContextInterface::resolve()},
      *             which adds the price of the customer group and the discounts
      */
@@ -106,7 +106,7 @@ class EffectivePriceCatalog implements ResetInterface
      *
      * @return array<int, EffectivePrice> keyed by product id, absent when no sale element of it is priced
      *
-     * @deprecated since 3.3.0, to be removed in 4.0: resolve the sale elements through
+     * @deprecated since 3.4.0, to be removed in 4.0: resolve the sale elements through
      *             {@see CustomerPrice\CustomerPriceContextInterface::resolve()}
      *             and keep the lowest {@see CustomerPrice\ResolvedPrice::chargedPrice()}
      */
@@ -150,7 +150,7 @@ class EffectivePriceCatalog implements ResetInterface
      * Whether a rule, a reserved operation or the sale unit may price for this visitor
      * beyond the catalog columns.
      *
-     * @deprecated since 3.3.0, to be removed in 4.0: ask {@see PricingActivityChecker::mayResolveEffectivePriceFor()},
+     * @deprecated since 3.4.0, to be removed in 4.0: ask {@see PricingActivityChecker::mayResolveEffectivePriceFor()},
      *             or {@see PricingActivityChecker::mayPriceBeyondCatalog()} to count the customer groups and
      *             the discounts in
      */
