@@ -33,10 +33,10 @@ final class AiAssert
     private const string DECIMAL_PATTERN = '/^\d{1,8}(\.\d{1,8})?$/';
 
     /** A name a provider accepts for a tool or a schema. */
-    private const string NAME_PATTERN = '/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/';
+    private const string NAME_PATTERN = '/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/D';
 
     /** A correlation identifier or a guardrail name: no space, no PII by construction. */
-    private const string TOKEN_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/';
+    private const string TOKEN_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/D';
 
     private function __construct()
     {
