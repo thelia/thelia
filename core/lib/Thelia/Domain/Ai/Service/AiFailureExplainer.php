@@ -50,6 +50,7 @@ final readonly class AiFailureExplainer
         'The jurisdiction ("eu" or "non_eu") is required for this provider.',
         AiEnvironmentKey::NOT_ALLOWED,
         AiEnvironmentKey::OTHER_ADDRESS,
+        AiEnvironmentKey::ADDRESS_NOT_SET,
         AiEnvironmentKey::INVALID_NAME,
         'The connection now points to another server: type its API key again, the saved key is not sent to a new address.',
         'Tiers, usages or models rely on the provider of this connection: move them to another connection before changing its provider.',
