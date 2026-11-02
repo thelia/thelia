@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\RequestPath;
 
 /**
  * Turns away, before the SDK reads them, the bodies the MCP endpoint (`POST /api/mcp`) does not serve: a JSON-RPC
@@ -31,6 +32,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * It runs just after the firewall of the tokens (priority 8): an anonymous caller gets its 401, or the 404 of an
  * endpoint that is off, without the body being read, and the request of a token was already counted by the limiter.
+ *
+ * The path is compared in its decoded spelling, the one the router matches: `/api/%6Dcp` reaches the endpoint too.
  *
  * @internal
  */
@@ -48,7 +51,7 @@ final class McpRequestGuardListener
     {
         $request = $event->getRequest();
 
-        if (!$event->isMainRequest() || !$request->isMethod(Request::METHOD_POST) || self::PATH !== $request->getPathInfo()) {
+        if (!$event->isMainRequest() || !$request->isMethod(Request::METHOD_POST) || self::PATH !== RequestPath::decoded($request)) {
             return;
         }
 
