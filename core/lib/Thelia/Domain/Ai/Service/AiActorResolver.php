@@ -25,7 +25,8 @@ use Thelia\Model\Customer;
 
 /**
  * Who a call is made for: the signed-in administrator, the signed-in customer, the visitor (by session, by address
- * without one), or the system when no request is under way (a command, a worker of Messenger).
+ * without one, and by address as well for the rate limit), or the system when no request is under way (a command, a
+ * worker of Messenger).
  *
  * It never assumes a request exists. What identifies a visitor (the session identifier or the IP address) is
  * personal data: it leaves this class only as an HMAC with the secret of the application.
@@ -65,9 +66,14 @@ class AiActorResolver implements AiActorResolverInterface
         }
 
         $session = $request->hasSession() ? $request->getSession()->getId() : '';
-        $visitor = '' !== $session ? 'session:'.$session : 'ip:'.($request->getClientIp() ?? 'unknown');
+        $address = $request->getClientIp();
+        $visitor = '' !== $session ? 'session:'.$session : 'ip:'.($address ?? 'unknown');
 
-        return AiActor::visitor(hash_hmac('sha256', 'visitor:'.$visitor, $this->secret));
+        // A session starts with each request that comes without its cookie: the address is counted as well.
+        return AiActor::visitor(
+            hash_hmac('sha256', 'visitor:'.$visitor, $this->secret),
+            null === $address ? null : hash_hmac('sha256', 'visitor:ip:'.$address, $this->secret),
+        );
     }
 
     /**
