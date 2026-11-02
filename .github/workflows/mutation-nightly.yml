@@ -118,6 +118,12 @@ jobs:
             TEST_TOKEN=$token php bin/console cache:warmup --env=test --no-debug
           done
 
+      # A mutant of a computed path can point a cleanup at the project root (the purge test
+      # sweeps the real import storage, and dist archives keep old dates): read-only
+      # dependencies make such a mutant fail, where it used to delete vendor/ under the run.
+      - name: Make the dependencies read-only
+        run: chmod -R a-w vendor
+
       - name: Mutate the domain
         run: |
           # --with-uncovered: the score is then over every mutant of the domain, and
