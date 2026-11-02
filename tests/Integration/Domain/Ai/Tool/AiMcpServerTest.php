@@ -260,6 +260,26 @@ final class AiMcpServerTest extends ApiTestCase
         self::assertSame(Response::HTTP_OK, $atTheLimit->getStatusCode(), (string) $atTheLimit->getContent());
     }
 
+    /**
+     * The router decodes the path once before it matches, so `/api/%6Dcp` is served by the endpoint: the guard reads
+     * the same spelling and refuses its batches and its oversized bodies alike.
+     */
+    public function testAnEncodedSpellingOfTheEndpointIsGuardedAlike(): void
+    {
+        $session = $this->session($this->token($this->editor, [['resource' => 'admin.product', 'access' => 'VIEW'], ['resource' => 'admin.product', 'access' => 'UPDATE']]));
+        $write = fn (int $id): array => ['jsonrpc' => '2.0', 'id' => $id, 'method' => 'tools/call', 'params' => ['name' => 'thelia_update_product_price', 'arguments' => ['pse_id' => $this->pse->getId(), 'price' => '9.00']]];
+
+        foreach (['/api/%6Dcp', '/api/%6dcp', '/%61pi/mcp'] as $path) {
+            $batch = $this->postBody($session['token'], json_encode([$write(10), $write(11)], \JSON_THROW_ON_ERROR), $session['id'], $path);
+            self::assertSame(Response::HTTP_BAD_REQUEST, $batch->getStatusCode(), $path.' '.$batch->getContent());
+
+            $tooLarge = $this->postBody($session['token'], str_repeat(' ', McpRequestGuardListener::MAX_BODY_BYTES + 1), $session['id'], $path);
+            self::assertSame(Response::HTTP_REQUEST_ENTITY_TOO_LARGE, $tooLarge->getStatusCode(), $path);
+        }
+
+        self::assertSame(0, AiToolApprovalQuery::create()->count());
+    }
+
     public function testAnAnonymousCallerGets401NotAnAnswerAboutItsBody(): void
     {
         $this->client->request('POST', '/api/mcp', server: ['CONTENT_TYPE' => 'application/json'], content: str_repeat('[', McpRequestGuardListener::MAX_BODY_BYTES + 1));
@@ -378,7 +398,7 @@ final class AiMcpServerTest extends ApiTestCase
         return $this->client->getResponse();
     }
 
-    private function postBody(string $token, string $body, ?string $sessionId = null): Response
+    private function postBody(string $token, string $body, ?string $sessionId = null, string $path = McpRequestGuardListener::PATH): Response
     {
         $server = ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json, text/event-stream', 'HTTP_AUTHORIZATION' => 'Bearer '.$token];
 
@@ -387,7 +407,7 @@ final class AiMcpServerTest extends ApiTestCase
             $server['HTTP_MCP_PROTOCOL_VERSION'] = self::PROTOCOL;
         }
 
-        $this->client->request('POST', '/api/mcp', server: $server, content: $body);
+        $this->client->request('POST', $path, server: $server, content: $body);
 
         return $this->client->getResponse();
     }
