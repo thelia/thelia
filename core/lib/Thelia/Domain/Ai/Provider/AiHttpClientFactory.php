@@ -28,13 +28,18 @@ use Thelia\Domain\Webhook\WebhookUrlValidator;
  *
  * A connection may reach a private network (a self-hosted Ollama, a server of the LAN) only when its
  * administrator allowed it. Even then the link-local range stays closed: it holds the metadata service of
- * the cloud providers, which hands out credentials.
+ * the cloud providers, which hands out credentials. So do the other ways to that service: an IPv4 address
+ * written as IPv6 (mapped `::ffff:169.254.169.254`, or compatible `::169.254.169.254`), the address AWS
+ * serves it at over IPv6 and the one of Alibaba Cloud.
  *
  * @internal
  */
 final class AiHttpClientFactory
 {
     public const array LINK_LOCAL_SUBNETS = ['169.254.0.0/16', 'fe80::/10'];
+
+    /** Of the IPv4-compatible range, only its link-local part: the whole of `::/96` would close `::1`, where `localhost` may resolve. */
+    private const array CLOUD_METADATA_SUBNETS = ['::ffff:0:0/96', '::a9fe:0/112', 'fd00:ec2::254/128', '100.100.100.200/32'];
 
     private ?HttpClientInterface $transport = null;
 
@@ -67,7 +72,7 @@ final class AiHttpClientFactory
     public function create(bool $allowPrivateNetwork): HttpClientInterface
     {
         $refusedSubnets = $allowPrivateNetwork
-            ? [...self::LINK_LOCAL_SUBNETS, ...WebhookUrlValidator::NON_ROUTABLE]
+            ? [...self::LINK_LOCAL_SUBNETS, ...self::CLOUD_METADATA_SUBNETS, ...WebhookUrlValidator::NON_ROUTABLE]
             : [...IpUtils::PRIVATE_SUBNETS, ...WebhookUrlValidator::NON_ROUTABLE];
 
         $options = [

@@ -68,11 +68,11 @@ final class AiHttpClientFactoryTest extends TestCase
         $reached = 0;
         $client = $this->factory($reached)->create(true);
 
-        foreach (['http://127.0.0.1:11434/api/chat', 'http://192.168.1.20:11434/api/chat', 'http://10.0.0.5/v1'] as $url) {
+        foreach (['http://127.0.0.1:11434/api/chat', 'http://[::1]:11434/api/chat', 'http://192.168.1.20:11434/api/chat', 'http://10.0.0.5/v1', 'http://[fd12:3456::20]:11434/api/chat'] as $url) {
             $client->request('POST', $url)->getStatusCode();
         }
 
-        self::assertSame(3, $reached);
+        self::assertSame(5, $reached);
     }
 
     /** @return iterable<string, array{string}> */
@@ -80,6 +80,11 @@ final class AiHttpClientFactoryTest extends TestCase
     {
         yield 'cloud metadata' => ['http://169.254.169.254/latest/meta-data'];
         yield 'link-local in IPv6' => ['http://[fe80::1]/v1'];
+        yield 'cloud metadata written as an IPv4-mapped IPv6 address' => ['http://[::ffff:169.254.169.254]/latest/meta-data'];
+        yield 'cloud metadata written as an IPv4-mapped IPv6 address in hexadecimal' => ['http://[::ffff:a9fe:a9fe]/latest/meta-data'];
+        yield 'cloud metadata written as an IPv4-compatible IPv6 address' => ['http://[::169.254.169.254]/latest/meta-data'];
+        yield 'cloud metadata of AWS over IPv6' => ['http://[fd00:ec2::254]/latest/meta-data'];
+        yield 'cloud metadata of Alibaba Cloud' => ['http://100.100.100.200/latest/meta-data'];
     }
 
     #[DataProvider('neverReachable')]
