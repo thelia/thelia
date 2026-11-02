@@ -162,6 +162,7 @@ final class AiSettingsWriterTest extends IntegrationTestCase
     {
         foreach ([
             ['code' => 'Bad Code'],
+            ['code' => "bad-code\n"],
             ['title' => ' '],
             ['provider' => 'nobody'],
             ['provider' => 'openai_compatible', 'jurisdiction' => null],

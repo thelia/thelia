@@ -49,7 +49,7 @@ use Thelia\Model\Map\AiConnectionTableMap;
  */
 final readonly class AiSettingsWriter
 {
-    private const string CODE_PATTERN = '/^[a-z0-9][a-z0-9_-]{0,63}$/';
+    private const string CODE_PATTERN = '/^[a-z0-9][a-z0-9_-]{0,63}$/D';
     private const string MODEL_NAME_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9._:\/@+-]{0,127}$/';
 
     private const array MODEL_PRICES = ['inputPrice' => 'The input price', 'outputPrice' => 'The output price', 'cacheReadPrice' => 'The cache read price', 'cacheWritePrice' => 'The cache write price'];
