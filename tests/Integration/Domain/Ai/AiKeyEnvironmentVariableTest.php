@@ -67,7 +67,7 @@ final class AiKeyEnvironmentVariableTest extends IntegrationTestCase
 
     protected function tearDown(): void
     {
-        unset($_SERVER[self::SERVER_SECRET], $_SERVER['MISTRAL_API_KEY'], $_SERVER['THELIA_AI_MISTRAL_KEY']);
+        unset($_SERVER[self::SERVER_SECRET], $_SERVER['MISTRAL_API_KEY'], $_SERVER['THELIA_AI_MISTRAL_KEY'], $_SERVER['THELIA_AI_MISTRAL_BASE_URL']);
 
         parent::tearDown();
     }
@@ -87,6 +87,7 @@ final class AiKeyEnvironmentVariableTest extends IntegrationTestCase
         yield 'the former application secret' => ['THELIA_AI_PREVIOUS_SECRET', null, AiEnvironmentKey::NOT_ALLOWED];
         yield 'the usual variable of another provider' => ['OPENAI_API_KEY', null, AiEnvironmentKey::NOT_ALLOWED];
         yield 'the usual variable of the provider towards another server' => ['MISTRAL_API_KEY', self::OTHER_SERVER, AiEnvironmentKey::OTHER_ADDRESS];
+        yield 'a variable of the layer towards an address the server did not set' => ['THELIA_AI_MISTRAL_KEY', self::OTHER_SERVER, AiEnvironmentKey::ADDRESS_NOT_SET];
     }
 
     #[DataProvider('variablesTheWriterRefuses')]
@@ -116,11 +117,29 @@ final class AiKeyEnvironmentVariableTest extends IntegrationTestCase
         self::assertNull($connection->getBaseUrl());
     }
 
-    public function testAVariableOfTheLayerGoesAnywhereAndTheUsualOneToItsProvider(): void
+    public function testAnUpdateThatPointsAVariableOfTheLayerToAnAddressTheServerDidNotSetIsRefused(): void
     {
         $writer = $this->writer();
+        $connection = $writer->saveConnection(null, 'v3-moved-own', 'Mistral', 'mistral', null, null, null, 'THELIA_AI_MISTRAL_KEY', false, true);
+
+        try {
+            $writer->saveConnection($connection, 'v3-moved-own', 'Mistral', 'mistral', 'eu', self::OTHER_SERVER, null, 'THELIA_AI_MISTRAL_KEY', false, true);
+            self::fail('A variable of the layer must not follow the connection to an address the server did not set.');
+        } catch (InvalidAiArgumentException $refused) {
+            self::assertSame(AiEnvironmentKey::ADDRESS_NOT_SET, $refused->getMessage());
+        }
+
+        $connection->reload();
+        self::assertNull($connection->getBaseUrl());
+    }
+
+    public function testAVariableOfTheLayerGoesToItsProviderOrToTheAddressTheServerSetsAndTheUsualOneToItsProvider(): void
+    {
+        $writer = $this->writer();
+        $_SERVER['THELIA_AI_MISTRAL_BASE_URL'] = self::OTHER_SERVER.'/';
 
         self::assertSame('THELIA_AI_MISTRAL_KEY', $writer->saveConnection(null, 'v3-own', 'Own', 'openai_compatible', 'eu', self::OTHER_SERVER, null, 'THELIA_AI_MISTRAL_KEY', false, true)->getApiKeyEnv());
+        self::assertSame('THELIA_AI_MISTRAL_KEY', $writer->saveConnection(null, 'v3-own-provider', 'Own', 'mistral', null, null, null, 'THELIA_AI_MISTRAL_KEY', false, true)->getApiKeyEnv());
         self::assertSame('MISTRAL_API_KEY', $writer->saveConnection(null, 'v3-usual', 'Usual', 'mistral', null, null, null, 'MISTRAL_API_KEY', false, true)->getApiKeyEnv());
         self::assertSame('MISTRAL_API_KEY', $writer->saveConnection(null, 'v3-usual-url', 'Usual', 'mistral', null, 'https://api.mistral.ai/', null, 'MISTRAL_API_KEY', false, true)->getApiKeyEnv());
     }
@@ -130,6 +149,7 @@ final class AiKeyEnvironmentVariableTest extends IntegrationTestCase
     {
         yield 'a secret of the server' => [self::SERVER_SECRET, AiEnvironmentKey::NOT_ALLOWED];
         yield 'the usual variable of the provider' => ['MISTRAL_API_KEY', AiEnvironmentKey::OTHER_ADDRESS];
+        yield 'a variable of the layer without the address of the server' => ['THELIA_AI_MISTRAL_KEY', AiEnvironmentKey::ADDRESS_NOT_SET];
     }
 
     /**
@@ -170,6 +190,20 @@ final class AiKeyEnvironmentVariableTest extends IntegrationTestCase
         self::assertNull($this->tester([AiProviderFixtures::chat('ok')])->test($connection));
         self::assertSame('Bearer sk-mistral-from-env-0123456789', $this->sent[0]['headers']['authorization']);
         self::assertSame('https://api.mistral.ai/v1/chat/completions', $this->sent[0]['url']);
+    }
+
+    public function testAVariableOfTheLayerIsSentToTheAddressTheServerSetsNextToIt(): void
+    {
+        $_SERVER['THELIA_AI_MISTRAL_KEY'] = 'sk-own-from-env-0123456789';
+        $_SERVER['THELIA_AI_MISTRAL_BASE_URL'] = self::OTHER_SERVER;
+        $connection = (new AiConnection())
+            ->setCode('v3-own-row')->setTitle('Own')->setProvider('mistral')->setJurisdiction('eu')
+            ->setBaseUrl(self::OTHER_SERVER.'/')->setApiKeyEnv('THELIA_AI_MISTRAL_KEY');
+        $connection->save();
+
+        self::assertNull($this->tester([AiProviderFixtures::chat('ok')])->test($connection));
+        self::assertSame('Bearer sk-own-from-env-0123456789', $this->sent[0]['headers']['authorization']);
+        self::assertStringStartsWith(self::OTHER_SERVER.'/', $this->sent[0]['url']);
     }
 
     public function testTheConnectionTestNeverSendsTheApplicationSecretToTheProvider(): void
