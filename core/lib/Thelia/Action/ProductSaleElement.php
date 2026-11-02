@@ -40,6 +40,7 @@ use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
 use Thelia\Domain\Catalog\Quantity\QuantityRule;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Log\Tlog;
@@ -193,11 +194,15 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $salesElement = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId());
 
         // The stock holds the decimals the combination is sold with, those this very
-        // write gives it if it gives any; judged before anything is written.
-        self::assertTheStockFits(
-            $event->getQuantity(),
-            $event->getQuantityRule() ?? (null === $salesElement ? new QuantityRule() : self::quantityRuleOf($salesElement)),
-        );
+        // write gives it if it gives any; judged before anything is written. The back
+        // office posts the stock it shows with every write: a stock left as it is stored
+        // is not judged, or a combination holding 37.75 could never be sold by the piece.
+        if (null === $salesElement || !QuantityScale::isTheSameQuantity($event->getQuantity(), $salesElement->getQuantity() ?? 0.0)) {
+            self::assertTheStockFits(
+                $event->getQuantity(),
+                $event->getQuantityRule() ?? (null === $salesElement ? new QuantityRule() : self::quantityRuleOf($salesElement)),
+            );
+        }
 
         $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 

@@ -47,6 +47,7 @@ use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Quantity\UnitCode;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\ProductSaleElementsQuery;
 
 #[ApiResource(
     operations: [
@@ -842,12 +843,27 @@ class ProductSaleElements implements PropelResourceInterface
             }
         }
 
-        if (isset($this->quantity) && !QuantityScale::fits($this->quantity, $this->quantityDecimals)) {
+        if (isset($this->quantity) && !QuantityScale::fits($this->quantity, $this->quantityDecimals) && !$this->keepsTheStoredStock()) {
             $context->buildViolation('The stock cannot carry more decimals than quantityDecimals ({{ decimals }}).')
                 ->setParameter('{{ decimals }}', (string) $this->quantityDecimals)
                 ->atPath('quantity')
                 ->addViolation();
         }
+    }
+
+    /**
+     * A stock left as it is stored is not judged on the decimals the write gives: a
+     * combination holding 37.75 can be sold by the piece from then on.
+     */
+    private function keepsTheStoredStock(): bool
+    {
+        if (null === $this->id) {
+            return false;
+        }
+
+        $stored = ProductSaleElementsQuery::create()->findPk($this->id);
+
+        return null !== $stored && QuantityScale::isTheSameQuantity($this->quantity, $stored->getQuantity() ?? 0.0);
     }
 
     /**
