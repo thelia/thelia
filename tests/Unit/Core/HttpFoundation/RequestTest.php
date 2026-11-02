@@ -85,4 +85,19 @@ final class RequestTest extends TestCase
         self::assertSame('2', $request->query->get('page'));
         self::assertSame('{"title":"Chair"}', $request->getContent());
     }
+
+    /**
+     * A file field the visitor left empty reaches the Symfony request as null. A form that names the
+     * field at the top level (`<input type="file" name="archive">`) used to turn it into a 500.
+     */
+    public function testARequestTakenOverFromTheSymfonyOneAcceptsAFileFieldLeftEmpty(): void
+    {
+        $empty = ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => \UPLOAD_ERR_NO_FILE, 'size' => 0];
+        $base = SymfonyRequest::create('/admin/module/CsvImporter', 'POST', [], [], ['archive' => $empty, 'form' => ['file' => $empty]]);
+
+        $request = Request::createFromBase($base);
+
+        self::assertNull($request->files->get('archive'));
+        self::assertSame(['file' => null], $request->files->all()['form']);
+    }
 }
