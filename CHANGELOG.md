@@ -4,6 +4,10 @@
 
 - [GHSA-g445-rq89-gwjx](https://github.com/thelia/thelia/security/advisories/GHSA-g445-rq89-gwjx) — the guard of the MCP endpoint compared the path as the client wrote it with `/api/mcp`, while the router matches it once decoded. A request to `/api/%6Dcp` reached the endpoint without the guard, so the holder of an MCP token could send a JSON-RPC batch, run every call of it for one request counted by the rate limiter of the token, and send a body over 256 KiB. The guard now reads the decoded path through `Thelia\Core\HttpFoundation\RequestPath`, and a test of the core fails on any new decision taken on `Request::getPathInfo()`. The shared cache reads the decoded path too, so a never shared address stays personal whatever letter is encoded.
 
+## Fixed
+
+- A form whose file field sits at the top level of the request (`<input type="file" name="archive">`) and is left empty no longer answers a 500: the request taken over from Symfony leaves the empty field out instead of refusing it.
+
 # 3.3.0
 
 Third minor of the 3.x line. 746 commits since 3.2.0. The version number follows the update script this release ships, `setup/update/sql/3.3.0.sql`, which creates the tables of the sale units, the order shipments, the delivery dates and slots, the shipping rules of the products, the payment parts of an order, the background jobs, the webhooks and the AI layer with its tools.
