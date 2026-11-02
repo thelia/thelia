@@ -89,7 +89,8 @@ final class CustomerRegistrationLimiterTest extends TestCase
 
         self::assertIsInt($secondsToWait);
         self::assertGreaterThan(0, $secondsToWait);
-        self::assertLessThanOrEqual(3600, $secondsToWait);
+        // The limiter rounds the end of the window up to the second, the clock reads it down.
+        self::assertLessThanOrEqual(3601, $secondsToWait);
     }
 
     public function testTheClientLimitAlsoSaysHowLongToWait(): void

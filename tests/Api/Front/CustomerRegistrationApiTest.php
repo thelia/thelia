@@ -88,7 +88,7 @@ final class CustomerRegistrationApiTest extends ApiTestCase
 
         self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $refused->getStatusCode(), (string) $refused->getContent());
         self::assertGreaterThan(0, (int) $refused->headers->get('Retry-After'));
-        self::assertLessThanOrEqual(3600, (int) $refused->headers->get('Retry-After'), 'The window of the budget is an hour.');
+        self::assertLessThanOrEqual(3601, (int) $refused->headers->get('Retry-After'), 'The window of the budget is an hour, its end rounded up to the second.');
     }
 
     public function testTheTokenOfALinkPutsTheNewAccountInItsGroupAndTheLifeOfTheToken(): void
