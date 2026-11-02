@@ -26,7 +26,7 @@ final class AiHtmlSanitizerTest extends TestCase
     #[DataProvider('hostileHtml')]
     public function testTheProfileRemovesWhatCanRunOrLoadCode(string $html, array $absent): void
     {
-        $clean = (new AiHtmlSanitizer())->sanitize($html);
+        $clean = (new AiHtmlSanitizer(['example.com']))->sanitize($html);
 
         foreach ($absent as $forbidden) {
             self::assertStringNotContainsStringIgnoringCase($forbidden, $clean);
@@ -56,16 +56,33 @@ final class AiHtmlSanitizerTest extends TestCase
     {
         $html = '<h2>Title</h2><p>A <strong>bold</strong> word, a <a href="https://example.com/a">link</a>, <a href="mailto:shop@example.com">mail</a> and <a href="/category/chairs">a relative one</a>.</p><ul><li>One</li></ul><img src="https://example.com/a.png" alt="A chair">';
 
-        $clean = (new AiHtmlSanitizer())->sanitize($html);
+        $clean = (new AiHtmlSanitizer(['example.com']))->sanitize($html);
 
         foreach (['<h2>Title</h2>', '<strong>bold</strong>', 'href="https://example.com/a"', 'href="mailto:shop&#64;example.com"', 'href="/category/chairs"', '<li>One</li>', 'src="https://example.com/a.png"', 'alt="A chair"'] as $kept) {
             self::assertStringContainsString($kept, $clean);
         }
     }
 
+    public function testAnImageAVideoOrASoundComesOnlyFromTheShop(): void
+    {
+        $html = '<img src="https://tracker.example/p.gif?d=order-42"><img src="//tracker.example/p.gif"><img srcset="https://tracker.example/a.png 1x">'
+            .'<picture><source srcset="https://tracker.example/b.png"></picture><video src="https://tracker.example/v.mp4" poster="https://tracker.example/p.png"></video><audio src="https://tracker.example/a.mp3"></audio>'
+            .'<img src="https://example.com/media/a.png"><img src="https://cdn.example.com/b.png"><img src="/media/c.png">';
+
+        $clean = (new AiHtmlSanitizer(['example.com']))->sanitize($html);
+
+        self::assertStringNotContainsString('tracker.example', $clean);
+
+        foreach (['src="https://example.com/media/a.png"', 'src="https://cdn.example.com/b.png"', 'src="/media/c.png"'] as $kept) {
+            self::assertStringContainsString($kept, $clean);
+        }
+
+        self::assertStringNotContainsString('example.com', (new AiHtmlSanitizer([]))->sanitize('<img src="https://example.com/media/a.png">'), 'a shop without an address of its own keeps the relative media only');
+    }
+
     public function testEveryLinkOpensWithoutAccessToThePageThatOpenedIt(): void
     {
-        $clean = (new AiHtmlSanitizer())->sanitize('<a href="https://example.com" target="_blank" rel="opener">x</a>');
+        $clean = (new AiHtmlSanitizer(['example.com']))->sanitize('<a href="https://example.com" target="_blank" rel="opener">x</a>');
 
         self::assertStringContainsString('rel="noopener noreferrer"', $clean);
     }
@@ -74,7 +91,7 @@ final class AiHtmlSanitizerTest extends TestCase
     {
         $html = str_repeat('<p>0123456789</p>', 5000);
 
-        self::assertSame(5000, substr_count((new AiHtmlSanitizer())->sanitize($html), '<p>'));
+        self::assertSame(5000, substr_count((new AiHtmlSanitizer(['example.com']))->sanitize($html), '<p>'));
     }
 
     public function testOnlyTheFieldsTheSchemaMarksAsHtmlAreSanitized(): void
@@ -99,7 +116,7 @@ final class AiHtmlSanitizerTest extends TestCase
             'sections' => [['html' => $evil, 'note' => $evil, 'nested' => ['left' => $evil, 'right' => $evil]]],
         ];
 
-        $clean = (new AiHtmlSanitizer())->sanitizeData($schema, $data);
+        $clean = (new AiHtmlSanitizer(['example.com']))->sanitizeData($schema, $data);
 
         self::assertIsArray($clean);
         self::assertSame($evil, $clean['title']);
@@ -113,15 +130,15 @@ final class AiHtmlSanitizerTest extends TestCase
     {
         $schema = ['type' => 'object', 'properties' => ['content' => ['anyOf' => [['type' => 'null'], ['type' => 'string', 'contentMediaType' => 'text/html']]]]];
 
-        $clean = (new AiHtmlSanitizer())->sanitizeData($schema, ['content' => '<b onmouseover="x()">hi</b>']);
+        $clean = (new AiHtmlSanitizer(['example.com']))->sanitizeData($schema, ['content' => '<b onmouseover="x()">hi</b>']);
 
         self::assertSame(['content' => '<b>hi</b>'], $clean);
-        self::assertSame(['content' => null], (new AiHtmlSanitizer())->sanitizeData($schema, ['content' => null]));
+        self::assertSame(['content' => null], (new AiHtmlSanitizer(['example.com']))->sanitizeData($schema, ['content' => null]));
     }
 
     public function testASchemaWithoutAnHtmlFieldSaysSo(): void
     {
-        $sanitizer = new AiHtmlSanitizer();
+        $sanitizer = new AiHtmlSanitizer(['example.com']);
 
         self::assertFalse($sanitizer->hasHtmlFields(['type' => 'object', 'properties' => ['a' => ['type' => 'string', 'contentMediaType' => 'text/plain']]]));
         self::assertTrue($sanitizer->hasHtmlFields(['type' => 'object', 'properties' => ['a' => ['type' => 'array', 'items' => ['type' => 'object', 'properties' => ['b' => ['contentMediaType' => 'text/html']]]]]]));

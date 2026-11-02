@@ -14,9 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Guardrail;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Thelia\Domain\Ai\Internal\AiSchemaReference;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\SaleUnitQuery;
 
 /**
  * Guardrail `html_sanitizer`: what the model wrote in a field the schema marks as HTML is reduced to the
@@ -31,6 +35,13 @@ use Thelia\Domain\Ai\Internal\AiSchemaReference;
  * links and media over `http` and `https` (and `mailto` for links) or relative, every link with
  * `rel="noopener noreferrer"`.
  *
+ * A browser loads an image, a video or a sound as soon as the page shows, and sends its address to the host that
+ * serves it: a model that writes data into that address hands it to a third party without anyone clicking. Media
+ * come only from a relative address or from a host of the shop (the host of `url_site`, of each sale unit, and of
+ * each language when every language has its own domain), and `srcset`, which the sanitizer does not check, is
+ * dropped. The hosts are read from the settings when the first page is sanitized, never when the container is
+ * built.
+ *
  * @internal
  */
 final class AiHtmlSanitizer
@@ -40,6 +51,13 @@ final class AiHtmlSanitizer
     private const int MAXIMUM_DEPTH = 64;
 
     private ?HtmlSanitizer $sanitizer = null;
+
+    /**
+     * @param list<string>|null $mediaHosts the hosts a media may come from, their subdomains included; null for the hosts of the shop
+     */
+    public function __construct(private readonly ?array $mediaHosts = null)
+    {
+    }
 
     public function sanitize(string $html): string
     {
@@ -80,11 +98,45 @@ final class AiHtmlSanitizer
             ->dropElement('form')
             ->allowLinkSchemes(['http', 'https', 'mailto'])
             ->allowMediaSchemes(['http', 'https'])
+            ->allowMediaHosts($this->mediaHosts ?? self::shopHosts())
+            ->dropAttribute('srcset', '*')
             ->allowRelativeLinks()
             ->allowRelativeMedias()
             ->forceAttribute('a', 'rel', 'noopener noreferrer')
             // The length of what the model wrote is bounded by its output limit: never cut a page short.
             ->withMaxInputLength(-1);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function shopHosts(): array
+    {
+        $urls = [(string) ConfigQuery::getConfiguredShopUrl()];
+
+        foreach (SaleUnitQuery::create()->filterByUrl(null, Criteria::ISNOTNULL)->find() as $saleUnit) {
+            $urls[] = (string) $saleUnit->getUrl();
+        }
+
+        if (ConfigQuery::isMultiDomainActivated()) {
+            foreach (LangQuery::create()->find() as $language) {
+                $urls[] = (string) $language->getUrl();
+            }
+        }
+
+        $hosts = [];
+
+        foreach ($urls as $url) {
+            $url = trim($url);
+            // A sale unit stores its domain without a scheme.
+            $host = '' === $url ? null : parse_url(str_contains($url, '//') ? $url : '//'.$url, \PHP_URL_HOST);
+
+            if (\is_string($host) && '' !== $host) {
+                $hosts[] = strtolower($host);
+            }
+        }
+
+        return array_values(array_unique($hosts));
     }
 
     /**
