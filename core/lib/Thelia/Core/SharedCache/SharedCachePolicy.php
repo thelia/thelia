@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Domain\Localization\VisitorCountry\VisitorCountryMode;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Model\ConfigQuery;
@@ -106,7 +107,7 @@ final readonly class SharedCachePolicy
             return false;
         }
 
-        return !$this->isSensitivePath($request->getPathInfo());
+        return !$this->isSensitivePath(RequestPath::decoded($request));
     }
 
     /**
