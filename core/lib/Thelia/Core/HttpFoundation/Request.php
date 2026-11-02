@@ -130,7 +130,9 @@ class Request extends BaseRequest
             $request->request->all(),
             $request->attributes->all(),
             $request->cookies->all(),
-            $request->files->all(),
+            // A file field left empty is null at this point, and a new FileBag refuses a null at the
+            // top level: the field is simply absent, as the Symfony request answers it anyway.
+            array_filter($request->files->all(), static fn (mixed $file): bool => null !== $file),
             $request->server->all(),
             $request->getContent()
         );
