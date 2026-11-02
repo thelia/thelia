@@ -25,9 +25,14 @@ use Thelia\Domain\Ai\Internal\AiAssert;
 #[Exclude]
 final readonly class AiActor
 {
+    /**
+     * @param string|null $addressHash a visitor only: the HMAC of the IP address he calls from, a second key of the
+     *                                 rate limit, so that a visitor who drops his session cookie is still counted
+     */
     private function __construct(
         public AiActorType $type,
         public string $identifier,
+        public ?string $addressHash = null,
     ) {
         AiAssert::notBlank($identifier, 'The identifier of an actor');
 
@@ -47,11 +52,12 @@ final readonly class AiActor
     }
 
     /**
-     * @param string $sessionIdOrIp the session identifier, or the IP address when there is no session
+     * @param string      $sessionIdOrIp the session identifier, or the IP address when there is no session
+     * @param string|null $addressHash   the HMAC of the IP address, when the request has one
      */
-    public static function visitor(string $sessionIdOrIp): self
+    public static function visitor(string $sessionIdOrIp, ?string $addressHash = null): self
     {
-        return new self(AiActorType::Visitor, $sessionIdOrIp);
+        return new self(AiActorType::Visitor, $sessionIdOrIp, $addressHash);
     }
 
     /**
