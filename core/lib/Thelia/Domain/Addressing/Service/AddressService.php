@@ -163,7 +163,8 @@ readonly class AddressService
      * its query string that holds a value (a blank string is no value). Strictly a positive
      * decimal integer: an int above zero, or digits only, without a sign, a space or a
      * leading zero. Anything else names none: zero, a negative or signed number, "007",
-     * " 7", a boolean or a float of a JSON body, text.
+     * " 7", a boolean or a float of a JSON body, text. A list in the body or the query
+     * string (addressId[]=7) is refused by the request itself, with a 400.
      */
     public function requestedAddressId(HttpRequest $request): ?int
     {
