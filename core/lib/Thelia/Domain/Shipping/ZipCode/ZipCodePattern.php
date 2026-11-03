@@ -333,7 +333,7 @@ final readonly class ZipCodePattern
     {
         $parts = [];
 
-        foreach (explode(self::RANGE_SEPARATOR, trim($pattern), 2) as $part) {
+        foreach (explode(self::RANGE_SEPARATOR, $pattern, 2) as $part) {
             $folded = self::fold($part);
 
             if (null === $folded || 1 !== preg_match('/^[A-Z0-9*]*$/', $folded)) {
@@ -344,6 +344,6 @@ final readonly class ZipCodePattern
         }
 
         // "**" means "*": one star per gap keeps the expression linear.
-        return (string) preg_replace('/\*+/', '*', implode(self::RANGE_SEPARATOR, $parts));
+        return preg_replace('/\*+/', '*', implode(self::RANGE_SEPARATOR, $parts));
     }
 }
