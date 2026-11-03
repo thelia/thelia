@@ -207,6 +207,24 @@ final class BundlePricingAndAvailabilityTest extends ActionIntegrationTestCase
         self::assertSame([(int) $example['bundle']->getId() => 0], $this->availability->forBundles([(int) $example['bundle']->getId()]));
     }
 
+    public function testAnOptionalComponentOutOfStockDoesNotMakeTheBundleUnavailable(): void
+    {
+        $bike = $this->component($this->factory, '500', 7);
+        $lock = $this->component($this->factory, '20', 0);
+        $bundle = $this->bundleProduct($this->factory, $this->service);
+        $bundleId = (int) $bundle->getId();
+
+        // Required: one bike (stock 7). Optional: one to three locks (stock 0), the buyer may take none.
+        $bikeItem = $this->service->addItem($bundleId, (int) $this->saleElementsOf($bike)->getId(), '1');
+        $this->service->addItem($bundleId, (int) $this->saleElementsOf($lock)->getId(), '1', '1', '3', false);
+
+        self::assertSame([$bundleId => 7], $this->availability->forBundles([$bundleId]));
+        self::assertSame(
+            '[{"bundleItemId":'.$bikeItem->getId().',"quantity":"1"}]',
+            $this->resolver->resolve($bundleId)->toCanonicalJson(),
+        );
+    }
+
     public function testSeveralBundlesAreReadWithoutAQueryPerBundle(): void
     {
         $first = $this->exampleBundle($this->factory, $this->service);
