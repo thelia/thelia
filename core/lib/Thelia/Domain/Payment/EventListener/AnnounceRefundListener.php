@@ -20,6 +20,7 @@ use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\Order\OrderRefundedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
+use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Domain\Payment\Service\RefundRequestContext;
 
 /**
@@ -27,6 +28,10 @@ use Thelia\Domain\Payment\Service\RefundRequestContext;
  * answer arrives: from Thelia, from the provider's notification or from its back office.
  * The reason and the comment travel when the refund was asked from Thelia in the same
  * request; otherwise nobody gave them.
+ *
+ * Not for the refund line the journal deduced from the status of the order alone
+ * (`PaymentTransactionRecorder::REASON_REFUNDED_STATUS`): the order is refunded already,
+ * and the event would tell it a second time.
  *
  * After the journal moved the order, so the event sees it refunded when it is.
  */
@@ -43,7 +48,10 @@ final readonly class AnnounceRefundListener
     {
         $transaction = $event->getTransaction();
 
-        if ($event->isReplay() || PaymentTransactionType::REFUND->value !== $transaction->getType() || !$transaction->isSucceeded()) {
+        if ($event->isReplay() || PaymentTransactionType::REFUND->value !== $transaction->getType() || !$transaction->isSucceeded()
+            // The line the status alone deduced: nobody reported that refund, the status said it.
+            || PaymentTransactionRecorder::REASON_REFUNDED_STATUS === $transaction->getErrorCode()
+        ) {
             return;
         }
 

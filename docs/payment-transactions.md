@@ -310,7 +310,7 @@ asked from Thelia, recorded by hand or made from the provider's back office. The
 reason and the comment are there when the refund was asked from Thelia and
 answered in the same request; a refund the provider confirms later, or made at
 the provider, carries null. A line announced again (`isReplay()`) is not sent
-twice, so a listener of `ORDER_REFUNDED` that fails is not called again for it. The service never moves the order:
+twice, so a listener of `ORDER_REFUNDED` that fails is not called again for it. The refund line a module keeping no journal gets from the `refunded` status alone (error code `refunded_status`) is not sent: nobody reported it, the status said it. The service never moves the order:
 once everything collected was given back and no refund waits for its answer, the
 journal moves a paid order to `refunded`, through the transition graph, as it
 moves it to `paid` after a capture. A partial refund leaves the order as it is.

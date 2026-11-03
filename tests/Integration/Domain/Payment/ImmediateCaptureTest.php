@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Payment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderRefundedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
@@ -305,6 +306,55 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
 
         self::assertSame(1, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
+    }
+
+    public function testTheRefundDeducedFromTheStatusAloneIsNotAnnouncedAsARefund(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        $announced = $this->announcedRefundAmounts(function () use ($order): void {
+            $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+        });
+
+        self::assertSame(
+            1,
+            OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->filterByErrorCode(PaymentTransactionRecorder::REASON_REFUNDED_STATUS)->count(),
+            'The status wrote its refund line.',
+        );
+        self::assertSame([], $announced, 'Nobody reported that refund: the order status already said so.');
+    }
+
+    public function testARefundTheModuleReportsIsStillAnnounced(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        $announced = $this->announcedRefundAmounts(function () use ($order): void {
+            $this->getService(PaymentTransactionRecorder::class)->recordRefund($order, 50, 'REFUND-OWN-REF', moduleCode: 'Cheque');
+        });
+
+        self::assertSame(['50.000000'], $announced);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function announcedRefundAmounts(callable $work): array
+    {
+        $announced = [];
+        $listener = static function (OrderRefundedEvent $event) use (&$announced): void {
+            $announced[] = (string) $event->getTransaction()->getAmount();
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_REFUNDED, $listener);
+
+        try {
+            $work();
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_REFUNDED, $listener);
+        }
+
+        return $announced;
     }
 
     public function testAPartialRefundTheModuleWroteIsCompletedWhenTheStatusSaysRefunded(): void
