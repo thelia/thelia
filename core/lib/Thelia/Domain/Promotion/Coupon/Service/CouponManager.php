@@ -17,7 +17,6 @@ namespace Thelia\Domain\Promotion\Coupon\Service;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
-use Thelia\Condition\Exception\UnmatchableConditionException;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
@@ -25,6 +24,8 @@ use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Exception\InactiveCouponException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
+use Thelia\Domain\Promotion\Coupon\Selection\PromotionSelection;
+use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Log\Tlog;
@@ -32,6 +33,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCountQuery;
+use Thelia\Model\CouponExclusionQuery;
 use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Customer;
@@ -53,11 +55,20 @@ class CouponManager implements ResetInterface
     /** @var CouponInterface[]|null Coupons built for the current request, invalidated on every cart mutation */
     private ?array $currentCoupons = null;
 
+    /** The selection made on $currentCoupons, valid while the state the conditions read is the one of $selectionFingerprint */
+    private ?PromotionSelection $selection = null;
+
+    private ?string $selectionFingerprint = null;
+
+    private PromotionSelector $promotionSelector;
+
     public function __construct(
         protected FacadeInterface $facade,
         protected CouponFactory $couponFactory,
         protected RequestStack $requestStack,
+        ?PromotionSelector $promotionSelector = null,
     ) {
+        $this->promotionSelector = $promotionSelector ?? new PromotionSelector();
     }
 
     /**
@@ -72,9 +83,7 @@ class CouponManager implements ResetInterface
         $coupons = $this->getCurrentCoupons();
 
         if ([] !== $coupons) {
-            $couponsKept = $this->sortCoupons($coupons);
-
-            $discount = $this->getEffect($couponsKept);
+            $discount = $this->getEffect($this->getSelection()->kept);
 
             // Just In Case test. The facade total leaves the offered lines out (they
             // must not feed the conditions), but they ARE payable lines the discount
@@ -139,6 +148,34 @@ class CouponManager implements ResetInterface
     public function invalidateCurrentCoupons(): void
     {
         $this->currentCoupons = null;
+        $this->selection = null;
+        $this->selectionFingerprint = null;
+    }
+
+    /**
+     * Which promotions apply to the cart, and which ones another promotion pushed aside.
+     *
+     * Memoised: it is rebuilt when the coupons are invalidated, or when the cart, the
+     * delivery or the customer the conditions read changed since it was made.
+     */
+    public function getSelection(): PromotionSelection
+    {
+        $coupons = $this->getCurrentCoupons();
+
+        if ([] === $coupons) {
+            return new PromotionSelection();
+        }
+
+        $fingerprint = $this->fingerprintState();
+
+        if ($this->selection instanceof PromotionSelection && $this->selectionFingerprint === $fingerprint) {
+            return $this->selection;
+        }
+
+        $this->selection = $this->selectCoupons($coupons);
+        $this->selectionFingerprint = $fingerprint;
+
+        return $this->selection;
     }
 
     public function reset(): void
@@ -324,16 +361,12 @@ class CouponManager implements ResetInterface
      */
     public function isCouponRemovingPostage(Cart $cart): bool
     {
-        $coupons = $this->getCurrentCoupons();
-
-        if ([] === $coupons) {
+        if ([] === $this->getCurrentCoupons()) {
             return false;
         }
 
-        $couponsKept = $this->sortCoupons($coupons);
-
         /** @var CouponInterface $coupon */
-        foreach ($couponsKept as $coupon) {
+        foreach ($this->getSelection()->kept as $coupon) {
             if ($coupon->isRemovingPostage()) {
                 // Check if delivery country is on the list of countries for which delivery is free
                 // If the list is empty, the shipping is free for all countries.
@@ -393,18 +426,11 @@ class CouponManager implements ResetInterface
 
     public function getCouponsKept(): array
     {
-        return $this->sortCoupons($this->getCurrentCoupons());
+        return $this->getSelection()->kept;
     }
 
     /**
-     * Sort Coupon to keep
-     * Coupon not cumulative cancels previous.
-     *
-     * The coupons that do not apply to this cart are dropped FIRST: a coupon only
-     * takes part in the cumulative rule when it actually matches, otherwise a
-     * non-cumulative promotion whose conditions are not even met would evict the
-     * coupons the customer is entitled to. The cumulative rule between the
-     * matching coupons is then the historic one, unchanged (its overhaul is #158).
+     * Sort Coupon to keep, see PromotionSelector for the rule.
      *
      * @param array $coupons CouponInterface to process
      *
@@ -412,51 +438,69 @@ class CouponManager implements ResetInterface
      */
     protected function sortCoupons(array $coupons): array
     {
-        $matchingCoupons = [];
+        return $this->selectCoupons($coupons)->kept;
+    }
 
-        /** @var CouponInterface $coupon */
+    private function selectCoupons(array $coupons): PromotionSelection
+    {
+        $candidateIds = [];
+
         foreach ($coupons as $coupon) {
-            if (!$coupon || $coupon->isExpired()) {
-                continue;
-            }
-
-            try {
-                if ($coupon->isMatching()) {
-                    $matchingCoupons[] = $coupon;
-                }
-            } catch (UnmatchableConditionException) {
-                // ignore unmatchable coupon
-                continue;
+            if ($coupon instanceof CouponAbstract && null !== $coupon->getCouponModelId()) {
+                $candidateIds[] = $coupon->getCouponModelId();
             }
         }
 
-        $couponsKept = [];
+        $exclusions = \count($candidateIds) > 1
+            ? CouponExclusionQuery::create()->excludedCouponIdsAmong($candidateIds)
+            : [];
 
-        /** @var CouponInterface $coupon */
-        foreach ($matchingCoupons as $coupon) {
-            if ($coupon->isCumulative()) {
-                if (isset($couponsKept[0])) {
-                    /** @var CouponInterface $previousCoupon */
-                    $previousCoupon = $couponsKept[0];
+        return $this->promotionSelector->select($coupons, $exclusions);
+    }
 
-                    if ($previousCoupon->isCumulative()) {
-                        // Add Coupon
-                        $couponsKept[] = $coupon;
-                    } else {
-                        // Reset Coupons, add last
-                        $couponsKept = [$coupon];
-                    }
-                } else {
-                    // Reset Coupons, add last
-                    $couponsKept = [$coupon];
-                }
-            } else {
-                // Reset Coupons, add last
-                $couponsKept = [$coupon];
+    /**
+     * A cheap digest of everything the conditions of a promotion read: the cart (its lines,
+     * quantities and prices), the delivery address and module, the currency, the countries, the customer.
+     *
+     * Without a request (CLI) there is no cart to read: the digest is then constant and the
+     * selection lives as long as the coupons do.
+     */
+    private function fingerprintState(): string
+    {
+        try {
+            $cart = $this->facade->getCart();
+            $customer = $this->facade->getCustomer();
+            $defaultAddress = $customer?->getDefaultAddress();
+            $parts = [
+                $cart?->getId(),
+                $cart?->getAddressDeliveryId(),
+                $cart?->getCartAddressRelatedByAddressDeliveryId()?->getCountryId(),
+                $cart?->getDeliveryModuleId(),
+                $customer?->getId(),
+                // The currency the amount conditions read, the country the delivery ones read (the tax
+                // engine's: picked address, else default address, else the visitor's), and the default
+                // address the billing ones read.
+                $this->facade->getCheckoutCurrency(),
+                $this->facade->getDeliveryCountry()->getId(),
+                $defaultAddress?->getId(),
+                $defaultAddress?->getCountryId(),
+                $this->facade->getCartTotalPrice(),
+            ];
+
+            foreach ($cart?->getCartItems() ?? [] as $cartItem) {
+                $parts[] = [
+                    $cartItem->getId(),
+                    $cartItem->getQuantity(),
+                    $cartItem->getPrice(),
+                    $cartItem->getPromoPrice(),
+                    $cartItem->getIsOffered(),
+                ];
             }
-        }
 
-        return $couponsKept;
+            return md5(serialize($parts));
+        } catch (\LogicException) {
+            return '';
+        }
     }
 
     /**

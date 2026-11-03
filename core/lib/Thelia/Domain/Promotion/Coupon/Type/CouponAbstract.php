@@ -67,6 +67,9 @@ abstract class CouponAbstract implements CouponInterface
     protected \DateTime $startDate;
     protected \DateTime $expirationDate;
     protected bool $isCumulative = false;
+    protected int $priority = 0;
+    protected bool $stopProcessing = false;
+    protected bool $isAutomatic = false;
     protected bool $isRemovingPostage = false;
     protected int $maxUsage = -1;
     protected bool $isAvailableOnSpecialOffers = false;
@@ -198,11 +201,50 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * If Coupon is cumulative or prevent any accumulation
      * If is cumulative you can sum Coupon effects
-     * If not cancel all other Coupon and take the last given.
+     * If not, it applies alone: no other promotion is kept next to it.
      */
     public function isCumulative(): bool
     {
         return $this->isCumulative;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * Whether the promotion applies on its own: at the same priority it ranks before the ones typed as a code.
+     */
+    public function isAutomatic(): bool
+    {
+        return $this->isAutomatic;
+    }
+
+    public function setAutomatic(bool $isAutomatic): static
+    {
+        $this->isAutomatic = $isAutomatic;
+
+        return $this;
+    }
+
+    public function isStopProcessing(): bool
+    {
+        return $this->stopProcessing;
+    }
+
+    public function setStopProcessing(bool $stopProcessing): static
+    {
+        $this->stopProcessing = $stopProcessing;
+
+        return $this;
     }
 
     /**
