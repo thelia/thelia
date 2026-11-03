@@ -76,8 +76,9 @@ final class OrderStatusTransitionApiTest extends ApiTestCase
 
     /**
      * The listeners of a status change call payment modules and write the payment
-     * journal under its own lock: they run once the other fields are committed, as they
-     * do from the back office, never inside a transaction the request still holds open.
+     * journal under its own lock: they run as they do from the back office, never inside
+     * a transaction the request still holds open. The other fields are written by the
+     * core with the status, in a transaction of its own.
      */
     public function testTheStatusChangeRunsOutsideTheTransactionOfTheOtherFields(): void
     {

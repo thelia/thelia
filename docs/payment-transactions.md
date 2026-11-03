@@ -401,7 +401,11 @@ a module that names itself is the author over an administrator in session.
 
 A status change written through `PUT /api/admin/orders/{id}` checks the
 transition graph and the cancellation right before anything of the request is
-written, then moves the status once the other fields are committed.
+written. The other fields are written by `Thelia\Action\Order::updateStatus`, in
+the transaction that writes the status and under the row lock of the order
+(`OrderEvent::writeWithStatus()`), so that no other request acts on the order
+between the two; the listeners of the status change run once that transaction
+is committed, never inside one the request holds open.
 
 ## Back office
 

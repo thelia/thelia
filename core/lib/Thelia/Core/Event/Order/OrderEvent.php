@@ -38,6 +38,9 @@ class OrderEvent extends ActionEvent
     protected bool $statusTransitionForced = false;
 
     protected ?int $expectedStatusId = null;
+
+    /** @var (\Closure(int): void)|null */
+    protected ?\Closure $writeWithStatus = null;
     protected ?string $deliveryRef = null;
     protected ?int $cartItemId = null;
     protected ?string $transactionRef = null;
@@ -322,6 +325,33 @@ class OrderEvent extends ActionEvent
     public function getExpectedStatusId(): ?int
     {
         return $this->expectedStatusId;
+    }
+
+    /**
+     * Work the core runs in the transaction that writes the status, under the row lock of
+     * the order, once the transition is allowed and before the status is written: the other
+     * fields of a request that also moves the status are written with it, and no other
+     * request acts on the order between the two. The work receives the status read under
+     * the lock, and must not write the status itself.
+     *
+     * When the order already holds the target status under the lock, the work runs alone,
+     * is committed, and the event stops there: no transition happened.
+     *
+     * @param callable(int): void $work
+     */
+    public function writeWithStatus(callable $work): self
+    {
+        $this->writeWithStatus = $work(...);
+
+        return $this;
+    }
+
+    /**
+     * @return (\Closure(int): void)|null
+     */
+    public function getWriteWithStatus(): ?\Closure
+    {
+        return $this->writeWithStatus;
     }
 
     /**

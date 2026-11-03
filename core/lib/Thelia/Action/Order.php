@@ -376,12 +376,14 @@ class Order extends BaseAction implements EventSubscriberInterface
         // Prevent partial stock update on status change.
         $con->beginTransaction();
         $expectedStatusId = $event->getExpectedStatusId();
+        $writeWithStatus = $event->getWriteWithStatus();
 
         try {
             // The status the order has now, the row held until the commit: two workers
             // moving the same order decide one after the other, each on what the other
             // wrote, not on the object it happened to load.
             $currentStatusId = $this->lockStatusOf($order, $con);
+            $alreadyThere = null !== $writeWithStatus && $currentStatusId === $newStatus;
 
             if (null === $expectedStatusId || $expectedStatusId === $currentStatusId) {
                 if ($currentStatusId !== (int) $order->getStatusId()) {
@@ -392,7 +394,9 @@ class Order extends BaseAction implements EventSubscriberInterface
 
                 // Every entry point (back office, API, payment modules, commands) lands here,
                 // so this is where the transition graph is enforced.
-                $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+                if (!$alreadyThere) {
+                    $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+                }
             }
         } catch (OrderStatusTransitionRefusedException|\InvalidArgumentException $refusal) {
             // A refusal writes nothing: the transaction is closed as it is, never rolled
@@ -423,9 +427,34 @@ class Order extends BaseAction implements EventSubscriberInterface
             return;
         }
 
+        if ($alreadyThere) {
+            // Another request moved the order to the target status first: the work that came
+            // with the move is written, and nothing else happens.
+            try {
+                $writeWithStatus($currentStatusId);
+                $con->commit();
+            } catch (\Throwable $exception) {
+                $con->rollBack();
+
+                throw $exception;
+            }
+
+            $order->reload();
+            $event->stopPropagation();
+
+            return;
+        }
+
         $event->setPreviousStatusId($currentStatusId);
 
         try {
+            if (null !== $writeWithStatus) {
+                $writeWithStatus($currentStatusId);
+                // What the work wrote, for the stock and the listeners that follow; the status
+                // is still the one read under the lock.
+                $order->reload(false, $con);
+            }
+
             $this->updateQuantity($order, $newStatus, $dispatcher);
 
             $order->setStatusId($newStatus)->save();
