@@ -25,6 +25,13 @@ use Thelia\Model\Map\CustomerTableMap;
 class CustomerGroup extends BaseCustomerGroup
 {
     /**
+     * What a code is made of, whoever writes it (the back office, the admin API): letters,
+     * digits, dots, dashes and underscores, starting with a letter or a digit, 64 characters
+     * at most.
+     */
+    public const CODE_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/';
+
+    /**
      * The discount rate the prices apply for the members of the group, in %.
      *
      * A rate outside 0..100 (0 excluded), which only a direct write to the database

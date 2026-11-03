@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -42,6 +43,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Domain\Customer\Exception\DefaultCustomerGroupHasNoRegistrationLinkException;
 use Thelia\Domain\Customer\Exception\DefaultCustomerGroupProtectedException;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\CustomerGroup as CustomerGroupModel;
 use Thelia\Model\CustomerGroupCategoryQuery;
 use Thelia\Model\CustomerGroupPaymentModuleQuery;
 use Thelia\Model\CustomerGroupQuery;
@@ -205,6 +207,11 @@ class CustomerGroup extends AbstractTranslatableResource
     ])]
     #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
     #[Length(max: 64, groups: [self::GROUP_ADMIN_WRITE])]
+    #[Regex(
+        pattern: CustomerGroupModel::CODE_PATTERN,
+        message: 'The code is made of letters, digits, dots, dashes and underscores, 64 characters at most.',
+        groups: [self::GROUP_ADMIN_WRITE],
+    )]
     public ?string $code = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
