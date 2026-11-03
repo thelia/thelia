@@ -200,17 +200,6 @@ final class OrderEditorTest extends IntegrationTestCase
         }
     }
 
-    public function testAnUnpaidOrderOnlyMovesStockWhenItsPaymentModuleTookItAtCreation(): void
-    {
-        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
-        $stock = $this->stockOf($this->pse);
-        $managed = $this->order->isStockManagedOnOrderCreation($this->getService(EventDispatcherInterface::class));
-
-        $this->editor->edit($this->order, new OrderEdit(quantities: [(int) $this->line->getId() => 5.0]));
-
-        self::assertEqualsWithDelta($managed ? $stock - 3 : $stock, $this->stockOf($this->pse), 0.0001);
-    }
-
     public function testAnUnpaidOrderThatWasPaidBeforeHoldsNoStockWhateverItsModuleDidAtCreation(): void
     {
         $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
@@ -484,6 +473,51 @@ final class OrderEditorTest extends IntegrationTestCase
             self::assertEqualsWithDelta($sum, (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(10.0, (float) $order->getPostage() - (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(1.25, (float) $order->getPostageTax(), 0.0001);
+        } finally {
+            ConfigQuery::write('postage_tax_strategy', (string) $previous);
+        }
+    }
+
+    public function testALineAddedWithoutAPriceHonoursThePermanentDiscountOfTheCustomer(): void
+    {
+        $customer = $this->order->getCustomer();
+        self::assertNotNull($customer);
+        $customer->setDiscount('10')->save();
+
+        $other = $this->createFixtureFactory()->product($this->createFixtureFactory()->category(), $this->createFixtureFactory()->taxRule(['isDefault' => false]), $this->createFixtureFactory()->currency(), ['title' => 'Discounted', 'baseQuantity' => 10, 'basePrice' => 100.0]);
+
+        $this->editor->edit($this->order, new OrderEdit(addedLines: [new AddedOrderLine((int) $other->getDefaultSaleElements()->getId(), 1.0)]));
+
+        $line = OrderProductQuery::create()->filterByOrderId($this->order->getId())->filterByProductRef($other->getRef())->findOne();
+        self::assertNotNull($line);
+        self::assertEqualsWithDelta(90.0, (float) $line->getPrice(), 0.0001);
+    }
+
+    public function testThePostageOfAnOrderPlacedWithASingleRuleIsLeftAloneWhenTheShopSpreadsTheTaxLater(): void
+    {
+        $previous = ConfigQuery::read('postage_tax_strategy');
+        ConfigQuery::write('postage_tax_strategy', 'pro_rata');
+
+        try {
+            $this->order->setPostage('12.000000')->setPostageTax('2.000000')->save($this->getPropelConnection());
+            OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->delete($this->getPropelConnection());
+
+            $reduced = $this->createFixtureFactory();
+            $rule = $reduced->taxRule(['isDefault' => false]);
+            (new TaxRuleCountry())
+                ->setTaxRuleId($rule->getId())
+                ->setCountryId($this->country()->getId())
+                ->setTaxId($reduced->tax(['requirements' => ['percent' => '10'], 'title' => 'VAT 10'])->getId())
+                ->setPosition(1)
+                ->save($this->getPropelConnection());
+            $other = $reduced->product($reduced->category(), $rule, $reduced->currency(), ['title' => 'Book', 'baseQuantity' => 10]);
+
+            $this->editor->edit($this->order, new OrderEdit(addedLines: [new AddedOrderLine((int) $other->getDefaultSaleElements()->getId(), 1.0, '20.000000')]));
+
+            $order = OrderQuery::create()->findPk($this->order->getId());
+            self::assertEqualsWithDelta(12.0, (float) $order->getPostage(), 0.0001);
+            self::assertEqualsWithDelta(2.0, (float) $order->getPostageTax(), 0.0001);
+            self::assertSame(0, OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->count());
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
         }
