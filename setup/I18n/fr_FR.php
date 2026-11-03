@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 return [
+    'Editing the lines of an order' => 'Modification des lignes d\'une commande',
     'Return status update sent to the customer' => 'Mise à jour du statut de retour envoyée au client',
     'Update on your return {{ return_ref }}' => 'Mise à jour de votre retour {{ return_ref }}',
     'Product returns' => 'Retours produits',
