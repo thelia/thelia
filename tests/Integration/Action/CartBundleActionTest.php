@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Cart\Bundle\CartCompositionResolver;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
@@ -29,6 +30,7 @@ use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Model\Cart;
@@ -41,6 +43,7 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Integration\Domain\Catalog\Bundle\BuildsBundles;
+use Thelia\Tests\Support\Trait\ResetsPriceMemos;
 
 /**
  * The cart and the bundles, with the figures of the plan: a bike (1), two helmets and up to three
@@ -49,6 +52,7 @@ use Thelia\Tests\Integration\Domain\Catalog\Bundle\BuildsBundles;
 final class CartBundleActionTest extends ActionIntegrationTestCase
 {
     use BuildsBundles;
+    use ResetsPriceMemos;
 
     private BundleCompositionService $service;
 
@@ -80,6 +84,47 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         self::assertSame(540.0, (float) $line->getPromoPrice());
         self::assertSame(1, (int) $line->getPromo());
         self::assertSame($this->composition($example, 2)->toCanonicalJson(), $line->getBundleComposition());
+    }
+
+    public function testAMemberOfADiscountedGroupPaysTheCompositionLessTheDiscountOfTheGroup(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->service);
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $this->factory->customerGroup('bundle-pro', 15.0)]);
+        $this->resetPriceMemos();
+        $cart = $this->factory->cart($member, ['currency' => Currency::getDefaultCurrency()]);
+
+        $line = $this->add($cart, $example['bundle'], 1, $this->composition($example, 2))->getCartItem();
+
+        // 600 and 540 for the composition chosen, 15 % off both for the group.
+        self::assertSame(510.0, (float) $line->getPrice());
+        self::assertSame(459.0, (float) $line->getPromoPrice());
+        self::assertSame(1, (int) $line->getPromo());
+
+        // The line follows its components for the group too, on the next change of the cart.
+        ProductPriceQuery::create()->filterByProductSaleElementsId($this->saleElementsOf($example['lockProduct'])->getId())->findOne()->setPrice('30')->setPromoPrice('30')->save();
+        $this->resetPriceMemos();
+        $this->add(CartQuery::create()->findPk($cart->getId()), $this->component($this->factory, '12', 5), 1);
+
+        // Two locks at 30 instead of 20: 620 and 558 for the composition, 15 % off both for the group.
+        $reloaded = CartItemQuery::create()->findPk($line->getId());
+        self::assertEqualsWithDelta(527.0, (float) $reloaded->getPrice(), 0.000001);
+        self::assertEqualsWithDelta(474.3, (float) $reloaded->getPromoPrice(), 0.000001);
+    }
+
+    public function testTheCustomerPriceContextPricesTheDefaultCompositionOfABundleForTheGroup(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->service);
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $this->factory->customerGroup('bundle-pro-page', 15.0)]);
+        $this->resetPriceMemos();
+        $saleElementsId = (int) $this->saleElementsOf($example['bundle'])->getId();
+
+        $price = $this->getService(CustomerPriceContextInterface::class)->resolve([$saleElementsId], Currency::getDefaultCurrency(), $member)[$saleElementsId];
+
+        // 560 and 504 for the default composition, 15 % off both: the price of the sale element
+        // standing for the bundle (999) is never read.
+        self::assertEqualsWithDelta(476.0, $price->untaxedPrice, 0.000001);
+        self::assertEqualsWithDelta(428.4, $price->untaxedPromoPrice, 0.000001);
+        self::assertTrue($price->isPromo);
     }
 
     public function testWithoutCompositionTheDefaultOneIsTaken(): void
@@ -232,8 +277,9 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         self::assertSame(799.0, (float) $line->getPromoPrice());
 
         // The promotion of the sale element of the bundle is over; the visitor touches the cart, in
-        // a later request, which reads the cart again.
+        // a later request, which reads the cart and the prices again.
         $bundleSaleElements->setPromo(0)->save();
+        $this->resetPriceMemos();
         $this->add(CartQuery::create()->findPk($cart->getId()), $this->component($this->factory, '12', 5), 1);
 
         $reloaded = CartItemQuery::create()->findPk($line->getId());
@@ -503,7 +549,7 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         $line = $this->add($cart, $example['bundle'], 1, $this->composition($example, 2))->getCartItem();
         $cart->clearCartItems();
 
-        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLineAvailability::class));
+        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class), $this->getService(CartLineAvailability::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         $copied = CartItemQuery::create()->filterByCartId($copy->getId())->find();
@@ -537,7 +583,7 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         $cart->clearCartItems();
         $this->saleElementsOf($example['bikeProduct'])->setQuantity(1)->save();
 
-        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLineAvailability::class));
+        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class), $this->getService(CartLineAvailability::class));
 
         self::assertSame(0, CartItemQuery::create()->filterByCartId($copy->getId())->count());
     }

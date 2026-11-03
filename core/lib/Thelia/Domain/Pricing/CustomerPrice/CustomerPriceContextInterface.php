@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Pricing\CustomerPrice;
 
+use Thelia\Domain\Pricing\BundleEffectivePriceSource;
+use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerGroup;
@@ -35,6 +37,19 @@ interface CustomerPriceContextInterface
      * @return array<int, ResolvedPrice> indexed by sale element id; a sale element with no price is absent, never an exception
      */
     public function resolve(array $productSaleElementsIds, Currency $currency, ?Customer $customer): array;
+
+    /**
+     * What a customer pays for bundles priced by the composition each holds (the line of a cart):
+     * the price of the components less the discount of the bundle, then the discounts of the group
+     * and of the customer. Nothing is read but the customer and their group.
+     *
+     * @template TKey of array-key
+     *
+     * @param array<TKey, EffectivePrice> $bundlePrices as {@see BundleEffectivePriceSource::forLines()} answers them
+     *
+     * @return array<TKey, ResolvedPrice> by the same keys
+     */
+    public function resolveBundlePrices(array $bundlePrices, ?Customer $customer): array;
 
     /**
      * The group of the customer, the default group for a visitor.

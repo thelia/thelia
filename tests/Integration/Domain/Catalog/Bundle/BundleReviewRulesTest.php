@@ -21,6 +21,7 @@ use Thelia\Api\Bridge\Propel\Extension\ProductBundleItemVisibilityExtension;
 use Thelia\Api\Resource\ProductBundleItem as ProductBundleItemResource;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Catalog\Bundle\BundleAvailability;
 use Thelia\Domain\Catalog\Bundle\BundleComponentReader;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
@@ -356,7 +357,7 @@ final class BundleReviewRulesTest extends ActionIntegrationTestCase
 
         self::assertSame(0, CartItemQuery::create()->filterByProductId($product->getId())->count());
         self::assertSame(1, CartItemQuery::create()->filterByProductId($other->getId())->count(), 'The lines of the other products stay.');
-        $copy = $first->duplicate('switched-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher);
+        $copy = $first->duplicate('switched-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class));
         self::assertInstanceOf(Cart::class, $copy);
         self::assertSame([(int) $other->getId()], $this->productsOfTheLines($copy));
     }
@@ -412,7 +413,7 @@ final class BundleReviewRulesTest extends ActionIntegrationTestCase
         ProductQuery::create()->filterById($plain->getId())->update(['IsBundle' => 1]);
         ProductTableMap::clearInstancePool();
 
-        $copy = $cart->duplicate('shape-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLineAvailability::class));
+        $copy = $cart->duplicate('shape-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class), $this->getService(CartLineAvailability::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         self::assertSame([(int) $example['bikeProduct']->getId()], $this->productsOfTheLines($copy));
@@ -426,7 +427,7 @@ final class BundleReviewRulesTest extends ActionIntegrationTestCase
         CartItemQuery::create()->filterById($line->getId())->update(['BundleComposition' => '{not json']);
         CartItemTableMap::clearInstancePool();
 
-        $copy = $cart->duplicate('unreadable-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher);
+        $copy = $cart->duplicate('unreadable-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         self::assertSame([], $this->productsOfTheLines($copy));

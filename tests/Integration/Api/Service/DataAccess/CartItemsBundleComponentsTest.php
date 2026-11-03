@@ -228,7 +228,9 @@ final class CartItemsBundleComponentsTest extends ActionIntegrationPromotionTest
         $statements = $this->recordSqlQueries(static fn () => $attributes->attributeCart('cart_items'));
 
         self::assertSame(0, self::countSqlQueriesSelectingFrom($statements, 'product_bundle_item'));
-        self::assertSame([], array_values(array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'FROM `product`') && str_contains($statement, 'is_bundle'))));
+        // The lines read their products whole, the bundle columns among them: what must not be asked is
+        // which of them are bundles.
+        self::assertSame([], array_values(array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'FROM `product`') && str_contains((string) strstr($statement, ' WHERE '), 'is_bundle'))));
     }
 
     public function testACartWithoutABundleLineOfAShopWithBundlesAsksTheBundleItemsNothing(): void

@@ -37,7 +37,9 @@ use Thelia\Model\CustomerGroup;
  * reserved operation competes with what the group pays, and the lower price wins -
  * except for a group that changes nothing for the sale element (no price of its own,
  * no discount), where the rule replaces the promo price whatever it was, as it did
- * before groups existed. The discount of the customer always applies last, to whatever won.
+ * before groups existed. A bundle priced by its components is priced by them, less the
+ * discount of the group, and nothing competes with it. The discount of the customer always
+ * applies last, to whatever won.
  * Nothing is rounded.
  *
  * Three statements for a whole batch at most - the catalog prices, the prices of the
@@ -72,9 +74,8 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         }
 
         $activity = $this->catalogActivityProbe->read();
-        $group = $activity->customerGroupsPriceAnything() ? $this->customerGroupOf($customer) : null;
-        $groupId = $group?->getId() ?? $this->customerGroupResolver->defaultGroupId();
-        $key = $this->keyOf($currency, $customer, (int) $groupId);
+        [$groupId, $groupRate] = $this->groupPricingOf($customer);
+        $key = $this->keyOf($currency, $customer, $groupId);
         $missing = array_values(array_filter(
             $productSaleElementsIds,
             fn (int $pseId): bool => !isset($this->memo[$key][$pseId]),
@@ -85,8 +86,8 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
                 $missing,
                 $currency,
                 $customer,
-                (int) $groupId,
-                $activity->hasDiscountedCustomerGroup ? (float) $group?->effectiveDiscountRate() : 0.0,
+                $groupId,
+                $groupRate,
                 $activity->hasCustomerGroupPrices,
             );
 
@@ -132,9 +133,60 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         return 1 === (int) $this->customerGroupOf($customer)->getDisplayTaxedPrice();
     }
 
+    public function resolveBundlePrices(array $bundlePrices, ?Customer $customer): array
+    {
+        if ([] === $bundlePrices) {
+            return [];
+        }
+
+        [$groupId, $groupRate] = $this->groupPricingOf($customer);
+        $customerRate = $this->customerDiscountRate->rateOf($customer);
+        $resolved = [];
+
+        foreach ($bundlePrices as $key => $bundlePrice) {
+            $resolved[$key] = $this->withCustomerDiscount($this->bundleCandidate($bundlePrice, $groupId, $groupRate), $customerRate);
+        }
+
+        return $resolved;
+    }
+
     public function reset(): void
     {
         $this->memo = [];
+    }
+
+    /**
+     * The group a customer is priced as, and its discount rate in %: the default group, at no
+     * rate, while no group prices anything of its own nor discounts anything.
+     *
+     * @return array{0: int, 1: float}
+     */
+    private function groupPricingOf(?Customer $customer): array
+    {
+        $activity = $this->catalogActivityProbe->read();
+        $group = $activity->customerGroupsPriceAnything() ? $this->customerGroupOf($customer) : null;
+        $groupId = (int) ($group?->getId() ?? $this->customerGroupResolver->defaultGroupId());
+
+        return [$groupId, $activity->hasDiscountedCustomerGroup ? (float) $group?->effectiveDiscountRate() : 0.0];
+    }
+
+    /**
+     * The discount of the customer, applied last to whatever won.
+     */
+    private function withCustomerDiscount(ResolvedPrice $candidate, float $customerRate): ResolvedPrice
+    {
+        $customerFactor = 1 - $customerRate / 100;
+
+        return new ResolvedPrice(
+            $candidate->untaxedPrice * $customerFactor,
+            $candidate->untaxedPromoPrice * $customerFactor,
+            $candidate->isPromo,
+            $candidate->displayInitialPrice,
+            $candidate->source,
+            $candidate->customerGroupId,
+            $candidate->customerGroupDiscountRate,
+            $customerRate,
+        );
     }
 
     /**
@@ -162,34 +214,25 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
 
         $resolved = [];
 
-        $customerFactor = 1 - $customerRate / 100;
-
         foreach ($productSaleElementsIds as $pseId) {
             $groupPrice = $groupPrices[$pseId] ?? null;
             $effectivePrice = $effectivePrices[$pseId] ?? null;
 
-            $candidate = EffectivePrice::SOURCE_SALE_UNIT === $effectivePrice?->source
-                ? $this->saleUnitCandidate($effectivePrice, $groupId, $groupRate)
-                : $this->groupCandidate($basePrices[$pseId] ?? null, $groupPrice, $currencyId, $groupId, $groupRate);
+            $candidate = match ($effectivePrice?->source) {
+                EffectivePrice::SOURCE_SALE_UNIT => $this->saleUnitCandidate($effectivePrice, $groupId, $groupRate),
+                EffectivePrice::SOURCE_BUNDLE => $this->bundleCandidate($effectivePrice, $groupId, $groupRate),
+                default => $this->groupCandidate($basePrices[$pseId] ?? null, $groupPrice, $currencyId, $groupId, $groupRate),
+            };
 
             if (null === $candidate) {
                 continue;
             }
 
-            if (null !== $effectivePrice && EffectivePrice::SOURCE_SALE_UNIT !== $effectivePrice->source) {
+            if (null !== $effectivePrice && !\in_array($effectivePrice->source, [EffectivePrice::SOURCE_SALE_UNIT, EffectivePrice::SOURCE_BUNDLE], true)) {
                 $candidate = $this->settle($candidate, $effectivePrice, 0.0 === $groupRate && null === $groupPrice);
             }
 
-            $resolved[$pseId] = new ResolvedPrice(
-                $candidate->untaxedPrice * $customerFactor,
-                $candidate->untaxedPromoPrice * $customerFactor,
-                $candidate->isPromo,
-                $candidate->displayInitialPrice,
-                $candidate->source,
-                $groupId,
-                $groupRate,
-                $customerRate,
-            );
+            $resolved[$pseId] = $this->withCustomerDiscount($candidate, $customerRate);
         }
 
         return $resolved;
@@ -281,6 +324,28 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         $price = $effectivePrice->untaxedPromoPrice * (1 - $groupRate / 100);
 
         return new ResolvedPrice($price, $price, false, false, EffectivePrice::SOURCE_SALE_UNIT, $groupId, $groupRate, 0.0);
+    }
+
+    /**
+     * A bundle priced by its components is sold at the sum of the components less the discount
+     * of the bundle, which nothing in the catalog holds: the discount of the group applies to both
+     * figures, as to any catalog price, and a price the group has of its own for the sale element
+     * standing for the bundle does not reach it. A bundle without a discount is no promotion.
+     */
+    private function bundleCandidate(EffectivePrice $bundlePrice, int $groupId, float $groupRate): ResolvedPrice
+    {
+        $groupFactor = 1 - $groupRate / 100;
+
+        return new ResolvedPrice(
+            (float) $bundlePrice->untaxedPrice * $groupFactor,
+            $bundlePrice->untaxedPromoPrice * $groupFactor,
+            $bundlePrice->isPromo(),
+            $bundlePrice->displayInitialPrice,
+            EffectivePrice::SOURCE_BUNDLE,
+            $groupId,
+            $groupRate,
+            0.0,
+        );
     }
 
     /**
