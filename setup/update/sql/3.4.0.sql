@@ -860,4 +860,19 @@ INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_mes
     (@report_mail_message_id, 'nl_NL', 'Per e-mail verzonden rapport', '{{ report_title }}: van {{ period_start }} tot {{ period_end }}', 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', '<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}'),
     (@report_mail_message_id, 'ru_RU', 'Отчёт, отправленный по электронной почте', '{{ report_title }}: с {{ period_start }} по {{ period_end }}', 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', '<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}');
 
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.edit', NOW(), NOW());
+
+SET @order_edit_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.edit');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@order_edit_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'en_US', 'Editing the lines of an order', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'fr_FR', 'Modification des lignes d\'une commande', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -42,6 +42,9 @@ class Order extends BaseOrder
     /** @var array{untaxed: float, taxed: float}|null */
     private ?array $serviceLinesTotals = null;
 
+    /** @var array<string, \stdClass|false|null> */
+    private static array $totalsCache = [];
+
     protected ?int $choosenDeliveryAddress = null;
 
     protected ?int $choosenInvoiceAddress = null;
@@ -144,6 +147,15 @@ class Order extends BaseOrder
         return self::$writeGeneration;
     }
 
+    public static function forgetCachedTotals(int $orderId): void
+    {
+        foreach (array_keys(self::$totalsCache) as $key) {
+            if (str_starts_with((string) $key, $orderId.'-')) {
+                unset(self::$totalsCache[$key]);
+            }
+        }
+    }
+
     /**
      * @throws PropelException
      */
@@ -239,13 +251,11 @@ class Order extends BaseOrder
         // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
         // and may cache results for several orders, for example in the order list in the back-office.
         // The rounding mode and the reading of the promotional price are part of the key: they decide what the query computes.
-        static $queryResult = [];
-
         $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
         $textPromoPrice = ConfigQuery::isOrderWithTextPromoPrice((int) $this->getId());
         $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice;
 
-        if (!isset($queryResult[$id]) || null === $queryResult[$id]) {
+        if (!isset(self::$totalsCache[$id]) || null === self::$totalsCache[$id]) {
             $con = Propel::getConnection();
             $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice));
 
@@ -253,11 +263,11 @@ class Order extends BaseOrder
                 throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
             }
 
-            $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
+            self::$totalsCache[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
-        $total = (float) $queryResult[$id]->total_taxed_price;
-        $tax = $total - (float) $queryResult[$id]->total_untaxed_price;
+        $total = (float) self::$totalsCache[$id]->total_taxed_price;
+        $tax = $total - (float) self::$totalsCache[$id]->total_untaxed_price;
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();

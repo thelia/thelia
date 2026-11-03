@@ -50,6 +50,35 @@ readonly class OrderProductFactory
         );
     }
 
+    public function createFromCatalog(
+        ModelOrder $placedOrder,
+        Product $product,
+        ProductSaleElements $productSaleElements,
+        ProductI18n $productI18n,
+        VirtualProductContext $virtualContext,
+        TaxRuleI18n $taxRuleI18n,
+        float $quantity,
+        string|float|null $price,
+        string|float|null $promoPrice,
+        int $wasInPromo,
+        int $isOffered,
+        ?int $cartItemId,
+        ConnectionInterface $connection,
+    ): OrderProduct {
+        return $this->saveLineOf(
+            $this->lineOf($placedOrder, $product, $productSaleElements, $productI18n, $virtualContext)
+                ->setQuantity($quantity)
+                ->setPrice($price)
+                ->setPromoPrice($promoPrice)
+                ->setWasInPromo($wasInPromo)
+                ->setTaxRuleTitle($taxRuleI18n->getTitle())
+                ->setTaxRuleDescription($taxRuleI18n->getDescription())
+                ->setIsOffered($isOffered)
+                ->setCartItemId($cartItemId),
+            $connection,
+        );
+    }
+
     /**
      * The line of a pack, written exactly like the line of a product: the price, the promo
      * and the quantity are the ones the cart settled, and the tax rule is the one of the
