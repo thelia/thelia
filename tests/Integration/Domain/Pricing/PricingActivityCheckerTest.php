@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Pricing;
 
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
@@ -79,6 +80,27 @@ final class PricingActivityCheckerTest extends ActionIntegrationTestCase
         $this->probe->reset();
 
         self::assertTrue($checker->hasActiveNamedRule());
+    }
+
+    public function testTheResetOfTheCheckerForgetsTheActivityAndTheDiscountsItAnswered(): void
+    {
+        $customer = $this->factory->customer($this->factory->customerTitle());
+        $checker = $this->checker();
+
+        self::assertInstanceOf(ResetInterface::class, $checker, 'The kernel resets it between two requests, as it did in 3.3.');
+        self::assertFalse($checker->hasActivePublicRule());
+        self::assertFalse($checker->hasDiscountedCustomer($customer));
+
+        $this->factory->catalogPriceRule(['active' => true, 'percentageValue' => 10.0]);
+        $customer->setDiscount('5')->save();
+
+        self::assertFalse($checker->hasActivePublicRule(), 'the answer is kept for the request');
+        self::assertFalse($checker->hasDiscountedCustomer($customer), 'the discount is kept for the request');
+
+        $checker->reset();
+
+        self::assertTrue($checker->hasActivePublicRule());
+        self::assertTrue($checker->hasDiscountedCustomer($customer));
     }
 
     public function testPricingDoesNotDependOnTheVisitorWhileNothingReservedRuns(): void
