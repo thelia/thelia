@@ -21,12 +21,12 @@ final readonly class OrderEdit
 {
     /**
      * @param list<AddedOrderLine> $addedLines
-     * @param list<int>            $removedLines  order product ids
-     * @param array<int, float>    $quantities    order product id => new quantity
-     * @param array<int, string>   $unitPrices    order product id => new unit price, untaxed
-     * @param string|null          $discount      new order discount, untouched when null
+     * @param list<int>            $removedLines   order product ids
+     * @param array<int, float>    $quantities     order product id => new quantity
+     * @param array<int, string>   $unitPrices     order product id => new unit price, untaxed
+     * @param string|null          $discount       new order discount, untouched when null
      * @param string|null          $untaxedPostage new untaxed postage, taxed again on the delivery country by the delivery module of the order; untouched when null
-     * @param string|null          $expectedState OrderEditor::stateOf() as the editor displayed it
+     * @param string|null          $expectedState  OrderEditor::stateOf() as the editor displayed it
      */
     public function __construct(
         public array $addedLines = [],
