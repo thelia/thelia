@@ -56,6 +56,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
+use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -407,6 +408,11 @@ class Order extends BaseAction implements EventSubscriberInterface
             // takes them so): the row of the order first, then the stock rows in ascending id.
             // Taken the other way round, two requests on the same order wait for each other.
             $statusIdUnderLock = null === $order->getId() ? null : OrderQuery::create()->lockStatusIdForUpdate((int) $order->getId(), $con);
+
+            // The lines are read again under that lock: an edit of the order may have changed them
+            // since they were read, and the stock moves with the lines the order has now.
+            OrderProductTableMap::clearInstancePool();
+            $order->clearOrderProducts();
 
             // Before anything else is read in the transaction: the stock rows the payment takes
             // from, so that the reservations of the other carts are read as they stand.

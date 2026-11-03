@@ -18,7 +18,9 @@ use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
@@ -35,6 +37,35 @@ final class OrderActionTest extends ActionIntegrationTestCase
         $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
 
         self::assertSame($paidStatus->getId(), OrderQuery::create()->findPk($order->getId())->getStatusId());
+    }
+
+    public function testUpdateStatusMovesTheStockOfTheLinesAsTheyAreStoredNotAsTheOrderHeldThem(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => 'not_paid']);
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(['isDefault' => false]), $this->factory->currency(), ['title' => 'Widget', 'baseQuantity' => 10]);
+        $pse = $product->getDefaultSaleElements();
+        $line = $this->factory->orderProduct($order, [
+            'productRef' => $product->getRef(),
+            'productSaleElementsRef' => $pse->getRef(),
+            'productSaleElementsId' => $pse->getId(),
+            'quantity' => 2.0,
+            'price' => '10.000000',
+            'promoPrice' => '10.000000',
+        ]);
+        self::assertCount(1, $order->getOrderProducts());
+
+        $this->getPropelConnection()->exec('UPDATE `order_product` SET `quantity` = 5 WHERE `id` = '.(int) $line->getId());
+
+        $stock = (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity();
+        $paidStatus = OrderStatusQuery::create()->findOneByCode('paid');
+        self::assertNotNull($paidStatus);
+
+        $event = new OrderEvent($order);
+        $event->setStatus($paidStatus->getId());
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+
+        self::assertSame(5.0, (float) OrderProductQuery::create()->findPk($line->getId())->getQuantity());
+        self::assertEqualsWithDelta($stock - 5.0, (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity(), 0.0001);
     }
 
     /**
