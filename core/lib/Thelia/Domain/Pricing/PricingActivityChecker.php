@@ -38,7 +38,7 @@ class PricingActivityChecker implements ResetInterface
         private readonly CustomerDiscountRate $customerDiscountRate,
         private readonly CustomerGroupResolver $customerGroupResolver,
         private readonly ?SaleUnitPricingActivityChecker $saleUnitPricingActivityChecker = null,
-        private readonly BundleCatalogState $bundleCatalogState = new BundleCatalogState(),
+        private readonly ?BundleCatalogState $bundleCatalogState = null,
     ) {
     }
 
@@ -150,11 +150,11 @@ class PricingActivityChecker implements ResetInterface
     /**
      * A bundle priced by its components exists, so that the price of its sale element is not
      * the one of the catalog. No query: the state of the catalog is a variable of the
-     * configuration.
+     * configuration. A checker built without that state (by hand, in a unit test) counts none.
      */
     public function hasComputedBundles(): bool
     {
-        return $this->bundleCatalogState->hasComputedBundles();
+        return true === $this->bundleCatalogState?->hasComputedBundles();
     }
 
     /**
