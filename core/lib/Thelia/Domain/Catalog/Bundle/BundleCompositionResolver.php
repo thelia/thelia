@@ -27,8 +27,9 @@ use Thelia\Model\ProductBundleItem;
  * least one bound above zero; an optional item may also be left out (quantity zero).
  *
  * The default composition holds every required item at its quantity, and every optional item
- * at its minimum when that is above zero, out otherwise; an optional item that cannot be sold
- * is out of it even then, so that one offline housse does not make the bundle unsellable.
+ * at its minimum when that is above zero, out otherwise; an optional item that cannot be sold,
+ * or whose stock cannot supply that minimum, is out of it even then, so that one offline housse
+ * or one lock out of stock does not make the bundle unsellable.
  *
  * A bundle with nothing in its composition has nothing to sell and is refused, whatever the
  * shop does with its stock. A component the visitor may not see (a private drop, a rule of a
@@ -133,7 +134,8 @@ final readonly class BundleCompositionResolver
     /**
      * Without any read of the catalogue: the items alone settle it. An optional item at a
      * minimum above zero is in, unless the caller, which has read the catalogue, hands over
-     * the components and this one cannot be sold (or the visitor may not see it).
+     * the components and this one cannot be sold (or the visitor may not see it), or, not
+     * being virtual, has less in stock than that minimum.
      *
      * @param list<ProductBundleItem>          $items
      * @param array<int, BundleComponent>|null $components the components the items name, by sale element id; null when the caller has not read them
@@ -150,7 +152,7 @@ final readonly class BundleCompositionResolver
 
             $saleElementsId = (int) $item->getProductSaleElementsId();
 
-            if (!$item->getRequired() && null !== $components && (!($components[$saleElementsId]->sellable ?? false) || isset($hidden[$saleElementsId]))) {
+            if (!$item->getRequired() && null !== $components && 0 !== $micro && !self::canSupply($components[$saleElementsId] ?? null, $micro, isset($hidden[$saleElementsId]))) {
                 $micro = 0;
             }
 
@@ -158,6 +160,15 @@ final readonly class BundleCompositionResolver
         }
 
         return BundleComposition::fromArray($lines);
+    }
+
+    private static function canSupply(?BundleComponent $component, int $micro, bool $hidden): bool
+    {
+        if (null === $component || !$component->sellable || $hidden) {
+            return false;
+        }
+
+        return $component->virtual || (int) round(max(0.0, $component->availableQuantity) * BundleDecimal::SCALE) >= $micro;
     }
 
     /**
