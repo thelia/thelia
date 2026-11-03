@@ -33,16 +33,16 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
 
         $response = $this->jsonRequest('GET', '/api/front/coupons');
 
-        self::assertSame(401, $response->getStatusCode(), 'Anonymous callers must not read coupon codes.');
+        self::assertSame(404, $response->getStatusCode(), 'Anonymous callers must not read coupon codes.');
     }
 
-    public function testFrontCouponsAllowAuthenticatedCustomer(): void
+    public function testFrontCouponsAreNotExposedToAuthenticatedCustomer(): void
     {
         $this->createFixtureFactory()->coupon();
 
         $response = $this->jsonRequest('GET', '/api/front/coupons', token: $this->authenticateAsCustomer());
 
-        self::assertJsonResponseSuccessful($response);
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testFrontModulesAreNotExposed(): void

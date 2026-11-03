@@ -14,140 +14,61 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
-use Thelia\Api\Bridge\Propel\Filter\DateFilter;
-use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
-use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
-use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
 use Thelia\Model\Map\CouponTableMap;
 
-#[ApiResource(
-    operations: [
-        new GetCollection(
-            uriTemplate: '/front/coupons',
-            security: 'is_granted("ROLE_CUSTOMER")',
-        ),
-        new Get(
-            uriTemplate: '/front/coupons/{id}',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'is_granted("ROLE_CUSTOMER")',
-        ),
-        new Get(
-            uriTemplate: '/front/coupons/{code}/by-code',
-            normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'is_granted("ROLE_CUSTOMER")',
-        ),
-    ],
-    normalizationContext: ['groups' => [self::GROUP_FRONT_READ]],
-)]
-#[ApiFilter(
-    filterClass: SearchFilter::class,
-    properties: [
-        'id',
-        'code',
-        'type',
-        'title' => 'partial',
-    ],
-)]
-#[ApiFilter(
-    filterClass: NotInFilter::class,
-    properties: [
-        'id',
-        'code',
-    ],
-)]
-#[ApiFilter(
-    filterClass: BooleanFilter::class,
-    properties: [
-        'isEnabled',
-        'isCumulative',
-        'isRemovingPostage',
-        'isAvailableOnSpecialOffers',
-        'isUsed',
-        'perCustomerUsageCount',
-    ],
-)]
-#[ApiFilter(
-    filterClass: DateFilter::class,
-    properties: [
-        'startDate',
-        'expirationDate',
-        'createdAt',
-        'updatedAt',
-    ],
-)]
-#[ApiFilter(
-    filterClass: OrderFilter::class,
-    properties: [
-        'id',
-        'code',
-        'title',
-        'isEnabled',
-        'startDate',
-        'expirationDate',
-        'maxUsage',
-        'createdAt',
-        'updatedAt',
-    ],
-)]
+// Not exposed by the API: the class carries no ApiResource, so no operation, front
+// or admin, serves the promotions.
 class Coupon extends AbstractTranslatableResource
 {
     public const GROUP_ADMIN_READ = 'admin:coupon:read';
     public const GROUP_ADMIN_READ_SINGLE = 'admin:coupon:read:single';
     public const GROUP_ADMIN_WRITE = 'admin:coupon:write';
-    public const GROUP_FRONT_READ = 'front:coupon:read';
-    public const GROUP_FRONT_READ_SINGLE = 'front:coupon:read:single';
 
     #[Groups([
         self::GROUP_ADMIN_READ,
-        self::GROUP_FRONT_READ,
     ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $code = null;
 
     // What makes the promotion apply: the customer typing its code, or the cart
     // matching its conditions. Read only — the trigger mode decides whether a
     // code is required at all, so it is set through the coupon events, which
     // enforce that pairing.
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?string $triggerMode = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $type = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?string $serializedEffects = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $isEnabled = true;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?\DateTime $startDate = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?\DateTime $expirationDate = null;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public int $maxUsage = 0;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $isCumulative = true;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $isRemovingPostage = false;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $isAvailableOnSpecialOffers = false;
 
     #[Groups([self::GROUP_ADMIN_READ])]
@@ -159,13 +80,13 @@ class Coupon extends AbstractTranslatableResource
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public bool $perCustomerUsageCount = false;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
+    #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $updatedAt = null;
 
-    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ, self::GROUP_ADMIN_WRITE])]
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
 
     #[Relation(targetResource: CouponCountry::class)]
@@ -409,7 +330,7 @@ class Coupon extends AbstractTranslatableResource
         return $this;
     }
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public function getDaysLeftBeforeExpiration(): int
     {
         if ($this->expirationDate === null) {
@@ -422,13 +343,13 @@ class Coupon extends AbstractTranslatableResource
         return max(0, $diff->days);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public function getUsageLeft(): int
     {
         return max(0, $this->maxUsage);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public function getFreeShippingForCountriesList(): string
     {
         $countryIds = [];
@@ -439,7 +360,7 @@ class Coupon extends AbstractTranslatableResource
         return implode(',', $countryIds);
     }
 
-    #[Groups([self::GROUP_ADMIN_READ_SINGLE, self::GROUP_FRONT_READ_SINGLE])]
+    #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
     public function getFreeShippingForModulesList(): string
     {
         $moduleIds = [];
