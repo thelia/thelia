@@ -245,6 +245,14 @@ final class ZipCodePatternTest extends TestCase
         ZipCodePattern::fromString(str_repeat('7', ZipCodePattern::MAX_LENGTH + 1));
     }
 
+    public function testAPatternWithTwoRangeSeparatorsIsNotTakenForARange(): void
+    {
+        $this->expectException(InvalidZipCodeRuleException::class);
+        $this->expectExceptionMessage('A postal code pattern holds digits, letters from A to Z, * and ... only.');
+
+        ZipCodePattern::fromString('1...2...3');
+    }
+
     /**
      * @return iterable<string, array{bool, string}>
      */
