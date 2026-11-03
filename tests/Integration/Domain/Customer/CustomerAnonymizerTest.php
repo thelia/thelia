@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Customer;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerAnonymizeEvent;
+use Thelia\Core\Event\Customer\CustomerGroupChangedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Customer\Service\CustomerAnonymizer;
@@ -28,6 +29,7 @@ use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\CustomerPaymentMethodQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\CustomerVersionQuery;
@@ -94,6 +96,32 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         self::assertNotNull($orderProduct);
         self::assertSame('99.990000', $orderProduct->getPrice());
         self::assertSame(2.0, $orderProduct->getQuantity());
+    }
+
+    public function testAnonymizeMovesTheAccountBackToTheDefaultGroupAndAnnouncesIt(): void
+    {
+        $customer = $this->createCustomerWithHistory();
+        $group = $this->factory->customerGroup('anonymized-pro', 10.0);
+        $customer->setCustomerGroupId($group->getId())->save();
+        $heard = [];
+        $listener = static function (CustomerGroupChangedEvent $event) use (&$heard): void {
+            $heard[] = $event;
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::CUSTOMER_GROUP_CHANGED, $listener);
+
+        try {
+            $this->anonymize($customer);
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::CUSTOMER_GROUP_CHANGED, $listener);
+        }
+
+        $reloaded = CustomerQuery::create()->findPk($customer->getId());
+        self::assertNotNull($reloaded);
+        self::assertSame(CustomerGroupQuery::findDefault()->getId(), $reloaded->getCustomerGroupId(), 'The group an administrator chose says something about the person.');
+        self::assertCount(1, $heard);
+        self::assertSame($group->getId(), $heard[0]->getPreviousCustomerGroupId());
+        self::assertSame(CustomerGroupQuery::findDefault()->getId(), $heard[0]->getCustomerGroupId());
     }
 
     public function testAnonymizeErasesTheAccountIdentity(): void
