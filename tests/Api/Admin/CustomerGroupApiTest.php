@@ -124,6 +124,44 @@ final class CustomerGroupApiTest extends ApiTestCase
         self::assertSame(1, CustomerGroupQuery::create()->filterByCode('taken')->count());
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invalidCodes(): iterable
+    {
+        yield 'a space' => ['pro b2b'];
+        yield 'an accent' => ['revendeur-été'];
+        yield 'a leading dash' => ['-pro'];
+        yield 'a slash' => ['pro/b2b'];
+    }
+
+    #[DataProvider('invalidCodes')]
+    public function testACodeTheBackOfficeWouldRefuseIsRefusedOnEveryWrite(string $code): void
+    {
+        $group = $this->createFixtureFactory()->customerGroup('code-format');
+        $token = $this->authenticateAsAdmin();
+
+        $created = $this->jsonRequest('POST', '/api/admin/customer_groups', ['code' => $code], $token);
+        $patched = $this->jsonRequest('PATCH', '/api/admin/customer_groups/'.$group->getId(), ['code' => $code], $token, 'merge-patch+json');
+        $replaced = $this->jsonRequest('PUT', '/api/admin/customer_groups/'.$group->getId(), ['code' => $code], $token);
+
+        self::assertSame(422, $created->getStatusCode(), (string) $created->getContent());
+        self::assertStringContainsString('"propertyPath":"code"', (string) $created->getContent());
+        self::assertSame(422, $patched->getStatusCode(), (string) $patched->getContent());
+        self::assertSame(422, $replaced->getStatusCode(), (string) $replaced->getContent());
+        self::assertSame(0, CustomerGroupQuery::create()->filterByCode($code)->count());
+        self::assertSame('code-format', CustomerGroupQuery::create()->findPk($group->getId())->getCode());
+    }
+
+    public function testACodeOfLettersDigitsDotsDashesAndUnderscoresIsAccepted(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('POST', '/api/admin/customer_groups', ['code' => 'Pro_B2B.eu-2'], $token);
+
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+    }
+
     public function testADiscountOutsideZeroToOneHundredIsRefused(): void
     {
         $token = $this->authenticateAsAdmin();
