@@ -172,6 +172,9 @@ class CouponFactory
 
         if ($couponManager instanceof CouponAbstract) {
             $couponManager->setCouponModelId($model->getId());
+            $couponManager->setPriority((int) $model->getPriority());
+            $couponManager->setStopProcessing((bool) $model->getStopProcessing());
+            $couponManager->setAutomatic($model->isAutomatic());
         }
 
         $conditions = $this->conditionFactory->unserializeConditionCollection(

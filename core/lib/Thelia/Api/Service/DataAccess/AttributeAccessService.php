@@ -352,6 +352,9 @@ class AttributeAccessService
             case 'unavailable_promotions':
                 $result = $this->offeredCartLineService->getUnavailablePromotions();
                 break;
+            case 'excluded_promotions':
+                $result = $this->excludedPromotions();
+                break;
             case 'gift_wrapping_id':
                 $result = $cart->getGiftWrappingId();
                 break;
@@ -429,9 +432,7 @@ class AttributeAccessService
                 continue;
             }
 
-            $modelId = $coupon instanceof CouponAbstract ? $coupon->getCouponModelId() : null;
-
-            $labels[] = $titles[$modelId] ?? ('' !== $coupon->getTitle() ? $coupon->getTitle() : $coupon->getCode());
+            $labels[] = $this->couponLabel($coupon, $titles);
             $rawAmounts[] = $rawAmount;
         }
 
@@ -830,6 +831,60 @@ class AttributeAccessService
         }
 
         return self::$dataAccessCache[$cacheKey] = $titles;
+    }
+
+    /**
+     * The name shown for a promotion: its translated title, else its title, else its code.
+     *
+     * @param array<int, string> $titles translated titles by promotion id, see couponTitles()
+     */
+    private function couponLabel(CouponInterface $coupon, array $titles): string
+    {
+        $modelId = $coupon instanceof CouponAbstract ? $coupon->getCouponModelId() : null;
+
+        return $titles[$modelId] ?? ('' !== $coupon->getTitle() ? $coupon->getTitle() : $coupon->getCode());
+    }
+
+    /**
+     * The codes the buyer typed that another promotion pushed aside, with the title of the
+     * promotion that won. An automatic promotion is never listed: the buyer did not ask for it.
+     *
+     * @return list<array{code: string, title: string, winner_title: string}>
+     */
+    private function excludedPromotions(): array
+    {
+        $discarded = $this->couponManager->getSelection()->discarded;
+
+        if ([] === $discarded) {
+            return [];
+        }
+
+        $coupons = [];
+
+        foreach ($discarded as $discardedPromotion) {
+            $coupons[] = $discardedPromotion->coupon;
+            $coupons[] = $discardedPromotion->winner;
+        }
+
+        $titles = $this->couponTitles($coupons);
+
+        $excluded = [];
+
+        foreach ($discarded as $discardedPromotion) {
+            $coupon = $discardedPromotion->coupon;
+
+            if (!$coupon instanceof CouponAbstract || $coupon->isAutomatic() || '' === $coupon->getCode()) {
+                continue;
+            }
+
+            $excluded[] = [
+                'code' => $coupon->getCode(),
+                'title' => $this->couponLabel($coupon, $titles),
+                'winner_title' => $this->couponLabel($discardedPromotion->winner, $titles),
+            ];
+        }
+
+        return $excluded;
     }
 
     public function attributeCoupon(string $attributeName): mixed

@@ -104,9 +104,20 @@ interface CouponInterface
     /**
      * If Coupon is cumulative or prevent any accumulation
      * If is cumulative you can sum Coupon effects
-     * If not cancel all other Coupon and take the last given.
+     * If not, it applies alone: no other promotion is kept next to it.
      */
     public function isCumulative(): bool;
+
+    /**
+     * Rank of the promotion in the selection: the lowest value is evaluated first,
+     * ties are broken by the id of the promotion.
+     */
+    public function getPriority(): int;
+
+    /**
+     * When true, no promotion ranked after this one is applied once this one is kept.
+     */
+    public function isStopProcessing(): bool;
 
     /**
      * If Coupon is removing Checkout Postage.
