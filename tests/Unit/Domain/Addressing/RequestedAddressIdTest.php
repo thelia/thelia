@@ -48,6 +48,8 @@ final class RequestedAddressIdTest extends TestCase
         yield 'false of a JSON body' => [false, null];
         yield 'text' => ['abc', null];
         yield 'more digits than an int holds' => ['99999999999999999999', null];
+        yield 'the most digits it reads' => ['123456789012345678', 123456789012345678];
+        yield 'one digit more than it reads' => ['1234567890123456789', null];
     }
 
     #[DataProvider('values')]
@@ -60,6 +62,19 @@ final class RequestedAddressIdTest extends TestCase
     {
         self::assertSame(12, $this->service()->requestedAddressId(new Request([], ['addressId' => '12'], ['addressId' => ' '])));
         self::assertSame(13, $this->service()->requestedAddressId(new Request(['addressId' => '13'], [], ['addressId' => ''])));
+    }
+
+    public function testTheIdIsReadFromTheRouteTheBodyAndTheQueryString(): void
+    {
+        self::assertSame(11, $this->service()->requestedAddressId(new Request([], [], ['addressId' => '11'])));
+        self::assertSame(12, $this->service()->requestedAddressId(new Request([], ['addressId' => '12'])));
+        self::assertSame(13, $this->service()->requestedAddressId(new Request(['addressId' => '13'])));
+    }
+
+    public function testTheRouteComesBeforeTheBodyAndTheBodyBeforeTheQueryString(): void
+    {
+        self::assertSame(11, $this->service()->requestedAddressId(new Request(['addressId' => '13'], ['addressId' => '12'], ['addressId' => '11'])));
+        self::assertSame(12, $this->service()->requestedAddressId(new Request(['addressId' => '13'], ['addressId' => '12'])));
     }
 
     public function testAValueThatNamesNoAddressIsNotReplacedByTheNextSource(): void
