@@ -17,6 +17,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Domain\Customer\Exception\DefaultCustomerGroupProtectedException;
+use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
 use Thelia\Model\Base\CustomerGroup as BaseCustomerGroup;
 use Thelia\Model\Map\CustomerGroupTableMap;
 use Thelia\Model\Map\CustomerTableMap;
@@ -32,10 +33,7 @@ class CustomerGroup extends BaseCustomerGroup
      */
     public function effectiveDiscountRate(): float
     {
-        // getDiscount() maps a DECIMAL column and returns a string.
-        $rate = (float) $this->getDiscount();
-
-        return $rate > 0.0 && $rate <= 100.0 ? $rate : 0.0;
+        return CustomerDiscountRate::effectiveRate($this->getDiscount());
     }
 
     /**
