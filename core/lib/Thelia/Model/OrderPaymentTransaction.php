@@ -27,6 +27,9 @@ class OrderPaymentTransaction extends BaseOrderPaymentTransaction
     /** What the journal keeps of an error message: the words of a provider, never a whole answer. */
     public const ERROR_MESSAGE_MAX_LENGTH = 1000;
 
+    /** The size of the `actor_label` column, which receives a login or a module code. */
+    public const ACTOR_LABEL_MAX_LENGTH = 255;
+
     public function getTypeEnum(): ?PaymentTransactionType
     {
         return PaymentTransactionType::tryFrom((string) $this->getType());

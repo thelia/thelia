@@ -515,7 +515,9 @@ final readonly class PaymentTransactionRecorder
                 ->setParentId($parent?->getId())
                 ->setPaymentModuleId($order->getPaymentModuleId())
                 ->setActorType($actor->actorType->value)
-                ->setActorLabel($actor->label)
+                // A module chooses its code, as long as it likes: cut to the column, so that a
+                // strict SQL mode does not refuse the line and take the caller's transaction away.
+                ->setActorLabel(null === $actor->label ? null : mb_substr($actor->label, 0, OrderPaymentTransaction::ACTOR_LABEL_MAX_LENGTH))
                 ->setAdminId($actor->adminId)
                 ->setErrorCode(self::errorCodeOf($errorCode))
                 ->setErrorMessage(self::errorMessageOf($errorMessage));
