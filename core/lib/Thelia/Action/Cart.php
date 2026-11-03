@@ -473,7 +473,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     protected function refreshCartItemPrices(CartModel $cart, CurrencyModel $currency, bool $bundleLinesOnly = false): void
     {
-        $this->cartLinePricer->reprice($cart, $currency, $cart->getCustomer());
+        $this->cartLinePricer->reprice($cart, $currency, $cart->getCustomer(), $bundleLinesOnly);
     }
 
     /**
@@ -490,7 +490,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $customer = null === $cart->getCustomerId() ? null : $cart->getCustomer();
 
-        if ($this->pricingActivityChecker->mayPriceBeyondCatalog($customer)
+        if ($this->pricingActivityChecker->mayPriceBeyondCatalogAsideFromBundles($customer)
             || $this->holdsSpecialOffer($cart)) {
             $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
 
@@ -1190,12 +1190,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $this->cartLinePricer,
             $this->cartLineAvailability,
         );
-
-        // A copied bundle line is priced from its composition, like on any other refresh.
-        if ($this->pricingActivityChecker->hasComputedBundles() && $this->holdsBundleLine($newCart)) {
-            $newCart->clearCartItems();
-            $this->refreshCartItemPrices($newCart, $this->currencyOf($newCart), true);
-        }
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
         $dispatcher->dispatch($cartEvent, TheliaEvents::CART_DUPLICATE);

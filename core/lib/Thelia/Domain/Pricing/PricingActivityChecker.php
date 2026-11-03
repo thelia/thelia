@@ -50,9 +50,23 @@ class PricingActivityChecker implements ResetInterface
      */
     public function mayPriceBeyondCatalog(?Customer $customer): bool
     {
+        return $this->mayPriceBeyondCatalogAsideFromBundles($customer) || $this->hasComputedBundles();
+    }
+
+    /**
+     * The same question with the bundles priced by their components left out: whether the price
+     * of a line that holds no such bundle may move for this visitor. A cart refreshes its other
+     * lines on this answer, and its bundle lines on its own.
+     */
+    public function mayPriceBeyondCatalogAsideFromBundles(?Customer $customer): bool
+    {
+        $activity = $this->catalogActivityProbe->read();
+
         return $this->hasDiscountedCustomer($customer)
-            || $this->catalogActivityProbe->read()->customerGroupsPriceAnything()
-            || $this->mayResolveEffectivePriceFor($customer);
+            || $activity->customerGroupsPriceAnything()
+            || $activity->hasActivePublicRule
+            || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
+            || (null !== $customer && ($activity->hasActiveNamedRule || $activity->hasActiveReservedSale));
     }
 
     /**

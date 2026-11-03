@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Cart\Service;
 
+use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Pricing\BundleEffectivePriceSource;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
 use Thelia\Model\Cart;
@@ -33,11 +35,18 @@ use Thelia\Model\Customer;
  *
  * A sale element the context cannot price (no price in the default currency) is left
  * alone: its line keeps the price it had, and nothing is raised.
+ *
+ * A line of a bundle priced by its components is priced from the composition it holds, not
+ * from the default one of its sale element: the components the customer chose, less the
+ * discount of the bundle, then the discounts of the group and of the customer. A composition
+ * the bundle can no longer hold leaves the line alone, at its last price: the order refuses it.
  */
 final readonly class CartLinePricer
 {
-    public function __construct(private CustomerPriceContextInterface $customerPriceContext)
-    {
+    public function __construct(
+        private CustomerPriceContextInterface $customerPriceContext,
+        private ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
+    ) {
     }
 
     /**
@@ -69,11 +78,21 @@ final readonly class CartLinePricer
      * promotion offered are left alone: they belong to the promotion that placed them,
      * which set their price.
      *
+     * With $bundleLinesOnly, only the lines priced by the components of their bundle are
+     * repriced: the others keep the price they hold.
+     *
      * @return list<CartItem>
      */
-    public function reprice(Cart $cart, Currency $currency, ?Customer $customer): array
+    public function reprice(Cart $cart, Currency $currency, ?Customer $customer, bool $bundleLinesOnly = false): array
     {
-        $moved = $this->price($this->payableLines($cart), $currency, $customer);
+        $moved = [];
+
+        foreach ($this->resolve($this->payableLines($cart), $currency, $customer, $bundleLinesOnly) as [$line, $price]) {
+            if ($this->differs($line, $price)) {
+                $this->write($line, $price);
+                $moved[] = $line;
+            }
+        }
 
         foreach ($moved as $line) {
             $line->save();
@@ -120,22 +139,31 @@ final readonly class CartLinePricer
 
     /**
      * @param iterable<CartItem> $lines
+     * @param bool               $bundleLinesOnly only the lines priced by the components of their bundle
      *
      * @return list<array{CartItem, ResolvedPrice}> the lines the context could price, with their price
      */
-    private function resolve(iterable $lines, Currency $currency, ?Customer $customer): array
+    private function resolve(iterable $lines, Currency $currency, ?Customer $customer, bool $bundleLinesOnly = false): array
     {
-        $lines = [...$lines];
-        $prices = $this->customerPriceContext->resolve(
-            array_map(static fn (CartItem $line): int => (int) $line->getProductSaleElementsId(), $lines),
+        $lines = array_values([...$lines]);
+        $bundlePrices = $this->bundleLinePricesOf($lines, $currency, $customer);
+        $otherLines = array_filter(
+            $lines,
+            static fn (CartItem $line, int $index): bool => !\array_key_exists($index, $bundlePrices),
+            \ARRAY_FILTER_USE_BOTH,
+        );
+        $prices = $bundleLinesOnly ? [] : $this->customerPriceContext->resolve(
+            array_values(array_map(static fn (CartItem $line): int => (int) $line->getProductSaleElementsId(), $otherLines)),
             $currency,
             $customer,
         );
 
         $resolved = [];
 
-        foreach ($lines as $line) {
-            $price = $prices[(int) $line->getProductSaleElementsId()] ?? null;
+        foreach ($lines as $index => $line) {
+            $price = \array_key_exists($index, $bundlePrices)
+                ? $bundlePrices[$index]
+                : ($bundleLinesOnly ? null : $prices[(int) $line->getProductSaleElementsId()] ?? null);
 
             if (null !== $price) {
                 $resolved[] = [$line, $price];
@@ -143,6 +171,55 @@ final readonly class CartLinePricer
         }
 
         return $resolved;
+    }
+
+    /**
+     * The price of each line that holds the composition of a bundle priced by its components, by
+     * the index of the line: null for a composition the bundle can no longer hold, absent for a
+     * line that is no such bundle (a simple product, a fixed bundle), which its sale element prices.
+     *
+     * @param list<CartItem> $lines
+     *
+     * @return array<int, ResolvedPrice|null>
+     */
+    private function bundleLinePricesOf(array $lines, Currency $currency, ?Customer $customer): array
+    {
+        if (null === $this->bundleEffectivePriceSource) {
+            return [];
+        }
+
+        $compositions = [];
+
+        foreach ($lines as $index => $line) {
+            if (null === $line->getProductSaleElementsId()) {
+                continue;
+            }
+
+            try {
+                $composition = $line->getBundleCompositionValue();
+            } catch (InvalidBundleCompositionException) {
+                // A composition that no longer reads is left to the order, which refuses it.
+                continue;
+            }
+
+            if (null !== $composition) {
+                $compositions[$index] = [(int) $line->getProductId(), (int) $line->getProductSaleElementsId(), $composition];
+            }
+        }
+
+        if ([] === $compositions) {
+            return [];
+        }
+
+        $effectivePrices = $this->bundleEffectivePriceSource->forLines($compositions, $currency);
+        $priced = $this->customerPriceContext->resolveBundlePrices(array_filter($effectivePrices), $customer);
+        $prices = [];
+
+        foreach ($effectivePrices as $index => $effectivePrice) {
+            $prices[$index] = null === $effectivePrice ? null : $priced[$index];
+        }
+
+        return $prices;
     }
 
     private function differs(CartItem $line, ResolvedPrice $price): bool

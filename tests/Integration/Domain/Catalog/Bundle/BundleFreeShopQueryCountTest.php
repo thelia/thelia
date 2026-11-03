@@ -21,13 +21,13 @@ use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Domain\Cart\Bundle\CartCompositionResolver;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
-use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\LangQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
+use Thelia\Tests\Support\Trait\ResetsPriceMemos;
 
 /**
  * A shop that sells no bundle pays nothing for them on its hot paths: the loops of a catalog
@@ -38,6 +38,7 @@ final class BundleFreeShopQueryCountTest extends ActionIntegrationTestCase
 {
     use BuildsBundles;
     use RecordsSqlQueries;
+    use ResetsPriceMemos;
 
     public function testTheProductAndSaleElementLoopsAskNothingOfBundles(): void
     {
@@ -109,7 +110,7 @@ final class BundleFreeShopQueryCountTest extends ActionIntegrationTestCase
 
         $small = \count(self::bundleStatements($this->recordSqlQueries(fn () => $this->rowsOf('product', ['id' => $few]))));
         // What the first page warmed is forgotten: the second is a request of its own.
-        $this->getService(EffectivePriceCatalog::class)->reset();
+        $this->resetPriceMemos();
         $large = \count(self::bundleStatements($this->recordSqlQueries(fn () => $this->rowsOf('product', ['id' => $many]))));
 
         self::assertGreaterThan(0, $small);
