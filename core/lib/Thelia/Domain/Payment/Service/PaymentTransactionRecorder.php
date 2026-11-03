@@ -30,6 +30,7 @@ use Thelia\Domain\Payment\Exception\MissingProviderReferenceException;
 use Thelia\Domain\Payment\Exception\PaymentAnnouncementFailedException;
 use Thelia\Domain\Payment\Exception\PaymentException;
 use Thelia\Log\Tlog;
+use Thelia\Model\Admin;
 use Thelia\Model\Map\OrderPaymentTransactionTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
@@ -272,8 +273,29 @@ final readonly class PaymentTransactionRecorder
                 return null;
             }
 
-            return $this->record($order, PaymentTransactionType::CAPTURE, $amount, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null);
+            return $this->record($order, PaymentTransactionType::CAPTURE, $amount, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null, null, $this->immediateCaptureAuthor($moduleCode));
         });
+    }
+
+    /**
+     * The money of a module that takes the price at once moves through that module, even
+     * when an administrator marks the order paid by hand on receiving a cheque: the module
+     * is the author of the capture, and the administrator who marked it paid stays named
+     * on the line. Without a module to name, the usual precedence applies.
+     */
+    private function immediateCaptureAuthor(?string $moduleCode): ?OrderHistoryActor
+    {
+        if (null === $moduleCode || '' === $moduleCode) {
+            return null;
+        }
+
+        $administrator = $this->actorResolver->actingAdministrator($moduleCode);
+
+        return new OrderHistoryActor(
+            OrderHistoryActorType::MODULE,
+            $moduleCode,
+            $administrator instanceof Admin ? $administrator->getId() : null,
+        );
     }
 
     /**
@@ -449,6 +471,7 @@ final readonly class PaymentTransactionRecorder
         ?string $errorCode,
         ?string $errorMessage,
         ?callable $guard = null,
+        ?OrderHistoryActor $author = null,
     ): OrderPaymentTransaction {
         $orderId = (int) $order->getId();
         $pspReference = $this->cleanReference($pspReference);
@@ -458,7 +481,7 @@ final readonly class PaymentTransactionRecorder
             throw new \InvalidArgumentException(\sprintf('Payment transaction #%d belongs to another order than %s.', (int) $parent->getId(), (string) $order->getRef()));
         }
 
-        return $this->locked($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard): OrderPaymentTransaction {
+        return $this->locked($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard, $author): OrderPaymentTransaction {
             $existing = null !== $pspReference
                 ? OrderPaymentTransactionQuery::create()->findByReference($orderId, $type, $pspReference)
                 : $this->replayedReferenceLessLine($orderId, $type, $state, $amount);
@@ -479,7 +502,7 @@ final readonly class PaymentTransactionRecorder
                 $guard();
             }
 
-            $actor = $this->actorOf($moduleCode);
+            $actor = $author ?? $this->actorOf($moduleCode);
 
             $transaction = new OrderPaymentTransaction();
             $transaction

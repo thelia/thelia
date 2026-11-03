@@ -152,7 +152,8 @@ after every core listener of it (history and invoice numbering at 64, coupons at
 10, status actions at 5) — and, the first time an order reaches a paid status
 coming from an unpaid one, writes a succeeded capture of the order total,
 carrying the transaction reference the module saved on the order, authored by
-the module (or by the administrator who marked the order paid). Cheque,
+the module, even when an administrator marks the order paid by hand on
+receiving a cheque: the line then names that administrator in `admin_id`. Cheque,
 FreeOrder and every published module get their line without a line of code.
 
 Nothing is written for a module that implements the capture interface and

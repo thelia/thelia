@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\EventListener\RecordImmediateCaptureListener;
@@ -58,6 +60,34 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         self::assertSame(OrderHistoryActorType::MODULE->value, $line->getActorType());
         self::assertSame('Cheque', $line->getActorLabel());
         self::assertSame($order->getPaymentModuleId(), $line->getPaymentModuleId());
+    }
+
+    public function testAChequeOrderAnAdministratorMarksPaidIsStillCapturedByTheModuleAndNamesTheAdministrator(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+        $admin = $this->factory->admin();
+
+        // The gesture of the back office: the request is an admin one, the administrator in session.
+        $requestStack = $this->getService('request_stack');
+        $testRequest = $requestStack->pop();
+        $backOfficeRequest = Request::create('http://localhost/admin/order/update/'.$order->getId());
+        $backOfficeRequest->setSession($testRequest->getSession());
+        $requestStack->push($backOfficeRequest);
+        $securityContext = $this->getService(SecurityContext::class);
+        $securityContext->setAdminUser($admin);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        } finally {
+            $securityContext->clearAdminUser();
+            $requestStack->pop();
+            $requestStack->push($testRequest);
+        }
+
+        $line = OrderPaymentTransactionQuery::create()->findJournal($order->getId())[0];
+        self::assertSame(OrderHistoryActorType::MODULE->value, $line->getActorType(), 'The cheque is taken through its module, not by the administrator.');
+        self::assertSame('Cheque', $line->getActorLabel());
+        self::assertSame($admin->getId(), $line->getAdminId(), 'The administrator who marked the order paid stays named on the line.');
     }
 
     public function testTheTransactionReferenceOfTheOrderIsUntouchedAndCarriedOnTheLine(): void
