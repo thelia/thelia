@@ -278,6 +278,37 @@ final readonly class PaymentTransactionRecorder
     }
 
     /**
+     * The refund line of an order paid by a module that keeps no journal, when it reaches a
+     * refunded status: the module gave the money back on its own, and the status is all it
+     * says of it. What the journal still counts as taken is written given back, so that the
+     * journal does not hold, against the status, money the buyer no longer paid.
+     *
+     * Nothing is written when the journal already holds a refund, succeeded or awaiting its
+     * answer, whatever wrote it, nor when it counts nothing left to give back.
+     */
+    public function recordImmediateRefundIfNone(
+        Order $order,
+        ?string $pspReference = null,
+        ?string $moduleCode = null,
+    ): ?OrderPaymentTransaction {
+        $orderId = (int) $order->getId();
+
+        return $this->locked($orderId, function () use ($order, $orderId, $pspReference, $moduleCode): ?OrderPaymentTransaction {
+            if (OrderPaymentTransactionQuery::create()->holdsMovement($orderId, [PaymentTransactionType::REFUND])) {
+                return null;
+            }
+
+            $refundable = $this->totalsReader->forOrder($orderId)->refundable();
+
+            if (!PaymentAmount::isPositive($refundable)) {
+                return null;
+            }
+
+            return $this->record($order, PaymentTransactionType::REFUND, $refundable, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null, null, $this->immediateCaptureAuthor($moduleCode));
+        });
+    }
+
+    /**
      * The money of a module that takes the price at once moves through that module, even
      * when an administrator marks the order paid by hand on receiving a cheque: the module
      * is the author of the capture, and the administrator who marked it paid stays named

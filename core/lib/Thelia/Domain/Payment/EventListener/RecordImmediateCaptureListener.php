@@ -22,11 +22,13 @@ use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
+use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\PaymentModuleWithCaptureInterface;
 
 /**
- * Gives the orders of a payment module that keeps no journal their capture line.
+ * Gives the orders of a payment module that keeps no journal their capture line, and
+ * their refund line.
  *
  * A module that takes the price at once tells the core nothing but "paid", through
  * the order status. The first time an order reaches a paid status, a succeeded capture
@@ -42,6 +44,11 @@ use Thelia\Module\PaymentModuleWithCaptureInterface;
  * coupons (10), status actions (5) — so that nothing here can cut them off. A failure is
  * logged and the status change goes on: the status is already committed, and a provider
  * notification answered with an error would be retried on an order already paid.
+ *
+ * The first time such an order reaches a refunded status, what the journal still counts as
+ * taken is written given back: the module returned it on its own, and a journal that kept
+ * it as taken would hold the order as paid for, against its status, once the back office
+ * turns it unpaid again.
  */
 final readonly class RecordImmediateCaptureListener
 {
@@ -86,17 +93,49 @@ final readonly class RecordImmediateCaptureListener
         }
     }
 
+    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 4)]
+    public function onOrderRefunded(OrderEvent $event): void
+    {
+        $order = $event->getOrder();
+
+        if (!$order->isRefunded(false) || $this->wasAlreadyRefunded($event)) {
+            return;
+        }
+
+        if ($this->moduleCapturesByHand($order)) {
+            return;
+        }
+
+        try {
+            $this->recorder->recordImmediateRefundIfNone(
+                $order,
+                $order->getTransactionRef(),
+                $event->getSourceModuleCode() ?? $this->paymentModuleCodeOf($order),
+            );
+        } catch (\Throwable $throwable) {
+            Tlog::getInstance()->error(\sprintf(
+                'The refund of order %s, refunded, could not be written to its payment journal: %s',
+                (string) $order->getRef(),
+                $throwable->getMessage(),
+            ));
+        }
+    }
+
     private function wasAlreadyPaid(OrderEvent $event): bool
+    {
+        return $this->previousStatusOf($event)?->isPaid(false) ?? false;
+    }
+
+    private function wasAlreadyRefunded(OrderEvent $event): bool
+    {
+        return $this->previousStatusOf($event)?->isRefunded(false) ?? false;
+    }
+
+    private function previousStatusOf(OrderEvent $event): ?OrderStatus
     {
         $previousStatusId = $event->getPreviousStatusId();
 
-        if (null === $previousStatusId) {
-            return false;
-        }
-
-        $previousStatus = OrderStatusQuery::create()->findPk($previousStatusId);
-
-        return null !== $previousStatus && $previousStatus->isPaid(false);
+        return null === $previousStatusId ? null : OrderStatusQuery::create()->findPk($previousStatusId);
     }
 
     private function moduleCapturesByHand(Order $order): bool

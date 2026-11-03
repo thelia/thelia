@@ -223,6 +223,60 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         self::assertCount(1, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
     }
 
+    /**
+     * The module gave the cheque back on its own and the order says refunded: the journal
+     * gives back what it counted as taken, and the order turned unpaid again no longer
+     * reads as paid for.
+     */
+    public function testAChequeOrderRefundedGetsTheRefundOfWhatItsCaptureTook(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertCount(2, OrderPaymentTransactionQuery::create()->findJournal($order->getId()));
+        $refund = OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->findOne();
+        self::assertNotNull($refund);
+        self::assertTrue($refund->isSucceeded());
+        self::assertSame('120.000000', $refund->getAmount());
+        self::assertSame('Cheque', $refund->getActorLabel());
+
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+
+        self::assertFalse(OrderQuery::create()->findPk($order->getId())->isPaymentSecured(), 'The money went back with the refund.');
+    }
+
+    public function testAModuleThatWroteItsOwnRefundGetsNoSecondOne(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->getService(PaymentTransactionRecorder::class)->recordRefund($order, 50, 'REFUND-OWN-REF', moduleCode: 'Cheque');
+
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertSame(
+            1,
+            OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count(),
+            'The refund the module wrote tells the story.',
+        );
+    }
+
+    public function testAModuleThatDefersItsCaptureGetsNoRefundFromItsStatus(): void
+    {
+        $this->registerTheDeferredCaptureModule();
+        DeferredCapturePaymentModule::reset();
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
+        $recorder = $this->getService(PaymentTransactionRecorder::class);
+        $recorder->recordAuthorization($order, 120, 'AUTH-1');
+        $recorder->recordCapture($order, 120, 'CAP-1');
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertSame(0, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
+    }
+
     public function testTheCaptureLineIsWrittenAfterTheCoreListenersOfThePaidStatus(): void
     {
         $listeners = $this->dispatcher->getListeners(TheliaEvents::ORDER_UPDATE_STATUS);
