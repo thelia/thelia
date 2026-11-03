@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Catalog\Bundle;
 
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductBundleItem;
 
 /**
@@ -28,8 +29,8 @@ use Thelia\Model\ProductBundleItem;
  *
  * The default composition holds every required item at its quantity, and every optional item
  * at its minimum when that is above zero, out otherwise; an optional item that cannot be sold,
- * or whose stock cannot supply that minimum, is out of it even then, so that one offline housse
- * or one lock out of stock does not make the bundle unsellable.
+ * or whose stock cannot supply that minimum in a shop that checks its stock, is out of it even
+ * then, so that one offline housse or one lock out of stock does not make the bundle unsellable.
  *
  * A bundle with nothing in its composition has nothing to sell and is refused, whatever the
  * shop does with its stock. A component the visitor may not see (a private drop, a rule of a
@@ -135,7 +136,7 @@ final readonly class BundleCompositionResolver
      * Without any read of the catalogue: the items alone settle it. An optional item at a
      * minimum above zero is in, unless the caller, which has read the catalogue, hands over
      * the components and this one cannot be sold (or the visitor may not see it), or, not
-     * being virtual, has less in stock than that minimum.
+     * being virtual, has less in stock than that minimum while the shop checks its stock.
      *
      * @param list<ProductBundleItem>          $items
      * @param array<int, BundleComponent>|null $components the components the items name, by sale element id; null when the caller has not read them
@@ -168,7 +169,9 @@ final readonly class BundleCompositionResolver
             return false;
         }
 
-        return $component->virtual || (int) round(max(0.0, $component->availableQuantity) * BundleDecimal::SCALE) >= $micro;
+        return $component->virtual
+            || !ConfigQuery::checkAvailableStock()
+            || (int) round(max(0.0, $component->availableQuantity) * BundleDecimal::SCALE) >= $micro;
     }
 
     /**

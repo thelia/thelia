@@ -22,6 +22,7 @@ use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Domain\Catalog\Bundle\BundleDiscountType;
 use Thelia\Domain\Catalog\Bundle\BundlePriceCalculator;
 use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Order\RecordsStatements;
@@ -223,6 +224,31 @@ final class BundlePricingAndAvailabilityTest extends ActionIntegrationTestCase
             '[{"bundleItemId":'.$bikeItem->getId().',"quantity":"1"}]',
             $this->resolver->resolve($bundleId)->toCanonicalJson(),
         );
+    }
+
+    public function testAnOptionalComponentAtItsMinimumStaysInTheDefaultPackWhenTheShopDoesNotCheckTheStock(): void
+    {
+        $previous = ConfigQuery::read('check-available-stock', '1');
+        ConfigQuery::write('check-available-stock', '0');
+
+        try {
+            $bike = $this->component($this->factory, '500', 7);
+            $lock = $this->component($this->factory, '20', 0);
+            $bundle = $this->bundleProduct($this->factory, $this->service);
+            $bundleId = (int) $bundle->getId();
+
+            // The shop sells whatever its counters say: the lock held at its minimum of one stays in.
+            $bikeItem = $this->service->addItem($bundleId, (int) $this->saleElementsOf($bike)->getId(), '1');
+            $lockItem = $this->service->addItem($bundleId, (int) $this->saleElementsOf($lock)->getId(), '1', '1', '3', false);
+
+            self::assertSame(
+                '[{"bundleItemId":'.$bikeItem->getId().',"quantity":"1"},{"bundleItemId":'.$lockItem->getId().',"quantity":"1"}]',
+                $this->resolver->resolve($bundleId)->toCanonicalJson(),
+            );
+        } finally {
+            ConfigQuery::write('check-available-stock', (string) $previous);
+            ConfigQuery::resetCache();
+        }
     }
 
     public function testSeveralBundlesAreReadWithoutAQueryPerBundle(): void
