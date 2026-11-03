@@ -334,10 +334,9 @@ final readonly class ShippingFacade
      * The postal code comes with the address it belongs to: the cart's own copy for the
      * cart's address, the place the order leaves for, also when no customer address stands
      * behind the copy (its customer was anonymized, or a module wrote the copy itself). An
-     * `addressId` gives its postal code only when it is an
-     * address of the cart's customer in the country asked for; otherwise, as for a country
-     * given alone, the postal code of the cart's address is read when that address is in
-     * the country.
+     * `addressId` gives its postal code only when it is an address of the cart's customer in
+     * the country asked for; otherwise, as for a country given alone, the postal code of the
+     * cart's address is read when that address is in the country.
      *
      * @param int|null $addressId id of a customer `address`
      *
@@ -350,10 +349,9 @@ final readonly class ShippingFacade
         ?int $addressId,
     ): array {
         if (null !== $country) {
-            // Explicit (country/state) context over address; an address of the cart's
-            // customer still gives its postal code when it is in that country, as the API
-            // passes both.
-            // An address in another country says nothing of this one: as for an address of
+            // Explicit (country/state) context over address. An address of the cart's customer
+            // still gives its postal code when it is in that country, as the API passes both;
+            // one in another country says nothing of this one, and, as for an address of
             // someone else, the cart's address speaks when it is in the country.
             $address = null === $addressId ? null : $this->addressOfTheCartCustomer($cart, $addressId);
 
