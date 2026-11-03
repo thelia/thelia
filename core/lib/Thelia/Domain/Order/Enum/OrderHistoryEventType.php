@@ -26,6 +26,7 @@ enum OrderHistoryEventType: string
     case ORDER_CREATED = 'order_created';
     case STATUS_CHANGED = 'status_changed';
     case ADDRESS_UPDATED = 'address_updated';
+    case ORDER_EDITED = 'order_edited';
     case DELIVERY_REF_UPDATED = 'delivery_ref_updated';
     case TRANSACTION_REF_UPDATED = 'transaction_ref_updated';
     case INVOICE_REF_ALLOCATED = 'invoice_ref_allocated';

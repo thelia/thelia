@@ -359,6 +359,8 @@ final class TheliaEvents
     public const ORDER_CART_CLEAR = 'action.order.cartClear';
     public const ORDER_CREATE_MANUAL = 'action.order.createManual';
     public const ORDER_UPDATE_STATUS = 'action.order.updateStatus';
+    public const ORDER_BEFORE_EDIT = 'action.order.beforeEdit';
+    public const ORDER_AFTER_EDIT = 'action.order.afterEdit';
     public const ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE = 'action.order.getStockUpdateOperationOnOrderStatusChange';
     public const ORDER_SEND_CONFIRMATION_EMAIL = 'action.order.sendOrderConfirmationEmail';
     public const ORDER_SEND_NOTIFICATION_EMAIL = 'action.order.sendOrderNotificationEmail';
