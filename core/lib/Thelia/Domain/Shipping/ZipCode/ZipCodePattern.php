@@ -304,18 +304,23 @@ final readonly class ZipCodePattern
             return null;
         }
 
-        // A character that is a digit to Unicode but has no value to ICU stays as it is, and
+        // A decimal digit is worth 0 to 9. One that has no value to ICU (-1) stays as it is, and
         // the check of the characters then leaves the code without a normal form.
         $asciiDigits = preg_replace_callback(
             '/[^\x{0030}-\x{0039}\P{Nd}]/u',
             static function (array $digit): string {
                 $value = \IntlChar::charDigitValue((int) mb_ord($digit[0]));
 
-                return $value >= 0 && $value <= 9 ? (string) $value : $digit[0];
+                return $value >= 0 ? (string) $value : $digit[0];
             },
             $withoutSeparators,
         );
-        $refolded = null === $asciiDigits ? false : \Normalizer::normalize($asciiDigits, \Normalizer::FORM_KC);
+
+        if (null === $asciiDigits) {
+            return null;
+        }
+
+        $refolded = \Normalizer::normalize($asciiDigits, \Normalizer::FORM_KC);
 
         return false === $refolded ? null : strtoupper($refolded);
     }
