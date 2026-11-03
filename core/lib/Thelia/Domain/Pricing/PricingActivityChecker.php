@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Pricing;
 
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
@@ -30,7 +31,7 @@ use Thelia\Model\Customer;
  * of its own: the probe is what the kernel forgets with the request. The bundles are read
  * from the configuration, without a query.
  */
-class PricingActivityChecker
+class PricingActivityChecker implements ResetInterface
 {
     public function __construct(
         private readonly CatalogActivityProbe $catalogActivityProbe,
@@ -179,5 +180,16 @@ class PricingActivityChecker
         return $activity->hasActiveNamedRule
             || $activity->hasActiveReservedSale
             || $activity->customerGroupsPriceAnything();
+    }
+
+    /**
+     * Forgets what the answers were read from, the activity of the catalog and the discounts of
+     * the customers, so that the next question reads them again: what a long-running process or
+     * a test asks after it changed a rule, an operation, a group or a discount.
+     */
+    public function reset(): void
+    {
+        $this->catalogActivityProbe->reset();
+        $this->customerDiscountRate->reset();
     }
 }
