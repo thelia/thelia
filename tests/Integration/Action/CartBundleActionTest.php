@@ -549,7 +549,7 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         $line = $this->add($cart, $example['bundle'], 1, $this->composition($example, 2))->getCartItem();
         $cart->clearCartItems();
 
-        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class), $this->getService(CartLineAvailability::class));
+        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLineAvailability::class), $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         $copied = CartItemQuery::create()->filterByCartId($copy->getId())->find();
@@ -583,7 +583,7 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         $cart->clearCartItems();
         $this->saleElementsOf($example['bikeProduct'])->setQuantity(1)->save();
 
-        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class), $this->getService(CartLineAvailability::class));
+        $copy = $cart->duplicate('duplicated-'.uniqid(), null, Currency::getDefaultCurrency(), $this->dispatcher, null, $this->getService(CartLineAvailability::class), $this->getService(CartLinePricer::class));
 
         self::assertSame(0, CartItemQuery::create()->filterByCartId($copy->getId())->count());
     }

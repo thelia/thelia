@@ -1187,8 +1187,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $this->getSession()->getCurrency(),
             $dispatcher,
             $this->saleUnitStockResolver,
-            $this->cartLinePricer,
             $this->cartLineAvailability,
+            $this->cartLinePricer,
         );
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);
