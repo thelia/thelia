@@ -110,6 +110,7 @@ final class OrderEditorRollbackTest extends IntegrationTestCase
         self::assertEqualsWithDelta($stock, (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity(), 0.0001);
         self::assertSame('0.000000', number_format((float) OrderQuery::create()->findPk($order->getId())->getDiscount(), 6, '.', ''));
         self::assertSame($state, $editor->stateOf(OrderQuery::create()->findPk($order->getId())));
+        self::assertSame($state, $editor->stateOf($order), 'The order held by the caller must show what the database holds after a refusal.');
         self::assertSame(0, OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count());
         self::assertNotNull(OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId()));
     }

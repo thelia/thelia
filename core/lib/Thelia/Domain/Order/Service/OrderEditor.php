@@ -116,6 +116,8 @@ final readonly class OrderEditor
         } catch (\Throwable $throwable) {
             $this->transactionManager->rollback($connection);
             Order::forgetCachedTotals((int) $order->getId());
+            OrderProductTableMap::clearInstancePool();
+            $order->reload(false);
 
             throw $throwable;
         }
@@ -316,6 +318,7 @@ final readonly class OrderEditor
     {
         $before = (string) $order->getPostage();
         $taxRuleTitle = $order->getPostageTaxRuleTitle();
+        $untaxedPostage = $this->amount(round((float) $untaxedPostage, 2));
 
         $state = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getState();
         $breakdown = $vatExempted ? [] : $this->postageTaxBreakdownCalculator->splitForEditedOrder($order, $country, $state, (float) $untaxedPostage, $locale);
@@ -326,6 +329,9 @@ final readonly class OrderEditor
         } elseif ([] !== $breakdown) {
             $tax = $this->amount(round(array_sum(array_map(static fn ($line): float => $line->amount, $breakdown)), 2));
             $taxed = $this->amount((float) $untaxedPostage + (float) $tax);
+        } elseif ((float) $untaxedPostage <= 0.0) {
+            $taxed = $this->amount(0);
+            $tax = $this->amount(0);
         } else {
             $module = $order->getDeliveryModuleInstance();
 
@@ -370,11 +376,10 @@ final readonly class OrderEditor
 
         if ($untaxedPostage > 0.0) {
             $breakdown = $this->postageTaxBreakdownCalculator->splitForEditedOrder($order, $country, $state, $untaxedPostage, $locale);
-            $module = $order->getDeliveryModuleInstance();
 
             if ([] !== $breakdown) {
                 $postageVat = array_sum(array_map(static fn ($line): float => $line->amount, $breakdown));
-            } elseif (method_exists($module, 'buildOrderPostage')) {
+            } elseif (method_exists($module = $order->getDeliveryModuleInstance(), 'buildOrderPostage')) {
                 $postageVat = (float) $module->buildOrderPostage($untaxedPostage, $country, $locale)->getAmountTax();
             }
         }
