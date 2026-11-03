@@ -21,6 +21,10 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\GiftWrappingQuery;
+use Thelia\Model\Order;
+use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderProductQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
@@ -82,6 +86,67 @@ readonly class ExemptedVatCalculator
         $vat += $postageVat + $this->giftWrappingVat($cart, $country, $state);
 
         return round(max(0.0, $vat), 2);
+    }
+
+    /**
+     * The same figure read from the lines an order carries now, for an order
+     * whose lines were edited after the cart that placed it stopped being the
+     * truth. A line whose product or gift wrapping no longer exists adds no VAT.
+     *
+     * @throws PropelException
+     */
+    public function forOrder(
+        Order $order,
+        Country $country,
+        ?State $state,
+        float $postageVat,
+    ): float {
+        $vat = 0.0;
+        $untaxedTotal = 0.0;
+        $wrappingVat = 0.0;
+
+        foreach (OrderProductQuery::create()->filterByOrderId($order->getId())->find() as $line) {
+            if ($line->isServiceLine()) {
+                $wrappingVat += $this->wrappingVatOf($line, $country, $state);
+
+                continue;
+            }
+
+            $product = ProductQuery::create()->findOneByRef($line->getProductRef());
+
+            if (null === $product) {
+                continue;
+            }
+
+            $untaxedPrice = (float) ($line->getWasInPromo() ? $line->getPromoPrice() : $line->getPrice());
+            $taxedPrice = $this->taxCalculatorFactory->createTaxCalculator()
+                ->load($product, $country, $state)
+                ->getTaxedPrice($untaxedPrice);
+
+            $untaxedLineTotal = $this->lineTotal($untaxedPrice, (float) $line->getQuantity());
+            $vat += $this->lineTotal($taxedPrice, (float) $line->getQuantity()) - $untaxedLineTotal;
+            $untaxedTotal += $untaxedLineTotal;
+        }
+
+        $discount = min((float) $order->getDiscount(), $untaxedTotal);
+
+        if ($discount > 0.0) {
+            $vat -= $vat * $discount / $untaxedTotal;
+        }
+
+        return round(max(0.0, $vat + $postageVat + $wrappingVat), 2);
+    }
+
+    private function wrappingVatOf(OrderProduct $line, Country $country, ?State $state): float
+    {
+        $giftWrapping = GiftWrappingQuery::create()->findOneByCode($line->getProductRef());
+
+        if (null === $giftWrapping) {
+            return 0.0;
+        }
+
+        return $this->giftWrappingProvider->taxedPrice($giftWrapping, $country, $state)
+            - round((float) $giftWrapping->getPrice(), 2);
     }
 
     private function giftWrappingVat(Cart $cart, Country $country, ?State $state): float

@@ -19,6 +19,7 @@ enum OrderEditRefusal: string
     case StatusNotEditable = 'status_not_editable';
     case InvoiceIssued = 'invoice_issued';
     case NothingToEdit = 'nothing_to_edit';
+    case PaidOrderLineRemoval = 'paid_order_line_removal';
     case LastLine = 'last_line';
     case UnknownLine = 'unknown_line';
     case ServiceLine = 'service_line';
