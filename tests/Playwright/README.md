@@ -112,7 +112,7 @@ The `accessibility` workflow runs it on every pull request against a demo shop
 served by `php -S` and a router that sends rewritten URLs to Symfony. Outside DDEV, point the SQL helpers at the shop database:
 
 ```bash
-BASE_URL=http://127.0.0.1:8000 MYSQL_COMMAND="mysql -h127.0.0.1 -uroot -proot thelia" \
+BASE_URL=http://127.0.0.1:8000 MYSQL_COMMAND="mysql -h127.0.0.1 -uroot -proot thelia" CONSOLE_COMMAND="php bin/console" \
   npx playwright test specs/accessibility.spec.ts
 ```
 
