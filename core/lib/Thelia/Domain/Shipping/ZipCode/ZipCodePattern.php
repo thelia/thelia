@@ -88,7 +88,8 @@ final readonly class ZipCodePattern
             throw new InvalidZipCodeRuleException('A postal code pattern needs at least one character other than *.');
         }
 
-        if (mb_strlen($normalized) > self::MAX_LENGTH) {
+        // Only ASCII is left: the pattern has no character but A to Z, 0 to 9, * and the dots.
+        if (\strlen($normalized) > self::MAX_LENGTH) {
             throw new InvalidZipCodeRuleException(\sprintf('A postal code pattern is %d characters long at most.', self::MAX_LENGTH));
         }
 
