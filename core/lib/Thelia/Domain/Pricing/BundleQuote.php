@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * What a composition of a bundle priced by its components costs a visitor: the figures a page
  * shows, settled and taxed the way the line of a cart is.
  *
+ * Which of the taxed and untaxed figures a page shows is the choice of the group of the customer
+ * (`displaysTaxedPrices`), as for the price of any product.
+ *
  * `taxedFullPrice` and `taxedSaving` are null when nothing is struck through: the bundle gives
  * no discount, or the shop asks not to show the price without it.
  */
@@ -33,6 +36,8 @@ final readonly class BundleQuote
         public ?float $taxedFullPrice,
         public ?float $untaxedSaving,
         public ?float $taxedSaving,
+        /** The group of the customer is shown the taxed figures; the untaxed ones otherwise. */
+        public bool $displaysTaxedPrices = true,
     ) {
     }
 }
