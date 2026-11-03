@@ -18,9 +18,16 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thelia\Domain\Shipping\ZipCode\Exception\InvalidZipCodeRuleException;
 use Thelia\Domain\Shipping\ZipCode\ZipCodePattern;
+use Thelia\Log\AbstractTlogDestination;
+use Thelia\Log\Tlog;
 
 final class ZipCodePatternTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        $this->setTlogInstance(null);
+    }
+
     /**
      * @return iterable<string, array{string, string, bool}>
      */
@@ -236,6 +243,79 @@ final class ZipCodePatternTest extends TestCase
         $this->expectException(InvalidZipCodeRuleException::class);
         $this->expectExceptionMessage(\sprintf('A postal code pattern is %d characters long at most.', ZipCodePattern::MAX_LENGTH));
         ZipCodePattern::fromString(str_repeat('7', ZipCodePattern::MAX_LENGTH + 1));
+    }
+
+    /**
+     * @return iterable<string, array{bool, string}>
+     */
+    public static function answersWhenPcreGivesUp(): iterable
+    {
+        yield 'an exclusion refuses the code' => [true, 'matching it'];
+        yield 'an inclusion does not take the code' => [false, 'not matching it'];
+    }
+
+    #[DataProvider('answersWhenPcreGivesUp')]
+    public function testAPatternPcreGivesUpOnIsLoggedAndAnswersWhenUnsure(bool $whenUnsure, string $answer): void
+    {
+        $logs = $this->captureTheLog();
+        $pattern = ZipCodePattern::fromString('1*2*3');
+        $backtrackLimit = ini_set('pcre.backtrack_limit', '1');
+        $jit = ini_set('pcre.jit', '0');
+
+        try {
+            $matched = $pattern->matchesNormalized('1'.str_repeat('2', 30).'3A', $whenUnsure);
+        } finally {
+            ini_set('pcre.backtrack_limit', (string) $backtrackLimit);
+            ini_set('pcre.jit', (string) $jit);
+        }
+
+        self::assertSame($whenUnsure, $matched);
+        self::assertCount(1, $logs->lines);
+        self::assertSame(
+            \sprintf('WARNING The postal code pattern "1*2*3" could not be checked (Backtrack limit exhausted): the code is taken as %s.', $answer),
+            $logs->lines[0],
+            'The pattern, the error and the answer are written, the postal code is not.',
+        );
+    }
+
+    private function captureTheLog(): object
+    {
+        $destination = new class extends AbstractTlogDestination {
+            /** @var list<string> */
+            public array $lines = [];
+
+            public function add($string): void
+            {
+                $this->lines[] = $string;
+            }
+
+            public function write(&$res): void
+            {
+            }
+
+            public function getTitle(): string
+            {
+                return 'Test';
+            }
+
+            public function getDescription(): string
+            {
+                return 'Test';
+            }
+        };
+
+        // Tlog::getInstance() would read its configuration from the database.
+        $tlog = (new \ReflectionClass(Tlog::class))->newInstanceWithoutConstructor();
+        $tlog->setLevel(Tlog::WARNING)->setPrefix('#LEVEL ')->setFiles('*');
+        (new \ReflectionProperty(Tlog::class, 'destinations'))->setValue($tlog, [$destination]);
+        $this->setTlogInstance($tlog);
+
+        return $destination;
+    }
+
+    private function setTlogInstance(?Tlog $instance): void
+    {
+        (new \ReflectionProperty(Tlog::class, 'instance'))->setValue(null, $instance);
     }
 
     /**

@@ -261,10 +261,13 @@ final readonly class ZipCodePattern
             $matched = preg_match($expression, $zipCode);
 
             if (false === $matched) {
+                // Read before forLog(), whose own preg_replace_callback() resets the error.
+                $error = preg_last_error_msg();
+
                 // The postal code itself stays out of the log: it is part of an address.
                 Tlog::getInstance()->warning(
                     'The postal code pattern "{pattern}" could not be checked ({error}): the code is taken as {answer}.',
-                    ['pattern' => self::forLog($this->pattern), 'error' => preg_last_error_msg(), 'answer' => $whenUnsure ? 'matching it' : 'not matching it'],
+                    ['pattern' => self::forLog($this->pattern), 'error' => $error, 'answer' => $whenUnsure ? 'matching it' : 'not matching it'],
                 );
 
                 return $whenUnsure;
