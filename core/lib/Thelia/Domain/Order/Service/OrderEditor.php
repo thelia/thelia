@@ -25,7 +25,6 @@ use Thelia\Domain\Order\Enum\OrderEditRefusal;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Exception\OrderEditRefusedException;
 use Thelia\Domain\Order\Exception\StockShortageException;
-use Thelia\Domain\Shipping\Enum\PostageTaxStrategy;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
 use Thelia\Exception\TheliaProcessException;
@@ -34,6 +33,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderVersionTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderPostageTax;
@@ -106,6 +106,7 @@ final readonly class OrderEditor
             $this->dispatcher->dispatch(new OrderEditEvent($order, $edit), TheliaEvents::ORDER_BEFORE_EDIT);
 
             $summary = $this->apply($order, $lines, $edit, $connection);
+            ProductSaleElementsTableMap::clearInstancePool();
 
             Order::forgetCachedTotals((int) $order->getId());
             $this->assertDiscountIsCovered($order);
@@ -299,7 +300,7 @@ final readonly class OrderEditor
         }
 
         $linesChanged = [] !== $edit->addedLines || [] !== $edit->removedLines || [] !== $edit->quantities || [] !== $edit->unitPrices;
-        $postageFollowsGoods = !$vatExempted && PostageTaxStrategy::SINGLE_RULE !== PostageTaxStrategy::fromShopConfiguration();
+        $postageFollowsGoods = !$vatExempted && OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->count() > 0;
 
         if (null !== $edit->untaxedPostage || ($linesChanged && $postageFollowsGoods)) {
             $country ?? throw new TheliaProcessException('The delivery address of the order has no country.');
@@ -409,7 +410,7 @@ final readonly class OrderEditor
             throw new OrderEditRefusedException(OrderEditRefusal::BundleLine, (string) $added->productSaleElementsId);
         }
 
-        $prices = $productSaleElements->getPricesByCurrency($order->getCurrency());
+        $prices = $productSaleElements->getPricesByCurrency($order->getCurrency(), (float) $order->getCustomer()?->getDiscount());
         $promo = 1 === (int) $productSaleElements->getPromo();
         $price = $added->unitPrice ?? (string) $prices->getPrice();
         $promoPrice = $added->unitPrice ?? (string) $prices->getPromoPrice();
