@@ -207,11 +207,12 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         $catalogPrice = $basePrices?->in($currencyId);
 
         if (null !== $groupPrice?->untaxedPrice) {
-            $isPromo = null !== $groupPrice->untaxedPromoPrice;
+            // The cheaper wins, as for the catalog: a promo price at or above the price is none.
+            $isPromo = null !== $groupPrice->untaxedPromoPrice && $groupPrice->untaxedPromoPrice < $groupPrice->untaxedPrice;
 
             return new ResolvedPrice(
                 $groupPrice->untaxedPrice,
-                $groupPrice->untaxedPromoPrice ?? $groupPrice->untaxedPrice,
+                $isPromo ? $groupPrice->untaxedPromoPrice : $groupPrice->untaxedPrice,
                 $isPromo,
                 $isPromo,
                 ResolvedPrice::SOURCE_CUSTOMER_GROUP,
@@ -226,13 +227,17 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         }
 
         // A promo price of its own without a price: the catalog price, less the
-        // discount of the group, is what the promotion is shown against.
+        // discount of the group, is what the promotion is shown against, and the
+        // cheaper wins: a promo price at or above it is none.
         if (null !== $groupPrice?->untaxedPromoPrice) {
+            $discountedPrice = $catalogPrice * $groupFactor;
+            $isPromo = $groupPrice->untaxedPromoPrice < $discountedPrice;
+
             return new ResolvedPrice(
-                $catalogPrice * $groupFactor,
-                $groupPrice->untaxedPromoPrice,
-                true,
-                true,
+                $discountedPrice,
+                $isPromo ? $groupPrice->untaxedPromoPrice : $discountedPrice,
+                $isPromo,
+                $isPromo,
                 ResolvedPrice::SOURCE_CUSTOMER_GROUP,
                 $groupId,
                 $groupRate,
