@@ -30,6 +30,7 @@ use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
+use Thelia\Domain\Pricing\BundleQuoter;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
 use Thelia\Domain\Pricing\PricingActivityChecker;
@@ -109,6 +110,30 @@ final class CartBundleActionTest extends ActionIntegrationTestCase
         $reloaded = CartItemQuery::create()->findPk($line->getId());
         self::assertEqualsWithDelta(527.0, (float) $reloaded->getPrice(), 0.000001);
         self::assertEqualsWithDelta(474.3, (float) $reloaded->getPromoPrice(), 0.000001);
+    }
+
+    public function testThePageQuoteOfABundleForAMemberOfADiscountedGroupIsThePriceOfTheCartLine(): void
+    {
+        $example = $this->exampleBundle($this->factory, $this->service);
+        $member = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $this->factory->customerGroup('bundle-pro-quote', 15.0, displayTaxedPrice: false)]);
+        $this->resetPriceMemos();
+        $composition = $this->composition($example, 2);
+
+        $quote = $this->getService(BundleQuoter::class)->quote(
+            (int) $example['bundle']->getId(),
+            (int) $this->saleElementsOf($example['bundle'])->getId(),
+            $composition,
+            Currency::getDefaultCurrency(),
+            $member,
+        );
+        $line = $this->add($this->factory->cart($member, ['currency' => Currency::getDefaultCurrency()]), $example['bundle'], 1, $composition)->getCartItem();
+
+        // 600 and 540 for the composition chosen, 15 % off both for the group: what the line charges.
+        self::assertNotNull($quote);
+        self::assertEqualsWithDelta(459.0, $quote->untaxedPrice, 0.000001);
+        self::assertEqualsWithDelta((float) $line->getPromoPrice(), $quote->untaxedPrice, 0.000001);
+        self::assertEqualsWithDelta((float) $line->getPrice(), $quote->untaxedFullPrice, 0.000001);
+        self::assertFalse($quote->displaysTaxedPrices, 'The group is shown untaxed prices.');
     }
 
     public function testTheCustomerPriceContextPricesTheDefaultCompositionOfABundleForTheGroup(): void
