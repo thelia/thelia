@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Action;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Action\Cart as CartAction;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
@@ -30,6 +31,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
+use Thelia\Tests\Integration\Action\Fixture\CartActionOverridingDoAddItem;
 
 final class CartActionTest extends ActionIntegrationTestCase
 {
@@ -302,6 +304,84 @@ final class CartActionTest extends ActionIntegrationTestCase
 
         self::assertInstanceOf(Cart::class, $duplicate);
         self::assertNull($duplicate->getToken());
+    }
+
+    public function testDuplicateTakesTheArgumentsOf33ByPosition(): void
+    {
+        $cart = $this->anonymousCartWithOneItem();
+        $line = $cart->getCartItems()->getFirst();
+        $customer = $this->customerWithDiscount('10');
+        $currency = $cart->getCurrency();
+
+        $deprecations = [];
+        set_error_handler(static function (int $level, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            // The call of a 3.3 module: five arguments by position, no line pricer.
+            $copy = $cart->duplicate('bc-'.uniqid(), $customer, $currency, $this->getService(EventDispatcherInterface::class), null);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertInstanceOf(Cart::class, $copy);
+        $copiedLines = CartItemQuery::create()->filterByCartId($copy->getId())->find();
+        self::assertCount(1, $copiedLines);
+
+        // Priced as 3.3 priced it: the catalog price, less the discount of the customer.
+        $catalogPrices = $line->getProductSaleElements()->getPricesByCurrency($currency, 10.0);
+        self::assertEqualsWithDelta($catalogPrices->getPrice(), (float) $copiedLines->getFirst()->getPrice(), 0.000001);
+        self::assertCount(1, array_filter($deprecations, static fn (string $message): bool => str_contains($message, 'duplicate() without a CartLinePricer is deprecated')));
+    }
+
+    public function testAnActionRedefiningDoAddItemWithThe33SignatureServesTheAddition(): void
+    {
+        $action = $this->actionOverridingDoAddItem();
+        $cart = $this->newEmptyCart();
+        $product = $this->factory->product(
+            $this->factory->category(),
+            $this->factory->taxRule(),
+            $this->factory->currency(),
+            ['baseQuantity' => 100],
+        );
+        $pse = $this->defaultPseFor($product->getId());
+
+        $event = new CartEvent($cart);
+        $event
+            ->setProductId($product->getId())
+            ->setProductSaleElementsId($pse->getId())
+            ->setQuantity(2)
+            ->setNewness(true)
+            ->setAppend(true);
+        $cart->save();
+        $action->addItem($event, TheliaEvents::CART_ADDITEM, $this->getService(EventDispatcherInterface::class));
+
+        $catalogPrices = $pse->getPricesByCurrency($cart->getCurrency(), 0.0);
+        self::assertNotNull($action->receivedPrices, 'The redefined doAddItem() serves the addition.');
+        self::assertSame($catalogPrices->getPrice(), $action->receivedPrices->getPrice(), 'It receives the catalog prices, as in 3.3.');
+        self::assertNotNull($event->getCartItem());
+        self::assertSame(2.0, (float) $event->getCartItem()->getQuantity());
+        self::assertEqualsWithDelta($catalogPrices->getPrice(), (float) $event->getCartItem()->getPrice(), 0.000001);
+    }
+
+    /**
+     * The action of the container, as a module extending it would build it: same dependencies.
+     */
+    private function actionOverridingDoAddItem(): CartActionOverridingDoAddItem
+    {
+        $service = $this->getService(CartAction::class);
+        $action = (new \ReflectionClass(CartActionOverridingDoAddItem::class))->newInstanceWithoutConstructor();
+
+        foreach ((new \ReflectionClass(CartAction::class))->getProperties() as $property) {
+            if (!$property->isStatic() && $property->isInitialized($service)) {
+                $property->setValue($action, $property->getValue($service));
+            }
+        }
+
+        return $action;
     }
 
     private function mainRequest(): Request
