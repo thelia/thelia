@@ -205,12 +205,10 @@ final class CartApiTest extends ApiTestCase
         self::assertArrayHasKey('hydra:member', $data);
     }
 
-    public function testCouponsCollectionReturns200ForAnAuthenticatedCustomer(): void
+    public function testCouponsCollectionIsNotExposedToAnAuthenticatedCustomer(): void
     {
         $response = $this->jsonRequest('GET', '/api/front/coupons', token: $this->authenticateAsCustomer());
 
-        self::assertJsonResponseSuccessful($response);
-        $data = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('hydra:member', $data);
+        self::assertSame(404, $response->getStatusCode());
     }
 }
