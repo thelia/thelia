@@ -252,9 +252,10 @@ final readonly class PaymentTransactionRecorder
     }
 
     /**
-     * The capture line of an order paid by a module that keeps no journal: written once,
-     * when the order first reaches a paid status, and only when the journal holds no
-     * authorization and no capture yet, whatever wrote them.
+     * The capture line of an order paid by a module that keeps no journal: written when the
+     * order reaches a paid status, and only when the journal holds no authorization and no
+     * capture yet, whatever wrote them, or when a refund gave back all that its captures
+     * took (an order paid again after its refund).
      *
      * No ceiling applies: the order was paid by whoever marked it so, and the line says
      * so. Nothing is written when the journal already tells the story, which keeps a
@@ -269,12 +270,34 @@ final readonly class PaymentTransactionRecorder
         $orderId = (int) $order->getId();
 
         return $this->locked($orderId, function () use ($order, $orderId, $amount, $pspReference, $moduleCode): ?OrderPaymentTransaction {
-            if (OrderPaymentTransactionQuery::create()->holdsMovement($orderId, [PaymentTransactionType::AUTHORIZATION, PaymentTransactionType::CAPTURE])) {
+            if (OrderPaymentTransactionQuery::create()->holdsMovement($orderId, [PaymentTransactionType::AUTHORIZATION])) {
                 return null;
             }
 
-            return $this->record($order, PaymentTransactionType::CAPTURE, $amount, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null, null, $this->immediateCaptureAuthor($moduleCode));
+            $capturedBefore = OrderPaymentTransactionQuery::create()->holdsMovement($orderId, [PaymentTransactionType::CAPTURE]);
+
+            if ($capturedBefore && !$this->hasGivenEverythingBack($orderId)) {
+                return null;
+            }
+
+            if ($capturedBefore && null !== $pspReference && null !== OrderPaymentTransactionQuery::create()->findByReference($orderId, PaymentTransactionType::CAPTURE, $pspReference)) {
+                // The reference of the order is on the first capture already and is unique
+                // per movement: the new line goes without it rather than not at all.
+                $pspReference = null;
+            }
+
+            // Written again after a refund: the line of the first payment is not a replay.
+            return $this->record($order, PaymentTransactionType::CAPTURE, $amount, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null, null, $this->immediateCaptureAuthor($moduleCode), $capturedBefore);
         });
+    }
+
+    private function hasGivenEverythingBack(int $orderId): bool
+    {
+        $totals = $this->totalsReader->forOrder($orderId);
+
+        return PaymentAmount::isPositive($totals->captured)
+            && !PaymentAmount::isPositive($totals->netCaptured())
+            && !$totals->hasPendingCapture();
     }
 
     /**
@@ -503,6 +526,7 @@ final readonly class PaymentTransactionRecorder
         ?string $errorMessage,
         ?callable $guard = null,
         ?OrderHistoryActor $author = null,
+        bool $isNewMovement = false,
     ): OrderPaymentTransaction {
         $orderId = (int) $order->getId();
         $pspReference = $this->cleanReference($pspReference);
@@ -512,10 +536,10 @@ final readonly class PaymentTransactionRecorder
             throw new \InvalidArgumentException(\sprintf('Payment transaction #%d belongs to another order than %s.', (int) $parent->getId(), (string) $order->getRef()));
         }
 
-        return $this->locked($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard, $author): OrderPaymentTransaction {
-            $existing = null !== $pspReference
+        return $this->locked($orderId, function () use ($order, $orderId, $type, $amount, $state, $pspReference, $parent, $moduleCode, $errorCode, $errorMessage, $guard, $author, $isNewMovement): OrderPaymentTransaction {
+            $existing = $isNewMovement ? null : (null !== $pspReference
                 ? OrderPaymentTransactionQuery::create()->findByReference($orderId, $type, $pspReference)
-                : $this->replayedReferenceLessLine($orderId, $type, $state, $amount);
+                : $this->replayedReferenceLessLine($orderId, $type, $state, $amount));
 
             if (null !== $existing) {
                 return $this->answerReplay($order, $existing, $amount, $state, $pspReference, $errorCode, $errorMessage, $moduleCode);

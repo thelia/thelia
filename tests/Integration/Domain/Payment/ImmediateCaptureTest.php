@@ -247,6 +247,35 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         self::assertFalse(OrderQuery::create()->findPk($order->getId())->isPaymentSecured(), 'The money went back with the refund.');
     }
 
+    public function testAChequeOrderPaidAgainAfterItsRefundGetsANewCaptureSoTheJournalIsNotNetZero(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        $query = OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId());
+        self::assertSame(2, (clone $query)->filterByTypeEnum(PaymentTransactionType::CAPTURE)->count());
+        self::assertSame(1, (clone $query)->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
+        $last = (clone $query)->filterByTypeEnum(PaymentTransactionType::CAPTURE)->orderById('desc')->findOne();
+        self::assertSame('120.000000', $last->getAmount());
+        self::assertSame('Cheque', $last->getActorLabel());
+        self::assertTrue(OrderQuery::create()->findPk($order->getId())->isPaymentSecured(), 'The journal holds the money again.');
+    }
+
+    public function testAnOrderWhoseJournalStillHoldsANetCapturedAmountGetsNoSecondCaptureWhenPaidAgain(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(1, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::CAPTURE)->count());
+    }
+
     public function testAModuleThatWroteItsOwnRefundGetsNoSecondOne(): void
     {
         $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
