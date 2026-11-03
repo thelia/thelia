@@ -22,6 +22,7 @@ use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\EventListener\RecordImmediateCaptureListener;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
+use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -274,6 +275,35 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
 
         self::assertSame(1, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::CAPTURE)->count());
+    }
+
+    public function testAChequeOrderRefundedAgainAfterBeingPaidAgainGetsASecondRefundSoTheNetIsZero(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        $query = OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId());
+        self::assertSame(2, (clone $query)->filterByTypeEnum(PaymentTransactionType::CAPTURE)->count());
+        self::assertSame(2, (clone $query)->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
+        $totals = $this->getService(PaymentTransactionTotalsReader::class)->forOrder((int) $order->getId());
+        self::assertSame('0.000000', $totals->netCaptured());
+    }
+
+    public function testAJournalAlreadyAtNetZeroGetsNoSecondRefundWhenRefundedAgain(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+        $this->moveOrderTo($order, OrderStatus::CODE_NOT_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertSame(1, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
     }
 
     public function testAModuleThatWroteItsOwnRefundGetsNoSecondOne(): void

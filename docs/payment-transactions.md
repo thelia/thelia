@@ -160,7 +160,7 @@ Nothing is written for a module that implements the capture interface and
 answers `supportsDeferredCapture()` with true, nor when the journal already holds an
 authorization or a capture, succeeded or pending, whatever wrote them: an open
 authorization is not taken by marking the order paid, and a module that writes
-its own captures keeps a single line. An order paid again after a refund gave back all its captures took (paid, refunded, unpaid, paid) gets a new capture of its total, the journal's net captured amount being zero. A failure here is logged and the status
+its own captures keeps a single line. An order paid again after a refund gave back all its captures took (paid, refunded, unpaid, paid) gets a new capture of its total, the journal's net captured amount being zero. Refunded again, it gets a second refund of the net captured amount, unless a refund already follows its last capture. A failure here is logged and the status
 change goes on: the status is committed, and a notification answered with an
 error would be retried on an order already paid. Such an order keeps no capture
 line — a replayed notification finds it already paid — and the log is where
