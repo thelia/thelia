@@ -25,10 +25,11 @@ use Thelia\Domain\Order\Enum\OrderEditRefusal;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Exception\OrderEditRefusedException;
 use Thelia\Domain\Order\Exception\StockShortageException;
+use Thelia\Domain\Shipping\Enum\PostageTaxStrategy;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
+use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
-use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Map\OrderProductTableMap;
@@ -42,8 +43,8 @@ use Thelia\Model\OrderProductAttributeCombinationQuery;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderProductTaxQuery;
 use Thelia\Model\OrderReturnLineQuery;
-use Thelia\Model\OrderVersionQuery;
 use Thelia\Model\OrderShipmentItemQuery;
+use Thelia\Model\OrderVersionQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -64,6 +65,7 @@ final readonly class OrderEditor
         private InvoiceRefAllocator $invoiceRefAllocator,
         private EditableOrderStatuses $editableStatuses,
         private PostageTaxBreakdownCalculator $postageTaxBreakdownCalculator,
+        private ExemptedVatCalculator $exemptedVatCalculator,
         private OrderHistoryRecorder $historyRecorder,
         private EventDispatcherInterface $dispatcher,
     ) {
@@ -139,6 +141,10 @@ final readonly class OrderEditor
     {
         if (!$this->editableStatuses->allowsEditing($order)) {
             throw new OrderEditRefusedException(OrderEditRefusal::StatusNotEditable, (string) $order->getOrderStatus()?->getCode());
+        }
+
+        if ([] !== $edit->removedLines && $order->isPaid(false)) {
+            throw new OrderEditRefusedException(OrderEditRefusal::PaidOrderLineRemoval);
         }
 
         if ($this->invoiceRefAllocator->isEnabled() && '' !== (string) $order->getInvoiceRef()) {
@@ -286,9 +292,18 @@ final readonly class OrderEditor
             $order->setDiscount($edit->discount)->save($connection);
         }
 
-        if (null !== $edit->untaxedPostage) {
+        $linesChanged = [] !== $edit->addedLines || [] !== $edit->removedLines || [] !== $edit->quantities || [] !== $edit->unitPrices;
+        $postageFollowsGoods = !$vatExempted && PostageTaxStrategy::SINGLE_RULE !== PostageTaxStrategy::fromShopConfiguration();
+
+        if (null !== $edit->untaxedPostage || ($linesChanged && $postageFollowsGoods)) {
             $country ?? throw new TheliaProcessException('The delivery address of the order has no country.');
-            $summary['postage'] = $this->replacePostage($order, $edit->untaxedPostage, $country, $locale, $vatExempted, $connection);
+            $untaxedPostage = $edit->untaxedPostage ?? $this->amount((float) $order->getPostage() - (float) $order->getPostageTax());
+            $summary['postage'] = $this->replacePostage($order, $untaxedPostage, $country, $locale, $vatExempted, $connection);
+        }
+
+        if ($vatExempted) {
+            $country ?? throw new TheliaProcessException('The delivery address of the order has no country.');
+            $this->refreshExemptedVat($order, $country, $locale, $connection);
         }
 
         return $summary;
@@ -302,9 +317,15 @@ final readonly class OrderEditor
         $before = (string) $order->getPostage();
         $taxRuleTitle = $order->getPostageTaxRuleTitle();
 
+        $state = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getState();
+        $breakdown = $vatExempted ? [] : $this->postageTaxBreakdownCalculator->splitForEditedOrder($order, $country, $state, (float) $untaxedPostage, $locale);
+
         if ($vatExempted) {
             $taxed = $untaxedPostage;
             $tax = '0';
+        } elseif ([] !== $breakdown) {
+            $tax = $this->amount(round(array_sum(array_map(static fn ($line): float => $line->amount, $breakdown)), 2));
+            $taxed = $this->amount((float) $untaxedPostage + (float) $tax);
         } else {
             $module = $order->getDeliveryModuleInstance();
 
@@ -322,30 +343,45 @@ final readonly class OrderEditor
 
         OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->delete($connection);
 
-        $cart = $vatExempted ? null : CartQuery::create()->findPk($order->getCartId());
-
-        if (null !== $cart) {
-            $lines = $this->postageTaxBreakdownCalculator->splitForOrder(
-                $cart,
-                $country,
-                OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getState(),
-                (float) $taxed - (float) $tax,
-                (float) $tax,
-                $locale,
-            );
-
-            foreach ($lines as $line) {
-                (new OrderPostageTax())
-                    ->setOrderId($order->getId())
-                    ->setTitle($line->title)
-                    ->setDescription($line->description)
-                    ->setUntaxedAmount((string) $line->untaxedAmount)
-                    ->setAmount((string) $line->amount)
-                    ->save($connection);
-            }
+        foreach ($breakdown as $line) {
+            (new OrderPostageTax())
+                ->setOrderId($order->getId())
+                ->setTitle($line->title)
+                ->setDescription($line->description)
+                ->setUntaxedAmount((string) $line->untaxedAmount)
+                ->setAmount((string) $line->amount)
+                ->save($connection);
         }
 
         return 0 === bccomp($before, $taxed, 6) ? null : ['from' => $before, 'to' => $taxed];
+    }
+
+    private function refreshExemptedVat(Order $order, Country $country, string $locale, ConnectionInterface $connection): void
+    {
+        $invoiceAddress = OrderAddressQuery::create()->findPk($order->getInvoiceOrderAddressId());
+
+        if (null === $invoiceAddress) {
+            return;
+        }
+
+        $state = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getState();
+        $untaxedPostage = (float) $order->getPostage();
+        $postageVat = 0.0;
+
+        if ($untaxedPostage > 0.0) {
+            $breakdown = $this->postageTaxBreakdownCalculator->splitForEditedOrder($order, $country, $state, $untaxedPostage, $locale);
+            $module = $order->getDeliveryModuleInstance();
+
+            if ([] !== $breakdown) {
+                $postageVat = array_sum(array_map(static fn ($line): float => $line->amount, $breakdown));
+            } elseif (method_exists($module, 'buildOrderPostage')) {
+                $postageVat = (float) $module->buildOrderPostage($untaxedPostage, $country, $locale)->getAmountTax();
+            }
+        }
+
+        $invoiceAddress
+            ->setVatExemptedAmount((string) $this->exemptedVatCalculator->forOrder($order, $country, $state, $postageVat))
+            ->save($connection);
     }
 
     /**

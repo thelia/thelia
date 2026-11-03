@@ -104,6 +104,8 @@ final class OrderEditorTest extends IntegrationTestCase
 
     public function testRemovingALineGivesItsStockBackAndLowersTheTotal(): void
     {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
+        $this->theModuleTakesStockAtCreation();
         $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
         $otherLine = $this->aLine($other, 1.0, '25.000000');
         $stock = $this->stockOf($other->getDefaultSaleElements());
@@ -282,6 +284,15 @@ final class OrderEditorTest extends IntegrationTestCase
         );
     }
 
+    public function testALineCannotBeRemovedFromAPaidOrder(): void
+    {
+        $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $otherLine = $this->aLine($other, 1.0, '25.000000');
+
+        $this->expectRefusal(OrderEditRefusal::PaidOrderLineRemoval);
+        $this->editor->edit($this->order, new OrderEdit(removedLines: [(int) $otherLine->getId()]));
+    }
+
     public function testAShortageRefusesTheEdit(): void
     {
         $this->expectException(StockShortageException::class);
@@ -307,12 +318,14 @@ final class OrderEditorTest extends IntegrationTestCase
 
     public function testTheLastLineCannotBeRemoved(): void
     {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
         $this->expectRefusal(OrderEditRefusal::LastLine);
         $this->editor->edit($this->order, new OrderEdit(removedLines: [(int) $this->line->getId()]));
     }
 
     public function testReplacingTheLastLineInOneEditIsAllowed(): void
     {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
         $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
 
         $this->editor->edit($this->order, new OrderEdit(
@@ -374,6 +387,7 @@ final class OrderEditorTest extends IntegrationTestCase
 
     public function testAServiceLineIsLeftAlone(): void
     {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
         $service = $this->aLine($this->product, 1.0, '3.000000');
         $service->setLineType(OrderProduct::LINE_TYPE_SERVICE)->save();
 
@@ -389,6 +403,68 @@ final class OrderEditorTest extends IntegrationTestCase
         $this->editor->edit($this->order, new OrderEdit(unitPrices: [(int) $this->line->getId() => '20.000000']));
 
         self::assertSame(0, OrderProductTaxQuery::create()->filterByOrderProductId($this->line->getId())->count());
+    }
+
+    public function testTheExemptedVatAmountFollowsTheEditedLines(): void
+    {
+        $invoice = OrderAddressQuery::create()->findPk($this->order->getInvoiceOrderAddressId());
+        $invoice->setVatExempted(1)->setVatExemptedAmount('99.00')->save();
+
+        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '20.000000'], untaxedPostage: '0'));
+
+        self::assertEqualsWithDelta(8.0, (float) OrderAddressQuery::create()->findPk($invoice->getId())->getVatExemptedAmount(), 0.0001);
+    }
+
+    public function testTheExemptedVatAmountSharesTheDiscountOfTheEditedOrder(): void
+    {
+        $invoice = OrderAddressQuery::create()->findPk($this->order->getInvoiceOrderAddressId());
+        $invoice->setVatExempted(1)->setVatExemptedAmount('99.00')->save();
+
+        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '20.000000'], discount: '10.000000', untaxedPostage: '0'));
+
+        self::assertEqualsWithDelta(6.0, (float) OrderAddressQuery::create()->findPk($invoice->getId())->getVatExemptedAmount(), 0.0001);
+    }
+
+    public function testThePostageBreakdownFollowsTheEditedLinesWhenTheShopSpreadsTheTax(): void
+    {
+        $previous = ConfigQuery::read('postage_tax_strategy');
+        ConfigQuery::write('postage_tax_strategy', 'pro_rata');
+
+        try {
+            $reduced = $this->createFixtureFactory();
+            $rule = $reduced->taxRule(['isDefault' => false]);
+            (new TaxRuleCountry())
+                ->setTaxRuleId($rule->getId())
+                ->setCountryId($this->country()->getId())
+                ->setTaxId($reduced->tax(['requirements' => ['percent' => '10'], 'title' => 'VAT 10'])->getId())
+                ->setPosition(1)
+                ->save($this->getPropelConnection());
+            $other = $reduced->product($reduced->category(), $rule, $reduced->currency(), ['title' => 'Book', 'baseQuantity' => 10]);
+
+            $this->editor->edit($this->order, new OrderEdit(
+                addedLines: [new AddedOrderLine((int) $other->getDefaultSaleElements()->getId(), 1.0, '20.000000')],
+                untaxedPostage: '10.000000',
+            ));
+
+            $rows = OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->find();
+            $order = OrderQuery::create()->findPk($this->order->getId());
+
+            self::assertCount(2, $rows);
+            self::assertEqualsWithDelta(1.5, (float) $order->getPostageTax(), 0.0001);
+            self::assertEqualsWithDelta(array_sum(array_map(static fn ($row): float => (float) $row->getAmount(), iterator_to_array($rows))), (float) $order->getPostageTax(), 0.0001);
+            self::assertEqualsWithDelta(11.5, (float) $order->getPostage(), 0.0001);
+
+            $this->editor->edit($this->order, new OrderEdit(quantities: [(int) OrderProductQuery::create()->filterByOrderId($this->order->getId())->filterByProductRef($other->getRef())->findOne()->getId() => 3.0]));
+
+            $order = OrderQuery::create()->findPk($this->order->getId());
+            $sum = array_sum(array_map(static fn ($row): float => (float) $row->getAmount(), iterator_to_array(OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->find())));
+
+            self::assertEqualsWithDelta($sum, (float) $order->getPostageTax(), 0.0001);
+            self::assertEqualsWithDelta(10.0, (float) $order->getPostage() - (float) $order->getPostageTax(), 0.0001);
+            self::assertEqualsWithDelta(1.25, (float) $order->getPostageTax(), 0.0001);
+        } finally {
+            ConfigQuery::write('postage_tax_strategy', (string) $previous);
+        }
     }
 
     public function testTheTotalReadRightAfterAnEditIsNotTheOneCachedBeforeIt(): void
