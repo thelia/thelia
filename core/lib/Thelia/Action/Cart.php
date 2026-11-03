@@ -70,6 +70,7 @@ use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderPostage;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\Module\Exception\DeliveryException;
 use Thelia\Tools\TokenProvider;
 
@@ -331,15 +332,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if ($appends) {
             $cartItem->addQuantity($quantity, $saleUnitQuantity)->save();
         } else {
-            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $bundleComposition);
-
-            if (null === $cartItem) {
-                // Nothing prices this sale element (no price in the default currency):
-                // there is no price to write on a line, so there is no line. Refused, not
-                // answered with an event that holds no line: a module dispatching
-                // CART_ADDITEM reads the line it asked for on the event.
-                throw new ProductWithoutPriceException();
-            }
+            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $this->catalogPricesOf($productSaleElements, $cart), $bundleComposition);
         }
 
         $this->settlePrices($cart);
@@ -646,9 +639,31 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * The catalog prices of a sale element in the currency of the cart, less the discount of the
+     * customer: what {@see doAddItem()} has received since 3.3. Zero for a sale element the
+     * catalog does not price, which doAddItem() refuses unless the line pricer prices it.
+     */
+    private function catalogPricesOf(ProductSaleElements $productSaleElements, CartModel $cart): ProductPriceTools
+    {
+        $customer = $cart->getCustomer();
+        // getDiscount() maps a DECIMAL column and returns a string.
+        $discount = null !== $customer && $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
+
+        try {
+            return $productSaleElements->getPricesByCurrency($this->currencyOf($cart), $discount);
+        } catch (\RuntimeException) {
+            return new ProductPriceTools(0.0, 0.0);
+        }
+    }
+
+    /**
      * try to attach a new item to an existing cart.
      *
-     * @return CartItem|null null when nothing prices the sale element: no line is written
+     * @param ProductPriceTools $productPrices not read since 3.4, the line is priced by the CartLinePricer
+     *                                         (price of the group, rules, operations, discounts); kept so
+     *                                         that the classes extending this one keep their signature
+     *
+     * @throws ProductWithoutPriceException when nothing prices the sale element: no line is written
      */
     protected function doAddItem(
         EventDispatcherInterface $dispatcher,
@@ -656,8 +671,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
         int $productId,
         ProductSaleElements $productSaleElements,
         float $quantity,
+        ProductPriceTools $productPrices,
         ?BundleComposition $bundleComposition = null,
-    ): ?CartItem {
+    ): CartItem {
         $cartItem = new CartItem();
         $cartItem->setDispatcher($dispatcher);
         $cartItem
@@ -678,7 +694,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 throw InvalidBundleCompositionException::malformed(\sprintf('the composition proposed for product %d cannot be priced', $productId));
             }
 
-            return null;
+            // Nothing prices this sale element (no price in the default currency): there is no
+            // price to write on a line, so there is no line. Refused, not answered with an event
+            // that holds no line: a module dispatching CART_ADDITEM reads the line it asked for.
+            throw new ProductWithoutPriceException();
         }
 
         $cartItem->save();
