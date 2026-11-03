@@ -308,10 +308,11 @@ final readonly class ZipCodePattern
         // the check of the characters then leaves the code without a normal form.
         $asciiDigits = preg_replace_callback(
             '/[^\x{0030}-\x{0039}\P{Nd}]/u',
-            static function (array $digit): string {
-                $value = \IntlChar::charDigitValue((int) mb_ord($digit[0]));
+            static function (array $match): string {
+                [$digit] = $match;
+                $value = \IntlChar::charDigitValue((int) mb_ord($digit));
 
-                return $value >= 0 ? (string) $value : $digit[0];
+                return $value >= 0 ? (string) $value : $digit;
             },
             $withoutSeparators,
         );
