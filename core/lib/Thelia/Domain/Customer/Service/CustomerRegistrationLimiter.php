@@ -16,9 +16,7 @@ namespace Thelia\Domain\Customer\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
-use Thelia\Domain\Customer\EmailAddress;
 
 /**
  * Caps how often a visitor may try to register an account.
@@ -36,13 +34,16 @@ use Thelia\Domain\Customer\EmailAddress;
  */
 readonly class CustomerRegistrationLimiter
 {
+    private TwoWindowRegistrationLimiter $limiter;
+
     public function __construct(
         #[Autowire(service: 'limiter.customer_registration_per_address')]
-        private RateLimiterFactoryInterface $perAddressLimiter,
+        RateLimiterFactoryInterface $perAddressLimiter,
         #[Autowire(service: 'limiter.customer_registration_per_client')]
-        private RateLimiterFactoryInterface $perClientLimiter,
-        private RequestStack $requestStack,
+        RateLimiterFactoryInterface $perClientLimiter,
+        RequestStack $requestStack,
     ) {
+        $this->limiter = new TwoWindowRegistrationLimiter($perAddressLimiter, $perClientLimiter, $requestStack);
     }
 
     /**
@@ -59,30 +60,6 @@ readonly class CustomerRegistrationLimiter
      */
     public function attempt(string $email): ?int
     {
-        // No request in a CLI context: the per-client limit simply does not apply. It is
-        // consumed first so that a caller who is already over it stops eating the budget
-        // of the address, whose legitimate owner would then be turned away.
-        $clientIp = $this->requestStack->getMainRequest()?->getClientIp();
-
-        if (null !== $clientIp) {
-            $perClient = $this->perClientLimiter->create($clientIp)->consume();
-
-            if (!$perClient->isAccepted()) {
-                return self::secondsToWait($perClient);
-            }
-        }
-
-        // The normalisation the registration compares addresses with, or a caller buys a
-        // fresh budget by changing the case of one letter.
-        $perAddress = $this->perAddressLimiter
-            ->create(hash('sha256', EmailAddress::normalize($email)))
-            ->consume();
-
-        return $perAddress->isAccepted() ? null : self::secondsToWait($perAddress);
-    }
-
-    private static function secondsToWait(RateLimit $refusal): int
-    {
-        return max(1, $refusal->getRetryAfter()->getTimestamp() - time());
+        return $this->limiter->attempt($email);
     }
 }
