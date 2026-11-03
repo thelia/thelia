@@ -186,6 +186,10 @@ final readonly class OrderEditor
                 throw new OrderEditRefusedException(OrderEditRefusal::ServiceLine, (string) $lineId);
             }
 
+            if ($line->isBundleLine() || $line->isBundleComponentLine()) {
+                throw new OrderEditRefusedException(OrderEditRefusal::BundleLine, (string) $lineId);
+            }
+
             if ($this->isShippedOrReturned($line)) {
                 throw new OrderEditRefusedException(OrderEditRefusal::LineInUse, (string) $lineId);
             }
@@ -399,6 +403,10 @@ final readonly class OrderEditor
 
         if (null === $productSaleElements || null === $product || 1 !== (int) $product->getVisible()) {
             throw new OrderEditRefusedException(OrderEditRefusal::UnknownProduct, (string) $added->productSaleElementsId);
+        }
+
+        if (1 === (int) $product->getIsBundle()) {
+            throw new OrderEditRefusedException(OrderEditRefusal::BundleLine, (string) $added->productSaleElementsId);
         }
 
         $prices = $productSaleElements->getPricesByCurrency($order->getCurrency());

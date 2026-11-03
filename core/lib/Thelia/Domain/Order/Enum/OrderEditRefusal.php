@@ -23,6 +23,7 @@ enum OrderEditRefusal: string
     case LastLine = 'last_line';
     case UnknownLine = 'unknown_line';
     case ServiceLine = 'service_line';
+    case BundleLine = 'bundle_line';
     case LineInUse = 'line_in_use';
     case UnknownProduct = 'unknown_product';
     case InvalidQuantity = 'invalid_quantity';
