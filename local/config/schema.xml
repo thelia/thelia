@@ -1599,6 +1599,8 @@
     <column name="is_used" required="true" type="BOOLEAN" />
     <column name="serialized_conditions" required="true" type="LONGVARCHAR" />
     <column name="per_customer_usage_count" required="true" type="BOOLEAN" />
+    <column defaultValue="0" description="the order in which promotions are considered, lowest first, a tie going to the oldest promotion" name="priority" required="true" type="INTEGER" />
+    <column defaultValue="0" description="once this promotion applies, the promotions after it are set aside" name="stop_processing" required="true" type="BOOLEAN" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
@@ -1631,6 +1633,9 @@
     </index>
     <index name="idx_trigger_mode">
       <index-column name="trigger_mode" />
+    </index>
+    <index name="idx_coupon_priority">
+      <index-column name="priority" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
@@ -2472,6 +2477,19 @@
     </index>
     <index name="fk_coupon_customer_coupon_id_idx">
       <index-column name="coupon_id" />
+    </index>
+  </table>
+  <table isCrossRef="true" name="coupon_exclusion" namespace="Thelia\Model">
+    <column name="coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="excluded_coupon_id" primaryKey="true" required="true" type="INTEGER" />
+    <foreign-key foreignTable="coupon" name="fk_coupon_exclusion_coupon_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="coupon_id" />
+    </foreign-key>
+    <foreign-key foreignTable="coupon" name="fk_coupon_exclusion_excluded_coupon_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="excluded_coupon_id" />
+    </foreign-key>
+    <index name="fk_coupon_exclusion_excluded_coupon_id_idx">
+      <index-column name="excluded_coupon_id" />
     </index>
   </table>
   <table name="brand" namespace="Thelia\Model">

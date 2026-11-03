@@ -88,6 +88,8 @@ class Coupon extends BaseCoupon
         bool $perCustomerUsageCount,
         $startDate = null,
         string $triggerMode = self::TRIGGER_MODE_CODE,
+        ?int $priority = null,
+        ?bool $stopProcessing = null,
     ): void {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
@@ -112,6 +114,15 @@ class Coupon extends BaseCoupon
                 ->setIsUsed(0)
                 ->setShortDescription($shortDescription ?? '')
                 ->setDescription($description ?? '');
+
+            // Left alone when the caller does not say: a promotion keeps the priority it has.
+            if (null !== $priority) {
+                $this->setPriority($priority);
+            }
+
+            if (null !== $stopProcessing) {
+                $this->setStopProcessing($stopProcessing);
+            }
 
             // If no rule given, set default rule
             if (null === $this->getSerializedConditions()) {

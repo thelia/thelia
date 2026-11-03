@@ -780,6 +780,8 @@ final class FixtureFactory
         $coupon->setIsAvailableOnSpecialOffers($overrides['isAvailableOnSpecialOffers'] ?? false);
         $coupon->setIsUsed($overrides['isUsed'] ?? false);
         $coupon->setPerCustomerUsageCount($overrides['perCustomerUsageCount'] ?? false);
+        $coupon->setPriority($overrides['priority'] ?? 0);
+        $coupon->setStopProcessing($overrides['stopProcessing'] ?? false);
         $coupon->setSerializedConditions($overrides['conditions'] ?? '');
         $coupon->setLocale($overrides['locale'] ?? 'en_US');
         $coupon->setTitle($overrides['title'] ?? 'Coupon '.$n);

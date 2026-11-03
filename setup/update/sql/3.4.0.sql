@@ -1,6 +1,59 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------------------------------------------------
+-- Promotion priority, stop and exclusions
+--
+-- `priority` orders the promotions that compete for a cart (lowest first),
+-- `stop_processing` sets aside the promotions after the one that applies, and
+-- `coupon_exclusion` lists the pairs of promotions that never apply together
+-- (one row per direction: the pair is written both ways).
+--
+-- The defaults (priority 0, no stop, no exclusion) leave every existing
+-- promotion behaving as before; no row is rewritten. `coupon` is versionable,
+-- so both columns are mirrored in `coupon_version`.
+--
+-- The table is created through PREPARE/EXECUTE only when it is missing: a bare
+-- CREATE TABLE IF NOT EXISTS commits the transaction ModuleManagement opened,
+-- even when the table exists. This block stays before any DML of the script.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon' AND `COLUMN_NAME` = 'priority');
+SET @statement := IF(@add_column, 'ALTER TABLE `coupon` ADD `priority` INTEGER DEFAULT 0 NOT NULL COMMENT \'the order in which promotions are considered, lowest first, a tie going to the oldest promotion\' AFTER `per_customer_usage_count`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon' AND `COLUMN_NAME` = 'stop_processing');
+SET @statement := IF(@add_column, 'ALTER TABLE `coupon` ADD `stop_processing` TINYINT(1) DEFAULT 0 NOT NULL COMMENT \'once this promotion applies, the promotions after it are set aside\' AFTER `priority`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon_version' AND `COLUMN_NAME` = 'priority');
+SET @statement := IF(@add_column, 'ALTER TABLE `coupon_version` ADD `priority` INTEGER DEFAULT 0 NOT NULL COMMENT \'the order in which promotions are considered, lowest first, a tie going to the oldest promotion\' AFTER `per_customer_usage_count`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon_version' AND `COLUMN_NAME` = 'stop_processing');
+SET @statement := IF(@add_column, 'ALTER TABLE `coupon_version` ADD `stop_processing` TINYINT(1) DEFAULT 0 NOT NULL COMMENT \'once this promotion applies, the promotions after it are set aside\' AFTER `priority`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon' AND `INDEX_NAME` = 'idx_coupon_priority');
+SET @statement := IF(@add_index, 'ALTER TABLE `coupon` ADD INDEX `idx_coupon_priority` (`priority`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'coupon_exclusion');
+SET @statement := IF(@create_table, 'CREATE TABLE `coupon_exclusion` (`coupon_id` INTEGER NOT NULL, `excluded_coupon_id` INTEGER NOT NULL, PRIMARY KEY (`coupon_id`, `excluded_coupon_id`), INDEX `fk_coupon_exclusion_excluded_coupon_id_idx` (`excluded_coupon_id`), CONSTRAINT `fk_coupon_exclusion_coupon_id` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE, CONSTRAINT `fk_coupon_exclusion_excluded_coupon_id` FOREIGN KEY (`excluded_coupon_id`) REFERENCES `coupon` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+-- ---------------------------------------------------------------------
 -- Express payment zones
 --
 -- Whether a shop shows the express payment buttons of its payment modules,
