@@ -396,6 +396,27 @@ final class OrderEditorTest extends IntegrationTestCase
         $this->editor->edit($this->order, new OrderEdit(removedLines: [(int) $service->getId()]));
     }
 
+    public function testTheLinesOfABundleAreLeftAlone(): void
+    {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
+        $bundle = $this->aLine($this->product, 1.0, '30.000000');
+        $bundle->setLineType(OrderProduct::LINE_TYPE_BUNDLE)->save();
+        $component = $this->aLine($this->product, 2.0, '0.000000');
+        $component->setLineType(OrderProduct::LINE_TYPE_BUNDLE_COMPONENT)->setParent($bundle->getId())->save();
+
+        $this->expectRefusal(OrderEditRefusal::BundleLine);
+        $this->editor->edit($this->order, new OrderEdit(quantities: [(int) $component->getId() => 4.0]));
+    }
+
+    public function testABundleProductCannotBeAddedAsAPlainLine(): void
+    {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
+        $this->product->setIsBundle(1)->save();
+
+        $this->expectRefusal(OrderEditRefusal::BundleLine);
+        $this->editor->edit($this->order, new OrderEdit(addedLines: [new AddedOrderLine((int) $this->product->getDefaultSaleElements()->getId(), 1.0, '20.000000')]));
+    }
+
     public function testAnExemptedOrderIsEditedWithoutTaxLines(): void
     {
         OrderAddressQuery::create()->findPk($this->order->getInvoiceOrderAddressId())->setVatExempted(1)->save();
