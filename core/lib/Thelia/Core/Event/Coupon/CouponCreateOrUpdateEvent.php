@@ -40,6 +40,22 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     protected string $triggerMode = Coupon::TRIGGER_MODE_CODE;
 
+    /**
+     * Null until a caller sets it: an update that never mentions the priority
+     * leaves the one on file alone.
+     */
+    protected ?int $priority = null;
+
+    protected ?bool $stopProcessing = null;
+
+    /**
+     * The promotions this one never applies with. Null leaves the exclusions
+     * on file untouched; an empty list removes them all.
+     *
+     * @var list<int>|null
+     */
+    protected ?array $excludedCouponIds = null;
+
     public function __construct(
         protected $code,
         protected $serviceId,
@@ -117,6 +133,58 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function getTriggerMode(): string
     {
         return $this->triggerMode;
+    }
+
+    public function setPriority(int $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority ?? 0;
+    }
+
+    public function hasPriority(): bool
+    {
+        return null !== $this->priority;
+    }
+
+    public function setStopProcessing(bool $stopProcessing): static
+    {
+        $this->stopProcessing = $stopProcessing;
+
+        return $this;
+    }
+
+    public function isStopProcessing(): bool
+    {
+        return $this->stopProcessing ?? false;
+    }
+
+    public function hasStopProcessing(): bool
+    {
+        return null !== $this->stopProcessing;
+    }
+
+    /**
+     * @param list<int>|null $excludedCouponIds null leaves the exclusions untouched
+     */
+    public function setExcludedCouponIds(?array $excludedCouponIds): static
+    {
+        $this->excludedCouponIds = $excludedCouponIds;
+
+        return $this;
+    }
+
+    /**
+     * @return list<int>|null
+     */
+    public function getExcludedCouponIds(): ?array
+    {
+        return $this->excludedCouponIds;
     }
 
     /**

@@ -2144,6 +2144,8 @@ CREATE TABLE `coupon`
     `is_used` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
     `per_customer_usage_count` TINYINT(1) NOT NULL,
+    `priority` INTEGER DEFAULT 0 NOT NULL COMMENT 'the order in which promotions are considered, lowest first, a tie going to the oldest promotion',
+    `stop_processing` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'once this promotion applies, the promotions after it are set aside',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -2160,7 +2162,8 @@ CREATE TABLE `coupon`
     INDEX `idx_max_usage` (`max_usage`),
     INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`),
     INDEX `idx_start_date` (`start_date`),
-    INDEX `idx_trigger_mode` (`trigger_mode`)
+    INDEX `idx_trigger_mode` (`trigger_mode`),
+    INDEX `idx_coupon_priority` (`priority`)
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -3257,6 +3260,30 @@ CREATE TABLE `coupon_customer_count`
         ON DELETE CASCADE,
     CONSTRAINT `fk_coupon_customer_coupon_id`
         FOREIGN KEY (`coupon_id`)
+        REFERENCES `coupon` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- coupon_exclusion
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_exclusion`;
+
+CREATE TABLE `coupon_exclusion`
+(
+    `coupon_id` INTEGER NOT NULL,
+    `excluded_coupon_id` INTEGER NOT NULL,
+    PRIMARY KEY (`coupon_id`,`excluded_coupon_id`),
+    INDEX `fk_coupon_exclusion_excluded_coupon_id_idx` (`excluded_coupon_id`),
+    CONSTRAINT `fk_coupon_exclusion_coupon_id`
+        FOREIGN KEY (`coupon_id`)
+        REFERENCES `coupon` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_exclusion_excluded_coupon_id`
+        FOREIGN KEY (`excluded_coupon_id`)
         REFERENCES `coupon` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
@@ -5325,6 +5352,8 @@ CREATE TABLE `coupon_version`
     `is_used` TINYINT(1) NOT NULL,
     `serialized_conditions` TEXT NOT NULL,
     `per_customer_usage_count` TINYINT(1) NOT NULL,
+    `priority` INTEGER DEFAULT 0 NOT NULL COMMENT 'the order in which promotions are considered, lowest first, a tie going to the oldest promotion',
+    `stop_processing` TINYINT(1) DEFAULT 0 NOT NULL COMMENT 'once this promotion applies, the promotions after it are set aside',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

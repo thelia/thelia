@@ -31,6 +31,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
+use Thelia\Domain\Promotion\Coupon\Service\CouponExclusionWriter;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
@@ -48,6 +49,7 @@ use Thelia\Model\CouponModule;
 use Thelia\Model\CouponModuleQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Event\AddressEvent;
+use Thelia\Model\Map\CouponTableMap;
 use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderCoupon;
@@ -64,6 +66,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 {
     private const DISCOUNT_PRICED_FOR = 'thelia.coupon.discount_priced_for';
 
+    protected readonly CouponExclusionWriter $couponExclusionWriter;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected CouponFactory $couponFactory,
@@ -74,7 +78,10 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected EventDispatcherInterface $dispatcher,
         protected OfferedCartLineService $offeredCartLineService,
         protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
+        ?CouponExclusionWriter $couponExclusionWriter = null,
     ) {
+        // Last and optional so that a module building the action itself keeps its call.
+        $this->couponExclusionWriter = $couponExclusionWriter ?? new CouponExclusionWriter();
     }
 
     private function surchargeLeftByTheCoupon(Cart $cart): ?OrderPostage
@@ -311,27 +318,51 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         // An automatic promotion applies on its own: it carries no code.
         $isAutomatic = CouponModel::TRIGGER_MODE_AUTOMATIC === $event->getTriggerMode();
 
-        $coupon->createOrUpdate(
-            $isAutomatic ? null : $event->getCode(),
-            $event->getTitle(),
-            $event->getEffects(),
-            $event->getServiceId(),
-            $event->isRemovingPostage() ?? false,
-            $event->getShortDescription(),
-            $event->getDescription(),
-            $event->isEnabled(),
-            $event->getExpirationDate(),
-            $event->isAvailableOnSpecialOffers(),
-            $event->isCumulative(),
-            $event->getMaxUsage(),
-            $defaultSerializedRule,
-            $event->getLocale(),
-            $event->getFreeShippingForCountries(),
-            $event->getFreeShippingForMethods(),
-            $event->getPerCustomerUsageCount(),
-            $event->getStartDate(),
-            $event->getTriggerMode(),
-        );
+        // Read before the transaction is opened, locked as its first statement: see CouponExclusionWriter.
+        $rowsToLock = null === $event->getExcludedCouponIds()
+            ? []
+            : $this->couponExclusionWriter->rowsToLock($coupon->isNew() ? null : $coupon->getId(), $event->getExcludedCouponIds());
+
+        $connection = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $this->couponExclusionWriter->lockRows($rowsToLock);
+
+            $coupon->createOrUpdate(
+                $isAutomatic ? null : $event->getCode(),
+                $event->getTitle(),
+                $event->getEffects(),
+                $event->getServiceId(),
+                $event->isRemovingPostage(),
+                $event->getShortDescription(),
+                $event->getDescription(),
+                $event->isEnabled(),
+                $event->getExpirationDate(),
+                $event->isAvailableOnSpecialOffers(),
+                $event->isCumulative(),
+                $event->getMaxUsage(),
+                $defaultSerializedRule,
+                $event->getLocale(),
+                $event->getFreeShippingForCountries(),
+                $event->getFreeShippingForMethods(),
+                $event->getPerCustomerUsageCount(),
+                $event->getStartDate(),
+                $event->getTriggerMode(),
+                $event->hasPriority() ? $event->getPriority() : null,
+                $event->hasStopProcessing() ? $event->isStopProcessing() : null,
+            );
+
+            if (null !== $event->getExcludedCouponIds()) {
+                $this->couponExclusionWriter->replace($coupon->getId(), $event->getExcludedCouponIds());
+            }
+
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
 
         $event->setCouponModel($coupon);
     }
