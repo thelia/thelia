@@ -328,7 +328,7 @@ final class CartCustomerPriceContextTest extends ActionIntegrationTestCase
         $this->factory->customerGroupProductPrice($this->group, $this->pseOf($product), $this->currency, 42.0);
         $this->forgetResolvedPrices();
 
-        $copy = $cart->duplicate('copy-'.uniqid(), $this->member(), $this->currency, $this->dispatcher, null, $this->getService(CartLinePricer::class));
+        $copy = $cart->duplicate('copy-'.uniqid(), $this->member(), $this->currency, $this->dispatcher, null, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         self::assertSame(42.0, $this->onlyLineOf($copy)->getRealPrice());
@@ -341,7 +341,7 @@ final class CartCustomerPriceContextTest extends ActionIntegrationTestCase
         $this->addToCart($cart, $product);
         ProductPriceQuery::create()->filterByProductSaleElementsId($this->pseOf($product)->getId())->delete();
 
-        $copy = $cart->duplicate('copy-'.uniqid(), $this->member(), $this->currency, $this->dispatcher, null, $this->getService(CartLinePricer::class));
+        $copy = $cart->duplicate('copy-'.uniqid(), $this->member(), $this->currency, $this->dispatcher, null, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         self::assertSame(self::CATALOG_PRICE, $this->onlyLineOf($copy)->getRealPrice());
@@ -360,7 +360,7 @@ final class CartCustomerPriceContextTest extends ActionIntegrationTestCase
         $customer = $this->member();
         $customer->setDiscount($discount)->save($this->getPropelConnection());
 
-        $copy = $cart->duplicate('copy-'.uniqid(), $customer, $this->currency, $this->dispatcher, null, $this->getService(CartLinePricer::class));
+        $copy = $cart->duplicate('copy-'.uniqid(), $customer, $this->currency, $this->dispatcher, null, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         // The 15 % of the group of the customer, and no discount of the customer.
@@ -382,7 +382,7 @@ final class CartCustomerPriceContextTest extends ActionIntegrationTestCase
         $cart = $this->factory->cart();
         $this->addToCart($cart, $product);
 
-        $copy = $cart->duplicate('copy-'.uniqid(), $this->member(), $this->currency, $this->dispatcher, null, $this->getService(CartLinePricer::class));
+        $copy = $cart->duplicate('copy-'.uniqid(), $this->member(), $this->currency, $this->dispatcher, null, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $copy);
         self::assertEqualsWithDelta(85.0, $this->onlyLineOf($copy)->getRealPrice(), 0.0000001, 'the group of the customer of the copy applies');

@@ -248,6 +248,7 @@ final class SaleUnitStockReadersTest extends IntegrationTestCase
             $this->currency,
             $this->getService(EventDispatcherInterface::class),
             $this->getService(SaleUnitStockResolver::class),
+            null,
             $this->getService(CartLinePricer::class),
         );
         self::assertInstanceOf(Cart::class, $copy);

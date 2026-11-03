@@ -82,20 +82,23 @@ class Cart extends BaseCart
      * The lines of the copy are priced by the line pricer for the customer and the currency of
      * the copy, in one resolution: the discount, the price of the group, the rules and the
      * reserved operations all apply, and a sale element nothing prices keeps the price of the
-     * line it copies. The pricer is required: a copy made without it would be the one path that
-     * ignores the group of the customer.
+     * line it copies.
+     *
+     * Called without the pricer, as a 3.3 caller does, the lines are priced the way 3.3 priced
+     * them: the catalog price in the currency of the copy, less the discount of the customer,
+     * without the price of the group. That call is deprecated.
      *
      * @throws \Exception
      * @throws PropelException
      */
     public function duplicate(
         ?string $token,
-        ?Customer $customer,
-        ?Currency $currency,
-        ?EventDispatcherInterface $dispatcher,
-        ?SaleUnitStockResolver $saleUnitStockResolver,
-        CartLinePricer $linePricer,
+        ?Customer $customer = null,
+        ?Currency $currency = null,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?SaleUnitStockResolver $saleUnitStockResolver = null,
         ?CartLineAvailability $cartLineAvailability = null,
+        ?CartLinePricer $linePricer = null,
     ): self|bool {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
@@ -163,7 +166,12 @@ class Cart extends BaseCart
             }
         }
 
-        $linePricer->price(array_column($copies, 0), $currency, $customer);
+        if ($linePricer instanceof CartLinePricer) {
+            $linePricer->price(array_column($copies, 0), $currency, $customer);
+        } else {
+            trigger_deprecation('thelia/core', '3.4', 'Calling %s::duplicate() without a CartLinePricer is deprecated: the lines of the copy are then priced from the catalog and the customer discount, without the price of the customer group. Pass the line pricer as the 7th argument.', self::class);
+            $this->priceCopiesFromTheCatalog($copies, $currency, $customer);
+        }
 
         foreach ($copies as [$item, $cartItem]) {
             $item->save();
@@ -180,6 +188,28 @@ class Cart extends BaseCart
         }
 
         return $cart;
+    }
+
+    /**
+     * The pricing of a copy made without the line pricer, as 3.3 did it: the catalog price of the
+     * sale element in the currency of the copy, less the discount of the customer.
+     *
+     * @param list<array{0: CartItem, 1: CartItem}> $copies the new line and the line it copies
+     */
+    private function priceCopiesFromTheCatalog(array $copies, Currency $currency, ?Customer $customer): void
+    {
+        // getDiscount() maps a DECIMAL column and returns a string.
+        $discount = null !== $customer && $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
+
+        foreach ($copies as [$item]) {
+            $productSaleElements = $item->getProductSaleElements();
+            $prices = $productSaleElements->getPricesByCurrency($currency, $discount);
+
+            $item
+                ->setPrice((string) $prices->getPrice())
+                ->setPromoPrice((string) $prices->getPromoPrice())
+                ->setPromo($productSaleElements->getPromo());
+        }
     }
 
     /**

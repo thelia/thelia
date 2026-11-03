@@ -392,7 +392,7 @@ final class AutomaticPromotionCartTest extends ActionIntegrationPromotionTestCas
         $customer = $this->factory->customer($this->factory->customerTitle());
         $this->getService(SecurityContext::class)->setCustomerUser($customer);
 
-        $newCart = $cart->duplicate(null, $customer, $cart->getCurrency(), $this->dispatcher, null, $this->getService(CartLinePricer::class));
+        $newCart = $cart->duplicate(null, $customer, $cart->getCurrency(), $this->dispatcher, null, null, $this->getService(CartLinePricer::class));
 
         self::assertInstanceOf(Cart::class, $newCart);
         self::assertCount(

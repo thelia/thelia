@@ -296,6 +296,7 @@ final class CartActionTest extends ActionIntegrationTestCase
             $this->factory->currency(),
             $this->getService(EventDispatcherInterface::class),
             null,
+            null,
             $this->getService(CartLinePricer::class),
         );
 
