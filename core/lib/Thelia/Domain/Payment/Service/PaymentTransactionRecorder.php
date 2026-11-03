@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Payment\Service;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderPaymentTransactionEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -87,6 +86,12 @@ final readonly class PaymentTransactionRecorder
      * before it was captured.
      */
     public const REASON_EXPIRED = 'expired';
+
+    /**
+     * Annotates the refund line deduced from the status of the order alone, which no
+     * module nor administrator reported: the money went back, nobody said how.
+     */
+    public const REASON_REFUNDED_STATUS = 'refunded_status';
 
     private const DUPLICATE_KEY_SQLSTATE = '23000';
 
@@ -292,30 +297,6 @@ final readonly class PaymentTransactionRecorder
         });
     }
 
-    /**
-     * A refund, succeeded or awaiting its answer, written after the last capture: it tells
-     * how the money of that capture went back, whatever wrote it. A refund older than the
-     * last capture belongs to a payment since made again.
-     */
-    private function holdsRefundAfterLastCapture(int $orderId): bool
-    {
-        $lastCapture = OrderPaymentTransactionQuery::create()
-            ->filterByOrderId($orderId)
-            ->filterByTypeEnum(PaymentTransactionType::CAPTURE)
-            ->orderById('desc')
-            ->findOne();
-
-        $refunds = OrderPaymentTransactionQuery::create()
-            ->filterByOrderId($orderId)
-            ->filterByTypeEnum(PaymentTransactionType::REFUND);
-
-        if (null !== $lastCapture) {
-            $refunds->filterById($lastCapture->getId(), Criteria::GREATER_THAN);
-        }
-
-        return $refunds->count() > 0;
-    }
-
     private function hasGivenEverythingBack(int $orderId): bool
     {
         $totals = $this->totalsReader->forOrder($orderId);
@@ -331,9 +312,10 @@ final readonly class PaymentTransactionRecorder
      * says of it. What the journal still counts as taken is written given back, so that the
      * journal does not hold, against the status, money the buyer no longer paid.
      *
-     * Nothing is written when the journal already holds a refund after its last capture,
-     * succeeded or awaiting its answer, whatever wrote it, nor when it counts nothing left
-     * to give back.
+     * The status says refunded in full, so what a partial refund left taken is written too.
+     * Nothing is written when a refund still awaits its answer, nor when the journal counts
+     * nothing left to give back. The line carries REASON_REFUNDED_STATUS as its error code,
+     * the annotation of a refund nobody reported.
      */
     public function recordImmediateRefundIfNone(
         Order $order,
@@ -343,11 +325,14 @@ final readonly class PaymentTransactionRecorder
         $orderId = (int) $order->getId();
 
         return $this->locked($orderId, function () use ($order, $orderId, $pspReference, $moduleCode): ?OrderPaymentTransaction {
-            if ($this->holdsRefundAfterLastCapture($orderId)) {
+            $totals = $this->totalsReader->forOrder($orderId);
+
+            // A refund still waiting for its answer may give all of it back: nothing to add.
+            if (PaymentAmount::isPositive($totals->pendingRefund)) {
                 return null;
             }
 
-            $refundable = $this->totalsReader->forOrder($orderId)->refundable();
+            $refundable = $totals->refundable();
 
             if (!PaymentAmount::isPositive($refundable)) {
                 return null;
@@ -362,7 +347,7 @@ final readonly class PaymentTransactionRecorder
             }
 
             // Written again after a new capture: the line of the first refund is not a replay.
-            return $this->record($order, PaymentTransactionType::REFUND, $refundable, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, null, null, null, $this->immediateCaptureAuthor($moduleCode), $refundedBefore);
+            return $this->record($order, PaymentTransactionType::REFUND, $refundable, PaymentTransactionState::SUCCEEDED, $pspReference, null, $moduleCode, self::REASON_REFUNDED_STATUS, null, null, $this->immediateCaptureAuthor($moduleCode), $refundedBefore);
         });
     }
 

@@ -19,6 +19,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
+use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\EventListener\RecordImmediateCaptureListener;
 use Thelia\Domain\Payment\Service\PaymentTransactionRecorder;
@@ -306,7 +307,7 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
         self::assertSame(1, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
     }
 
-    public function testAModuleThatWroteItsOwnRefundGetsNoSecondOne(): void
+    public function testAPartialRefundTheModuleWroteIsCompletedWhenTheStatusSaysRefunded(): void
     {
         $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
@@ -314,11 +315,23 @@ final class ImmediateCaptureTest extends ActionIntegrationTestCase
 
         $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
 
-        self::assertSame(
-            1,
-            OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count(),
-            'The refund the module wrote tells the story.',
-        );
+        $refunds = OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->orderById()->find();
+        self::assertCount(2, $refunds, 'Refunded in full: what the partial refund left taken goes back too.');
+        self::assertSame('70.000000', $refunds[1]->getAmount());
+        self::assertSame(PaymentTransactionRecorder::REASON_REFUNDED_STATUS, $refunds[1]->getErrorCode());
+        self::assertNull($refunds[0]->getErrorCode(), 'The refund the module wrote is left as it is.');
+        self::assertSame('0.000000', $this->getService(PaymentTransactionTotalsReader::class)->forOrder((int) $order->getId())->netCaptured());
+    }
+
+    public function testARefundWaitingForItsAnswerLeavesTheRefundedStatusWritingNothing(): void
+    {
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->getService(PaymentTransactionRecorder::class)->recordRefund($order, 50, null, PaymentTransactionState::PENDING, moduleCode: 'Cheque');
+
+        $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+
+        self::assertSame(1, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
     }
 
     public function testAModuleThatDefersItsCaptureGetsNoRefundFromItsStatus(): void
