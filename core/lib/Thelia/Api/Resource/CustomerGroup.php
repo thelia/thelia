@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -240,9 +241,11 @@ class CustomerGroup extends AbstractTranslatableResource
      * The secret of the registration link of the group, null when the link is closed. Read only,
      * and only by the administration on the single item: it is opened, regenerated and closed by
      * the `registration_link` operations, never written with the group, and the storefront never
-     * sees it.
+     * sees it. Whoever holds it registers accounts in the group: an administrator restricted to a
+     * sale unit, who may not open the link nor put a customer in the group, is not handed it.
      */
     #[Groups([self::GROUP_ADMIN_READ_SINGLE])]
+    #[ApiProperty(security: 'is_granted("'.SaleUnitScopeVoter::UNRESTRICTED.'")')]
     public ?string $registrationToken = null;
 
     /**
