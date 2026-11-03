@@ -150,7 +150,7 @@ final class CustomerGroupAssignmentTest extends IntegrationTestCase
         self::assertSame($group->getId(), $reloaded->getCustomerGroupId());
     }
 
-    public function testAnonymizingKeepsTheGroupOfTheCustomer(): void
+    public function testAnonymizingPutsTheCustomerBackInTheDefaultGroup(): void
     {
         $group = $this->factory->customerGroup('erased');
         $customer = $this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group]);
@@ -159,7 +159,7 @@ final class CustomerGroupAssignmentTest extends IntegrationTestCase
 
         $reloaded = $this->reload($customer->getId());
         self::assertNotNull($reloaded->getAnonymizedAt());
-        self::assertSame($group->getId(), $reloaded->getCustomerGroupId());
+        self::assertSame(CustomerGroupQuery::findDefault()->getId(), $reloaded->getCustomerGroupId());
     }
 
     private function createEvent(string $email, ?int $customerGroupId = null): CustomerCreateOrUpdateEvent
