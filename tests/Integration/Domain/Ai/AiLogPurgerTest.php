@@ -153,7 +153,9 @@ final class AiLogPurgerTest extends IntegrationTestCase
         $event = new MaintenancePurgeEvent(true);
         static::getContainer()->get('event_dispatcher')->dispatch($event, TheliaEvents::MAINTENANCE_PURGE);
 
-        $lines = array_values(array_filter($event->getResults(), static fn (string $line): bool => str_contains($line, 'AI ')));
+        // The lines of the core only: an installed module may report its own purge with
+        // "AI" in its label (TheliaCMS: "CMS generator prompts (as the AI log of the core)").
+        $lines = array_values(array_filter($event->getResults(), static fn (string $line): bool => str_starts_with($line, '<comment>AI ')));
         self::assertCount(9, $lines);
         self::assertStringContainsString('AI usage log (>36500 days):</comment> <info>0 to delete', $lines[0]);
         self::assertStringContainsString('1 to delete', $lines[2]);
