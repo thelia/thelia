@@ -25,6 +25,7 @@ use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\CustomerListQuery;
 use Thelia\Model\CustomerVersionQuery;
 use Thelia\Model\Map\CustomerTableMap;
@@ -50,7 +51,9 @@ use Thelia\Model\TagElementQuery;
  * payment methods, the address the consents of the checkout were accepted from,
  * the label naming them as the author of an entry in the history of their own
  * orders, and the identity the administrator audit trail recorded about that
- * customer.
+ * customer. The account goes back to the default customer group: the group an
+ * administrator put a person in says something about that person. Each order
+ * keeps the group frozen on it, part of its accounting record.
  *
  * The country and state of an order address are kept, because they justify
  * the tax rate applied on the order.
@@ -66,11 +69,13 @@ final readonly class CustomerAnonymizer
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
+     * @param CustomerGroupAssignment|null                    $customerGroupAssignment what announces the move to the default group; without it, the move is written and not announced
      */
     public function __construct(
         private CustomerPaymentMethodService $customerPaymentMethodService,
         #[AutowireIterator('thelia.customer.personal_data_provider')]
         private iterable $personalDataProviders = [],
+        private ?CustomerGroupAssignment $customerGroupAssignment = null,
     ) {
     }
 
@@ -80,6 +85,7 @@ final readonly class CustomerAnonymizer
     public function anonymize(Customer $customer): void
     {
         $connection = Propel::getConnection(CustomerTableMap::DATABASE_NAME);
+        $previousCustomerGroupId = (int) $customer->getCustomerGroupId();
         $connection->beginTransaction();
 
         try {
@@ -112,6 +118,9 @@ final readonly class CustomerAnonymizer
         foreach ($tellProvidersToForget as $tellProviderToForget) {
             $tellProviderToForget();
         }
+
+        // Announced once the erasure is committed, as any other move of a customer.
+        $this->customerGroupAssignment?->announceChangeFrom($customer, $previousCustomerGroupId);
     }
 
     /**
@@ -351,6 +360,7 @@ final readonly class CustomerAnonymizer
             ->setRememberMeSerial(null)
             ->setConfirmationToken(null)
             ->setConfirmationTokenExpiresAt(null)
+            ->setCustomerGroupId((int) CustomerGroupQuery::findDefault()->getId())
             ->setEnable(0);
 
         // The marker is what tells an anonymous account from an account that
