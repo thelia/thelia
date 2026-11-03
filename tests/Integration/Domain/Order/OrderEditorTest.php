@@ -32,6 +32,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderPostageTaxQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct;
@@ -462,6 +463,43 @@ final class OrderEditorTest extends IntegrationTestCase
             self::assertEqualsWithDelta($sum, (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(10.0, (float) $order->getPostage() - (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(1.25, (float) $order->getPostageTax(), 0.0001);
+        } finally {
+            ConfigQuery::write('postage_tax_strategy', (string) $previous);
+        }
+    }
+
+    public function testAnUntaxedPostageIsRoundedToTheCentLikeAtCheckout(): void
+    {
+        $previous = ConfigQuery::read('postage_tax_strategy');
+        ConfigQuery::write('postage_tax_strategy', 'pro_rata');
+
+        try {
+            $this->editor->edit($this->order, new OrderEdit(untaxedPostage: '10.005000'));
+
+            $order = OrderQuery::create()->findPk($this->order->getId());
+            $untaxed = array_sum(array_map(static fn ($row): float => (float) $row->getUntaxedAmount(), iterator_to_array(OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->find())));
+
+            self::assertEqualsWithDelta((float) $order->getPostage() - (float) $order->getPostageTax(), $untaxed, 0.0001);
+            self::assertEqualsWithDelta(10.01, $untaxed, 0.0001);
+        } finally {
+            ConfigQuery::write('postage_tax_strategy', (string) $previous);
+        }
+    }
+
+    public function testAFreePostageNeverAsksTheDeliveryModuleWhenALineChanges(): void
+    {
+        $previous = ConfigQuery::read('postage_tax_strategy');
+        ConfigQuery::write('postage_tax_strategy', 'pro_rata');
+
+        try {
+            $this->order->setPostage('0')->setPostageTax('0')->setDeliveryModuleId((int) ModuleQuery::create()->findOneByCode('Cheque')->getId())->save($this->getPropelConnection());
+            $line = OrderProductQuery::create()->filterByOrderId($this->order->getId())->findOne();
+
+            $this->editor->edit($this->order, new OrderEdit(quantities: [(int) $line->getId() => 4.0]));
+
+            $order = OrderQuery::create()->findPk($this->order->getId());
+            self::assertEqualsWithDelta(0.0, (float) $order->getPostage(), 0.0001);
+            self::assertEqualsWithDelta(4.0, (float) OrderProductQuery::create()->findPk($line->getId())->getQuantity(), 0.0001);
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
         }
