@@ -85,12 +85,20 @@ class CustomerGroup extends BaseCustomerGroup
      * payment modules go with it (ON DELETE CASCADE): they were its own, and no other group
      * sees more or less for it.
      *
+     * Each customer is moved, and the move announced, by the listener of the deletion
+     * ({@see \Thelia\Domain\Customer\EventListener\MoveCustomersOfADeletedGroupListener}); the
+     * bulk update after it only catches a deletion made on a connection that dispatches nothing.
+     *
      * @throws DefaultCustomerGroupProtectedException
      */
     public function preDelete(?ConnectionInterface $con = null): bool
     {
         if (1 === $this->getIsDefault()) {
             throw DefaultCustomerGroupProtectedException::onDeletion((int) $this->getId());
+        }
+
+        if (!parent::preDelete($con)) {
+            return false;
         }
 
         CustomerQuery::create()
@@ -100,6 +108,6 @@ class CustomerGroup extends BaseCustomerGroup
         // A bulk update leaves the pooled customers on the group that is going away.
         CustomerTableMap::clearInstancePool();
 
-        return parent::preDelete($con);
+        return true;
     }
 }
