@@ -60,6 +60,12 @@
 - `Action\Cart::doAddItem()` keeps the signature of 3.3, `ProductPriceTools $productPrices` included, and still returns a `CartItem`: a module that redefines it with the 3.3 signature loads and serves the additions. The line is priced by the `CartLinePricer`, so `$productPrices` (the catalog prices less the discount of the customer, as in 3.3) is no longer read; a sale element nothing prices throws `Thelia\Domain\Cart\Exception\ProductWithoutPriceException` from `doAddItem()`.
 - The price of a composition of a bundle shown on the product page (`BundleQuoter`) applies the discount of the group of the customer as the cart line does (`CustomerPriceContextInterface::resolveBundlePrices()`), and `BundleQuote::$displaysTaxedPrices` tells whether the group is shown the taxed or the untaxed figures.
 
+## AI gateway
+
+- A reasoning effort per tier and per usage. `ai_tier_assignment.effort` and `ai_usage_setting.effort` (`setup/update/sql/3.4.0.sql`, replayable) hold `low`, `medium`, `high`, `xhigh` or `max`; empty means nothing is sent and the provider keeps its default, which is what every existing shop runs. A usage takes its own effort, else the one of its tier, and the call of the core (`core.*` usages: connection test, guardrail judge) takes none. It is exposed on `/api/admin/ai/tiers` and `/api/admin/ai/usage-settings` as `effort`.
+- Only the Anthropic adapter translates it, into `output_config.effort`. A native `effort` or `output_config.effort` in `providerOptions` still wins. The default on thinking is unchanged (off from `low` to `high`, kept at `xhigh` and `max`); on a model that cannot stop thinking (claude-opus-5-5, claude-fable-5), the effort of the tier now replaces the lowest effort the adapter used to force, so such a model thinks at the effort set.
+- OpenAI, Mistral, Ollama and the OpenAI-compatible providers ignore it and send nothing. OpenAI is left out until the accepted values and the models that take `reasoning.effort` are known: the catalogue flags no reasoning model, and a blind send would break `gpt-4o` and `gpt-4.1` calls. `AiEffort::isTranslatedFor()` tells a screen whether a provider uses the setting.
+
 ## API
 
 - `Thelia\Api\Bridge\Propel\FrontOperation::isFront()` tells whether an API Platform operation is served under `/front/`, for a processor, a provider or an extension that behaves differently there than on the admin side.
