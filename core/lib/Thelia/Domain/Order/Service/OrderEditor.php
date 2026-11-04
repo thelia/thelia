@@ -61,6 +61,8 @@ final readonly class OrderEditor
 
     private const QUANTITY_TOLERANCE = 0.000001;
 
+    private const MAX_QUANTITY = 9_999_999.0;
+
     public function __construct(
         private OrderTransactionManager $transactionManager,
         private OrderProductFactory $orderProductFactory,
@@ -267,7 +269,7 @@ final readonly class OrderEditor
         }
 
         foreach ([...array_values($edit->quantities), ...array_map(static fn (AddedOrderLine $added): float => $added->quantity, $edit->addedLines)] as $quantity) {
-            if (!is_finite($quantity) || $quantity <= 0) {
+            if (!is_finite($quantity) || $quantity <= 0 || $quantity > self::MAX_QUANTITY) {
                 throw new OrderEditRefusedException(OrderEditRefusal::InvalidQuantity);
             }
         }
