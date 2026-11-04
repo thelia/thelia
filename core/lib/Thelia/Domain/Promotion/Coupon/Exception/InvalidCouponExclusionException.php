@@ -16,6 +16,8 @@ namespace Thelia\Domain\Promotion\Coupon\Exception;
 
 final class InvalidCouponExclusionException extends \InvalidArgumentException
 {
+    private bool $concurrentEdit = false;
+
     public static function selfExclusion(int $couponId): self
     {
         return new self(\sprintf('The promotion %d cannot exclude itself.', $couponId));
@@ -36,6 +38,15 @@ final class InvalidCouponExclusionException extends \InvalidArgumentException
 
     public static function concurrentEdit(?\Throwable $previous = null): self
     {
-        return new self('Another change of the promotions got in the way, nothing was saved: try again.', 0, $previous);
+        $exception = new self('Another change of the promotions got in the way, nothing was saved: try again.', 0, $previous);
+        $exception->concurrentEdit = true;
+
+        return $exception;
+    }
+
+    /** True when nothing was wrong with the choice: another change got in the way, the same save can be tried again. */
+    public function isConcurrentEdit(): bool
+    {
+        return $this->concurrentEdit;
     }
 }
