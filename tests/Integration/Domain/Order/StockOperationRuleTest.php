@@ -296,6 +296,16 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         self::assertSame(['NoSuchModule'], $diagnostics->missingModules($overridden));
     }
 
+    public function testAModuleGoneFromALimitDoesNotHideThatAnEarlierActionCoversIt(): void
+    {
+        $first = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_NONE, 1, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque']]);
+        $later = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_INCREASE, 2, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque', 'NoSuchModule']]);
+
+        $overriddenActions = $this->getService(StockActionDiagnostics::class)->overriddenActions();
+
+        self::assertSame($first->getId(), $overriddenActions[$later->getId()] ?? null, 'NoSuchModule is ignored: the later action only ever applies to cheques, which the first one already takes.');
+    }
+
     private function stockIsManagedOnOrderCreation(bool $managed): void
     {
         $listener = static function (ManageStockOnCreationEvent $event) use ($managed): void {

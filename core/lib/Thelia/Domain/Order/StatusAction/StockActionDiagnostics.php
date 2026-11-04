@@ -57,14 +57,32 @@ final readonly class StockActionDiagnostics
             ->find()
             ->getData();
 
+        $activeModuleCodes = $this->activeModuleCodes();
         $payloads = [];
 
         foreach ($actions as $action) {
             try {
-                $payloads[$action->getId()] = $stockAction->normalizePayload($action->getDecodedPayload());
+                $payload = $stockAction->normalizePayload($action->getDecodedPayload());
             } catch (InvalidOrderStatusActionPayloadException) {
                 // A refused payload never applies: it overrides nothing.
+                continue;
             }
+
+            // Compared as the resolver applies them: a module gone from a limit is not part of it,
+            // and a limit left with no module at all makes its action ignored.
+            foreach ([AdjustStockAction::FIELD_PAYMENT_MODULES, AdjustStockAction::FIELD_DELIVERY_MODULES] as $field) {
+                if (!isset($payload[$field])) {
+                    continue;
+                }
+
+                $payload[$field] = array_values(array_intersect($payload[$field], $activeModuleCodes));
+
+                if ([] === $payload[$field]) {
+                    continue 2;
+                }
+            }
+
+            $payloads[$action->getId()] = $payload;
         }
 
         $overridden = [];
@@ -114,14 +132,23 @@ final readonly class StockActionDiagnostics
             return [];
         }
 
-        $activeCodes = ModuleQuery::create()
-            ->filterByCode($codes, Criteria::IN)
-            ->filterByActivate(1)
-            ->select(['Code'])
-            ->find()
-            ->getData();
+        return array_values(array_diff($codes, $this->activeModuleCodes($codes)));
+    }
 
-        return array_values(array_diff($codes, $activeCodes));
+    /**
+     * @param list<string>|null $amongCodes
+     *
+     * @return list<string>
+     */
+    private function activeModuleCodes(?array $amongCodes = null): array
+    {
+        $query = ModuleQuery::create()->filterByActivate(1);
+
+        if (null !== $amongCodes) {
+            $query->filterByCode($amongCodes, Criteria::IN);
+        }
+
+        return array_values(array_map(strval(...), $query->select(['Code'])->find()->getData()));
     }
 
     /**
