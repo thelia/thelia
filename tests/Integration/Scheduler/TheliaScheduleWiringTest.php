@@ -44,15 +44,19 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
     public function testTheScheduleRunsTheTasksOfTheCoreOnTheirDefaultExpressions(): void
     {
         $schedule = $this->getService(TheliaSchedule::class)->getSchedule();
+        $coreTasks = [
+            'sale:check-activation' => '* * * * *',
+            'maintenance:purge' => '30 3 * * *',
+            'thelia:messenger:purge-failed' => '0 4 * * *',
+            'content:publish-scheduled' => '* * * * *',
+        ];
+        // An active module may add its own tasks to this schedule: only the tasks of the core are compared.
+        $commands = self::commands($schedule->getRecurringMessages());
 
-        self::assertSame(
-            [
-                'sale:check-activation' => '* * * * *',
-                'maintenance:purge' => '30 3 * * *',
-                'thelia:messenger:purge-failed' => '0 4 * * *',
-                'content:publish-scheduled' => '* * * * *',
-            ],
-            self::commands($schedule->getRecurringMessages()),
+        self::assertSame($coreTasks, array_intersect_key($commands, $coreTasks));
+        self::assertArrayNotHasKey(
+            'currency:update-rates',
+            $commands,
             'The currency rates are left out: the update overwrites every rate, those set by hand included.',
         );
     }
@@ -127,7 +131,11 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
 
         foreach ($recurringMessages as $recurringMessage) {
             foreach ($recurringMessage->getMessages(new MessageContext(TheliaSchedule::NAME, 'id', $recurringMessage->getTrigger(), new \DateTimeImmutable())) as $message) {
-                \assert($message instanceof RunCommandMessage);
+                // A task that calls a service, as a module may declare, runs no command.
+                if (!$message instanceof RunCommandMessage) {
+                    continue;
+                }
+
                 $commands[$message->input] = (string) $recurringMessage->getTrigger();
             }
         }
