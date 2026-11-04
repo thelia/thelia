@@ -20,8 +20,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 final class OrderActionTest extends ActionIntegrationTestCase
