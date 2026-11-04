@@ -37,4 +37,27 @@ readonly class OrderTransactionManager
     {
         $connection->rollBack();
     }
+
+    public function isInTransaction(): bool
+    {
+        return Propel::getConnection(OrderTableMap::DATABASE_NAME)->inTransaction();
+    }
+
+    /**
+     * Propel's nested rollback undoes nothing: it only marks the outer transaction as unusable.
+     * Inside a transaction opened by the caller, a savepoint is the only way to take work back.
+     */
+    public function savepoint(): ConnectionInterface
+    {
+        $connection = Propel::getConnection(OrderTableMap::DATABASE_NAME);
+        $connection->exec('SAVEPOINT order_edit_simulation');
+
+        return $connection;
+    }
+
+    public function rollbackToSavepoint(ConnectionInterface $connection): void
+    {
+        $connection->exec('ROLLBACK TO SAVEPOINT order_edit_simulation');
+        $connection->exec('RELEASE SAVEPOINT order_edit_simulation');
+    }
 }

@@ -114,4 +114,71 @@ final class OrderEditorRollbackTest extends IntegrationTestCase
         self::assertSame(0, OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count());
         self::assertNotNull(OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId()));
     }
+
+    public function testASimulationAnnouncesTheTotalsOfTheEditAndWritesNothing(): void
+    {
+        [$order, $line, $pse] = $this->aPaidOrderWithOneLine();
+
+        $editor = $this->getService(OrderEditor::class);
+        $edit = new OrderEdit(quantities: [(int) $line->getId() => 5.0], unitPrices: [(int) $line->getId() => '12.000000'], discount: '3.000000');
+        $state = $editor->stateOf($order);
+        $stock = (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity();
+
+        $preview = $editor->simulate($order, $edit);
+
+        self::assertNotSame($preview->before->total, $preview->after->total);
+        self::assertSame($state, $editor->stateOf(OrderQuery::create()->findPk($order->getId())));
+        self::assertSame($state, $editor->stateOf($order), 'The order held by the caller must show what the database holds after a simulation.');
+        self::assertEqualsWithDelta($stock, (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity(), 0.0001);
+        self::assertEqualsWithDelta(2.0, (float) OrderProductQuery::create()->findPk($line->getId())->getQuantity(), 0.0001);
+        self::assertSame(0, OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count());
+
+        $editor->edit($order, $edit);
+        $tax = 0;
+        $order->clearOrderProducts();
+        \Thelia\Model\Order::forgetCachedTotals((int) $order->getId());
+
+        self::assertSame($preview->after->total, number_format($order->getTotalAmount($tax, true, true), 6, '.', ''), 'The simulated total must be the total the real edit gives.');
+        self::assertSame($preview->after->tax, number_format($tax, 6, '.', ''));
+    }
+
+    public function testASimulationRefusesWhatTheEditRefusesAndLeavesTheOrderUntouched(): void
+    {
+        [$order, $line] = $this->aPaidOrderWithOneLine();
+
+        $editor = $this->getService(OrderEditor::class);
+        $state = $editor->stateOf($order);
+
+        try {
+            $editor->simulate($order, new OrderEdit(quantities: [(int) $line->getId() => 5.0], discount: '99999.000000'));
+            self::fail('The discount above the total must refuse the simulation.');
+        } catch (OrderEditRefusedException $refusal) {
+            self::assertStringContainsString('('.OrderEditRefusal::InvalidDiscount->value.')', $refusal->getMessage());
+        }
+
+        self::assertSame($state, $editor->stateOf(OrderQuery::create()->findPk($order->getId())));
+        self::assertSame($state, $editor->stateOf($order));
+    }
+
+    /**
+     * @return array{0: \Thelia\Model\Order, 1: \Thelia\Model\OrderProduct, 2: \Thelia\Model\ProductSaleElements}
+     */
+    private function aPaidOrderWithOneLine(): array
+    {
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+
+        $product = $factory->product($factory->category(), $factory->taxRule(['isDefault' => false]), $factory->currency(), ['title' => 'Widget', 'baseQuantity' => 10]);
+        $pse = $product->getDefaultSaleElements();
+        $line = $factory->orderProduct($order, [
+            'productRef' => $product->getRef(),
+            'productSaleElementsRef' => $pse->getRef(),
+            'productSaleElementsId' => $pse->getId(),
+            'quantity' => 2.0,
+            'price' => '10.000000',
+            'promoPrice' => '10.000000',
+        ]);
+
+        return [$order, $line, $pse];
+    }
 }
