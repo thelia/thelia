@@ -126,7 +126,7 @@ final class OrderEditorRollbackTest extends IntegrationTestCase
 
         $preview = $editor->simulate($order, $edit);
 
-        self::assertNotSame($preview->before->total, $preview->after->total);
+        self::assertGreaterThan((float) $preview->before->total, (float) $preview->after->total, 'Five units at 12 less a discount of 3 cost more than two units at 10.');
         self::assertSame($state, $editor->stateOf(OrderQuery::create()->findPk($order->getId())));
         self::assertSame($state, $editor->stateOf($order), 'The order held by the caller must show what the database holds after a simulation.');
         self::assertEqualsWithDelta($stock, (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity(), 0.0001);

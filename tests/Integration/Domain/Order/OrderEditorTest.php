@@ -19,6 +19,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\OrderEditEvent;
+use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\DTO\AddedOrderLine;
 use Thelia\Domain\Order\DTO\OrderEdit;
@@ -149,7 +150,7 @@ final class OrderEditorTest extends IntegrationTestCase
 
         $preview = $this->editor->simulate($this->order, new OrderEdit(removedLines: [(int) $otherLine->getId()], discount: '2.000000'));
 
-        self::assertNotSame($preview->before->total, $preview->after->total);
+        self::assertLessThan((float) $preview->before->total, (float) $preview->after->total, 'Removing a line and adding a discount lowers the total.');
         self::assertNotNull(OrderProductQuery::create()->findPk($otherLine->getId()));
         self::assertSame(1, OrderProductTaxQuery::create()->filterByOrderProductId($otherLine->getId())->count());
         self::assertSame($state, $this->editor->stateOf(OrderQuery::create()->findPk($this->order->getId())));
@@ -420,7 +421,19 @@ final class OrderEditorTest extends IntegrationTestCase
         yield 'unknown line' => [OrderEditRefusal::UnknownLine, static fn (self $t) => new OrderEdit(quantities: [999999999 => 1.0])];
         yield 'unknown sale element' => [OrderEditRefusal::UnknownProduct, static fn (self $t) => new OrderEdit(addedLines: [new AddedOrderLine(999999999, 1.0)])];
         yield 'added zero quantity' => [OrderEditRefusal::InvalidQuantity, static fn (self $t) => new OrderEdit(addedLines: [new AddedOrderLine(1, 0.0)])];
+        yield 'quantity above the bound' => [OrderEditRefusal::InvalidQuantity, static fn (self $t) => new OrderEdit(quantities: [$t->lineId() => 1.0e300])];
+        yield 'added quantity above the bound' => [OrderEditRefusal::InvalidQuantity, static fn (self $t) => new OrderEdit(addedLines: [new AddedOrderLine(1, 10000000.0)])];
         yield 'nothing' => [OrderEditRefusal::NothingToEdit, static fn (self $t) => new OrderEdit()];
+    }
+
+    public function testAFreeLineIsAllowedByAForcedPriceOfZero(): void
+    {
+        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '0']));
+
+        $line = OrderProductQuery::create()->findPk($this->lineId());
+
+        self::assertEqualsWithDelta(0.0, (float) $line->getPromoPrice(), 0.0001);
+        self::assertSame(1, (int) $line->getWasInPromo());
     }
 
     public function testAnOfflineProductIsRefusedLikeAnUnknownOne(): void
@@ -617,12 +630,15 @@ final class OrderEditorTest extends IntegrationTestCase
 
         try {
             $this->order->setPostage('0')->setPostageTax('0')->setDeliveryModuleId((int) ModuleQuery::create()->findOneByCode('Cheque')->getId())->save($this->getPropelConnection());
+            OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->delete($this->getPropelConnection());
+            (new OrderPostageTax())->setOrderId($this->order->getId())->setTitle('Free postage')->setUntaxedAmount('0')->setAmount('0')->save($this->getPropelConnection());
             $line = OrderProductQuery::create()->filterByOrderId($this->order->getId())->findOne();
 
             $this->editor->edit($this->order, new OrderEdit(quantities: [(int) $line->getId() => 4.0]));
 
             $order = OrderQuery::create()->findPk($this->order->getId());
             self::assertEqualsWithDelta(0.0, (float) $order->getPostage(), 0.0001);
+            self::assertEqualsWithDelta(0.0, (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(4.0, (float) OrderProductQuery::create()->findPk($line->getId())->getQuantity(), 0.0001);
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
@@ -748,7 +764,7 @@ final class OrderEditorTest extends IntegrationTestCase
             $tax = 0;
 
             self::assertGreaterThan(0.0, $sql);
-            self::assertEqualsWithDelta($sql, OrderQuery::create()->findPk($this->order->getId())->getTotalAmount($tax, true, true), 0.005);
+            self::assertEqualsWithDelta($sql, OrderQuery::create()->findPk($this->order->getId())->getTotalAmount($tax, true, true), 0.0001);
         });
     }
 
@@ -763,8 +779,15 @@ final class OrderEditorTest extends IntegrationTestCase
         ));
 
         $tester = new CommandTester((new Application(self::$kernel))->find('pdf:render'));
+        $html = '';
+        $capture = static function (PdfEvent $event) use (&$html): void {
+            $html = (string) $event->getContent();
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::GENERATE_PDF, $capture, 1000);
 
         foreach (['invoice', 'delivery'] as $document) {
+            $html = '';
             $file = sys_get_temp_dir().'/edited_order_'.$document.'_'.uniqid('', true).'.pdf';
 
             try {
@@ -772,12 +795,15 @@ final class OrderEditorTest extends IntegrationTestCase
 
                 $tester->assertCommandIsSuccessful();
                 self::assertStringStartsWith('%PDF', (string) file_get_contents($file));
+                self::assertStringContainsString('Gadget', $html, \sprintf('The %s carries the line added by the edit.', $document));
             } finally {
                 if (file_exists($file)) {
                     unlink($file);
                 }
             }
         }
+
+        $dispatcher->removeListener(TheliaEvents::GENERATE_PDF, $capture);
     }
 
     /**
