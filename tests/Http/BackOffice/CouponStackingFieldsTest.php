@@ -149,6 +149,23 @@ final class CouponStackingFieldsTest extends WebIntegrationTestCase
         self::assertSame([$other->getId()], CouponExclusionQuery::create()->excludedCouponIdsFor($coupon->getId()));
     }
 
+    public function testALegacyPromotionThatAppliesAloneIsSavedAgainWithItsStopFlag(): void
+    {
+        // State of a non cumulative promotion right after setup/update/sql/3.4.0.sql: stop_processing 0.
+        $this->loginAdmin();
+        $coupon = $this->factory()->coupon(['isCumulative' => false, 'stopProcessing' => false, 'priority' => 0, 'code' => 'LEGACY-'.strtoupper(uniqid())]);
+
+        $this->assertPageRenders('/admin/coupon/update/'.$coupon->getId());
+        $form = $this->client->getCrawler()->filter('form[data-testid="coupon-edit-form"]')->form();
+        $this->client->request('POST', '/admin/coupon/update/'.$coupon->getId(), $form->getPhpValues());
+        self::assertSame(302, $this->client->getResponse()->getStatusCode());
+
+        \Thelia\Model\Map\CouponTableMap::clearInstancePool();
+        $stored = CouponQuery::create()->findPk($coupon->getId());
+        self::assertFalse((bool) $stored->getIsCumulative());
+        self::assertFalse((bool) $stored->getStopProcessing());
+    }
+
     public function testExcludingAPromotionFromItselfIsRefusedWithoutAServerError(): void
     {
         $this->loginAdmin();
