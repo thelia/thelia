@@ -1114,4 +1114,11 @@ return [
     '%products is no longer available to you. Remove it from your cart to complete your order.' => '%products is no longer available to you. Remove it from your cart to complete your order.',
     '%products are no longer available to you. Remove them from your cart to complete your order.' => '%products are no longer available to you. Remove them from your cart to complete your order.',
     'These products are not available to your account and were taken out of your cart: %products.' => 'These products are not available to your account and were taken out of your cart: %products.',
+    'Paid orders' => 'Paid orders',
+    'Revenue incl. tax' => 'Revenue incl. tax',
+    'Average order value' => 'Average order value',
+    'Carts created' => 'Carts created',
+    'Orders created' => 'Orders created',
+    'Orders paid' => 'Orders paid',
+    'Paid orders out of created orders' => 'Paid orders out of created orders',
 ];

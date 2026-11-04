@@ -1155,4 +1155,11 @@ return [
     '%products is no longer available to you. Remove it from your cart to complete your order.' => '%products n\'est plus disponible pour vous. Retirez-le de votre panier pour finaliser votre commande.',
     '%products are no longer available to you. Remove them from your cart to complete your order.' => '%products ne sont plus disponibles pour vous. Retirez-les de votre panier pour finaliser votre commande.',
     'These products are not available to your account and were taken out of your cart: %products.' => 'Ces produits ne sont pas disponibles pour votre compte et ont été retirés de votre panier : %products.',
+    'Paid orders' => 'Commandes payées',
+    'Revenue incl. tax' => 'Chiffre d\'affaires TTC',
+    'Average order value' => 'Panier moyen',
+    'Carts created' => 'Paniers créés',
+    'Orders created' => 'Commandes créées',
+    'Orders paid' => 'Commandes payées',
+    'Paid orders out of created orders' => 'Commandes payées sur commandes créées',
 ];

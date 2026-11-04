@@ -3875,4 +3875,22 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="report_mailing" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="what the merchant calls the report; the subject and the title of the e-mail" name="title" required="true" size="255" type="VARCHAR" />
+    <column description="ref of the export the report is made of" name="export_ref" required="true" size="255" type="VARCHAR" />
+    <column description="one of ReportPeriod: the period the export covers, relative to the day it is sent" name="period" required="true" size="32" type="VARCHAR" />
+    <column description="one of ReportFrequency: daily, weekly or monthly" name="frequency" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="NULL" description="weekly: the day of the week, 1 (Monday) to 7 (Sunday)" name="day_of_week" type="TINYINT" />
+    <column defaultValue="NULL" description="monthly: the day of the month, 1 to 28" name="day_of_month" type="TINYINT" />
+    <column defaultValue="7" description="the hour of the day, in the timezone of PHP, from which the report is sent" name="send_hour" required="true" type="TINYINT" />
+    <column description="the language of the e-mail and of the export" name="locale" required="true" size="10" type="VARCHAR" />
+    <column description="e-mail addresses, comma separated" name="recipients" required="true" type="LONGVARCHAR" />
+    <column defaultValue="1" name="enabled" required="true" type="TINYINT" />
+    <column defaultValue="NULL" description="the end of the last period sent to every recipient" name="last_period_end" type="DATE" />
+    <column defaultValue="NULL" description="the recipients the last send failed for, comma separated, to be tried again on their own; NULL when none" name="pending_recipients" type="LONGVARCHAR" />
+    <column defaultValue="0" description="how many times the period has been tried again for the recipients still waiting; back to 0 with each new period" name="pending_attempts" required="true" type="TINYINT" />
+    <column defaultValue="NULL" name="last_sent_at" type="TIMESTAMP" />
+    <behavior name="timestampable" />
+  </table>
 </database>

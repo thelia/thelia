@@ -15,9 +15,17 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Export\Type;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Template\Helper\FormatService;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
+use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
+use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency;
+use Thelia\Model\OrderStatusQuery;
 
 /**
  * Class OrderExport.
@@ -25,7 +33,7 @@ use Thelia\Model\ConfigQuery;
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
  */
-class OrderExport extends JsonFileAbstractExport
+class OrderExport extends JsonFileAbstractExport implements MailableReportInterface
 {
     public const FILE_NAME = 'order';
     public const USE_RANGE_DATE = true;
@@ -94,11 +102,68 @@ class OrderExport extends JsonFileAbstractExport
 
     protected function getData(): array|string|ModelCriteria
     {
+        $stmt = $this->statement($this->rowsSql());
+        $stmt->execute();
+
+        return $this->getDataJsonCache($stmt, 'order');
+    }
+
+    /**
+     * The orders of the period, then the paid ones only (the statuses the dashboard counts): their
+     * revenue with taxes and shipping less the discount, and the average of a paid order, each order brought back to the default currency of the shop
+     * by the rate it was placed with (the amounts of an order are in its own currency, and the
+     * file lists them so, with the currency beside): counted with the very query of the rows, so the figures
+     * of the e-mail and the lines of the file agree.
+     *
+     * @return list<ReportSummaryLine>
+     */
+    public function summarize(): array
+    {
+        $paidStatuses = implode(',', array_map('intval', OrderStatusQuery::getPaidStatusIdList()));
+        $isPaid = '' === $paidStatuses ? '0' : 'summarized.order_status_id IN ('.$paidStatuses.')';
+        $amount = 'CASE WHEN summarized.order_currency_rate > 0 THEN summarized.order_total_with_taxes_shipping_discount / summarized.order_currency_rate ELSE summarized.order_total_with_taxes_shipping_discount END';
+
+        $stmt = $this->statement('SELECT COUNT(*) AS orders_count, COALESCE(SUM(CASE WHEN '.$isPaid.' THEN 1 ELSE 0 END), 0) AS paid_orders_count, COALESCE(SUM(CASE WHEN '.$isPaid.' THEN '.$amount.' ELSE 0 END), 0) AS revenue FROM ('.$this->rowsSql().') AS summarized');
+        $stmt->execute();
+        $totals = $stmt->fetch(\PDO::FETCH_ASSOC) ?: ['orders_count' => 0, 'paid_orders_count' => 0, 'revenue' => 0];
+
+        $count = (int) $totals['orders_count'];
+        $paidCount = (int) $totals['paid_orders_count'];
+        $revenue = (float) $totals['revenue'];
         $locale = $this->language->getLocale();
+        $translator = Translator::getInstance();
 
-        $con = Propel::getConnection();
+        return [
+            new ReportSummaryLine($translator->trans('Orders', [], 'core', $locale), (string) $count),
+            new ReportSummaryLine($translator->trans('Paid orders', [], 'core', $locale), (string) $paidCount),
+            new ReportSummaryLine($translator->trans('Revenue incl. tax', [], 'core', $locale), $this->money($revenue, $locale)),
+            new ReportSummaryLine($translator->trans('Average order value', [], 'core', $locale), $this->money(0 === $paidCount ? 0.0 : $revenue / $paidCount, $locale)),
+        ];
+    }
 
-        $query = '
+    private function money(float $amount, string $locale): string
+    {
+        return (new FormatService(new RequestStack()))->money($amount, Currency::getDefaultCurrency()->getId(), $locale);
+    }
+
+    private function statement(string $query): StatementInterface
+    {
+        $stmt = Propel::getConnection()->prepare($query);
+        $stmt->bindValue('locale', $this->language->getLocale());
+        $stmt->bindValue('legacy_rounding_pivot', (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
+        $stmt->bindValue('sum_of_roundings_pivot', (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
+        $stmt->bindValue('text_promo_price_pivot', (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
+
+        foreach ($this->getDateRangeBounds() as $bound => $date) {
+            $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
+        }
+
+        return $stmt;
+    }
+
+    private function rowsSql(): string
+    {
+        return '
             SELECT
                 *,
                 (order_total_taxed_price - order_total_price) as order_total_tax,
@@ -143,6 +208,8 @@ class OrderExport extends JsonFileAbstractExport
                     invoice_country_i18n.title as "invoice_country_i18n_title",
                     invoice_address.phone as "invoice_address_phone",
                     currency.code as "currency_code",
+                    `order`.currency_rate as "order_currency_rate",
+                    `order`.status_id as "order_status_id",
                     '.$this->taxTitles().' as "order_product_tax_title"
                 FROM `order`
                 LEFT JOIN customer ON customer.id = `order`.customer_id
@@ -163,19 +230,7 @@ class OrderExport extends JsonFileAbstractExport
             ) as tmp
         ';
 
-        $stmt = $con->prepare($query);
-        $stmt->bindValue('locale', $locale);
-        $stmt->bindValue('legacy_rounding_pivot', (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
-        $stmt->bindValue('sum_of_roundings_pivot', (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
-        $stmt->bindValue('text_promo_price_pivot', (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
-
-        foreach ($this->getDateRangeBounds() as $bound => $date) {
-            $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
-        }
-
-        $stmt->execute();
-
-        return $this->getDataJsonCache($stmt, 'order');
+        return $query;
     }
 
     /**

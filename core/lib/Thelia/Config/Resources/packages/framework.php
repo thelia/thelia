@@ -95,6 +95,13 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 60,
                 'interval' => '1 hour',
             ],
+            // Signatures tried on the download link of an e-mailed report: a recipient
+            // opening it a few times does not notice it; a caller forging signatures does.
+            'report_mail_download_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 60,
+                'interval' => '1 hour',
+            ],
             'admin_two_factor_failures_per_account' => [
                 'policy' => 'sliding_window',
                 'limit' => 10,
