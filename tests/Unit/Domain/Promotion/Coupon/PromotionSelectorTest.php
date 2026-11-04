@@ -280,8 +280,8 @@ final class PromotionSelectorTest extends TestCase
     }
 
     /**
-     * Every priority left at 0 (a shop that never heard of priorities): one code and the automatic
-     * promotions give the discount the previous algorithm gave. The oracle is the previous
+     * Every priority left at 0 (a shop that never heard of priorities): one code or none and the automatic
+     * promotions give the discount the previous algorithm gave, several automatic ones applying alone included. The oracle is the previous
      * CouponManager::sortCoupons, copied: the matching promotions in the order they were fed (the codes
      * typed, then the automatic ones by id), a non cumulative one resets the list, a cumulative one
      * resets it too unless the first kept one is cumulative.
@@ -294,7 +294,7 @@ final class PromotionSelectorTest extends TestCase
         $shapes = [];
 
         foreach ([null, true, false] as $code) {
-            foreach ([[], [true], [false], [true, true]] as $automatics) {
+            foreach ([[], [true], [false], [true, true], [false, true], [true, false], [false, false], [false, true, true], [true, false, true]] as $automatics) {
                 if (null === $code && [] === $automatics) {
                     continue;
                 }
@@ -349,23 +349,54 @@ final class PromotionSelectorTest extends TestCase
         }
     }
 
-    public function testTwoAutomaticPromotionsOneOfThemAloneNowKeepTheSmallestIdInsteadOfTheLast(): void
+    public function testWithAllPrioritiesAtZeroTheLastAutomaticPromotionApplyingAloneWins(): void
     {
-        // The one case that stays different from the previous algorithm (the last non cumulative one won,
-        // and the cumulative ones after it replaced it). Frozen here on purpose.
-        $alone = $this->promotion(4, cumulative: false, automatic: true, label: 'AUTO_ALONE');
-        $cumulative = $this->promotion(5, cumulative: true, automatic: true, label: 'AUTO_CUMULATIVE');
-
-        self::assertSame(['AUTO_CUMULATIVE'], $this->legacySort([$alone, $cumulative]));
-        self::assertSame($alone, $this->selector->select([$alone, $cumulative])->kept[0]);
-        self::assertCount(1, $this->selector->select([$alone, $cumulative])->kept);
-
-        // The other way round (the cumulative one has the smaller id): the last one used to win, the first wins now.
         $cumulative = $this->promotion(4, cumulative: true, automatic: true, label: 'AUTO_CUMULATIVE');
         $alone = $this->promotion(5, cumulative: false, automatic: true, label: 'AUTO_ALONE');
 
-        self::assertSame(['AUTO_ALONE'], $this->legacySort([$cumulative, $alone]));
-        self::assertSame([$cumulative], $this->selector->select([$cumulative, $alone])->kept);
+        foreach ([[$cumulative, $alone], [$alone, $cumulative]] as $candidates) {
+            $selection = $this->selector->select($candidates);
+
+            self::assertSame([$alone], $selection->kept);
+            self::assertCount(1, $selection->discarded);
+            self::assertSame($cumulative, $selection->discarded[0]->coupon);
+            self::assertSame($alone, $selection->discarded[0]->winner);
+        }
+    }
+
+    public function testWithAllPrioritiesAtZeroACumulativeAutomaticPromotionAfterOneApplyingAloneReplacesIt(): void
+    {
+        $alone = $this->promotion(4, cumulative: false, automatic: true, label: 'AUTO_ALONE');
+        $cumulative = $this->promotion(5, cumulative: true, automatic: true, label: 'AUTO_CUMULATIVE');
+        $code = $this->promotion(1, cumulative: true, label: 'CODE');
+
+        foreach ([[$alone, $cumulative, $code], [$code, $cumulative, $alone]] as $candidates) {
+            $selection = $this->selector->select($candidates);
+
+            self::assertSame([$cumulative], $selection->kept);
+            self::assertSame([$alone, $code], array_map(static fn ($discarded): CouponInterface => $discarded->coupon, $selection->discarded));
+            self::assertSame($cumulative, $selection->discarded[0]->winner);
+            self::assertSame($cumulative, $selection->discarded[1]->winner);
+        }
+    }
+
+    /**
+     * As soon as the shop sets a priority, a stop flag or an exclusion, the new order decides: the first
+     * automatic promotion by id applying alone wins over the ones after it.
+     */
+    public function testAPriorityAStopFlagOrAnExclusionKeepsTheNewOrderForTwoAutomaticPromotions(): void
+    {
+        $alone = $this->promotion(4, priority: 1, cumulative: false, automatic: true, label: 'AUTO_ALONE');
+        $cumulative = $this->promotion(5, priority: 1, cumulative: true, automatic: true, label: 'AUTO_CUMULATIVE');
+        self::assertSame([$alone], $this->selector->select([$cumulative, $alone])->kept);
+
+        $alone = $this->promotion(4, cumulative: false, automatic: true, label: 'AUTO_ALONE');
+        $cumulative = $this->promotion(5, cumulative: true, automatic: true, label: 'AUTO_CUMULATIVE');
+        self::assertSame([$alone], $this->selector->select([$cumulative, $alone], [4 => [5]])->kept);
+
+        $stopping = $this->promotion(4, cumulative: true, stop: true, automatic: true, label: 'AUTO_STOP');
+        $alone = $this->promotion(5, cumulative: false, automatic: true, label: 'AUTO_ALONE');
+        self::assertSame([$stopping], $this->selector->select([$alone, $stopping])->kept);
     }
 
     /**

@@ -32,6 +32,10 @@ use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
  * otherwise it is kept, and when it asks to stop the chain (or applies alone) every following
  * promotion is discarded.
  *
+ * A shop that sets no priority, no stop flag and no exclusion keeps the result it had before they
+ * existed: when an automatic promotion applying alone matches, the last one by id wins, unless
+ * cumulative automatic promotions come after it, which then replace it, and the codes are discarded.
+ *
  * Pure: the pairs of promotions that exclude each other are given by the caller.
  */
 final readonly class PromotionSelector
@@ -47,8 +51,10 @@ final readonly class PromotionSelector
         /** @var list<DiscardedPromotion> $discarded */
         $discarded = [];
         $stoppedBy = null;
+        $sorted = $this->sort($candidates);
+        $legacyWinners = $this->legacyWinners($sorted, $exclusionsByCouponId);
 
-        foreach ($this->sort($candidates) as $coupon) {
+        foreach ($sorted as $coupon) {
             if ($coupon->isExpired()) {
                 continue;
             }
@@ -59,15 +65,11 @@ final readonly class PromotionSelector
                 continue;
             }
 
-            try {
-                if (!$coupon->isMatching()) {
-                    continue;
-                }
-            } catch (UnmatchableConditionException) {
+            if (!$this->matches($coupon)) {
                 continue;
             }
 
-            $winner = $this->findExcludingPromotion($coupon, $kept, $exclusionsByCouponId);
+            $winner = $legacyWinners[spl_object_id($coupon)] ?? $this->findExcludingPromotion($coupon, $kept, $exclusionsByCouponId);
 
             if (null === $winner && !$coupon->isCumulative() && [] !== $kept) {
                 $winner = $kept[0];
@@ -114,6 +116,95 @@ final readonly class PromotionSelector
     }
 
     /**
+     * The promotions the algorithm before the priorities set aside, each with the one that wins over
+     * it, for a shop that uses neither priorities, stop flags nor exclusions. It walked the codes, then
+     * the automatic promotions by id: a non cumulative one replaced the ones kept, a cumulative one was
+     * added after cumulative ones and replaced a non cumulative one. Once an automatic promotion
+     * applying alone matches, the codes were replaced, so only the automatic ones decide.
+     *
+     * @param list<CouponInterface> $sorted
+     * @param array<int, list<int>> $exclusionsByCouponId
+     *
+     * @return array<int, CouponInterface> object id of the promotion set aside => the one that wins
+     */
+    private function legacyWinners(array $sorted, array $exclusionsByCouponId): array
+    {
+        $automatic = [];
+
+        foreach ($sorted as $coupon) {
+            if (0 !== $coupon->getPriority() || $coupon->isStopProcessing() || $this->hasExclusion($coupon, $exclusionsByCouponId)) {
+                return [];
+            }
+
+            if ($this->isAutomatic($coupon) && !$coupon->isExpired()) {
+                $automatic[] = $coupon;
+            }
+        }
+
+        // Without an automatic promotion applying alone, the walk of select() decides alone.
+        if ([] === array_filter($automatic, static fn (CouponInterface $coupon): bool => !$coupon->isCumulative())) {
+            return [];
+        }
+
+        $kept = [];
+        $resetByAutomatic = false;
+
+        foreach (array_filter($automatic, $this->matches(...)) as $coupon) {
+            if (!$coupon->isCumulative()) {
+                $kept = [$coupon];
+                $resetByAutomatic = true;
+            } else {
+                $kept = [] !== $kept && $kept[0]->isCumulative() ? [...$kept, $coupon] : [$coupon];
+            }
+        }
+
+        if (!$resetByAutomatic) {
+            return [];
+        }
+
+        $winners = [];
+
+        foreach ($sorted as $coupon) {
+            if (!\in_array($coupon, $kept, true)) {
+                $winners[spl_object_id($coupon)] = $kept[0];
+            }
+        }
+
+        return $winners;
+    }
+
+    /** @param array<int, list<int>> $exclusionsByCouponId */
+    private function hasExclusion(CouponInterface $coupon, array $exclusionsByCouponId): bool
+    {
+        $couponId = $this->modelId($coupon);
+
+        if (null === $couponId) {
+            return false;
+        }
+
+        if ([] !== ($exclusionsByCouponId[$couponId] ?? [])) {
+            return true;
+        }
+
+        foreach ($exclusionsByCouponId as $excludedIds) {
+            if (\in_array($couponId, $excludedIds, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function matches(CouponInterface $coupon): bool
+    {
+        try {
+            return $coupon->isMatching();
+        } catch (UnmatchableConditionException) {
+            return false;
+        }
+    }
+
+    /**
      * @param list<CouponInterface> $kept
      * @param array<int, list<int>> $exclusionsByCouponId
      */
@@ -153,7 +244,12 @@ final readonly class PromotionSelector
      */
     private function triggerRank(CouponInterface $coupon): int
     {
-        return $coupon instanceof CouponAbstract && $coupon->isAutomatic() ? 0 : 1;
+        return $this->isAutomatic($coupon) ? 0 : 1;
+    }
+
+    private function isAutomatic(CouponInterface $coupon): bool
+    {
+        return $coupon instanceof CouponAbstract && $coupon->isAutomatic();
     }
 
     /** A promotion that does not come from the database ranks after the stored ones of its priority. */
