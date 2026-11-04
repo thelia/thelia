@@ -46,13 +46,11 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Model\OrderVersionQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tools\URL;
@@ -65,6 +63,8 @@ use Thelia\Tools\URL;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
+    private const STATUS_CHANGE_SAVEPOINT = 'thelia_order_status_change';
+
     /**
      * Where the shipped front office serves a guest order tracking link. Kept as a path
      * rather than a route name so that the core never depends on a theme's routing.
@@ -378,8 +378,17 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
-        // Prevent partial stock update on status change.
-        $con->beginTransaction();
+        // Prevent partial stock update on status change, WHATEVER the surrounding transaction.
+        // The admin API and the back office dispatch the status change inside one of their own:
+        // a nested rollBack would only poison the caller's commit and leave the products moved
+        // before the failing one as they are, a savepoint undoes exactly what is written here.
+        $ownTransaction = !$con->inTransaction();
+
+        if ($ownTransaction) {
+            $con->beginTransaction();
+        } else {
+            $con->exec('SAVEPOINT '.self::STATUS_CHANGE_SAVEPOINT);
+        }
 
         try {
             $this->updateQuantity($order, $newStatus, $dispatcher);
@@ -388,9 +397,21 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $event->setOrder($order);
 
-            $con->commit();
+            if ($ownTransaction) {
+                $con->commit();
+            } else {
+                $con->exec('RELEASE SAVEPOINT '.self::STATUS_CHANGE_SAVEPOINT);
+            }
         } catch (\Throwable $exception) {
-            $con->rollBack();
+            if ($ownTransaction) {
+                $con->rollBack();
+            } else {
+                $con->exec('ROLLBACK TO SAVEPOINT '.self::STATUS_CHANGE_SAVEPOINT);
+            }
+
+            // The sale elements saved before the failure would otherwise be read back from
+            // the instance pool with the quantity the rollback just undid.
+            ProductSaleElementsTableMap::clearInstancePool();
 
             throw $exception;
         }
@@ -420,7 +441,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
         // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
-        if (OrderVersionQuery::create()->filterById($order->getId())->select(OrderVersionTableMap::COL_STATUS_ID)->distinct()->count() > 1) {
+        if ($order->hasChangedStatusSinceCreation()) {
             // A status change occured. Ignore $manageStockOnCreation
             $manageStockOnCreation = false;
         } else {

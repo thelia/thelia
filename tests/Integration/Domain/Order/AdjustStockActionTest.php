@@ -17,10 +17,12 @@ namespace Thelia\Tests\Integration\Domain\Order;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusAction;
 use Thelia\Model\ProductSaleElements;
@@ -29,9 +31,9 @@ use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Order\MovesOrders;
 
 /**
- * The stock of an order is adjusted as a whole or not at all: a product that cannot be
- * decremented leaves the products already decremented untouched. The status change itself
- * survives, the runner records the failure - only the stock is kept whole.
+ * A stock action moves the stock of an order as a whole or not at all, in the transaction of
+ * the status change: a product the stock cannot serve refuses the status change, and leaves
+ * every product, the ones before it included, as it was.
  */
 final class AdjustStockActionTest extends ActionIntegrationTestCase
 {
@@ -43,69 +45,67 @@ final class AdjustStockActionTest extends ActionIntegrationTestCase
         parent::tearDown();
     }
 
-    public function testAFailingDecreaseLeavesNoProductAdjusted(): void
+    public function testADecreaseTheStockCannotServeRefusesTheStatusChangeAndMovesNothing(): void
     {
         ConfigQuery::write('check_available_stock', '1');
+        [$order, $plenty, $short] = $this->orderOfAProductInStockAndOneShortOfIt();
 
-        $this->action(
-            OrderStatusActionTrigger::TRANSITION,
-            OrderStatus::CODE_PROCESSING,
-            OrderStatus::CODE_SENT,
-            AdjustStockAction::getType(),
-            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
-        );
-
-        $plenty = $this->createProductSaleElements(10);
-        $short = $this->createProductSaleElements(1);
-
-        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
-        $this->addOrderProduct($order, $plenty, 3);
-        $this->addOrderProduct($order, $short, 5);
-
-        $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+            self::fail('A stock the order cannot take must refuse the status change.');
+        } catch (TheliaProcessException) {
+        }
 
         self::assertSame(1.0, $this->stockOf($short), 'The product without enough stock is left alone.');
-        self::assertSame(
-            10.0,
-            $this->stockOf($plenty),
-            'The action adjusts the order as a whole or not at all: the first product must not stay decremented when a later one fails.',
-        );
+        self::assertSame(10.0, $this->stockOf($plenty), 'The first product must not stay decremented when a later one fails.');
+        self::assertSame(OrderStatus::CODE_PROCESSING, OrderQuery::create()->findPk($order->getId())?->getOrderStatus()->getCode());
     }
 
     /**
      * The same, inside a transaction opened by the caller: the admin API wraps the whole
-     * ORDER_UPDATE_STATUS dispatch in one, and a nested rollback would poison its commit.
+     * ORDER_UPDATE_STATUS dispatch in one, and gets the refusal to roll it back.
      */
-    public function testAFailingDecreaseInsideACallersTransactionLeavesNoProductAdjusted(): void
+    public function testADecreaseTheStockCannotServeInsideACallersTransactionMovesNothing(): void
     {
         ConfigQuery::write('check_available_stock', '1');
-
-        $this->action(
-            OrderStatusActionTrigger::TRANSITION,
-            OrderStatus::CODE_PROCESSING,
-            OrderStatus::CODE_SENT,
-            AdjustStockAction::getType(),
-            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
-        );
-
-        $plenty = $this->createProductSaleElements(10);
-        $short = $this->createProductSaleElements(1);
-
-        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
-        $this->addOrderProduct($order, $plenty, 3);
-        $this->addOrderProduct($order, $short, 5);
+        [$order, $plenty, $short] = $this->orderOfAProductInStockAndOneShortOfIt();
 
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         $connection->beginTransaction();
 
         try {
             $this->moveOrderTo($order, OrderStatus::CODE_SENT);
-        } finally {
             $connection->commit();
+            self::fail('A stock the order cannot take must refuse the status change.');
+        } catch (TheliaProcessException) {
+            $connection->rollBack();
         }
 
         self::assertSame(1.0, $this->stockOf($short), 'The product without enough stock is left alone.');
-        self::assertSame(10.0, $this->stockOf($plenty), 'The caller commits, and the first product must not stay decremented.');
+        self::assertSame(10.0, $this->stockOf($plenty), 'The first product must not stay decremented when a later one fails.');
+    }
+
+    /**
+     * @return array{Order, ProductSaleElements, ProductSaleElements}
+     */
+    private function orderOfAProductInStockAndOneShortOfIt(): array
+    {
+        $this->action(
+            OrderStatusActionTrigger::TRANSITION,
+            OrderStatus::CODE_PROCESSING,
+            OrderStatus::CODE_SENT,
+            AdjustStockAction::getType(),
+            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
+        );
+
+        $plenty = $this->createProductSaleElements(10);
+        $short = $this->createProductSaleElements(1);
+
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
+        $this->addOrderProduct($order, $plenty, 3);
+        $this->addOrderProduct($order, $short, 5);
+
+        return [$order, $plenty, $short];
     }
 
     private function action(

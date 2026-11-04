@@ -22,18 +22,30 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionInterface;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionPayloadField;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderProduct;
+use Thelia\Module\BaseModule;
 
 /**
- * Puts the ordered quantities back in stock, or takes them out, on a transition
- * the merchant chose. The core keeps handling the stock of the standard
- * paid/unpaid changes by itself; this action covers the custom flows.
+ * The stock movement of the status changes the merchant chose: put the ordered quantities
+ * back in stock, take them out, or leave the stock alone, optionally for some payment or
+ * delivery modules only.
+ *
+ * On a status change, the action is not run by OrderStatusActionRunner: StockOperationActionResolver
+ * reads it when the core asks which stock operation to apply, so the movement happens in the
+ * transaction of the status change, and replaces the fixed rule of the core instead of adding
+ * to it. execute() remains for a caller that moves the stock of an order by itself.
  */
 final readonly class AdjustStockAction implements OrderStatusActionInterface
 {
     public const FIELD_OPERATION = 'operation';
+    public const FIELD_PAYMENT_MODULES = 'payment_modules';
+    public const FIELD_DELIVERY_MODULES = 'delivery_modules';
     public const OPERATION_INCREASE = 'increase';
     public const OPERATION_DECREASE = 'decrease';
+    public const OPERATION_NONE = 'none';
+
+    private const OPERATIONS = [self::OPERATION_INCREASE, self::OPERATION_DECREASE, self::OPERATION_NONE];
 
     /** Undoes the movements of ONE run of this action inside a transaction the caller owns. */
     private const SAVEPOINT = 'thelia_adjust_stock';
@@ -54,27 +66,55 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
             OrderStatusActionPayloadField::choice(self::FIELD_OPERATION, 'Stock operation', [
                 self::OPERATION_INCREASE => 'Put the ordered quantities back in stock',
                 self::OPERATION_DECREASE => 'Take the ordered quantities out of stock',
+                self::OPERATION_NONE => 'Leave the stock as it is',
             ]),
+            OrderStatusActionPayloadField::multipleChoice(
+                self::FIELD_PAYMENT_MODULES,
+                'Only for the orders paid with',
+                $this->moduleChoices(BaseModule::PAYMENT_MODULE_TYPE),
+            ),
+            OrderStatusActionPayloadField::multipleChoice(
+                self::FIELD_DELIVERY_MODULES,
+                'Only for the orders delivered by',
+                $this->moduleChoices(BaseModule::DELIVERY_MODULE_TYPE),
+            ),
         ];
     }
 
     public function normalizePayload(array $payload): array
     {
-        if ([] !== array_diff(array_keys($payload), [self::FIELD_OPERATION])) {
-            throw InvalidOrderStatusActionPayloadException::unexpectedFields(self::getType(), $payload, [self::FIELD_OPERATION]);
+        $allowedFields = [self::FIELD_OPERATION, self::FIELD_PAYMENT_MODULES, self::FIELD_DELIVERY_MODULES];
+
+        if ([] !== array_diff(array_keys($payload), $allowedFields)) {
+            throw InvalidOrderStatusActionPayloadException::unexpectedFields(self::getType(), $payload, $allowedFields);
         }
 
         $operation = $payload[self::FIELD_OPERATION] ?? null;
 
-        if (!\in_array($operation, [self::OPERATION_INCREASE, self::OPERATION_DECREASE], true)) {
-            throw InvalidOrderStatusActionPayloadException::invalidValue(self::getType(), self::FIELD_OPERATION, 'must be "increase" or "decrease"');
+        if (!\in_array($operation, self::OPERATIONS, true)) {
+            throw InvalidOrderStatusActionPayloadException::invalidValue(self::getType(), self::FIELD_OPERATION, 'must be "increase", "decrease" or "none"');
         }
 
-        return [self::FIELD_OPERATION => $operation];
+        $normalized = [self::FIELD_OPERATION => $operation];
+
+        // A module listed here may be gone since: the payload stays valid, the resolver ignores it.
+        foreach ([self::FIELD_PAYMENT_MODULES, self::FIELD_DELIVERY_MODULES] as $field) {
+            $codes = $this->moduleCodes($payload[$field] ?? [], $field);
+
+            if ([] !== $codes) {
+                $normalized[$field] = $codes;
+            }
+        }
+
+        return $normalized;
     }
 
     public function execute(OrderStatusActionContext $context): void
     {
+        if (self::OPERATION_NONE === $context->payload[self::FIELD_OPERATION]) {
+            return;
+        }
+
         $increase = self::OPERATION_INCREASE === $context->payload[self::FIELD_OPERATION];
         $checkAvailableStock = ConfigQuery::checkAvailableStock();
 
@@ -141,5 +181,40 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
 
             throw $throwable;
         }
+    }
+
+    /**
+     * @return list<string>
+     *
+     * @throws InvalidOrderStatusActionPayloadException
+     */
+    private function moduleCodes(mixed $codes, string $field): array
+    {
+        if (!\is_array($codes) || !array_is_list($codes)) {
+            throw InvalidOrderStatusActionPayloadException::invalidValue(self::getType(), $field, 'must be a list of module codes');
+        }
+
+        foreach ($codes as $code) {
+            if (!\is_string($code) || '' === trim($code)) {
+                throw InvalidOrderStatusActionPayloadException::invalidValue(self::getType(), $field, 'must be a list of module codes');
+            }
+        }
+
+        return array_values(array_unique(array_map(trim(...), $codes)));
+    }
+
+    /**
+     * @return array<string, string> module code => module title
+     */
+    private function moduleChoices(int $moduleType): array
+    {
+        $choices = [];
+
+        foreach (ModuleQuery::create()->filterByType($moduleType)->orderByCode()->find() as $module) {
+            $code = (string) $module->getCode();
+            $choices[$code] = (string) ($module->getTitle() ?: $code);
+        }
+
+        return $choices;
     }
 }
