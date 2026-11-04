@@ -36,6 +36,8 @@ final class AiGatewayStreamTest extends AiGatewayTestCase
 {
     public function testAStreamReadToTheEndYieldsItsDeltasThenTheCompleteResponse(): void
     {
+        // The mark is off by default: turned on, it comes with the end of the stream.
+        $this->setting('aiprobe.drafts', provenanceMark: true);
         $gateway = $this->gatewayAnswering([$this->stream(['Bon', 'jour'])]);
 
         $events = iterator_to_array($gateway->stream($this->request('aiprobe.drafts', correlationId: 'aiprobe.draft.1')), false);

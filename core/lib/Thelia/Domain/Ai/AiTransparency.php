@@ -16,8 +16,9 @@ namespace Thelia\Domain\Ai;
 
 /**
  * The transparency duty of a usage under the EU AI Act, declared by the module. The core gives the tools
- * (notice, provenance mark), turns them on by default and explains; it never blocks. The merchant may turn
- * them off: the usage then shows as not compliant (AiUsageRegistryInterface::compliance()).
+ * (notice, provenance mark) and explains; it never blocks. The notice is on by default, the provenance mark off
+ * until the merchant turns it on. A tool that is off shows the usage as not compliant
+ * (AiUsageRegistryInterface::compliance()).
  */
 enum AiTransparency: string
 {

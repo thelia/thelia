@@ -3651,7 +3651,7 @@
     <column description="how hard the model reasons for this usage: low, medium, high, xhigh or max; empty: the effort of the tier" name="effort" size="16" type="VARCHAR" />
     <column description="JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares" name="guardrails" type="LONGVARCHAR" />
     <column defaultValue="1" description="0 hides the notice of an interactive usage (AI Act 50(1)): allowed, the usage then shows as not compliant" name="transparency_notice" required="true" type="BOOLEAN" />
-    <column defaultValue="1" description="0 drops the provenance mark of a generative usage (AI Act 50(2)): allowed, the usage then shows as not compliant" name="provenance_mark" required="true" type="BOOLEAN" />
+    <column defaultValue="0" description="1 puts the provenance mark on what a generative usage writes (AI Act 50(2)); off by default, the usage then shows as not compliant" name="provenance_mark" required="true" type="BOOLEAN" />
     <column defaultValue="0" description="1 keeps the prompt of each call in the log" name="store_prompt" required="true" type="BOOLEAN" />
     <column description="days a stored prompt is kept before the maintenance purge removes it" name="prompt_retention_days" type="INTEGER" />
     <foreign-key foreignTable="ai_connection" name="fk_ai_usage_setting_pinned_connection_id" onDelete="SET NULL" onUpdate="RESTRICT">

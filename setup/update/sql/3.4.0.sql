@@ -76,6 +76,17 @@ EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
 -- ---------------------------------------------------------------------
+-- Provenance mark of generated content, off by default
+--
+-- A generative usage marks what it writes only once the merchant turns the
+-- mark on in its AI settings. A shop that saved the settings of a usage keeps
+-- the value it saved: only the default of the column changes, no row is
+-- rewritten. Replaying the script changes nothing.
+-- ---------------------------------------------------------------------
+
+ALTER TABLE `ai_usage_setting` MODIFY `provenance_mark` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '1 puts the provenance mark on what a generative usage writes (AI Act 50(2)); off by default, the usage then shows as not compliant';
+
+-- ---------------------------------------------------------------------
 -- Express payment zones
 --
 -- Whether a shop shows the express payment buttons of its payment modules,

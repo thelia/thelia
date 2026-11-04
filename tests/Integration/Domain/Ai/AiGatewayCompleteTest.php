@@ -637,10 +637,13 @@ final class AiGatewayCompleteTest extends AiGatewayTestCase
         self::assertSame('succeeded', $this->lastLog()->getStatus());
     }
 
-    public function testAGenerativeUsageMarksItsAnswerUnlessTheMerchantTurnedTheMarkOff(): void
+    public function testAGenerativeUsageMarksItsAnswerOnlyOnceTheMerchantTurnedTheMarkOn(): void
     {
-        $gateway = $this->gatewayAnswering([Wire::chat('a'), Wire::chat('b'), Wire::chat('c')]);
+        $gateway = $this->gatewayAnswering([Wire::chat('a'), Wire::chat('b'), Wire::chat('c'), Wire::chat('d')]);
 
+        self::assertNull($gateway->complete($this->request())->provenance, 'Off by default: nothing set, nothing marked.');
+
+        $this->setting('aiprobe.pages', provenanceMark: true);
         $marked = $gateway->complete($this->request());
         self::assertNotNull($marked->provenance);
         self::assertSame(['ai_generated' => true, 'usage' => 'aiprobe.pages', 'model' => 'probe-model-2026', 'log_id' => $marked->logId], array_diff_key($marked->provenance->toArray(), ['generated_at' => 0]));

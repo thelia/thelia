@@ -84,7 +84,7 @@ final readonly class AiUsageRegister
             'transparency' => $usage->transparency->value,
             'active' => $this->usages->isActive($usage->id),
             'notice_enabled' => $setting?->getTransparencyNotice() ?? true,
-            'provenance_mark_enabled' => $setting?->getProvenanceMark() ?? true,
+            'provenance_mark_enabled' => $setting?->getProvenanceMark() ?? false,
             'compliance' => self::overall($details),
             'compliance_details' => $details,
             'jurisdiction' => $this->jurisdiction($usage->id)?->value,

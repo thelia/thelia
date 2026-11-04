@@ -264,7 +264,7 @@ final class AiGateway implements AiGatewayInterface
     {
         $result = $settlement->result;
         $model = '' !== $result->model ? $result->model : $call->target->model->name;
-        $marked = AiTransparency::Generative === $call->usage->transparency && ($call->setting?->getProvenanceMark() ?? true);
+        $marked = AiTransparency::Generative === $call->usage->transparency && ($call->setting?->getProvenanceMark() ?? false);
 
         return new AiResponse(
             $result->text,

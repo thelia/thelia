@@ -110,7 +110,9 @@ final class AiUsagesCommandTest extends IntegrationTestCase
         self::assertSame('notice_turned_off', $chat['compliance_details'][0]['reason']);
         self::assertStringContainsString('ne respecte pas l\'article 50', $chat['compliance_details'][0]['message']);
 
-        self::assertSame('met', $writing['compliance']);
+        self::assertFalse($writing['provenance_mark_enabled'], 'the mark is off until the merchant turns it on');
+        self::assertSame('not_met', $writing['compliance']);
+        self::assertSame('mark_turned_off', $writing['compliance_details'][0]['reason']);
         self::assertTrue($writing['notice_enabled']);
     }
 
