@@ -42,11 +42,11 @@ Note on the PDF and e-mail templates: `templates/pdf/default/` and `templates/em
 - `order` has one `delivery_order_address_id`, `required="true"` (`local/config/schema.xml:786`) with a foreign key to `order_address`, ON DELETE RESTRICT (`:841`) and an index (`:868`). The generated SQL repeats it: `NOT NULL` at `setup/thelia.sql:900`, constraint at `:974`.
 - Everything about the delivery is one value per order: `delivery_ref` (`:791`), `postage` and `postage_tax` (`:795-796`), `postage_tax_rule_title` (`:797`), `delivery_module_id` and `delivery_module_title` (`:800-801`), `cart_id` (`:804`), `cart_fingerprint` (`:809`), `gift_message` (`:813`), `delivery_date` and the delivery slot columns (`:818-821`).
 - `order_address` has no `order_id` and no delivery or invoice flag. An address belongs to an order only through the two columns of `order` (`:923-963`). It carries `country_id`, required (`:942`), and the VAT exemption (`:931-932`).
-- `order_product` has no address and no country (`:964-996`). `order_product_tax` already freezes the tax of each line (`:2254-2268`).
-- `order_postage_tax` splits the postage by tax rule, per order, with no address dimension (`:2269-2282`).
-- `order_payment_part.order_id` is required, with a foreign key to `order` ON DELETE CASCADE (`:3464-3476`).
+- `order_product` has no address and no country (`:964-996`). `order_product_tax` already freezes the tax of each line (`:2259-2273`).
+- `order_postage_tax` splits the postage by tax rule, per order, with no address dimension (`:2274-2288`).
+- `order_payment_part.order_id` is required, with a foreign key to `order` ON DELETE CASCADE (`:3482-3494`).
 - `order.invoice_ref` is unique (`:792`, `:877-879`).
-- `cart` also has a single `address_delivery_id`, a single `delivery_module_id` and a single postage (`:1710`, `:1714`, `:1720-1722`). The delivery address is a foreign key to `cart_address`, ON DELETE SET NULL (`:1737-1738`). Cart lines have no address.
+- `cart` also has a single `address_delivery_id`, a single `delivery_module_id` and a single postage (`:1715`, `:1719`, `:1725-1727`). The delivery address is a foreign key to `cart_address`, ON DELETE SET NULL (`:1742-1743`). Cart lines have no address.
 
 ### Order creation
 
@@ -104,14 +104,15 @@ Pattern searched in the monorepo and the four template repositories: `getDeliver
 |---|---|
 | `core/lib` | 39 in 19 files, 1 line in `Test/FixtureFactory.php` |
 | `setup` | 8 |
-| `tests` | 36 |
+| `tests` | 37 |
 | `templates/frontOffice/flexy` | 16 |
 | `templates/backOffice/default-twig` | 11 |
 | `templates/pdf` | 2 |
 | `templates/email` | 4 |
+| `local/config/schema.xml` | 5 |
 | `local/modules`, `vendor/thelia/modules`, `src` | 0 |
 
-The carrier of the order is read even more widely: `getDeliveryModuleId()` appears 43 times in 28 files of `core/lib` (generated `Base` and `Map` classes excluded), cart and order together. The readers that act after the order is placed are listed in [After the order is placed](#after-the-order-is-placed).
+The carrier of the order is read even more widely: `getDeliveryModuleId()` appears on 44 lines in 28 files of `core/lib` (generated `Base` and `Map` classes excluded), cart and order together. The readers that act after the order is placed are listed in [After the order is placed](#after-the-order-is-placed).
 
 Production readers in the core that assume one address per order. What each one needs under option 1 is in [Other consumers](#other-consumers) and [Security and personal data](#security-and-personal-data).
 
@@ -180,7 +181,7 @@ The destinations are the source of truth. The delivery columns of `order` are de
 | `order` column | Value |
 |---|---|
 | `delivery_order_address_id`, `delivery_module_id`, `delivery_module_title`, `postage_tax_rule_title` | Those of the main destination |
-| `postage`, `postage_tax` | Sums over the destinations, because `Order::getTotalAmount()` adds `order.postage` and `order.postage_tax` to the total (`core/lib/Thelia/Model/Order.php:276-277`) |
+| `postage`, `postage_tax` | Sums over the destinations, because `Order::getTotalAmount()` adds `order.postage` to the total and `order.postage_tax` to the tax it returns (`core/lib/Thelia/Model/Order.php:276-277`) |
 | `delivery_ref` | Tracking number of the first parcel of the main destination, as today for the first parcel of the order |
 | `gift_message` | That of the main destination |
 
@@ -373,7 +374,7 @@ Proposal, to be confirmed: until the buyer has split the lines, the country in u
 
 ### The contract the modules implement
 
-A delivery module answers two questions: `isValidDelivery(Country, ?State)` and `getPostage(Country, ?State)`. The interfaces do not receive a cart, a weight or an address (`core/lib/Thelia/Module/DeliveryModuleInterface.php:32`, `:43`, `core/lib/Thelia/Module/DeliveryModuleWithStateInterface.php:33`, `:44`). The core calls them through `Action\Delivery::getPostage()` with the country and state of the event (`core/lib/Thelia/Action/Delivery.php:60-72`). The event also carries a cart and an address (`core/lib/Thelia/Core/Event/Delivery/DeliveryPostageEvent.php`), which a module can read if it listens to `MODULE_DELIVERY_GET_POSTAGE` for its own code (`core/lib/Thelia/Action/Delivery.php:50`).
+A delivery module answers two questions: `isValidDelivery(Country)` and `getPostage(Country)`, or `isValidDelivery(Country, ?State)` and `getPostage(Country, ?State)` for a module that handles states. The interfaces do not receive a cart, a weight or an address (`core/lib/Thelia/Module/DeliveryModuleInterface.php:32`, `:43`, `core/lib/Thelia/Module/DeliveryModuleWithStateInterface.php:33`, `:44`). The core calls them through `Action\Delivery::getPostage()` with the country and state of the event (`core/lib/Thelia/Action/Delivery.php:60-72`). The event also carries a cart and an address (`core/lib/Thelia/Core/Event/Delivery/DeliveryPostageEvent.php`), which a module can read if it listens to `MODULE_DELIVERY_GET_POSTAGE` for its own code (`core/lib/Thelia/Action/Delivery.php:50`).
 
 The two delivery modules shipped with the core read the cart from the session. `CustomDelivery` calls `getSessionCart()` in both methods and reads weight, total and currency from it (`vendor/thelia/modules/CustomDelivery/CustomDelivery.php:327`, `:346`, `:397`, `:437`, `:442`). `VirtualProductDelivery` reads `isVirtual()` from it (`vendor/thelia/modules/VirtualProductDelivery/VirtualProductDelivery.php:51`). The other modules are not in the repository; they were read at their published tag, see [Delivery modules](#delivery-modules).
 
@@ -404,7 +405,7 @@ The core has no threshold. Searching `core/lib/Thelia` for `shipping_from`, `fra
 
 - Module slices. `CustomDelivery` selects the first slice whose price ceiling is above the cart total, read from the session cart (`CustomDelivery.php:442-446`). A threshold is a slice with a zero price, a setting of the module. With the scope, the total is the total of the destination.
 - Product flag. `product.free_shipping` leaves the product out of the quote, and a surcharge can be added (`local/config/schema.xml:61-63`). The quoter drops the free lines from the sub-cart and forces zero when everything is free (`ProductShippingRuleQuoter.php:50-77`). This works on the sub-cart of a destination as it does on a cart.
-- Free-shipping coupons. A coupon has an `isRemovingPostage` flag and lists of countries and modules (`core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php:73`). The check reads the country of the one cart delivery address and the one cart module (`core/lib/Thelia/Domain/Promotion/Coupon/Service/CouponManager.php:376`, `:371`), and the estimate version takes one country and one module (`core/lib/Thelia/Domain/Promotion/Coupon/Service/CouponFreeShippingEvaluator.php:27`). An empty country list means all countries. With destinations the coupon is evaluated per destination, with the country and module of the destination, and applies to every eligible destination. The product surcharges stay due, as today (`core/lib/Thelia/Action/Coupon.php:408-421`).
+- Free-shipping coupons. A coupon has an `isRemovingPostage` flag and lists of countries and modules (`core/lib/Thelia/Domain/Promotion/Coupon/Type/CouponAbstract.php:73`). The check reads the country of the one cart delivery address and the one cart module (`core/lib/Thelia/Domain/Promotion/Coupon/Service/CouponManager.php:376`, `:404`), and the estimate version takes one country and one module (`core/lib/Thelia/Domain/Promotion/Coupon/Service/CouponFreeShippingEvaluator.php:27`). An empty country list means all countries. With destinations the coupon is evaluated per destination, with the country and module of the destination, and applies to every eligible destination. The product surcharges stay due, as today (`core/lib/Thelia/Action/Coupon.php:408-421`).
 - Zones. Eligibility of a module for a country, state and postal code is unchanged (`core/lib/Thelia/Domain/Shipping/Service/DeliveryModuleEligibilityChecker.php`).
 
 The coupon condition "delivery module is one of" reads the single module of the cart (`core/lib/Thelia/Condition/Implementation/MatchDeliveryModules.php:76`). With several destinations it has no single module to read; whether it requires every destination or one of them to match is an [open question](#open-questions).
@@ -529,7 +530,7 @@ Option 1 adds a destination table and links to it from tables every existing sho
 
 - Schema: a new `order_delivery` table (address, carrier and its title, postage, postage tax, postage tax rule title, exemption, gift message). A nullable destination reference on `order_product`, `order_shipment` and `order_postage_tax`. On the cart side, the planned destinations of a cart and the destination of each cart line. They go in `local/config/schema.xml` and `setup/thelia.sql`. The references are nullable so that code writing these rows without a destination keeps working: on insert, the core gives a line without one the main destination of its order, and gives a parcel the destination of its lines.
 - Settings: two rows in the `config` table, the switch that hides the feature and the maximum number of destinations per order ([Performance](#performance)). They go in `setup/insert.sql.tpl` and in the update script; configuration variables are covered by the compatibility promise (`BC-PROMISE.md:23-24`).
-- Migration: a script in `setup/update/sql/` for the version being prepared (`3.4.0.sql` today, `core/lib/Thelia/Core/TheliaKernel.php:110`, `CHANGELOG.md:1`). It must be replayable. The file already adds columns only when `information_schema` shows them missing (`setup/update/sql/3.4.0.sql:114`) and inserts settings with `INSERT IGNORE` (`:19`). A shop runs it with `php local/setup/update.php` (`UPDATE.md:28-34`).
+- Migration: a script in `setup/update/sql/` for the version being prepared (`3.4.0.sql` today, `core/lib/Thelia/Core/TheliaKernel.php:110`, `CHANGELOG.md:1`). It must be replayable. The file already adds columns only when `information_schema` shows them missing (`setup/update/sql/3.4.0.sql:114`) and inserts settings with `INSERT IGNORE` (`:72`, `:83`, `:91`). A shop runs it with `php local/setup/update.php` (`UPDATE.md:28-34`).
 - CI: the Upgrade workflow moves a shop from the last release and compares its schema with a fresh install. It catches a column present in `schema.xml` and missing from the update script. It is a signal, not a required check (`.github/workflows/upgrade.yml:1-10`, `.github/scripts/upgrade/compare-schema.sh:1-8`).
 - Publication: `.github/scripts/split-downstream.sh:36-38` publishes `core` and `setup` to `thelia/core` and `thelia/setup` on `main`, `3.1`, `3.2` and `3.3`, and `local/config` to `thelia/config` on `main` only. The schema change reaches shops through `main` after a green CI. It cannot be back-ported to the 3.3 line of `thelia/config`.
 - Existing orders: the script back-fills one destination per existing order, from the order columns (delivery address, carrier and title, postage, postage tax, rule title, gift message, and the exemption frozen on the invoice address). Every line of the order, every existing parcel and every `order_postage_tax` row are attached to it. The 3.3 update created a parcel only for orders that were sent or had a tracking number (`setup/update/sql/3.3.0.sql:700-721`); the back-fill creates no parcel, so that history is unchanged. After the upgrade every order has at least one destination and no reader needs a fallback to the order address.
@@ -541,7 +542,7 @@ Option 1 adds a destination table and links to it from tables every existing sho
 
 ### Who reads an order address today
 
-- `/api` has no default refusal outside two prefixes: only `^/api/admin` (administrator) and `^/api/front/account` (customer) are protected by the firewall (`core/lib/Thelia/Core/TheliaKernel.php:1000-1001`). Every other front operation needs its own `security` expression.
+- `/api` has no default refusal outside these prefixes: only `^/api/admin` and `^/api/mcp` (administrator) and `^/api/front/account` (customer) are protected by the firewall, next to the public login, token refresh and docs paths (`core/lib/Thelia/Core/TheliaKernel.php:995-1001`). Every other front operation needs its own `security` expression.
 - `OrderAddress` has administrator operations only (`core/lib/Thelia/Api/Resource/OrderAddress.php:33-53`) and none for the front. A customer reads an address through `Order`, in the `FRONT_READ_SINGLE` group (`core/lib/Thelia/Api/Resource/Order.php:303-313`), behind `object.customer.getId() == user.getId()` (`Order.php:82`). A buyer without an account reaches the order by a signed token on `/front/guest-orders/{token}`, where `security: 'true'` is intentional and the provider holds the check (`Order.php:91-98`).
 - `OrderShipment` follows the same model: front reads behind a customer check (`core/lib/Thelia/Api/Resource/OrderShipment.php:72-83`).
 
