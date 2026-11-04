@@ -83,6 +83,10 @@ class AiTierAssignment implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $modelId = null;
 
+    /** low, medium, high, xhigh or max; empty: nothing is sent and the provider keeps its default. */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    public ?string $effort = null;
+
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt = null;
 
@@ -133,6 +137,18 @@ class AiTierAssignment implements PropelResourceInterface
     public function setModelId(?int $modelId): self
     {
         $this->modelId = $modelId;
+
+        return $this;
+    }
+
+    public function getEffort(): ?string
+    {
+        return $this->effort;
+    }
+
+    public function setEffort(?string $effort): self
+    {
+        $this->effort = $effort;
 
         return $this;
     }

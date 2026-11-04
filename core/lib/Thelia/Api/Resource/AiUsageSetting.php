@@ -111,6 +111,10 @@ class AiUsageSetting implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public ?int $pinnedModelId = null;
 
+    /** low, medium, high, xhigh or max; empty: the effort of the range. */
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    public ?string $effort = null;
+
     /**
      * @var array<string, string>|null
      */
@@ -276,6 +280,18 @@ class AiUsageSetting implements PropelResourceInterface
     public function setPinnedModelId(?int $pinnedModelId): self
     {
         $this->pinnedModelId = $pinnedModelId;
+
+        return $this;
+    }
+
+    public function getEffort(): ?string
+    {
+        return $this->effort;
+    }
+
+    public function setEffort(?string $effort): self
+    {
+        $this->effort = $effort;
 
         return $this;
     }

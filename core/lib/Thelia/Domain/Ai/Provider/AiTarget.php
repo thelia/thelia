@@ -16,6 +16,7 @@ namespace Thelia\Domain\Ai\Provider;
 
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Thelia\Domain\Ai\AiCapability;
+use Thelia\Domain\Ai\AiEffort;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\Catalog\AiModelSpecification;
@@ -23,6 +24,8 @@ use Thelia\Domain\Ai\Catalog\AiModelSpecification;
 /**
  * Where one call goes: the connection (endpoint, key, jurisdiction) and the model, resolved for a usage.
  * The key is held here only to be handed to the adapter; it never shows in a dump of the object.
+ * `effort` is the one the merchant set for the usage (its own, else its tier's); null when none is set or for a call
+ * of the core: the adapter then sends nothing.
  *
  * @internal
  */
@@ -39,6 +42,7 @@ final readonly class AiTarget
         public bool $allowPrivateNetwork,
         public AiJurisdiction $jurisdiction,
         public AiModelSpecification $model,
+        public ?AiEffort $effort = null,
     ) {
     }
 
@@ -70,6 +74,7 @@ final readonly class AiTarget
             'allowPrivateNetwork' => $this->allowPrivateNetwork,
             'jurisdiction' => $this->jurisdiction,
             'model' => $this->model->name,
+            'effort' => $this->effort?->value,
         ];
     }
 }

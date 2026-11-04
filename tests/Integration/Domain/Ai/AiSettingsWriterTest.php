@@ -293,10 +293,38 @@ final class AiSettingsWriterTest extends IntegrationTestCase
         self::assertSame(1, AiUsageSettingQuery::create()->filterByUsageId('aiprobe.writing')->count());
     }
 
+    public function testTheEffortOfATierAndOfAUsageIsStoredAndClearedWithAnEmptyValue(): void
+    {
+        $connection = $this->connection('anthropic-main', provider: 'anthropic');
+        $model = $this->model($connection, 'claude-probe');
+
+        $assignment = $this->writer->assignTier(null, 'fast', $connection->getId(), $model->getId(), 'high');
+        self::assertSame('high', AiTierAssignmentQuery::create()->findPk($assignment->getId())->getEffort());
+
+        $this->writer->assignTier($assignment, 'fast', $connection->getId(), $model->getId());
+        self::assertNull(AiTierAssignmentQuery::create()->findPk($assignment->getId())->getEffort());
+
+        $setting = $this->writer->saveUsageSetting(null, 'aiprobe.writing', effort: 'low');
+        self::assertSame('low', AiUsageSettingQuery::create()->findPk($setting->getId())->getEffort());
+
+        $this->writer->saveUsageSetting($setting, 'aiprobe.writing', effort: '');
+        self::assertNull(AiUsageSettingQuery::create()->findPk($setting->getId())->getEffort());
+    }
+
+    public function testATierWithAnEffortThatIsNotALevelIsRefused(): void
+    {
+        $connection = $this->connection('anthropic-main', provider: 'anthropic');
+
+        $this->expectException(InvalidAiArgumentException::class);
+
+        $this->writer->assignTier(null, 'fast', $connection->getId(), $this->model($connection, 'claude-probe')->getId(), 'turbo');
+    }
+
     public function testAUsageSettingThatBreaksARuleIsRefused(): void
     {
         foreach ([
             ['tier' => 'turbo'],
+            ['effort' => 'turbo'],
             ['monthlyBudget' => 'a lot'],
             ['currency' => 'dollars'],
             ['maxOutputTokens' => 0],

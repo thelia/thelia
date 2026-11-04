@@ -16,6 +16,7 @@ namespace Thelia\Domain\Ai\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
+use Thelia\Domain\Ai\AiEffort;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\AiTier;
@@ -158,10 +159,12 @@ final readonly class AiSettingsWriter
     /**
      * Gives the range a model. The model must belong to the provider of the connection, and to the connection
      * itself when it is bound to one; a range has one assignment: pass the one it has to change it.
+     * `$effort` (low, medium, high, xhigh or max) is how hard the model reasons for the usages of the range; null or
+     * empty clears it: nothing is sent, the provider keeps its default.
      *
      * @throws AiExceptionInterface
      */
-    public function assignTier(?AiTierAssignment $assignment, string $tier, int $connectionId, int $modelId): AiTierAssignment
+    public function assignTier(?AiTierAssignment $assignment, string $tier, int $connectionId, int $modelId, ?string $effort = null): AiTierAssignment
     {
         $assignment ??= new AiTierAssignment();
 
@@ -171,6 +174,7 @@ final readonly class AiSettingsWriter
             ?? throw new InvalidAiArgumentException('The connection does not exist.');
         $model = AiModelQuery::create()->findPk($modelId)
             ?? throw new InvalidAiArgumentException('The model does not exist.');
+        $effort = self::effort($effort);
 
         if ($model->getProvider() !== $connection->getProvider() || (null !== $model->getConnectionId() && $model->getConnectionId() !== $connection->getId())) {
             throw new InvalidAiArgumentException('The model is not served by this connection.');
@@ -186,7 +190,7 @@ final readonly class AiSettingsWriter
             throw new InvalidAiArgumentException('This tier already has an assignment: update it instead.');
         }
 
-        $assignment->setTier($tier->value)->setConnectionId($connection->getId())->setModelId($model->getId())->save();
+        $assignment->setTier($tier->value)->setConnectionId($connection->getId())->setModelId($model->getId())->setEffort($effort?->value)->save();
 
         return $assignment;
     }
@@ -197,6 +201,7 @@ final readonly class AiSettingsWriter
      * lacks a capability the usage declared is accepted here and refuses the calls (the usage shows as inactive).
      *
      * @param string|null           $monthlyBudget a non-negative decimal like "25.00", null for no budget of its own
+     * @param string|null           $effort        low, medium, high, xhigh or max; null or empty follows the effort of the range
      * @param array<string, string> $guardrails    the name of an optional guardrail to "block" or "annotate"
      *
      * @throws AiExceptionInterface
@@ -219,6 +224,7 @@ final readonly class AiSettingsWriter
         bool $provenanceMark = true,
         bool $storePrompt = false,
         ?int $promptRetentionDays = null,
+        ?string $effort = null,
     ): AiUsageSetting {
         $setting ??= new AiUsageSetting();
         $this->usages->get($usageId);
@@ -236,6 +242,7 @@ final readonly class AiSettingsWriter
         $tier = null === $tier || '' === $tier ? null : (AiTier::tryFrom($tier)
             ?? throw new InvalidAiArgumentException(\sprintf('The tier must be one of: %s.', implode(', ', array_column(AiTier::cases(), 'value')))));
 
+        $effort = self::effort($effort);
         $budget = null === $monthlyBudget || '' === trim($monthlyBudget) ? null : trim($monthlyBudget);
 
         if (null !== $budget) {
@@ -294,6 +301,7 @@ final readonly class AiSettingsWriter
             ->setMaxInputCharacters($maxInputCharacters)
             ->setPinnedConnectionId($pinnedConnectionId)
             ->setPinnedModelId($pinnedModelId)
+            ->setEffort($effort?->value)
             ->setGuardrailMap($modes)
             ->setTransparencyNotice((int) $transparencyNotice)
             ->setProvenanceMark((int) $provenanceMark)
@@ -614,6 +622,16 @@ final readonly class AiSettingsWriter
         }
 
         return null === $tier ? null : AiTierAssignmentQuery::create()->filterByTier($tier->value)->findOne()?->getConnectionId();
+    }
+
+    private static function effort(?string $effort): ?AiEffort
+    {
+        if (null === $effort || '' === $effort) {
+            return null;
+        }
+
+        return AiEffort::tryFrom($effort)
+            ?? throw new InvalidAiArgumentException(\sprintf('The effort must be one of: %s.', implode(', ', array_column(AiEffort::cases(), 'value'))));
     }
 
     private function positive(?int $value, string $label): ?int

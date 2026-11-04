@@ -56,11 +56,27 @@ final class AiSchemaParityTest extends TestCase
             preg_match_all('#^\s+`([a-z_]+)` [A-Z]#m', $body, $sqlColumns);
             preg_match_all('#(?:UNIQUE )?INDEX `([^`]+)`#', $body, $sqlIndexes);
             $found = ['columns' => $sqlColumns[1], 'indexes' => $sqlIndexes[1]];
+
+            if ('setup/update/sql/3.3.0.sql' === $file) {
+                // 3.3.0 is released: a column added since lives in a later script, which a shop updating from 3.2 runs too.
+                $found['columns'] = [...$found['columns'], ...self::columnsAddedBy($root.'/setup/update/sql/3.4.0.sql', $table)];
+            }
+
             sort($found['columns']);
             sort($found['indexes']);
 
             self::assertSame($expected, $found, $file);
         }
+    }
+
+    /**
+     * @return list<string> the columns an `ALTER TABLE ... ADD` of the script gives to the table
+     */
+    private static function columnsAddedBy(string $script, string $table): array
+    {
+        preg_match_all('#ALTER TABLE `'.$table.'` ADD `([a-z_]+)`#', (string) file_get_contents($script), $added);
+
+        return $added[1];
     }
 
     /**
