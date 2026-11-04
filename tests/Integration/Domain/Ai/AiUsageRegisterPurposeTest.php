@@ -17,6 +17,11 @@ namespace Thelia\Tests\Integration\Domain\Ai;
 use AiProbeModule\ProbeWriter;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Ai\AiAudience;
+use Thelia\Domain\Ai\AiTier;
+use Thelia\Domain\Ai\AiTransparency;
+use Thelia\Domain\Ai\AsAiUsage;
 use Thelia\Domain\Ai\Catalog\AiModelCatalog;
 use Thelia\Domain\Ai\Guardrail\TopicGuardrail;
 use Thelia\Domain\Ai\Provider\AiTargetResolver;
@@ -33,7 +38,8 @@ use Thelia\Test\IntegrationTestCase;
 
 /**
  * The purpose of a usage is a sentence the merchant reads: the one of a usage the core declares comes in the
- * language of the reader, the one a module declares is shown as the module wrote it.
+ * language of the reader, the one a module declares in the language its module translates it to, else as the
+ * module wrote it.
  */
 final class AiUsageRegisterPurposeTest extends IntegrationTestCase
 {
@@ -55,14 +61,32 @@ final class AiUsageRegisterPurposeTest extends IntegrationTestCase
         self::assertSame('Writes probe texts.', $this->purposes('fr_FR')['aiprobe.writing']);
     }
 
+    public function testThePurposeOfAModuleIsTranslatedByTheCatalogOfTheModule(): void
+    {
+        $catalog = tempnam(sys_get_temp_dir(), 'ai_purpose_').'.php';
+        file_put_contents($catalog, "<?php\n\nreturn ['Writes the purpose probe texts.' => 'Écrit les textes de la sonde des intitulés.'];\n");
+
+        try {
+            Translator::getInstance()->addResource('php', $catalog, 'fr_FR', 'aipurposeprobe');
+            $usage = new #[AsAiUsage(id: 'aipurposeprobe.writing', purpose: 'Writes the purpose probe texts.', audience: AiAudience::Admin, tier: AiTier::Fast, transparency: AiTransparency::Generative)] class {};
+
+            self::assertSame('Écrit les textes de la sonde des intitulés.', $this->purposes('fr_FR', ['aipurposeprobe.writing' => $usage::class])['aipurposeprobe.writing']);
+            self::assertSame('Writes the purpose probe texts.', $this->purposes('en_US', ['aipurposeprobe.writing' => $usage::class])['aipurposeprobe.writing'], 'A language the module does not translate shows the text as written.');
+        } finally {
+            unlink($catalog);
+        }
+    }
+
     /**
+     * @param array<string, class-string> $usages
+     *
      * @return array<string, string>
      */
-    private function purposes(string $locale): array
+    private function purposes(string $locale, array $usages = []): array
     {
         $settings = new AiUsageSettingRepository();
         $translator = new AiTextTranslator(new LangService(new RequestStack(), new NullLogger()));
-        $registry = new AiUsageRegistry([TopicGuardrail::USAGE => TopicGuardrail::class, 'aiprobe.writing' => ProbeWriter::class], $settings, new AiSettings(), $translator);
+        $registry = new AiUsageRegistry([TopicGuardrail::USAGE => TopicGuardrail::class, 'aiprobe.writing' => ProbeWriter::class, ...$usages], $settings, new AiSettings(), $translator);
         $resolver = new AiTargetResolver($registry, $settings, new AiRoutingRepository(), new AiModelCatalog(), new AiKeyVault(new AiKeyCipher('purpose-test-secret')));
 
         $purposes = [];
