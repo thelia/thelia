@@ -476,7 +476,7 @@ Delivery modules also act once the order exists: labels, tracking, saving the ch
 
 Proposed contract: a module reacts per parcel and per destination, not per order. The parcel events already exist (`ORDER_SHIPMENT_CREATE`, `_SHIP`, `_CANCEL`, `core/lib/Thelia/Core/Event/TheliaEvents.php:371-373`); they gain access to the destination of the parcel and its carrier. Hooks that today receive the order carrier receive the destination and its carrier. The tracking link of a parcel uses the carrier of its destination. A module that keeps reading `order.delivery_module_id` keeps working on single-destination orders.
 
-Not done for this study: an inventory of the label and tracking modules published for Thelia 3. It is part of L6 and of the plan contingency, and listed in [Open questions](#open-questions).
+Label modules published for Thelia 3 (`<thelia>3.0.0` in `Config/module.xml`): ChronopostLabel 3.0.2, ColissimoLabel 3.1.1 and DpdLabel 3.1.1. Each builds its label from the delivery address of the order (`Controller/ChronopostLabelController.php:136`, `Request/LabelRequest.php:33`, `Controller/LabelController.php:274`), so on an order with several destinations every label would carry the main address until they read the destination of the parcel (L6). Tracking modules were not inventoried; they are listed in [Open questions](#open-questions).
 
 ### Payment modules
 
@@ -486,7 +486,8 @@ Modules that send a single delivery address to the provider read `order.delivery
 
 - PayPal 6.2.0 builds the shipping address of the payment from `getDeliveryOrderAddressId()` (`Service/Base/PayPalBaseService.php:213`, in `generateShippingAddress`, declared at `:212`) and copies it to the agreement (`Service/PayPalAgreementService.php:762`). The provider receives one address, so the main address is a partial truth on a multi-address order. Which behaviour to choose is an [open question](#open-questions).
 - CmCIC 3.1.0 sends a billing and a shipping context built from the invoice and the delivery address (`Cmcic/CmCIC.php:323-336`). Same decision as PayPal.
-- Not found reading a delivery address in the code read: Payzen 3.2.0, PayzenEmbedded 3.7.3, Stripe 5.1.0, Paybox 3.0.2 and BridgePayment 3.0.1 (grep for `DeliveryOrderAddress`, `getDeliveryAddress` and `shipping`; Paybox and BridgePayment read the invoice address only, `Paybox.php:211`, `Request/PaymentRequest.php:54`). PayPlugOney 3.0.1 reads shipping fields from a payment event (`Service/OneyService.php:54-56`); where the event gets them was not traced: to be confirmed by its maintainers. PayPlug 3.2.1 was not read.
+- PayPlugModule 3.2.1 sends the delivery address as the shipping address of the payment (`Event/PayPlugPaymentEvent.php:599`, fields at `:139-221`). PayPlugOney 3.0.1 builds its payment from the same event (`Service/OneyService.php:48-49`) and checks the delivery address before offering Oney (`Controller/Front/OneyController.php:91`). Same decision as PayPal.
+- Not found reading a delivery address in the code read: Payzen 3.2.0, PayzenEmbedded 3.7.3, Stripe 5.1.0, Paybox 3.0.2 and BridgePayment 3.0.1 (grep for `DeliveryOrderAddress`, `getDeliveryAddress` and `shipping`; Paybox and BridgePayment read the invoice address only, `Paybox.php:211`, `Request/PaymentRequest.php:54`).
 
 The express checkout of the core stays single-destination: it places the one carrier and address written on the cart ([Order creation](#order-creation)), so it has to refuse a cart that holds planned destinations (part of L2).
 
@@ -513,7 +514,8 @@ The invoice reference allocator numbers an order when it becomes paid. One order
 Sources (tag read, survey 2026-11-04):
 - https://github.com/thelia-modules/PayPal/blob/6.2.0/Service/Base/PayPalBaseService.php#L213
 - https://github.com/thelia-modules/PayPal/blob/6.2.0/Service/PayPalAgreementService.php#L762
-- https://github.com/thelia-modules/Cmcic/tree/3.1.0 and https://github.com/thelia-modules/PayPlugOney/tree/3.0.1
+- https://github.com/thelia-modules/Cmcic/tree/3.1.0, https://github.com/thelia-modules/PayPlugModule/tree/3.2.1 and https://github.com/thelia-modules/PayPlugOney/tree/3.0.1
+- https://github.com/thelia-modules/ChronopostLabel/tree/3.0.2, https://github.com/thelia-modules/ColissimoLabel/tree/3.1.1 and https://github.com/thelia-modules/DpdLabel/tree/3.1.1
 - https://github.com/thelia-modules/ColissimoHomeDelivery/tree/3.0.3, https://github.com/thelia-modules/ColissimoPickupPoint/tree/3.1.0
 - https://github.com/thelia-modules/ChronopostHomeDelivery/tree/3.2.1, https://github.com/thelia-modules/ChronopostPickupPoint/tree/3.2.0
 - https://github.com/thelia-modules/DpdClassic/tree/3.1.0, https://github.com/thelia-modules/DpdPickup/tree/3.0.1
@@ -649,7 +651,7 @@ Sum of the feature lots (L1 to L6): 28 to 43 days.
 Contingency, held at the level of the whole feature: 6 days. It is not spread over the lots. Its reasons:
 
 - The chartered accountant may require mentions or a layout on the multi-country invoice, or a presentation of mixed exempted and taxed destinations, that the study cannot foresee (L4, possibly L2 for rounding and the discount split).
-- No third-party module was run. The opt-in list rests on reading their code at one tag, and the label and tracking modules were not inventoried ([Module impact](#module-impact)).
+- No third-party module was run. The opt-in list rests on reading their code at one tag, and the tracking modules were not inventoried ([Module impact](#module-impact)).
 - FacturX and CreditNote handle one postage rate; their maintainers may ask for core data the plan does not include.
 
 Total of the feature with contingency: 34 to 49 days. With L0: 34.75 to 50.5 days.
@@ -696,7 +698,7 @@ Order of delivery and what ships alone:
 | How is an order-level discount split between destinations? | The tax of each rate and country depends on it. The study proposes a split pro rata of the goods excluding tax. | Chartered accountant |
 | Free shipping on the order total or on the destination subtotal? | The study evaluates module slices per destination (the carrier invoices each destination). A cart that is free at one address can pay postage when split. Merchants may expect the order total. | Product maintainer, with module maintainers |
 | Does the coupon condition "delivery module is one of" require every destination or one of them to match? | It reads the single cart module today. A wrong choice grants or refuses a coupon on mixed carriers. | Product maintainer |
-| Which delivery address do PayPal and CmCIC send to the provider: the main destination or none? | Both send a single address (Module impact). The main one is a partial truth on a multi-address order; sending none may change fraud scoring on the provider side. | Module maintainers |
+| Which delivery address do PayPal, CmCIC and PayPlug (with PayPlugOney) send to the provider: the main destination or none? | All three send a single address (Module impact). The main one is a partial truth on a multi-address order; sending none may change fraud scoring on the provider side. | Module maintainers |
 | Is a relay (pickup point) choice per destination wanted? | The seven single-destination modules include all pickup modules read. Without it a pickup carrier stays limited to single-destination orders. | Module maintainers, product maintainer |
 | Should the requested delivery date and slot be chosen per destination? | They depend on the carrier, and the slot is booked once per order today (`core/lib/Thelia/Domain/Order/OrderFacade.php:318-324`) for the cart carrier (`core/lib/Thelia/Domain/Shipping/DeliveryDate/Service/DeliveryDateSelection.php:58`). The study offers them only to single-destination orders. | Product maintainer |
 | Should one cart line be split between destinations by quantity? | The study keeps one line, one destination, so one tax country per line. A line can already be split between parcels of one destination. Buying the same product for two addresses means two lines. | Product maintainer |
@@ -706,7 +708,7 @@ Order of delivery and what ships alone:
 | How does a postage credit note split two postage rates? How does FacturX express two ship-to parties and two postage rates? | CreditNote credits postage from the order scalars; FacturX derives one postage rate and one delivery country. | Module maintainers, chartered accountant |
 | Is the feature behind a shop setting until every lot is released? | Shipping L2 before L4 and L5 would produce invoices with one address and destination addresses missed by anonymization. | Core maintainers |
 | Should `BC-PROMISE.md` point to `UPDATE.md`, or should `UPGRADE-3.x.md` be created? | The promise names a file that does not exist; the deprecations and the change of meaning of this feature need one place. | Core maintainers |
-| Which label and tracking modules published for Thelia 3 read `order.delivery_module_id` after the order? | They keep working on single-destination orders only; their count sizes L6 and its share of the contingency. | Module maintainers |
+| Which tracking modules published for Thelia 3 read `order.delivery_module_id` after the order, and how do the three label modules pick their orders? | They keep working on single-destination orders only; their count sizes L6 and its share of the contingency. | Module maintainers |
 | Who signs this study and who arbitrates between the options? | A decision record needs an owner who accepts it and a named arbiter when maintainers disagree. | Product maintainer |
 
-Left as "to be confirmed" in place, outside this table: the platform comparison ([Context](#context)), the price shown before the split ([Prices shown before the buyer splits the lines](#prices-shown-before-the-buyer-splits-the-lines)), the PayPlugOney and PayPlug 3.2.1 payment modules ([Payment modules](#payment-modules)), the ProcessAndInvoice delivery note ([Invoicing and PDF](#invoicing-and-pdf)), the return country ([Other consumers](#other-consumers)) and the recipient access request ([Personal data](#personal-data)).
+Left as "to be confirmed" in place, outside this table: the platform comparison ([Context](#context)), the price shown before the split ([Prices shown before the buyer splits the lines](#prices-shown-before-the-buyer-splits-the-lines)), the ProcessAndInvoice delivery note ([Invoicing and PDF](#invoicing-and-pdf)), the return country ([Other consumers](#other-consumers)) and the recipient access request ([Personal data](#personal-data)).
