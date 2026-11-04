@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\Ai\Provider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Domain\Ai\AiEffort;
 use Thelia\Domain\Ai\AiFinishReason;
 use Thelia\Domain\Ai\AiMessage;
 use Thelia\Domain\Ai\AiOutputSchema;
@@ -242,6 +243,99 @@ final class AnthropicAdapterTest extends AiProviderTestCase
         $adapter->complete($this->request(providerOptions: ['anthropic' => ['effort' => 'high']]), $target);
 
         self::assertSame('' === $thinkingOff ? AnthropicAdapter::THINKING_DISABLED : $thinkingOff, $this->lastBody()['thinking']['type'], 'at high effort thinking is still turned off');
+    }
+
+    public function testTheEffortOfTheMerchantIsSentWhereTheApiReadsItAndThinkingStaysOff(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport([Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => 'ok']]), Wire::anthropic([['type' => 'text', 'text' => 'ok']])]));
+
+        foreach ([AiEffort::Low, AiEffort::Medium, AiEffort::High] as $effort) {
+            $adapter->complete($this->request(), $this->target(AiProvider::Anthropic, effort: $effort));
+
+            self::assertSame($effort->value, $this->lastBody()['output_config']['effort']);
+            self::assertArrayNotHasKey('effort', $this->lastBody());
+            self::assertSame(['type' => 'disabled'], $this->lastBody()['thinking'], 'the decision on default thinking is unchanged');
+        }
+    }
+
+    public function testNoEffortOfTheMerchantSendsNoEffortAsBefore(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        $adapter->complete($this->request(), $this->target(AiProvider::Anthropic));
+
+        self::assertArrayNotHasKey('output_config', $this->lastBody());
+    }
+
+    /**
+     * Anthropic refuses `disabled` and `between_tools` at `xhigh` and `max`: the effort of the merchant rides the same rule
+     * as the one of a request.
+     */
+    #[DataProvider('effortsThatKeepThinking')]
+    public function testTheEffortOfTheMerchantAboveHighSendsNoThinkingEither(string $model, string $thinkingOff): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        $adapter->complete($this->request(), $this->target(AiProvider::Anthropic, model: $model, thinkingOff: '' === $thinkingOff ? null : $thinkingOff, effort: AiEffort::Max));
+
+        self::assertArrayNotHasKey('thinking', $this->lastBody());
+        self::assertSame('max', $this->lastBody()['output_config']['effort']);
+    }
+
+    public function testAModelThatCannotStopThinkingIsAskedTheEffortOfTheMerchantInsteadOfTheLowestOne(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        $adapter->complete($this->request(), $this->target(AiProvider::Anthropic, model: 'claude-fable-5', thinkingOff: AnthropicAdapter::THINKING_ADAPTIVE, effort: AiEffort::High));
+
+        self::assertSame(['type' => 'adaptive'], $this->lastBody()['thinking']);
+        self::assertSame('high', $this->lastBody()['output_config']['effort']);
+    }
+
+    /**
+     * The order, from the strongest: the native option of the module, then the setting of the usage, then the one of its
+     * tier (the first two are folded into the effort of the target by AiEffort::resolve(), see AiEffortTest).
+     *
+     * @param array<string, mixed> $native
+     */
+    #[DataProvider('nativeEfforts')]
+    public function testAnExplicitNativeOptionOfTheModuleWinsOverTheEffortOfTheMerchant(array $native, string $expected): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => $native]), $this->target(AiProvider::Anthropic, effort: AiEffort::Max));
+
+        self::assertSame($expected, $this->lastBody()['output_config']['effort']);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>, string}> */
+    public static function nativeEfforts(): iterable
+    {
+        yield 'the short way' => [['effort' => 'low'], 'low'];
+        yield 'in the output config' => [['output_config' => ['effort' => 'medium']], 'medium'];
+    }
+
+    public function testANativeThinkingSettingOfTheModuleIsNotTouchedByTheEffortOfTheMerchant(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropic([['type' => 'text', 'text' => 'ok']])));
+
+        $adapter->complete($this->request(providerOptions: ['anthropic' => ['thinking' => ['type' => 'adaptive']]]), $this->target(AiProvider::Anthropic, effort: AiEffort::Low));
+
+        self::assertSame(['type' => 'adaptive'], $this->lastBody()['thinking']);
+        self::assertSame('low', $this->lastBody()['output_config']['effort']);
+    }
+
+    public function testARefusalAtTheEffortOfTheMerchantAboveHighIsNotTriedAgain(): void
+    {
+        $adapter = $this->adapter(AnthropicAdapter::class, $this->transport(Wire::anthropicMeasured('claude-fable-5-1', 'disabled')));
+
+        $this->expectException(AiProviderUnavailableException::class);
+
+        try {
+            $adapter->complete($this->request(), $this->target(AiProvider::Anthropic, model: 'claude-next', effort: AiEffort::Max));
+        } finally {
+            self::assertCount(1, $this->sent);
+        }
     }
 
     public function testARefusalAtAnEffortAboveHighIsNotTriedAgain(): void

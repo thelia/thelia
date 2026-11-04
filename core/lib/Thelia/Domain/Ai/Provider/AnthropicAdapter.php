@@ -89,9 +89,15 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
      *
      * A request at `xhigh` or `max` effort asks the model to think hard: the API refuses `disabled` and `between_tools`
      * at these efforts, so no `thinking` is sent and the model keeps its own default.
+     *
+     * The effort the merchant set for the usage (its own, else its tier's) is the effort of a request that names none,
+     * `effort` or `output_config.effort`: the module's native option wins. It rides the rules above like an effort of the
+     * request, so a model that cannot stop thinking is asked this effort instead of the lowest one.
      */
     protected function nativeOptions(array $native, AiTarget $target): array
     {
+        $native = self::withEffortOfTarget($native, $target);
+
         if (isset($native['effort'])) {
             $outputConfig = \is_array($native['output_config'] ?? null) ? $native['output_config'] : [];
             $outputConfig['effort'] ??= $native['effort'];
@@ -120,7 +126,7 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
      */
     protected function retries(DeferredResult $deferred, AiRequest $request, AiTarget $target): bool
     {
-        $native = $request->optionsFor($target->provider);
+        $native = self::withEffortOfTarget($request->optionsFor($target->provider), $target);
 
         if (isset($native['thinking']) || self::keepsThinking($native) || self::THINKING_DISABLED !== $this->thinkingOff($target)) {
             return false;
@@ -140,6 +146,22 @@ final class AnthropicAdapter extends AbstractPlatformAdapter
     protected function refusal(array $body): ?AiProviderRefusal
     {
         return AiProviderRefusal::fromAnthropic($body);
+    }
+
+    /**
+     * @param array<string, mixed> $native the native options of the request, `effort` written either way
+     *
+     * @return array<string, mixed> the same options, with the effort of the merchant when the request names none
+     */
+    private static function withEffortOfTarget(array $native, AiTarget $target): array
+    {
+        if (null === $target->effort || isset($native['effort']) || (\is_array($native['output_config'] ?? null) && isset($native['output_config']['effort']))) {
+            return $native;
+        }
+
+        $native['effort'] = $target->effort->value;
+
+        return $native;
     }
 
     /**

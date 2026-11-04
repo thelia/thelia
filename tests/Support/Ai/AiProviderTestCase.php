@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Thelia\Domain\Ai\AiEffort;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiMessage;
 use Thelia\Domain\Ai\AiProvider;
@@ -124,7 +125,7 @@ abstract class AiProviderTestCase extends TestCase
         };
     }
 
-    protected function target(AiProvider $provider, ?string $baseUrl = self::PUBLIC_URL, ?string $key = self::KEY, bool $privateNetwork = false, string $model = 'probe-model', bool $structured = true, ?int $maxOutputTokens = 8000, ?string $thinkingOff = null): AiTarget
+    protected function target(AiProvider $provider, ?string $baseUrl = self::PUBLIC_URL, ?string $key = self::KEY, bool $privateNetwork = false, string $model = 'probe-model', bool $structured = true, ?int $maxOutputTokens = 8000, ?string $thinkingOff = null, ?AiEffort $effort = null): AiTarget
     {
         return new AiTarget(
             1,
@@ -135,6 +136,7 @@ abstract class AiProviderTestCase extends TestCase
             $privateNetwork,
             AiJurisdiction::EuropeanUnion,
             new AiModelSpecification($provider->value, $model, null, '1.000000', '5.000000', '0.100000', null, 'USD', 100000, $maxOutputTokens, $structured, true, false, true, AiModelSpecification::SOURCE_CATALOG, thinkingOff: $thinkingOff),
+            $effort,
         );
     }
 
