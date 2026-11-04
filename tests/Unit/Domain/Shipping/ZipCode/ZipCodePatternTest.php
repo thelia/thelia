@@ -106,6 +106,16 @@ final class ZipCodePatternTest extends TestCase
         self::assertSame('20*', (string) ZipCodePattern::fromString("\u{FF12}\u{FF10}\u{FF0A}"), 'Written in full-width characters, kept in its normal form.');
     }
 
+    public function testTheRangeSeparatorIsReadInItsCompatibilityForms(): void
+    {
+        self::assertSame('75001...75020', (string) ZipCodePattern::fromString("75001\u{2026}75020"), 'An ellipsis, as autocorrect types "...".');
+        self::assertSame(
+            '75001...75020',
+            (string) ZipCodePattern::fromString("\u{FF17}\u{FF15}\u{FF10}\u{FF10}\u{FF11}\u{FF0E}\u{FF0E}\u{FF0E}\u{FF17}\u{FF15}\u{FF10}\u{FF12}\u{FF10}"),
+            'A range written in full-width characters.',
+        );
+    }
+
     /**
      * @return iterable<string, array{string}>
      */

@@ -328,13 +328,21 @@ final readonly class ZipCodePattern
 
     /**
      * The normal form of a pattern: each side of the range separator folded as a code is,
-     * with * kept, or null when a side keeps another character.
+     * with * kept, or null when a side keeps another character. The pattern is folded with
+     * NFKC before it is split, so that the separator typed as an ellipsis "…" or as
+     * full-width full stops is the range separator.
      */
     private static function normalizePattern(string $pattern): ?string
     {
+        $compatible = \Normalizer::normalize($pattern, \Normalizer::FORM_KC);
+
+        if (false === $compatible) {
+            return null;
+        }
+
         $parts = [];
 
-        foreach (explode(self::RANGE_SEPARATOR, $pattern, 2) as $part) {
+        foreach (explode(self::RANGE_SEPARATOR, $compatible, 2) as $part) {
             $folded = self::fold($part);
 
             if (null === $folded || 1 !== preg_match('/^[A-Z0-9*]*$/', $folded)) {
