@@ -28,7 +28,7 @@ final class CouponFrontVisibilityTest extends ApiTestCase
     {
         $coupon = $this->createFixtureFactory()->coupon(['code' => 'PROMO-'.uniqid()]);
 
-        $response = $this->jsonRequest('GET', str_replace('{id}', (string) $coupon->getId(), $uriTemplate), token: $this->authenticateAsCustomer());
+        $response = $this->jsonRequest('GET', self::uri($uriTemplate, $coupon), token: $this->authenticateAsCustomer());
 
         self::assertSame(404, $response->getStatusCode(), $uriTemplate);
         self::assertStringNotContainsString($coupon->getCode(), (string) $response->getContent());
@@ -39,10 +39,23 @@ final class CouponFrontVisibilityTest extends ApiTestCase
     {
         $coupon = $this->createFixtureFactory()->coupon(['code' => 'PROMO-'.uniqid()]);
 
-        $response = $this->jsonRequest('GET', str_replace('{id}', (string) $coupon->getId(), $uriTemplate));
+        $response = $this->jsonRequest('GET', self::uri($uriTemplate, $coupon));
 
         self::assertSame(404, $response->getStatusCode(), $uriTemplate);
         self::assertStringNotContainsString($coupon->getCode(), (string) $response->getContent());
+    }
+
+    public function testACustomerStillReadsThePromotionsOfTheirOwnOrder(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $owner = $factory->customer($factory->customerTitle());
+        $order = $factory->order($owner);
+        $factory->orderCoupon($order, $factory->coupon(['code' => 'PROMO-'.uniqid()]));
+
+        $response = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $this->authenticateAsCustomer($owner));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertNotEmpty(json_decode((string) $response->getContent(), true)['orderCoupons'] ?? []);
     }
 
     /**
@@ -52,5 +65,11 @@ final class CouponFrontVisibilityTest extends ApiTestCase
     {
         yield 'list' => ['/api/front/coupons'];
         yield 'by id' => ['/api/front/coupons/{id}'];
+        yield 'by code' => ['/api/front/coupons/{code}/by-code'];
+    }
+
+    private static function uri(string $template, \Thelia\Model\Coupon $coupon): string
+    {
+        return strtr($template, ['{id}' => (string) $coupon->getId(), '{code}' => $coupon->getCode()]);
     }
 }
