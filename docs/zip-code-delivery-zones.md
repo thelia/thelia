@@ -19,7 +19,7 @@ optionally one country of the zone (no country: every country of the zone).
 - a pattern where `*` stands for any characters, `20*` or `75*1`;
 - a range of numeric codes, `75001...75020`, bounds included.
 
-Codes and patterns are compared in their normal form (`ZipCodePattern::normalize()`):
+Codes and patterns are compared in their normal form (`ZipCodePattern::normalForm()`):
 compatibility characters folded (Unicode NFKC, through `ext-intl`, which the core
 requires: `２０000` is `20000`), without spaces, dashes (every `\p{Pd}`, and the minus
 sign) or invisible format characters (`\p{Cf}`: a soft hyphen, a zero-width space), with
@@ -94,7 +94,7 @@ country, as the postage estimate does. The front API (`GET /api/front/delivery_m
 judges the cart's copy unless the request names another address of the cart's customer
 (never for a guest) than the one the copy was taken from.
 
-A postal code without a normal form (`ZipCodePattern::normalize()` returns null) is
+A postal code without a normal form (`ZipCodePattern::normalForm()` returns null) is
 uncertain, as a code PCRE gives up on: an exclusion refuses it and an inclusion
 does not take it; a zone without a rule still takes it. The database refuses a code that
 is not valid UTF-8 in an address, so only a caller passing one itself meets that case.
