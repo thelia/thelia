@@ -83,6 +83,21 @@ final class OrderProductUnitTaxedPriceApiTest extends ApiTestCase
         self::assertSame(self::UNIT_PRICE, $payload['unitTaxedPrice'], 'An order without VAT charges the price: not an unknown amount.');
     }
 
+    public function testALineInPromotionReturnsThePromotionalPriceWithItsOwnTax(): void
+    {
+        $orderProduct = $this->taxedOrderLine();
+        $orderProduct->setPromoPrice('10')->setWasInPromo(1)->save($this->getPropelConnection());
+        OrderProductTaxQuery::create()->filterByOrderProductId($orderProduct->getId())->update(['PromoAmount' => '2']);
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('GET', '/api/admin/order_products/'.$orderProduct->getId(), token: $token);
+
+        self::assertJsonResponseSuccessful($response);
+        $payload = json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertEqualsWithDelta(12.0, $payload['unitTaxedPrice'], 0.000001);
+    }
+
     private function taxedOrderLine(): OrderProduct
     {
         $connection = $this->getPropelConnection();
