@@ -119,14 +119,14 @@ final class PromotionStackingTest extends ActionIntegrationPromotionTestCase
     /**
      * With every priority at 0, one code and the automatic promotions give the discount of the algorithm
      * the shops had before the priorities (CouponManager::sortCoupons, copied in legacyDiscount()), whatever
-     * the cumulative flag of each one and whichever was created first.
+     * the cumulative flag of each one and whichever was created first, two automatic ones applying alone included.
      *
      * @return iterable<string, array{bool, list<bool>, bool}>
      */
     public static function legacyDiscountCases(): iterable
     {
         foreach ([true, false] as $codeCumulative) {
-            foreach ([[true], [false], [true, true]] as $automatics) {
+            foreach ([[true], [false], [true, true], [false, true], [true, false], [false, false]] as $automatics) {
                 foreach ([true, false] as $codeCreatedFirst) {
                     yield \sprintf(
                         'code %s + automatics [%s], code created %s',
@@ -171,19 +171,25 @@ final class PromotionStackingTest extends ActionIntegrationPromotionTestCase
         self::assertSame(self::legacyDiscount($fed), $this->couponManager->getDiscount());
     }
 
-    /**
-     * The one case that stays different from the previous algorithm, frozen on purpose: two automatic
-     * promotions, one of them applying alone. The previous one let the last non cumulative promotion win
-     * and the cumulative ones after it replace it; the first one by id wins now.
-     */
-    public function testTwoAutomaticPromotionsOneOfThemAloneNowKeepTheFirstOne(): void
+    public function testTwoAutomaticPromotionsOneOfThemAloneKeepTheLegacyDiscount(): void
     {
         $this->automaticPromotion(effects: ['amount' => 5.0], conditions: $this->everyone(), overrides: ['isCumulative' => false]);
         $this->automaticPromotion(effects: ['amount' => 7.0], conditions: $this->everyone());
         $this->cartWithAProduct();
         $this->couponManager->invalidateCurrentCoupons();
 
+        // The last non cumulative one used to win, and a cumulative one after it replaced it.
         self::assertSame(7.0, self::legacyDiscount([[5.0, false], [7.0, true]]));
+        self::assertSame(7.0, $this->couponManager->getDiscount());
+    }
+
+    public function testTwoAutomaticPromotionsWithAPriorityKeepTheNewOrder(): void
+    {
+        $this->automaticPromotion(effects: ['amount' => 5.0], conditions: $this->everyone(), overrides: ['isCumulative' => false, 'priority' => 1]);
+        $this->automaticPromotion(effects: ['amount' => 7.0], conditions: $this->everyone(), overrides: ['priority' => 1]);
+        $this->cartWithAProduct();
+        $this->couponManager->invalidateCurrentCoupons();
+
         self::assertSame(5.0, $this->couponManager->getDiscount());
     }
 
