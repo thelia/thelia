@@ -90,7 +90,7 @@ class AiUsageRegistry implements AiUsageRegistryInterface
         return AiComplianceStatus::evaluate(
             $usage,
             $setting?->getTransparencyNotice() ?? true,
-            $setting?->getProvenanceMark() ?? true,
+            $setting?->getProvenanceMark() ?? false,
         );
     }
 

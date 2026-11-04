@@ -55,7 +55,7 @@ final readonly class AiComplianceStatus
      * The statuses of a usage, from what its module declared and what the merchant set.
      *
      * @param bool $noticeShown      the notice "you are talking with an AI" is on (on by default)
-     * @param bool $provenanceMarked the provenance mark of generated content is on (on by default)
+     * @param bool $provenanceMarked the provenance mark of generated content is on (off by default)
      *
      * @return list<self> empty when the usage falls under no transparency duty
      */

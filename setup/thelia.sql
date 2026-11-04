@@ -1810,7 +1810,7 @@ CREATE TABLE `ai_usage_setting`
     `effort` VARCHAR(16) COMMENT 'how hard the model reasons for this usage: low, medium, high, xhigh or max; empty: the effort of the tier',
     `guardrails` TEXT COMMENT 'JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares',
     `transparency_notice` TINYINT(1) DEFAULT 1 NOT NULL COMMENT '0 hides the notice of an interactive usage (AI Act 50(1)): allowed, the usage then shows as not compliant',
-    `provenance_mark` TINYINT(1) DEFAULT 1 NOT NULL COMMENT '0 drops the provenance mark of a generative usage (AI Act 50(2)): allowed, the usage then shows as not compliant',
+    `provenance_mark` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '1 puts the provenance mark on what a generative usage writes (AI Act 50(2)); off by default, the usage then shows as not compliant',
     `store_prompt` TINYINT(1) DEFAULT 0 NOT NULL COMMENT '1 keeps the prompt of each call in the log',
     `prompt_retention_days` INTEGER COMMENT 'days a stored prompt is kept before the maintenance purge removes it',
     `created_at` DATETIME,
