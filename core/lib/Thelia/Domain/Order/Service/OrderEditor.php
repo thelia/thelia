@@ -21,17 +21,23 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Invoice\InvoiceRefAllocator;
 use Thelia\Domain\Order\DTO\AddedOrderLine;
 use Thelia\Domain\Order\DTO\OrderEdit;
+use Thelia\Domain\Order\DTO\OrderEditPreview;
+use Thelia\Domain\Order\DTO\OrderTotals;
 use Thelia\Domain\Order\Enum\OrderEditRefusal;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Exception\OrderEditRefusedException;
 use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Domain\Taxation\Service\ExemptedVatCalculator;
+use Thelia\Domain\Taxation\TaxEngine\Calculator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\Map\OrderAddressTableMap;
+use Thelia\Model\Map\OrderPostageTaxTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order;
@@ -89,11 +95,22 @@ final readonly class OrderEditor
 
     public function edit(Order $order, OrderEdit $edit): void
     {
+        $this->run($order, $edit, false);
+    }
+
+    public function simulate(Order $order, OrderEdit $edit): OrderEditPreview
+    {
+        return $this->run($order, $edit, true) ?? throw new TheliaProcessException('A simulation must give a preview.');
+    }
+
+    private function run(Order $order, OrderEdit $edit, bool $simulation): ?OrderEditPreview
+    {
         if ($edit->isEmpty()) {
             throw new OrderEditRefusedException(OrderEditRefusal::NothingToEdit);
         }
 
-        $connection = $this->transactionManager->begin();
+        $nested = $simulation && $this->transactionManager->isInTransaction();
+        $connection = $nested ? $this->transactionManager->savepoint() : $this->transactionManager->begin();
 
         try {
             $this->lock($order, $connection);
@@ -103,22 +120,36 @@ final readonly class OrderEditor
             $lines = $this->linesOf($order);
             $this->assertOperations($lines, $edit);
 
-            $this->dispatcher->dispatch(new OrderEditEvent($order, $edit), TheliaEvents::ORDER_BEFORE_EDIT);
+            if (!$simulation) {
+                $this->dispatcher->dispatch(new OrderEditEvent($order, $edit), TheliaEvents::ORDER_BEFORE_EDIT);
+            }
 
+            $before = $simulation ? $this->totalsOf($order) : null;
             $summary = $this->apply($order, $lines, $edit, $connection);
             ProductSaleElementsTableMap::clearInstancePool();
 
             Order::forgetCachedTotals((int) $order->getId());
             $this->assertDiscountIsCovered($order);
 
+            if (null !== $before) {
+                $preview = new OrderEditPreview($before, $this->totalsOf($order), $summary);
+
+                $nested ? $this->transactionManager->rollbackToSavepoint($connection) : $this->transactionManager->rollback($connection);
+                $this->restore($order);
+
+                return $preview;
+            }
+
             $this->historyRecorder->record((int) $order->getId(), OrderHistoryEventType::ORDER_EDITED->value, $summary);
 
             $this->transactionManager->commit($connection);
         } catch (\Throwable $throwable) {
-            $this->transactionManager->rollback($connection);
-            Order::forgetCachedTotals((int) $order->getId());
-            OrderProductTableMap::clearInstancePool();
-            $order->reload(false);
+            $nested ? $this->transactionManager->rollbackToSavepoint($connection) : $this->transactionManager->rollback($connection);
+
+            try {
+                $this->restore($order);
+            } catch (\Throwable) {
+            }
 
             throw $throwable;
         }
@@ -128,6 +159,39 @@ final readonly class OrderEditor
         } catch (\Throwable $throwable) {
             Tlog::getInstance()->err('A listener of the edit of order {order} failed: {ex}', ['order' => $order->getId(), 'ex' => $throwable]);
         }
+
+        return null;
+    }
+
+    private function restore(Order $order): void
+    {
+        Order::forgetCachedTotals((int) $order->getId());
+        OrderProductTableMap::clearInstancePool();
+        OrderProductTaxTableMap::clearInstancePool();
+        OrderPostageTaxTableMap::clearInstancePool();
+        OrderAddressTableMap::clearInstancePool();
+        ProductSaleElementsTableMap::clearInstancePool();
+        Calculator::forgetOrderTaxFactor($order);
+        $order->reload(false);
+    }
+
+    private function totalsOf(Order $order): OrderTotals
+    {
+        Order::forgetCachedTotals((int) $order->getId());
+        Calculator::forgetOrderTaxFactor($order);
+        $order->clearOrderProducts();
+
+        $tax = 0;
+        $goods = $order->getTotalAmount($tax, false, false);
+        $total = $order->getTotalAmount($tax, true, true);
+
+        return new OrderTotals(
+            $this->amount($goods),
+            $this->amount($order->getDiscount()),
+            $this->amount($order->getPostage()),
+            $this->amount($tax),
+            $this->amount($total),
+        );
     }
 
     private function lock(Order $order, ConnectionInterface $connection): void
@@ -283,7 +347,7 @@ final readonly class OrderEditor
 
             $previous = (string) ($line->getWasInPromo() ? $line->getPromoPrice() : $line->getPrice());
 
-            $line->setPrice($price)->setPromoPrice($price)->setWasInPromo(0)->save($connection);
+            $line->setPromoPrice($price)->setWasInPromo(1)->save($connection);
             $this->replaceTaxes($line, $product, $country, $locale, $vatExempted, $connection);
 
             $summary['prices'][] = ['ref' => $line->getProductSaleElementsRef(), 'from' => $previous, 'to' => $price];
