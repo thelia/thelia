@@ -6182,5 +6182,33 @@ CREATE TABLE `order_payment_part`
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
+-- ---------------------------------------------------------------------
+-- report_mailing
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `report_mailing`;
+
+CREATE TABLE `report_mailing`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(255) NOT NULL COMMENT 'what the merchant calls the report; the subject and the title of the e-mail',
+    `export_ref` VARCHAR(255) NOT NULL COMMENT 'ref of the export the report is made of',
+    `period` VARCHAR(32) NOT NULL COMMENT 'one of ReportPeriod: the period the export covers, relative to the day it is sent',
+    `frequency` VARCHAR(16) NOT NULL COMMENT 'one of ReportFrequency: daily, weekly or monthly',
+    `day_of_week` TINYINT COMMENT 'weekly: the day of the week, 1 (Monday) to 7 (Sunday)',
+    `day_of_month` TINYINT COMMENT 'monthly: the day of the month, 1 to 28',
+    `send_hour` TINYINT DEFAULT 7 NOT NULL COMMENT 'the hour of the day, in the timezone of PHP, from which the report is sent',
+    `locale` VARCHAR(10) NOT NULL COMMENT 'the language of the e-mail and of the export',
+    `recipients` TEXT NOT NULL COMMENT 'e-mail addresses, comma separated',
+    `enabled` TINYINT DEFAULT 1 NOT NULL,
+    `last_period_end` DATE COMMENT 'the end of the last period sent to every recipient',
+    `pending_recipients` TEXT COMMENT 'the recipients the last send failed for, comma separated, to be tried again on their own; NULL when none',
+    `pending_attempts` TINYINT DEFAULT 0 NOT NULL COMMENT 'how many times the period has been tried again for the recipients still waiting; back to 0 with each new period',
+    `last_sent_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

@@ -45,6 +45,13 @@ final class TheliaScheduleTest extends TestCase
         self::assertSame(['currency:update-rates' => '0 6 * * *'], self::commands($schedule->getRecurringMessages()));
     }
 
+    public function testTheReportMailsAreSentWhenTheirExpressionSays(): void
+    {
+        $schedule = $this->schedule(saleCheck: '', maintenancePurge: '', failedJobsPurge: '', currencyRates: '', contentPublication: '', reportMails: '*/15 * * * *');
+
+        self::assertSame(['report:send-due' => '*/15 * * * *'], self::commands($schedule->getRecurringMessages()));
+    }
+
     public function testAnEmptyExpressionLeavesTheTaskOut(): void
     {
         $schedule = $this->schedule(saleCheck: '  ', maintenancePurge: '', failedJobsPurge: '', currencyRates: '', contentPublication: '');
@@ -59,8 +66,8 @@ final class TheliaScheduleTest extends TestCase
     public function testTwoWorkersCannotHoldTheScheduleAtOnce(): void
     {
         $store = new InMemoryStore();
-        $first = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', '', ''))->getSchedule();
-        $second = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', '', ''))->getSchedule();
+        $first = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', '', '', ''))->getSchedule();
+        $second = (new TheliaSchedule(new ArrayAdapter(), new LockFactory($store), '* * * * *', '', '', '', '', ''))->getSchedule();
 
         self::assertTrue($first->getLock()?->acquire());
         self::assertFalse($second->getLock()?->acquire(), 'The second worker must wait for the first.');
@@ -81,9 +88,9 @@ final class TheliaScheduleTest extends TestCase
         self::assertTrue($schedule->shouldProcessOnlyLastMissedRun());
     }
 
-    private function schedule(string $saleCheck, string $maintenancePurge, string $failedJobsPurge, string $currencyRates, string $contentPublication): \Symfony\Component\Scheduler\Schedule
+    private function schedule(string $saleCheck, string $maintenancePurge, string $failedJobsPurge, string $currencyRates, string $contentPublication, string $reportMails = ''): \Symfony\Component\Scheduler\Schedule
     {
-        return (new TheliaSchedule(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $saleCheck, $maintenancePurge, $failedJobsPurge, $currencyRates, $contentPublication))->getSchedule();
+        return (new TheliaSchedule(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $saleCheck, $maintenancePurge, $failedJobsPurge, $currencyRates, $contentPublication, $reportMails))->getSchedule();
     }
 
     /**

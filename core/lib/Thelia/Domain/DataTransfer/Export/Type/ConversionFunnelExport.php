@@ -19,6 +19,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartPurgeHorizon;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Export\ArrayAbstractExport;
+use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
+use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Domain\Report\ConversionFunnel\ConversionFunnelCalculator;
 use Thelia\Domain\Report\ConversionFunnel\FunnelStep;
 
@@ -29,7 +31,7 @@ use Thelia\Domain\Report\ConversionFunnel\FunnelStep;
  * The period starts on the cart purge horizon at the earliest, as on the back-office
  * report: before it, the orders would be set against carts that no longer exist.
  */
-class ConversionFunnelExport extends ArrayAbstractExport
+class ConversionFunnelExport extends ArrayAbstractExport implements MailableReportInterface
 {
     public const FILE_NAME = 'conversion_funnel';
     public const USE_RANGE_DATE = true;
@@ -71,6 +73,46 @@ class ConversionFunnelExport extends ArrayAbstractExport
         }
 
         return $rows;
+    }
+
+    /**
+     * The totals of the columns over the period, and the share of the created orders that
+     * were paid (left out while no order was created).
+     *
+     * @return list<ReportSummaryLine>
+     */
+    public function summarize(): array
+    {
+        [$from, $to] = $this->period();
+
+        $cartsCreated = 0;
+        $ordersCreated = 0;
+        $ordersPaid = 0;
+
+        foreach ((new ConversionFunnelCalculator())->daily($from, $to) as $day) {
+            $cartsCreated += $day->cartsCreated;
+            $ordersCreated += $day->ordersCreated;
+            $ordersPaid += $day->ordersPaid;
+        }
+
+        $locale = $this->language->getLocale();
+        $translator = Translator::getInstance();
+
+        $lines = [
+            new ReportSummaryLine($translator->trans('Carts created', [], 'core', $locale), (string) $cartsCreated),
+            new ReportSummaryLine($translator->trans('Orders created', [], 'core', $locale), (string) $ordersCreated),
+            new ReportSummaryLine($translator->trans('Orders paid', [], 'core', $locale), (string) $ordersPaid),
+        ];
+
+        if ($ordersCreated > 0) {
+            $percent = FunnelStep::percent($ordersPaid / $ordersCreated);
+            $lines[] = new ReportSummaryLine(
+                $translator->trans('Paid orders out of created orders', [], 'core', $locale),
+                number_format((float) $percent, FunnelStep::PERCENT_PRECISION, (string) $this->language->getDecimalSeparator(), '').' %',
+            );
+        }
+
+        return $lines;
     }
 
     /**
