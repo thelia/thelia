@@ -20,8 +20,10 @@ use Thelia\Domain\Order\Service\StockDecrementer;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionInterface;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionPayloadField;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\Map\SaleUnitProductSaleElementsTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Module\BaseModule;
@@ -47,7 +49,7 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
 
     private const OPERATIONS = [self::OPERATION_INCREASE, self::OPERATION_DECREASE, self::OPERATION_NONE];
 
-    /** Undoes the movements of ONE run of this action inside a transaction the caller owns. */
+    /** Prefix of the savepoint that undoes the movements of ONE run inside a transaction the caller owns. */
     private const SAVEPOINT = 'thelia_adjust_stock';
 
     public function __construct(
@@ -121,16 +123,19 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
         // The order is adjusted as a whole or not at all, WHATEVER the surrounding transaction.
-        // The status change itself is dispatched inside one (the back office as well as the admin
-        // API), so this action rarely owns it; a nested rollBack would poison the caller's commit,
-        // and doing nothing left the products adjusted before the failing one decremented for good.
-        // A savepoint undoes exactly what this action wrote, and nothing of what the caller wrote.
+        // A caller often runs this inside a transaction of its own (a status change, the admin
+        // API); a nested rollBack would poison the caller's commit, and doing nothing left the
+        // products adjusted before the failing one decremented for good. A savepoint undoes
+        // exactly what this action wrote, and nothing of what the caller wrote.
         $ownTransaction = !$connection->inTransaction();
+        // One name per run: a run nested in another (from a listener, a decorated decrementer)
+        // would otherwise replace the savepoint of the outer run, whose release would then fail.
+        $savepoint = self::nextSavepoint();
 
         if ($ownTransaction) {
             $connection->beginTransaction();
         } else {
-            $connection->exec('SAVEPOINT '.self::SAVEPOINT);
+            $connection->exec('SAVEPOINT '.$savepoint);
         }
 
         // The stock of the sale unit the order was placed on, when the unit keeps a row
@@ -170,17 +175,36 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
             if ($ownTransaction) {
                 $connection->commit();
             } else {
-                $connection->exec('RELEASE SAVEPOINT '.self::SAVEPOINT);
+                $connection->exec('RELEASE SAVEPOINT '.$savepoint);
             }
         } catch (\Throwable $throwable) {
-            if ($ownTransaction) {
-                $connection->rollBack();
-            } else {
-                $connection->exec('ROLLBACK TO SAVEPOINT '.self::SAVEPOINT);
+            try {
+                // A deadlock (1213) or a lost connection already rolled back the whole transaction
+                // on the server: there is no savepoint left to go back to (1305), and the error
+                // that says so would hide the one the caller has to see.
+                if ($ownTransaction) {
+                    $connection->rollBack();
+                } elseif ($connection->inTransaction()) {
+                    $connection->exec('ROLLBACK TO SAVEPOINT '.$savepoint);
+                }
+            } catch (\Throwable $rollbackFailure) {
+                Tlog::getInstance()->addError('The stock adjustment could not be undone: '.$rollbackFailure->getMessage());
             }
 
             throw $throwable;
+        } finally {
+            // The rows were written in SQL, behind the back of the instance pool, and maybe
+            // undone since: a findPk() later in the request would read a quantity they no longer have.
+            ProductSaleElementsTableMap::clearInstancePool();
+            SaleUnitProductSaleElementsTableMap::clearInstancePool();
         }
+    }
+
+    private static function nextSavepoint(): string
+    {
+        static $sequence = 0;
+
+        return self::SAVEPOINT.'_'.++$sequence;
     }
 
     /**

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,6 +37,7 @@ use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Domain\Order\Service\StockDecrementer;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
@@ -47,11 +49,11 @@ use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\Map\SaleUnitProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tools\URL;
 
@@ -64,6 +66,8 @@ use Thelia\Tools\URL;
 class Order extends BaseAction implements EventSubscriberInterface
 {
     private const STATUS_CHANGE_SAVEPOINT = 'thelia_order_status_change';
+
+    private static int $savepointSequence = 0;
 
     /**
      * Where the shipped front office serves a guest order tracking link. Kept as a path
@@ -379,15 +383,19 @@ class Order extends BaseAction implements EventSubscriberInterface
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
         // Prevent partial stock update on status change, WHATEVER the surrounding transaction.
-        // The admin API and the back office dispatch the status change inside one of their own:
-        // a nested rollBack would only poison the caller's commit and leave the products moved
-        // before the failing one as they are, a savepoint undoes exactly what is written here.
+        // The admin API dispatches the status change inside a transaction of its own, and so does
+        // any code that changes a status from a listener of another status change: a nested
+        // rollBack would only poison the caller's commit and leave the products moved before the
+        // failing one as they are, a savepoint undoes exactly what is written here.
         $ownTransaction = !$con->inTransaction();
+        // One name per call: a status change dispatched from a listener of this one would
+        // otherwise replace the savepoint of the outer change, whose release would then fail.
+        $savepoint = self::STATUS_CHANGE_SAVEPOINT.'_'.++self::$savepointSequence;
 
         if ($ownTransaction) {
             $con->beginTransaction();
         } else {
-            $con->exec('SAVEPOINT '.self::STATUS_CHANGE_SAVEPOINT);
+            $con->exec('SAVEPOINT '.$savepoint);
         }
 
         try {
@@ -400,21 +408,42 @@ class Order extends BaseAction implements EventSubscriberInterface
             if ($ownTransaction) {
                 $con->commit();
             } else {
-                $con->exec('RELEASE SAVEPOINT '.self::STATUS_CHANGE_SAVEPOINT);
+                $con->exec('RELEASE SAVEPOINT '.$savepoint);
             }
         } catch (\Throwable $exception) {
-            if ($ownTransaction) {
-                $con->rollBack();
-            } else {
-                $con->exec('ROLLBACK TO SAVEPOINT '.self::STATUS_CHANGE_SAVEPOINT);
-            }
-
-            // The sale elements saved before the failure would otherwise be read back from
-            // the instance pool with the quantity the rollback just undid.
-            ProductSaleElementsTableMap::clearInstancePool();
+            $this->undoStatusChange($con, $ownTransaction, $savepoint);
 
             throw $exception;
         }
+    }
+
+    /**
+     * Never throws: the failure of the status change is what the caller has to see, not the
+     * failure of undoing it.
+     */
+    private function undoStatusChange(ConnectionInterface $con, bool $ownTransaction, string $savepoint): void
+    {
+        try {
+            // A deadlock (1213) or a lost connection already rolled back the whole transaction
+            // on the server: there is no savepoint left to go back to (1305).
+            if ($ownTransaction) {
+                $con->rollBack();
+            } elseif ($con->inTransaction()) {
+                $con->exec('ROLLBACK TO SAVEPOINT '.$savepoint);
+            }
+        } catch (\Throwable $rollbackFailure) {
+            Tlog::getInstance()->addError('The status change could not be undone: '.$rollbackFailure->getMessage());
+        } finally {
+            // The rows written before the failure would otherwise be read back from the
+            // instance pool with the quantity the rollback just undid.
+            $this->forgetPooledStock();
+        }
+    }
+
+    private function forgetPooledStock(): void
+    {
+        ProductSaleElementsTableMap::clearInstancePool();
+        SaleUnitProductSaleElementsTableMap::clearInstancePool();
     }
 
     /**
@@ -492,100 +521,66 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE,
         );
 
-        if ($operationEvent->getOperation() === $operationEvent::DO_NOTHING) {
+        $increase = $operationEvent->getOperation() === $operationEvent::INCREASE_STOCK;
+
+        if (!$increase && $operationEvent->getOperation() !== $operationEvent::DECREASE_STOCK) {
             return;
         }
+
         // In the ascending id of the sale element, the order the placement locked the stock rows
         // in: two orders moving the same rows the other way round would wait for each other.
         $orderProductList = $order->getOrderProducts()->getData();
         usort($orderProductList, static fn (OrderProduct $first, OrderProduct $second): int => (int) $first->getProductSaleElementsId() <=> (int) $second->getProductSaleElementsId());
 
-        foreach ($orderProductList as $orderProduct) {
-            // The sale element of a pack holds no stock: what the pack took is carried by
-            // its component lines, which come through here like any other line.
-            if (!$orderProduct->movesStockOfItsOwn()) {
-                continue;
-            }
-
-            $productSaleElementsId = $orderProduct->getProductSaleElementsId();
-
-            if ($this->movesSaleUnitStock($order, $productSaleElementsId)) {
-                $this->updateSaleUnitQuantity($order, $orderProduct, $operationEvent);
-
-                continue;
-            }
-
-            /** @var ProductSaleElements $productSaleElements */
-            if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                $offset = 0;
-
-                if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
-                    $offset = $orderProduct->getQuantity();
-                } elseif ($operationEvent->getOperation() === $operationEvent::DECREASE_STOCK) {
-                    /* Check if we have enough stock */
-                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                        throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
-                    }
-
-                    $offset = -$orderProduct->getQuantity();
-                }
-
-                Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
-
-                $productSaleElements
-                    ->setQuantity($productSaleElements->getQuantity() + $offset)
-                    ->save();
-            }
-        }
-    }
-
-    /**
-     * An order placed on a sale unit that keeps its own stock of the sale element gives
-     * back, or takes again, from that stock: the same rule the checkout decremented by.
-     * Any other order moves the shared national counter, as it always has.
-     */
-    private function movesSaleUnitStock(ModelOrder $order, ?int $productSaleElementsId): bool
-    {
-        return null !== $productSaleElementsId
-            && null !== $this->stockDecrementer
-            && $this->stockDecrementer->movesSaleUnitStock($order->getSaleUnitId(), $productSaleElementsId);
-    }
-
-    /**
-     * @throws TheliaProcessException when the sale unit has not enough stock left to take the order again
-     */
-    private function updateSaleUnitQuantity(
-        ModelOrder $order,
-        OrderProduct $orderProduct,
-        GetStockUpdateOperationOnOrderStatusChangeEvent $operationEvent,
-    ): void {
-        $productSaleElementsId = (int) $orderProduct->getProductSaleElementsId();
-        $quantity = (float) $orderProduct->getQuantity();
-        $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
-
-        if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
-            $this->stockDecrementer?->increment($productSaleElementsId, $quantity, $connection, $order->getSaleUnitId());
-
-            return;
-        }
-
-        if ($operationEvent->getOperation() !== $operationEvent::DECREASE_STOCK) {
-            return;
-        }
-
+        $stockDecrementer = $this->stockDecrementer ?? new StockDecrementer(new SaleUnitStockResolver());
         $checkAvailableStock = ConfigQuery::checkAvailableStock();
+        $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+        // The stock of the sale unit the order was placed on when the unit keeps a row for the
+        // sale element, the shared counter otherwise: the same rule the checkout decremented by.
+        $saleUnitId = $order->getSaleUnitId();
 
         try {
-            $this->stockDecrementer?->decrement(
-                $productSaleElementsId,
-                $quantity,
-                guardAvailability: $checkAvailableStock,
-                allowNegativeStock: !$checkAvailableStock,
-                connection: $connection,
-                saleUnitId: $order->getSaleUnitId(),
-            );
-        } catch (TheliaProcessException $shortage) {
-            throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);
+            foreach ($orderProductList as $orderProduct) {
+                $productSaleElementsId = $orderProduct->getProductSaleElementsId();
+                $quantity = (float) $orderProduct->getQuantity();
+
+                // The sale element of a pack holds no stock: what the pack took is carried by
+                // its component lines, which come through here like any other line.
+                if (null === $productSaleElementsId || $quantity <= 0 || !$orderProduct->movesStockOfItsOwn()) {
+                    continue;
+                }
+
+                // One conditional UPDATE per row, never a quantity read here and written back:
+                // a checkout taking the same stock in the meantime would be overwritten.
+                if ($increase) {
+                    $stockDecrementer->increment($productSaleElementsId, $quantity, $connection, $saleUnitId);
+
+                    continue;
+                }
+
+                try {
+                    $stockDecrementer->decrement(
+                        $productSaleElementsId,
+                        $quantity,
+                        guardAvailability: $checkAvailableStock,
+                        allowNegativeStock: !$checkAvailableStock,
+                        connection: $connection,
+                        saleUnitId: $saleUnitId,
+                    );
+                } catch (TheliaProcessException $shortage) {
+                    // A sale element deleted since the order was placed (the line keeps its id,
+                    // with no foreign key) has no stock to take: it is skipped, as it always was.
+                    if (!ProductSaleElementsQuery::create()->filterById($productSaleElementsId)->exists()) {
+                        continue;
+                    }
+
+                    throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);
+                }
+            }
+        } finally {
+            // The rows were written in SQL, behind the back of the instance pool: a findPk()
+            // later in the request would otherwise read the quantity they had before.
+            $this->forgetPooledStock();
         }
     }
 
