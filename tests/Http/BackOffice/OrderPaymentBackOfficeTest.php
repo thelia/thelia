@@ -566,6 +566,21 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
         self::assertCount(0, $line->filter('[data-testid="order-payment-line-error"]'));
     }
 
+    public function testARefundDeducedFromTheRefundedStatusReadsAsARefundNotAsAnError(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->factory->order(null, ['postage' => 120, 'paymentModuleCode' => 'Cheque']);
+        $this->markPaid($order);
+        $this->moveTo($order, (int) OrderStatusQuery::getRefundedStatus()->getId());
+
+        $line = $this->sheet($order)->filter('[data-testid="order-payment-line"][data-payment-type="refund"]');
+
+        self::assertCount(1, $line, 'The refunded status writes back what the order had taken.');
+        self::assertStringContainsString('120.00', $line->text());
+        self::assertCount(0, $line->filter('[data-testid="order-payment-line-error"]'), 'The marker of a deduced refund is no answer of the provider.');
+        self::assertStringNotContainsString(PaymentTransactionRecorder::REASON_REFUNDED_STATUS, $line->text());
+    }
+
     public function testAReleaseTheProviderRefusedWithTheCodeExpiredReadsAsARefusal(): void
     {
         // The provider's own code may be the word Thelia uses for a lapsed authorization:
@@ -678,8 +693,13 @@ final class OrderPaymentBackOfficeTest extends WebIntegrationTestCase
 
     private function markPaid(Order $order): void
     {
+        $this->moveTo($order, (int) OrderStatusQuery::getPaidStatus()->getId());
+    }
+
+    private function moveTo(Order $order, int $statusId): void
+    {
         $event = new OrderEvent($order);
-        $event->setStatus((int) OrderStatusQuery::getPaidStatus()->getId());
+        $event->setStatus($statusId);
         $this->getService(EventDispatcherInterface::class)->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
     }
 
