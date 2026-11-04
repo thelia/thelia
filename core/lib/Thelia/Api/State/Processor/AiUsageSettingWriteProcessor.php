@@ -75,6 +75,7 @@ final readonly class AiUsageSettingWriteProcessor implements ProcessorInterface
                 $data->getProvenanceMark() ?? true,
                 $data->getStorePrompt() ?? false,
                 $data->getPromptRetentionDays(),
+                $data->getEffort(),
             );
         } catch (AiExceptionInterface $refusal) {
             throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);

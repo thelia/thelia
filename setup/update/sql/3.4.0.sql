@@ -54,6 +54,28 @@ EXECUTE create_table_statement;
 DEALLOCATE PREPARE create_table_statement;
 
 -- ---------------------------------------------------------------------
+-- AI reasoning effort
+--
+-- `ai_tier_assignment.effort` is the effort of a tier, `ai_usage_setting.effort`
+-- the one a usage sets for itself (empty: the effort of its tier). Empty means
+-- no effort: nothing is sent and the provider keeps its own default, which is
+-- what every existing shop already runs. No row is rewritten. Same guard as the
+-- columns above, so the script can be replayed.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'ai_tier_assignment' AND `COLUMN_NAME` = 'effort');
+SET @statement := IF(@add_column, 'ALTER TABLE `ai_tier_assignment` ADD `effort` VARCHAR(16) COMMENT \'how hard the model reasons: low, medium, high, xhigh or max; empty: nothing is sent, the provider keeps its default\' AFTER `model_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'ai_usage_setting' AND `COLUMN_NAME` = 'effort');
+SET @statement := IF(@add_column, 'ALTER TABLE `ai_usage_setting` ADD `effort` VARCHAR(16) COMMENT \'how hard the model reasons for this usage: low, medium, high, xhigh or max; empty: the effort of the tier\' AFTER `pinned_model_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- ---------------------------------------------------------------------
 -- Express payment zones
 --
 -- Whether a shop shows the express payment buttons of its payment modules,

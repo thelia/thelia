@@ -3617,6 +3617,7 @@
     <column description="fast, standard or advanced" name="tier" required="true" size="16" type="VARCHAR" />
     <column name="connection_id" required="true" type="INTEGER" />
     <column name="model_id" required="true" type="INTEGER" />
+    <column description="how hard the model reasons: low, medium, high, xhigh or max; empty: nothing is sent, the provider keeps its default" name="effort" size="16" type="VARCHAR" />
     <foreign-key foreignTable="ai_connection" name="fk_ai_tier_assignment_connection_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="connection_id" />
     </foreign-key>
@@ -3647,6 +3648,7 @@
     <column description="the size limit of what a person types, in characters, empty: the default of the usage" name="max_input_characters" type="INTEGER" />
     <column description="a connection that replaces the one of the tier for this usage" name="pinned_connection_id" type="INTEGER" />
     <column description="a model that replaces the one of the tier for this usage" name="pinned_model_id" type="INTEGER" />
+    <column description="how hard the model reasons for this usage: low, medium, high, xhigh or max; empty: the effort of the tier" name="effort" size="16" type="VARCHAR" />
     <column description="JSON object of the optional guardrails: name to block or annotate, empty: those the usage declares" name="guardrails" type="LONGVARCHAR" />
     <column defaultValue="1" description="0 hides the notice of an interactive usage (AI Act 50(1)): allowed, the usage then shows as not compliant" name="transparency_notice" required="true" type="BOOLEAN" />
     <column defaultValue="1" description="0 drops the provenance mark of a generative usage (AI Act 50(2)): allowed, the usage then shows as not compliant" name="provenance_mark" required="true" type="BOOLEAN" />

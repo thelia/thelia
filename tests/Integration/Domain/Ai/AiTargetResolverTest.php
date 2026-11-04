@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Ai;
 
 use AiProbeModule\ProbeWriter;
+use Thelia\Domain\Ai\AiEffort;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\AiTier;
@@ -305,6 +306,26 @@ final class AiTargetResolverTest extends IntegrationTestCase
         self::assertStringNotContainsString('sk-stored-0123', print_r($target, true));
         self::assertStringNotContainsString('sk-stored-0123', var_export($target->__debugInfo(), true));
         self::assertStringNotContainsString('sk-stored-0123', serialize($target->__debugInfo()));
+    }
+
+    public function testTheEffortOfTheTierReachesTheTargetAndTheOneOfTheUsageWinsOverIt(): void
+    {
+        $connection = $this->connection('anthropic-main', 'anthropic', 'non_eu', apiKey: 'sk-stored-0123');
+        (new AiTierAssignment())->setTier(AiTier::Fast->value)->setConnectionId($connection->getId())->setModelId($this->model('anthropic', 'claude-probe')->getId())->setEffort('high')->save();
+
+        self::assertSame(AiEffort::High, $this->resolver->resolve('aiprobe.writing')->effort);
+
+        (new AiUsageSetting())->setUsageId('aiprobe.writing')->setEffort('low')->save();
+
+        self::assertSame(AiEffort::Low, $this->resolver->resolve('aiprobe.writing')->effort);
+        self::assertSame(AiEffort::High, $this->resolver->resolve('aiprobe.chat')->effort, 'another usage keeps the effort of its tier');
+    }
+
+    public function testNoEffortIsSetByDefault(): void
+    {
+        $this->assign(AiTier::Fast, $this->connection('mistral-main', 'mistral', 'eu'), $this->model('mistral', 'ministral-probe'));
+
+        self::assertNull($this->resolver->resolve('aiprobe.writing')->effort);
     }
 
     private function connection(string $code, string $provider, string $jurisdiction, ?string $baseUrl = null, bool $privateNetwork = false, bool $active = true, ?string $apiKey = null, ?string $keyEnvironment = null): AiConnection

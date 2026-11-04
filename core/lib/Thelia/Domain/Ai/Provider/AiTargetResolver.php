@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Ai\Provider;
 
+use Thelia\Domain\Ai\AiEffort;
 use Thelia\Domain\Ai\AiJurisdiction;
 use Thelia\Domain\Ai\AiProvider;
 use Thelia\Domain\Ai\AiUsageRegistryInterface;
@@ -32,6 +33,8 @@ use Thelia\Model\AiModel;
  *
  * The model pinned to the usage wins; without one, the model the merchant gave to the tier of the usage: the tier
  * the merchant chose for it, else the one the module declared.
+ * The effort is the one of the usage, else the one of its tier (the range it runs on), whatever the model: a pinned
+ * model of another provider is asked the same effort, translated by its own adapter.
  * A connection pinned to the usage replaces the one of the tier, and keeps the model of the tier only when
  * both belong to the same provider. The connection must be active; the key comes from the vault and the
  * jurisdiction from the provider and the address (the one the administrator declared, for a self-hosted or
@@ -96,6 +99,7 @@ final readonly class AiTargetResolver
             (bool) $connection->getAllowPrivateNetwork(),
             $provider->defaultJurisdiction($baseUrl) ?? AiJurisdiction::tryFrom((string) $connection->getJurisdiction()) ?? AiJurisdiction::OutsideEuropeanUnion,
             $specification,
+            AiEffort::resolve($usageId, $setting?->getEffort(), $assignment?->getEffort()),
         );
     }
 

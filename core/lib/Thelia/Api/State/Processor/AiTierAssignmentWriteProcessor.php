@@ -61,6 +61,7 @@ final readonly class AiTierAssignmentWriteProcessor implements ProcessorInterfac
                 (string) $data->getTier(),
                 (int) $data->getConnectionId(),
                 (int) $data->getModelId(),
+                $data->getEffort(),
             );
         } catch (AiExceptionInterface $refusal) {
             throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
