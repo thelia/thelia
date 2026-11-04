@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent;
@@ -24,11 +25,13 @@ use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\Service\StockDecrementer;
 use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusAction;
 use Thelia\Model\ProductSaleElements;
@@ -38,9 +41,9 @@ use Thelia\Tests\Support\Order\MovesOrders;
 use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
- * The stock of an order is adjusted as a whole or not at all: a product that cannot be
- * decremented leaves the products already decremented untouched. The status change itself
- * survives, the runner records the failure - only the stock is kept whole.
+ * A stock action moves the stock of an order in the transaction of the status change: a product
+ * the stock cannot serve refuses the status change, and that transaction is rolled back with
+ * what it wrote for the products before it.
  */
 final class AdjustStockActionTest extends ActionIntegrationTestCase
 {
@@ -53,73 +56,73 @@ final class AdjustStockActionTest extends ActionIntegrationTestCase
         parent::tearDown();
     }
 
-    public function testAFailingDecreaseLeavesNoProductAdjusted(): void
+    public function testADecreaseTheStockCannotServeRefusesTheStatusChange(): void
     {
         ConfigQuery::write('check_available_stock', '1');
+        [$order, $short] = $this->orderOfAProductInStockAndOneShortOfIt();
 
-        $this->action(
-            OrderStatusActionTrigger::TRANSITION,
-            OrderStatus::CODE_PROCESSING,
-            OrderStatus::CODE_SENT,
-            AdjustStockAction::getType(),
-            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
-        );
-
-        $plenty = $this->createProductSaleElements(10);
-        $short = $this->createProductSaleElements(1);
-
-        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
-        $this->addOrderProduct($order, $plenty, 3);
-        $this->addOrderProduct($order, $short, 5);
-
-        $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+            self::fail('A stock the order cannot take must refuse the status change.');
+        } catch (TheliaProcessException $refusal) {
+            self::assertSame($short->getRef().' : Not enough stock', $refusal->getMessage());
+        }
 
         self::assertSame(1.0, $this->stockOf($short), 'The product without enough stock is left alone.');
-        self::assertSame(
-            10.0,
-            $this->stockOf($plenty),
-            'The action adjusts the order as a whole or not at all: the first product must not stay decremented when a later one fails.',
-        );
+        self::assertSame(OrderStatus::CODE_PROCESSING, OrderQuery::create()->findPk($order->getId())?->getOrderStatus()->getCode());
     }
 
     /**
-     * The same, inside a transaction opened by the caller: the admin API wraps the whole
-     * ORDER_UPDATE_STATUS dispatch in one, and a nested rollback would poison its commit.
+     * The same, inside a transaction opened by the caller (a module, or this test case, which
+     * wraps every test in one): the status change rolls its own level back, so the caller can no
+     * longer commit, and what the change wrote for the products before the failing one goes
+     * with the transaction of the caller.
      */
-    public function testAFailingDecreaseInsideACallersTransactionLeavesNoProductAdjusted(): void
+    public function testADecreaseTheStockCannotServeInsideACallersTransactionLeavesTheCallerNothingToCommit(): void
     {
         ConfigQuery::write('check_available_stock', '1');
-
-        $this->action(
-            OrderStatusActionTrigger::TRANSITION,
-            OrderStatus::CODE_PROCESSING,
-            OrderStatus::CODE_SENT,
-            AdjustStockAction::getType(),
-            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
-        );
-
-        $plenty = $this->createProductSaleElements(10);
-        $short = $this->createProductSaleElements(1);
-
-        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
-        $this->addOrderProduct($order, $plenty, 3);
-        $this->addOrderProduct($order, $short, 5);
+        [$order] = $this->orderOfAProductInStockAndOneShortOfIt();
 
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+        self::assertInstanceOf(ConnectionWrapper::class, $connection);
         $connection->beginTransaction();
 
         try {
             $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+            self::fail('A stock the order cannot take must refuse the status change.');
+        } catch (TheliaProcessException) {
+            self::assertFalse($connection->isCommitable(), 'The refused change rolled its level back: the caller cannot commit the stock it moved.');
         } finally {
-            $connection->commit();
+            $connection->rollBack();
         }
-
-        self::assertSame(1.0, $this->stockOf($short), 'The product without enough stock is left alone.');
-        self::assertSame(10.0, $this->stockOf($plenty), 'The caller commits, and the first product must not stay decremented.');
     }
 
     /**
-     * Physical 1, another cart holds 1: a decrease of 1 is refused, the unit stays the other cart's.
+     * @return array{Order, ProductSaleElements} the order, and the product it asks more of than the stock holds
+     */
+    private function orderOfAProductInStockAndOneShortOfIt(): array
+    {
+        $this->action(
+            OrderStatusActionTrigger::TRANSITION,
+            OrderStatus::CODE_PROCESSING,
+            OrderStatus::CODE_SENT,
+            AdjustStockAction::getType(),
+            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE],
+        );
+
+        $plenty = $this->createProductSaleElements(10);
+        $short = $this->createProductSaleElements(1);
+
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
+        $this->addOrderProduct($order, $plenty, 3);
+        $this->addOrderProduct($order, $short, 5);
+
+        return [$order, $short];
+    }
+
+    /**
+     * Physical 1, another cart holds 1: a decrease of 1 refuses the status change, the unit stays
+     * the other cart's.
      */
     public function testADecreaseLeavesToAnotherCartWhatItHolds(): void
     {
@@ -132,9 +135,14 @@ final class AdjustStockActionTest extends ActionIntegrationTestCase
         $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PROCESSING]);
         $this->addOrderProduct($order, $last, 1);
 
-        $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_SENT);
+            self::fail('A unit another cart holds must refuse the status change.');
+        } catch (TheliaProcessException) {
+        }
 
         self::assertSame(1.0, $this->stockOf($last), 'The unit another cart holds is not taken.');
+        self::assertSame(OrderStatus::CODE_PROCESSING, OrderQuery::create()->findPk($order->getId())?->getOrderStatus()->getCode());
     }
 
     /**

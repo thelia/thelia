@@ -21,6 +21,7 @@ final readonly class OrderStatusActionPayloadField
 {
     public const TYPE_TEXT = 'text';
     public const TYPE_CHOICE = 'choice';
+    public const TYPE_MULTIPLE_CHOICE = 'multiple_choice';
 
     /**
      * @param array<string, string>|null $choices value => label, for a choice field
@@ -40,5 +41,15 @@ final readonly class OrderStatusActionPayloadField
     public static function choice(string $name, string $label, array $choices, bool $required = true): self
     {
         return new self($name, $label, self::TYPE_CHOICE, $required, $choices);
+    }
+
+    /**
+     * A list of values picked among the choices, stored as a JSON list in the payload.
+     *
+     * @param array<string, string> $choices value => label
+     */
+    public static function multipleChoice(string $name, string $label, array $choices, bool $required = false): self
+    {
+        return new self($name, $label, self::TYPE_MULTIPLE_CHOICE, $required, $choices);
     }
 }
