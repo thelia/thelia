@@ -26,7 +26,6 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Addressing\Service\AddressService;
 use Thelia\Domain\Shipping\ShippingFacade;
 use Thelia\Model\Address;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
@@ -68,7 +67,7 @@ readonly class DeliveryModuleProvider implements ProviderInterface
         // be read out through the carriers listed for it.
         $copy = $cart->getCartAddressRelatedByAddressDeliveryId();
         $requestedId = $request instanceof HttpRequest ? $this->addressService->requestedAddressId($request) : null;
-        $namedAddress = $this->anotherAddressOfTheCustomer($cart, $requestedId, $copy?->getAddressId());
+        $namedAddress = null === $requestedId ? null : $this->shippingFacade->addressOfTheCartCustomer($cart, $requestedId);
 
         if (null !== $copy && null === $namedAddress) {
             return $this->shippingFacade->listValidMethodsAsResourceApi($cart);
@@ -95,24 +94,5 @@ readonly class DeliveryModuleProvider implements ProviderInterface
             : StateQuery::create()->filterByCountryId($country->getId())->findOne();
 
         return $this->shippingFacade->listValidMethodsAsResourceApi($cart, $country, $state, $deliveryAddress?->getId());
-    }
-
-    /**
-     * The address the request names when it is another address of the cart's customer than
-     * the one the cart's copy was taken from. Never for a guest: a guest row is reused by
-     * whoever types the same e-mail address, so its other addresses may be other buyers'.
-     */
-    private function anotherAddressOfTheCustomer(Cart $cart, ?int $addressId, ?int $copySourceId): ?Address
-    {
-        $customer = $cart->getCustomer();
-
-        if (null === $addressId || $addressId === $copySourceId || null === $customer || $customer->isGuest()) {
-            return null;
-        }
-
-        return AddressQuery::create()
-            ->filterById($addressId)
-            ->filterByCustomerId($customer->getId())
-            ->findOne();
     }
 }

@@ -397,7 +397,7 @@ final readonly class ShippingFacade
      * (CustomerGuestRegistrationService), so it carries the addresses of earlier buyers: the
      * only address a guest owns for sure is the source of the copy, so a guest names none.
      */
-    private function addressOfTheCartCustomer(Cart $cart, int $addressId): ?Address
+    public function addressOfTheCartCustomer(Cart $cart, int $addressId): ?Address
     {
         $customer = $cart->getCustomer();
 
