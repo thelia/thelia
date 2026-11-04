@@ -15,10 +15,12 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Order;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Event\Order\GetStockUpdateOperationOnOrderStatusChangeEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
+use Thelia\Domain\Order\EventListener\StockOperationActionListener;
 use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\Order\StatusAction\StockActionDiagnostics;
 use Thelia\Domain\Order\StatusAction\StockOperationSimulator;
@@ -304,6 +306,69 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         $overriddenActions = $this->getService(StockActionDiagnostics::class)->overriddenActions();
 
         self::assertSame($first->getId(), $overriddenActions[$later->getId()] ?? null, 'NoSuchModule is ignored: the later action only ever applies to cheques, which the first one already takes.');
+    }
+
+    public function testARefusedPayloadIsRecordedOnceTheStatusChangeIsCommittedAndNotWhenTheChangeIsRefused(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, 'drop_table');
+        $committed = $this->orderOf($this->createProductSaleElements(10), 3, OrderStatus::CODE_PAID);
+
+        $this->moveOrderTo($committed, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(1, OrderStatusActionFailureQuery::create()->filterByOrderId($committed->getId())->count());
+
+        ConfigQuery::write('check_available_stock', '1');
+        $this->stockIsManagedOnOrderCreation(false);
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, 'drop_table', 2);
+        $refused = $this->orderOf($this->createProductSaleElements(1), 3, OrderStatus::CODE_NOT_PAID);
+
+        try {
+            $this->moveOrderTo($refused, OrderStatus::CODE_PAID);
+            self::fail('A stock the order cannot take must refuse the status change.');
+        } catch (TheliaProcessException) {
+        }
+
+        self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($refused->getId())->count());
+    }
+
+    public function testTheDecisionOfAFailedStatusChangeIsNotHandedToAnotherObjectOfTheSameOrder(): void
+    {
+        ConfigQuery::write('check_available_stock', '1');
+        $this->stockIsManagedOnOrderCreation(false);
+        $order = $this->orderOf($this->createProductSaleElements(1), 3, OrderStatus::CODE_NOT_PAID);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+            self::fail('A stock the order cannot take must refuse the status change.');
+        } catch (TheliaProcessException) {
+        }
+
+        $listener = $this->getService(StockOperationActionListener::class);
+        $sameOrderReloaded = new Order();
+        $sameOrderReloaded->setId($order->getId());
+
+        self::assertNull($listener->takeDecisionFor($sameOrderReloaded));
+        self::assertNotNull($listener->takeDecisionFor($order), 'The failed change of this very object is what is left, until the next decision replaces it.');
+    }
+
+    public function testTheHistoryLineSaysWhatAModuleListenerDecidedAfterTheStockActions(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_INCREASE);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_PAID);
+        $moduleListener = static function (GetStockUpdateOperationOnOrderStatusChangeEvent $event): void {
+            $event->setOperation($event::DECREASE_STOCK)->setDecidingActionId(null);
+        };
+        $this->dispatcher->addListener(TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE, $moduleListener, 0);
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_CANCELED);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE, $moduleListener);
+        }
+
+        self::assertSame(7.0, $this->stockOf($productSaleElements));
+        self::assertSame(['stock' => 'decrease', 'stock_action_id' => null], $this->stockOfLastStatusLine($order));
     }
 
     private function stockIsManagedOnOrderCreation(bool $managed): void

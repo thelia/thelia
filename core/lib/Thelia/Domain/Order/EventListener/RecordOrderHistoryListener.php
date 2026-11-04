@@ -94,7 +94,7 @@ readonly class RecordOrderHistoryListener
             $fromStatusCode,
             $toStatusCode,
             $event->getSourceModuleCode(),
-            $this->stockOperations?->takeDecisionFor($order->getId()),
+            $this->stockOperations?->takeDecisionFor($order),
         );
     }
 

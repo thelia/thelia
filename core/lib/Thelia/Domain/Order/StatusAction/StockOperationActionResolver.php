@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\StatusAction;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\GetStockUpdateOperationOnOrderStatusChangeEvent;
 use Thelia\Domain\Order\Exception\InvalidOrderStatusActionPayloadException;
@@ -30,8 +29,8 @@ use Thelia\Model\OrderStatus;
  * payment and delivery modules match the order. None found, the fixed rule of the core
  * keeps deciding.
  *
- * Reads only, except a refused payload, recorded as an action failure like the runner
- * records it, unless the caller only simulates.
+ * Reads only: a payload it refuses is handed back with the decision, for the caller to
+ * record once the status change is committed.
  */
 final readonly class StockOperationActionResolver
 {
@@ -43,13 +42,13 @@ final readonly class StockOperationActionResolver
     ) {
     }
 
-    public function resolve(Order $order, OrderStatus $newStatus, bool $recordRefusedPayloads = true): ?StockOperationDecision
+    public function resolve(Order $order, OrderStatus $newStatus): StockActionResolution
     {
         $previousStatusId = $order->getStatusId();
         $newStatusId = $newStatus->getId();
 
         if (null === $previousStatusId || null === $newStatusId || $previousStatusId === $newStatusId) {
-            return null;
+            return StockActionResolution::none();
         }
 
         // Same guard as the runner: moving to a status equivalent to the current one
@@ -58,14 +57,18 @@ final readonly class StockOperationActionResolver
         $effectiveNewStatus = $this->catalog->get($newStatusId) ?? $newStatus;
 
         if (null !== $previousStatus && $previousStatus->getEffectiveCode() === $effectiveNewStatus->getEffectiveCode()) {
-            return null;
+            return StockActionResolution::none();
         }
 
         $stockAction = $this->registry->get(AdjustStockAction::getType());
 
         if (null === $stockAction) {
-            return null;
+            return StockActionResolution::none();
         }
+
+        $refusedPayloads = [];
+        // Read once, and only when an action carries a limit.
+        $activeModuleCodes = null;
 
         foreach ($this->runner->actionsFor($previousStatusId, $newStatusId) as $action) {
             if (AdjustStockAction::getType() !== $action->getActionType()) {
@@ -75,42 +78,45 @@ final readonly class StockOperationActionResolver
             try {
                 $payload = $stockAction->normalizePayload($action->getDecodedPayload());
             } catch (InvalidOrderStatusActionPayloadException $exception) {
-                if ($recordRefusedPayloads) {
-                    $this->runner->recordFailure($action, $order, $exception->getMessage());
-                }
+                $refusedPayloads[] = new RefusedStockPayload($action, $exception->getMessage());
 
                 continue;
             }
 
-            if (!$this->matchesModules($payload, $order)) {
+            if (!$this->matchesModules($payload, $order, $activeModuleCodes)) {
                 continue;
             }
 
-            return new StockOperationDecision(
-                $this->operationFor($payload[AdjustStockAction::FIELD_OPERATION], $order),
-                $action->getId(),
+            return new StockActionResolution(
+                new StockOperationDecision(
+                    $this->operationFor($payload[AdjustStockAction::FIELD_OPERATION], $order),
+                    $action->getId(),
+                ),
+                $refusedPayloads,
             );
         }
 
-        return null;
+        return new StockActionResolution(null, $refusedPayloads);
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param array<string, mixed>    $payload
+     * @param array<int, string>|null $activeModuleCodes
      */
-    private function matchesModules(array $payload, Order $order): bool
+    private function matchesModules(array $payload, Order $order, ?array &$activeModuleCodes): bool
     {
-        return $this->matchesModule($payload[AdjustStockAction::FIELD_PAYMENT_MODULES] ?? [], $order->getPaymentModuleId())
-            && $this->matchesModule($payload[AdjustStockAction::FIELD_DELIVERY_MODULES] ?? [], $order->getDeliveryModuleId());
+        return $this->matchesModule($payload[AdjustStockAction::FIELD_PAYMENT_MODULES] ?? [], $order->getPaymentModuleId(), $activeModuleCodes)
+            && $this->matchesModule($payload[AdjustStockAction::FIELD_DELIVERY_MODULES] ?? [], $order->getDeliveryModuleId(), $activeModuleCodes);
     }
 
     /**
      * A limit counts only its modules still installed and active: one that lists none of
      * them any more is ignored with its action, it never widens to every order.
      *
-     * @param list<string> $moduleCodes
+     * @param list<string>            $moduleCodes
+     * @param array<int, string>|null $activeModuleCodes the code of each active module by id, loaded on first use
      */
-    private function matchesModule(array $moduleCodes, ?int $orderModuleId): bool
+    private function matchesModule(array $moduleCodes, ?int $orderModuleId, ?array &$activeModuleCodes): bool
     {
         if ([] === $moduleCodes) {
             return true;
@@ -120,11 +126,15 @@ final readonly class StockOperationActionResolver
             return false;
         }
 
-        return ModuleQuery::create()
-            ->filterByCode($moduleCodes, Criteria::IN)
-            ->filterByActivate(1)
-            ->filterById($orderModuleId)
-            ->exists();
+        if (null === $activeModuleCodes) {
+            $activeModuleCodes = [];
+
+            foreach (ModuleQuery::create()->filterByActivate(1)->find() as $module) {
+                $activeModuleCodes[$module->getId()] = $module->getCode();
+            }
+        }
+
+        return isset($activeModuleCodes[$orderModuleId]) && \in_array($activeModuleCodes[$orderModuleId], $moduleCodes, true);
     }
 
     /**
