@@ -24,7 +24,7 @@ use Thelia\Log\Tlog;
  * range matches the codes of the length of its bounds only, so "01000...01999" takes
  * "01500" and neither "1500" nor "001500".
  *
- * Codes are compared in their normal form (normalize()): compatibility characters folded
+ * Codes are compared in their normal form (normalForm()): compatibility characters folded
  * (Unicode NFKC, so a full-width "２０" is "20"), without spaces, dashes or invisible format
  * characters, with the digits of every script written in ASCII and the letters in ASCII
  * upper case. So "sw1a 1aa" matches "SW1A1AA" and "1000-001" matches "1000001". A code
@@ -167,7 +167,7 @@ final readonly class ZipCodePattern
      */
     public static function nameable(?string $zipCode): ?string
     {
-        if (null === $zipCode || null === self::normalize($zipCode)) {
+        if (null === $zipCode || null === self::normalForm($zipCode)) {
             return null;
         }
 
@@ -203,7 +203,7 @@ final readonly class ZipCodePattern
      * have, and the ASCII letters are put in upper case. What is left must be A to Z and 0
      * to 9 only. Applied twice, it gives the same code.
      */
-    public static function normalize(string $zipCode): ?string
+    public static function normalForm(string $zipCode): ?string
     {
         $folded = self::fold($zipCode);
 
@@ -211,10 +211,22 @@ final readonly class ZipCodePattern
     }
 
     /**
+     * Spaces and dashes removed, ASCII letters in upper case, nothing else folded or checked.
+     *
+     * @deprecated since 3.4, use ZipCodePattern::normalForm() instead
+     */
+    public static function normalize(string $zipCode): string
+    {
+        trigger_deprecation('thelia/core', '3.4', 'Use %s instead of %s, which folds compatibility characters and returns null for a code that has no normal form.', 'ZipCodePattern::normalForm()', 'ZipCodePattern::normalize()');
+
+        return strtoupper((string) preg_replace('/[\s\-]+/u', '', $zipCode));
+    }
+
+    /**
      * A placeholder matches no pattern.
      *
      * @param bool $whenUnsure the answer when the code is uncertain, because it has no normal
-     *                         form (see normalize()), or when the expression of a pattern
+     *                         form (see normalForm()), or when the expression of a pattern
      *                         with * cannot be run (PCRE limits): true for an exclusion,
      *                         which then refuses the code rather than letting it through
      */
@@ -224,11 +236,11 @@ final readonly class ZipCodePattern
             return false;
         }
 
-        return $this->matchesNormalized(self::normalize($zipCode), $whenUnsure);
+        return $this->matchesNormalized(self::normalForm($zipCode), $whenUnsure);
     }
 
     /**
-     * matches() for a code already in its normal form, as normalize() gives it and as
+     * matches() for a code already in its normal form, as normalForm() gives it and as
      * ZipCodeRuleSet passes it once for all its rules. A code without a normal form (null)
      * or empty is uncertain: the answer is $whenUnsure.
      *

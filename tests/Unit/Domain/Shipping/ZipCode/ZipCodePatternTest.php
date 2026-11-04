@@ -140,7 +140,7 @@ final class ZipCodePatternTest extends TestCase
     #[DataProvider('codesWithoutANormalForm')]
     public function testACodeThatKeepsAnotherCharacterHasNoNormalForm(string $zipCode): void
     {
-        self::assertNull(ZipCodePattern::normalize($zipCode));
+        self::assertNull(ZipCodePattern::normalForm($zipCode));
         self::assertFalse(ZipCodePattern::isUnknown($zipCode), 'It is not unknown either.');
         self::assertFalse(ZipCodePattern::isPlaceholder($zipCode), 'Nor a placeholder.');
     }
@@ -204,7 +204,7 @@ final class ZipCodePatternTest extends TestCase
      */
     public function testACodeHoldingARightToLeftCharacterIsNotNamed(): void
     {
-        self::assertSame('75001', ZipCodePattern::normalize("\u{07C7}\u{07C5}\u{07C0}\u{07C0}\u{07C1}"), 'N\'Ko digits are a code.');
+        self::assertSame('75001', ZipCodePattern::normalForm("\u{07C7}\u{07C5}\u{07C0}\u{07C0}\u{07C1}"), 'N\'Ko digits are a code.');
         self::assertNull(ZipCodePattern::nameable("\u{07C7}\u{07C5}\u{07C0}\u{07C0}\u{07C1}"), 'N\'Ko digits are not named.');
         self::assertNull(ZipCodePattern::nameable("75\u{1E950}\u{1E950}1"), 'Adlam digits are not named.');
         self::assertSame("\u{0667}\u{0665}\u{0660}\u{0660}\u{0661}", ZipCodePattern::nameable("\u{0667}\u{0665}\u{0660}\u{0660}\u{0661}"), 'Arabic-Indic digits are named.');
@@ -242,8 +242,40 @@ final class ZipCodePatternTest extends TestCase
     #[DataProvider('codesToNormalizeTwice')]
     public function testTheNormalFormIsTheSameAppliedTwice(string $zipCode, string $normalForm): void
     {
-        self::assertSame($normalForm, ZipCodePattern::normalize($zipCode));
-        self::assertSame($normalForm, ZipCodePattern::normalize($normalForm));
+        self::assertSame($normalForm, ZipCodePattern::normalForm($zipCode));
+        self::assertSame($normalForm, ZipCodePattern::normalForm($normalForm));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function codesAsTheyWereNormalizedIn33(): iterable
+    {
+        yield 'spaces and a dash' => ['sw1a 1aa', 'SW1A1AA'];
+        yield 'a dash' => ['1000-001', '1000001'];
+        yield 'a character outside A to Z and 0 to 9' => ['é20a 090', 'é20A090'];
+        yield 'an empty code' => ['  - ', ''];
+    }
+
+    #[DataProvider('codesAsTheyWereNormalizedIn33')]
+    public function testNormalizeKeepsItsBehaviourOf33AndIsDeprecated(string $zipCode, string $expected): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $level, string $message) use (&$deprecations): bool {
+            $deprecations[] = $message;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            $normalized = ZipCodePattern::normalize($zipCode);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame($expected, $normalized);
+        self::assertCount(1, $deprecations);
+        self::assertStringContainsString('ZipCodePattern::normalForm()', $deprecations[0]);
     }
 
     public function testAPatternIsRefusedPastTheLengthOfItsColumn(): void
