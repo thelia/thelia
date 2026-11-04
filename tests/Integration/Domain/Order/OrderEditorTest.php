@@ -28,17 +28,17 @@ use Thelia\Domain\Order\Exception\OrderEditRefusedException;
 use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Order\Service\OrderEditor;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderPostageTax;
 use Thelia\Model\OrderPostageTaxQuery;
-use Thelia\Model\ModuleQuery;
-use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderProductTaxQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderShipment;
 use Thelia\Model\OrderShipmentItem;
 use Thelia\Model\OrderStatus;
@@ -122,19 +122,88 @@ final class OrderEditorTest extends IntegrationTestCase
 
     public function testAForcedPriceRecomputesItsTaxesAndStaysWhenTheCatalogueMoves(): void
     {
+        $catalogue = (string) OrderProductQuery::create()->findPk($this->line->getId())->getPrice();
+
         $this->editor->edit($this->order, new OrderEdit(unitPrices: [(int) $this->line->getId() => '10.000000']));
         $this->editor->edit($this->order, new OrderEdit(unitPrices: [(int) $this->line->getId() => '15.500000']));
 
         $reloaded = OrderProductQuery::create()->findPk($this->line->getId());
-        self::assertSame('15.500000', (string) $reloaded->getPrice());
+        self::assertSame($catalogue, (string) $reloaded->getPrice());
         self::assertSame('15.500000', (string) $reloaded->getPromoPrice());
+        self::assertSame(1, (int) $reloaded->getWasInPromo());
         $taxes = OrderProductTaxQuery::create()->filterByOrderProductId($this->line->getId())->find();
         self::assertCount(1, $taxes);
-        self::assertSame('3.100000', (string) $taxes[0]->getAmount());
+        self::assertSame('3.100000', (string) $taxes[0]->getPromoAmount());
 
         $price = \Thelia\Model\ProductPriceQuery::create()->filterByProductSaleElementsId($this->pse->getId())->findOne();
         $price->setPrice('99')->setPromoPrice('99')->save();
-        self::assertSame('15.500000', (string) OrderProductQuery::create()->findPk($this->line->getId())->getPrice());
+        self::assertSame('15.500000', (string) OrderProductQuery::create()->findPk($this->line->getId())->getPromoPrice());
+    }
+
+    public function testASimulationInsideTheTransactionOfTheCallerTakesBackItsWrites(): void
+    {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
+        $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $otherLine = $this->aLine($other, 1.0, '25.000000');
+        $state = $this->editor->stateOf($this->order);
+
+        $preview = $this->editor->simulate($this->order, new OrderEdit(removedLines: [(int) $otherLine->getId()], discount: '2.000000'));
+
+        self::assertNotSame($preview->before->total, $preview->after->total);
+        self::assertNotNull(OrderProductQuery::create()->findPk($otherLine->getId()));
+        self::assertSame(1, OrderProductTaxQuery::create()->filterByOrderProductId($otherLine->getId())->count());
+        self::assertSame($state, $this->editor->stateOf(OrderQuery::create()->findPk($this->order->getId())));
+        self::assertSame($state, $this->editor->stateOf($this->order));
+        self::assertTrue($this->getPropelConnection()->isCommitable(), 'The simulation must not mark the transaction of the caller as unusable.');
+    }
+
+    public function testASimulationWithADiscountTaxesTheOrderAsTheRealEditDoes(): void
+    {
+        $this->placeAnOrder(OrderStatus::CODE_NOT_PAID);
+        $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $otherLine = $this->aLine($other, 1.0, '25.000000');
+        OrderProductTaxQuery::create()->filterByOrderProductId($otherLine->getId())->update(['Amount' => '1.375000', 'PromoAmount' => '1.375000']);
+        $this->editor->edit($this->order, new OrderEdit(discount: '5.000000'));
+
+        $edit = new OrderEdit(removedLines: [(int) $otherLine->getId()]);
+        $preview = $this->editor->simulate($this->order, $edit);
+        $this->editor->edit($this->order, $edit);
+
+        $fresh = OrderQuery::create()->findPk($this->order->getId());
+        Order::forgetCachedTotals((int) $fresh->getId());
+        $tax = 0;
+        $total = $fresh->getTotalAmount($tax, true, true);
+
+        self::assertSame(number_format($total, 6, '.', ''), $preview->after->total);
+        self::assertSame(number_format($tax, 6, '.', ''), $preview->after->tax, 'The tax factor of the discount must be read again on the simulated lines.');
+    }
+
+    public function testASimulationOfAnAddedLineAnnouncesTheTotalOfTheRealEdit(): void
+    {
+        $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $edit = new OrderEdit(addedLines: [new AddedOrderLine((int) $other->getDefaultSaleElements()->getId(), 2.0)]);
+        $stock = $this->stockOf($other->getDefaultSaleElements());
+
+        $preview = $this->editor->simulate($this->order, $edit);
+
+        self::assertSame(0, OrderProductQuery::create()->filterByOrderId($this->order->getId())->filterByProductRef($other->getRef())->count());
+        self::assertEqualsWithDelta($stock, $this->stockOf($other->getDefaultSaleElements()), 0.0001);
+        self::assertEqualsWithDelta((float) $preview->before->total + 60.0, (float) $preview->after->total, 0.0001);
+
+        $this->editor->edit($this->order, $edit);
+        self::assertEqualsWithDelta((float) $preview->after->total, $this->totalOf(), 0.0001);
+    }
+
+    public function testAForcedPriceOnALineAlreadyInPromotionKeepsItsCataloguePrice(): void
+    {
+        $this->line->setPrice('12.000000')->setPromoPrice('8.000000')->setWasInPromo(1)->save();
+
+        $this->editor->edit($this->order, new OrderEdit(unitPrices: [(int) $this->line->getId() => '9.500000']));
+
+        $reloaded = OrderProductQuery::create()->findPk($this->line->getId());
+        self::assertSame('12.000000', (string) $reloaded->getPrice());
+        self::assertSame('9.500000', (string) $reloaded->getPromoPrice());
+        self::assertSame(1, (int) $reloaded->getWasInPromo());
     }
 
     public function testADiscountLowersTheTotalAndCannotExceedIt(): void
@@ -599,7 +668,7 @@ final class OrderEditorTest extends IntegrationTestCase
         $this->placeAnOrder(OrderStatus::CODE_SENT);
 
         $this->editor->edit($this->order, new OrderEdit(discount: '1.000000'));
-        self::assertSame('1.000000', (string) \Thelia\Model\OrderQuery::create()->findPk($this->order->getId())->getDiscount());
+        self::assertSame('1.000000', (string) OrderQuery::create()->findPk($this->order->getId())->getDiscount());
 
         $this->placeAnOrder(OrderStatus::CODE_PAID);
         $this->expectRefusal(OrderEditRefusal::StatusNotEditable);

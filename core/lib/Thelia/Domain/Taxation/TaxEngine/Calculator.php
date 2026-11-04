@@ -138,6 +138,17 @@ class Calculator implements TaxCalculatorInterface
     }
 
     /**
+     * The factor is kept for the life of the order object: an order whose lines changed under it
+     * (an edit, or its simulation) must ask for it again.
+     */
+    public static function forgetOrderTaxFactor(Order $order): void
+    {
+        if (null !== self::$orderTaxFactors) {
+            unset(self::$orderTaxFactors[$order]);
+        }
+    }
+
+    /**
      * @throws PropelException
      */
     public function computeOrderTaxFactor(Order $order): float
