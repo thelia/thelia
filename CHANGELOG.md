@@ -126,7 +126,10 @@
 - The back-office themes and the document templates that read the new figures need this core: the `default-twig` and Flexy themes and the e-mail templates raise their `thelia/core` constraint to `^3.4` at the release; the PDF templates keep `^3.2` and fall back with `is defined` on the variables that exist from 3.4.0 only (`TOTAL_AMOUNT_AFTER_DISCOUNT`, `TOTAL_TAXED_AMOUNT_AFTER_DISCOUNT`, `TOTAL_GOODS_AMOUNT`, `TOTAL_TAXED_GOODS_AMOUNT`, `CUSTOMER_GROUP_*`).
 - The body of `POST /api/front/customers` is `firstname`, `lastname`, `email`, `password` and the optional `langId` (an integer) and `registrationToken`; `customerTitle` and a `lang` IRI are no longer read. The route used to answer 500 on every call, so no working client sends the old body.
 - A module that dispatches `TheliaEvents::CART_ADDITEM` for a product the customer's group or a catalog rule hides now receives a `ProductNotAvailableException`, as an addition by any other path does.
-- `ZipCodePattern::normalize()` returns `?string`: `null` for a code that has no normal form: empty once its spaces and dashes are removed, keeping a character outside `A` to `Z` and `0` to `9` once folded, or not valid UTF-8. A caller that used its result as a string checks for `null` first, or calls `matches()`, which judges such a code itself.
+
+## Deprecations
+
+- `Thelia\Domain\Shipping\ZipCode\ZipCodePattern::normalize()` is deprecated and keeps its 3.3 behaviour (spaces and dashes removed, ASCII letters in upper case, always a string). Use `ZipCodePattern::normalForm()`, which folds compatibility characters and returns `null` for a code that has no normal form: empty once its spaces and dashes are removed, keeping a character outside `A` to `Z` and `0` to `9` once folded, or not valid UTF-8. A caller that uses it checks for `null`, or calls `matches()`, which judges such a code itself. See `UPGRADE-3.4.md`.
 
 # 3.3.0
 
