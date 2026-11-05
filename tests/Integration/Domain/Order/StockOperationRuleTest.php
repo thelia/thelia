@@ -178,6 +178,17 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         self::assertSame(13.0, $this->stockOf($productSaleElements), 'The limit names no active module: the action is ignored, the core rule applies.');
     }
 
+    public function testAStockActionWhoseLimitNamesAGoneModuleIsIgnoredForItsOtherModulesToo(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_NONE, limits: [AdjustStockAction::FIELD_PAYMENT_MODULES => ['FreeOrder', 'NoSuchModule']]);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_PAID, ['paymentModuleCode' => 'FreeOrder']);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(13.0, $this->stockOf($productSaleElements), 'FreeOrder is active, but the limit also names a module that is gone: the action is ignored, the core rule applies.');
+    }
+
     public function testAStockActionDoesNotTakeOutAgainTheStockTakenWhenTheOrderWasPlaced(): void
     {
         $this->stockIsManagedOnOrderCreation(true);
@@ -285,9 +296,10 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
     public function testTheBackOfficeIsToldWhichStockActionsNeverApplyAndWhichModulesAreGone(): void
     {
         $first = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_NONE, 1);
-        $overridden = $this->stockAction(OrderStatusActionTrigger::TRANSITION, OrderStatus::CODE_PAID, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_INCREASE, 2, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque', 'NoSuchModule']]);
+        $overridden = $this->stockAction(OrderStatusActionTrigger::TRANSITION, OrderStatus::CODE_PAID, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_INCREASE, 2, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque']]);
         $transitionFirst = $this->stockAction(OrderStatusActionTrigger::TRANSITION, OrderStatus::CODE_PAID, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_NONE, 3);
         $enterAfter = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_INCREASE, 4);
+        $withAGoneModule = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, AdjustStockAction::OPERATION_DECREASE, 5, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque', 'NoSuchModule']]);
         $diagnostics = $this->getService(StockActionDiagnostics::class);
 
         $overriddenActions = $diagnostics->overriddenActions();
@@ -295,17 +307,34 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         self::assertSame($first->getId(), $overriddenActions[$overridden->getId()] ?? null);
         self::assertArrayNotHasKey($enterAfter->getId(), $overriddenActions, 'A transition placed first does not cover every entry into the status.');
         self::assertArrayNotHasKey($transitionFirst->getId(), $overriddenActions);
-        self::assertSame(['NoSuchModule'], $diagnostics->missingModules($overridden));
+        self::assertSame(['NoSuchModule'], $diagnostics->missingModules($withAGoneModule));
+        self::assertSame([], $diagnostics->missingModules($overridden));
     }
 
-    public function testAModuleGoneFromALimitDoesNotHideThatAnEarlierActionCoversIt(): void
+    public function testAnActionWhoseLimitNamesAGoneModuleOverridesNoActionAfterIt(): void
     {
-        $first = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_NONE, 1, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque']]);
-        $later = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_INCREASE, 2, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque', 'NoSuchModule']]);
+        $ignored = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_NONE, 1, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque', 'NoSuchModule']]);
+        $later = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_INCREASE, 2, [AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque']]);
+        $diagnostics = $this->getService(StockActionDiagnostics::class);
+
+        self::assertArrayNotHasKey($later->getId(), $diagnostics->overriddenActions(), 'The first action is ignored for its gone module: the later one applies to cheques.');
+        self::assertSame(['NoSuchModule'], $diagnostics->missingModules($ignored));
+    }
+
+    public function testAnActionOfACanonicalStatusOverridesTheOnesOfACustomStatusEquivalentToIt(): void
+    {
+        $this->factory->orderStatus(['code' => 'canceled_by_customer', 'equivalentCode' => OrderStatus::CODE_CANCELED]);
+        $this->factory->orderStatus(['code' => 'refunded_by_shop', 'equivalentCode' => OrderStatus::CODE_REFUNDED]);
+        $canonical = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_NONE, 1);
+        $custom = $this->stockAction(OrderStatusActionTrigger::ENTER, null, 'canceled_by_customer', AdjustStockAction::OPERATION_INCREASE, 2);
+        $customFirst = $this->stockAction(OrderStatusActionTrigger::ENTER, null, 'refunded_by_shop', AdjustStockAction::OPERATION_NONE, 3);
+        $canonicalAfter = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_INCREASE, 4);
 
         $overriddenActions = $this->getService(StockActionDiagnostics::class)->overriddenActions();
 
-        self::assertSame($first->getId(), $overriddenActions[$later->getId()] ?? null, 'NoSuchModule is ignored: the later action only ever applies to cheques, which the first one already takes.');
+        self::assertSame($canonical->getId(), $overriddenActions[$custom->getId()] ?? null, 'A change into the custom status reads the actions of the canonical one first.');
+        self::assertArrayNotHasKey($canonicalAfter->getId(), $overriddenActions, 'A change into the canonical status does not read the actions of a custom one.');
+        self::assertArrayNotHasKey($customFirst->getId(), $overriddenActions);
     }
 
     public function testARefusedPayloadIsRecordedOnceTheStatusChangeIsCommittedAndNotWhenTheChangeIsRefused(): void

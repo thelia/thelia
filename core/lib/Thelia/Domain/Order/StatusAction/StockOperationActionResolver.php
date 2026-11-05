@@ -110,8 +110,9 @@ final readonly class StockOperationActionResolver
     }
 
     /**
-     * A limit counts only its modules still installed and active: one that lists none of
-     * them any more is ignored with its action, it never widens to every order.
+     * A limit that names a module no longer installed or active is ignored with its action,
+     * whatever its other modules: the merchant set it for modules that are not all there,
+     * and the back office tells them so. It never widens to every order either.
      *
      * @param list<string>            $moduleCodes
      * @param array<int, string>|null $activeModuleCodes the code of each active module by id, loaded on first use
@@ -132,6 +133,10 @@ final readonly class StockOperationActionResolver
             foreach (ModuleQuery::create()->filterByActivate(1)->find() as $module) {
                 $activeModuleCodes[$module->getId()] = $module->getCode();
             }
+        }
+
+        if ([] !== array_diff($moduleCodes, $activeModuleCodes)) {
+            return false;
         }
 
         return isset($activeModuleCodes[$orderModuleId]) && \in_array($activeModuleCodes[$orderModuleId], $moduleCodes, true);
