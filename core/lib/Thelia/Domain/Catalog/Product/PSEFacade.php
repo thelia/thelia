@@ -27,6 +27,7 @@ use Thelia\Domain\Catalog\Product\DTO\PSECreateDTO;
 use Thelia\Domain\Catalog\Product\DTO\PSEUpdateDTO;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\PSENotFoundException;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
@@ -36,6 +37,7 @@ final readonly class PSEFacade
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
+        private StockLevelAnnouncer $stockLevelAnnouncer,
     ) {
     }
 
@@ -178,7 +180,9 @@ final readonly class PSEFacade
             throw PSENotFoundException::withId($pseId);
         }
 
+        $before = (float) $pse->getQuantity();
         $pse->setQuantity($quantity)->save();
+        $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
 
     public function decreaseStock(int $pseId, float $quantity): void
@@ -189,8 +193,10 @@ final readonly class PSEFacade
             throw PSENotFoundException::withId($pseId);
         }
 
+        $before = (float) $pse->getQuantity();
         $newQuantity = max(0, $pse->getQuantity() - $quantity);
         $pse->setQuantity($newQuantity)->save();
+        $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
 
     public function increaseStock(int $pseId, float $quantity): void
@@ -201,7 +207,9 @@ final readonly class PSEFacade
             throw PSENotFoundException::withId($pseId);
         }
 
+        $before = (float) $pse->getQuantity();
         $pse->setQuantity($pse->getQuantity() + $quantity)->save();
+        $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
 
     private function getProductById(int $productId): ?Product

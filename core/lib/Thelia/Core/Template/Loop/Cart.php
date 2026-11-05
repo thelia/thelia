@@ -23,6 +23,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
+use Thelia\Domain\Catalog\Stock\NoReservedQuantity;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
@@ -42,8 +44,11 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function __construct(
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
         protected readonly ?CartLineAvailability $cartLineAvailability = null,
+        protected readonly ?SellableStock $sellableStock = null,
     ) {
     }
+
+    private ?CartModel $sessionCart = null;
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -70,6 +75,8 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             return [];
         }
 
+        $this->sessionCart = $cart;
+
         $returnArray = iterator_to_array($cart->getCartItems());
 
         $orders = $this->getOrder();
@@ -92,7 +99,9 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $locale = $this->getMainRequest()->getSession()->getLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = (int) ConfigQuery::read('default-available-stock', 100);
-        $saleUnitQuantities = $checkAvailability ? $this->saleUnitQuantitiesOf($loopResult) : [];
+        $sellableLines = $checkAvailability && null !== $this->sessionCart
+            ? ($this->sellableStock ?? new SellableStock(new NoReservedQuantity(), $this->saleUnitAvailableStock))->forCart($this->sessionCart)
+            : [];
         $bundleAvailabilities = $checkAvailability ? $this->bundleAvailabilitiesOf($loopResult) : [];
 
         /** @var CartItemModel $cartItem */
@@ -116,7 +125,11 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             } elseif (!$checkAvailability || 1 === $product->getVirtual() || null !== $cartItem->getBundleComposition()) {
                 $loopResultRow->set('STOCK', $defaultAvailability);
             } else {
-                $loopResultRow->set('STOCK', $saleUnitQuantities[(int) $productSaleElement->getId()] ?? $productSaleElement->getQuantity());
+                // What the line may still be raised to: the stock (the sale unit's own when it keeps one) and what
+                // the sale mode of the sale element allows below zero, less what the other carts hold: the number
+                // the cart refuses above. The default availability when it sells without limit.
+                $available = $sellableLines[(int) $cartItem->getId()]['available'] ?? null;
+                $loopResultRow->set('STOCK', $available ?? $defaultAvailability);
             }
 
             $loopResultRow
@@ -176,27 +189,5 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         }
 
         return $this->cartLineAvailability->forBundleLines($lines);
-    }
-
-    /**
-     * The stock the sale unit the visitor buys from keeps of the sale elements in the
-     * cart, in one query; empty, without a query, when no unit is resolved.
-     *
-     * @return array<int, float> keyed by sale element id
-     */
-    private function saleUnitQuantitiesOf(LoopResult $loopResult): array
-    {
-        if (null === $this->saleUnitAvailableStock) {
-            return [];
-        }
-
-        $productSaleElementsIds = [];
-
-        /** @var CartItemModel $cartItem */
-        foreach ($loopResult->getResultDataCollection() as $cartItem) {
-            $productSaleElementsIds[] = (int) $cartItem->getProductSaleElementsId();
-        }
-
-        return $this->saleUnitAvailableStock->ownQuantities($productSaleElementsIds);
     }
 }

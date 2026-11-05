@@ -21,6 +21,8 @@ use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderTable;
@@ -39,6 +41,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElements;
 
 /**
  * Ordering by reference: the one entry point the API and the theme call.
@@ -69,6 +72,8 @@ final readonly class QuickOrderFacade
         private QuickOrderLimiter $limiter,
         private ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
         private ?BundleDisplayedStock $bundleDisplayedStock = null,
+        private ?SellableStock $sellableStock = null,
+        private ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -165,7 +170,7 @@ final readonly class QuickOrderFacade
 
                 $tableLines[] = $inCart[(int) $item->getId()] - $before >= $line->quantity
                     ? $line->markAdded()
-                    : $line->refusedByTheCart((float) $item->getProductSaleElements()->getQuantity() - $before);
+                    : $line->refusedByTheCart($this->sellableFor($item->getProductSaleElements(), $cart) - $before);
             }
 
             $connection->commit();
@@ -174,6 +179,9 @@ final readonly class QuickOrderFacade
 
             throw $throwable;
         }
+
+        // Once the lines are committed, in a transaction of its own (StockReservationService).
+        $this->stockReservation?->holdAfterCartChange($cart);
 
         return new QuickOrderTable($tableLines);
     }
@@ -259,5 +267,21 @@ final readonly class QuickOrderFacade
         if (!$this->limiter->allows($customer)) {
             throw new QuickOrderRateLimitedException('Too many quick order requests, please try again in a minute.');
         }
+    }
+
+    /**
+     * What the cart may still hold of a sale element, below zero stock included when its sale mode
+     * allows it, less what the other carts hold of it, never below zero (SellableStock); 0.0 when it
+     * sells without limit, as before.
+     */
+    private function sellableFor(ProductSaleElements $productSaleElements, Cart $cart): float
+    {
+        $cartId = (int) $cart->getId();
+
+        return ($this->sellableStock ?? SellableStock::withoutReservations())->forPse(
+            $productSaleElements,
+            saleUnitId: $cart->getSaleUnitId(),
+            excludedCartId: $cartId > 0 ? $cartId : null,
+        ) ?? 0.0;
     }
 }

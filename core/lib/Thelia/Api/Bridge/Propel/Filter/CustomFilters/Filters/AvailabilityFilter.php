@@ -21,6 +21,9 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggreg
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
+use Thelia\Domain\Catalog\Stock\StockSettings;
+use Thelia\Domain\Catalog\Stock\VisitorCart;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
@@ -44,7 +47,7 @@ final readonly class AvailabilityFilter implements TheliaFilterInterface, Thelia
 
     public const OUT_OF_STOCK = 2;
 
-    public function __construct(private Translator $translator)
+    public function __construct(private Translator $translator, private ?StockSettings $stockSettings = null, private ?VisitorCart $visitorCart = null)
     {
     }
 
@@ -145,23 +148,98 @@ final readonly class AvailabilityFilter implements TheliaFilterInterface, Thelia
      */
     private function restrictToInStock(ModelCriteria $query): void
     {
+        if ($this->reservesStock()) {
+            $query
+                ->filterBy('Virtual', 1)
+                ->_or()
+                ->useExistsQuery('ProductSaleElements', 'availability_in_stock_pse')
+                    ->filterBy('Visible', true)
+                    ->where($this->sellableAfterReservationsClause('availability_in_stock_pse'))
+                ->endUse();
+
+            return;
+        }
+
         $query
             ->filterBy('Virtual', 1)
             ->_or()
             ->useExistsQuery('ProductSaleElements', 'availability_in_stock_pse')
                 ->filterByVisible(true)
                 ->filterByQuantity(0, Criteria::GREATER_THAN)
+                ->_or()
+                ->where(self::sellsBelowZeroClause('availability_in_stock_pse'))
             ->endUse();
     }
 
     private function restrictToOutOfStock(ModelCriteria $query): void
     {
+        if ($this->reservesStock()) {
+            $query
+                ->filterBy('Virtual', 0)
+                ->useNotExistsQuery('ProductSaleElements', 'availability_out_of_stock_pse')
+                    ->filterBy('Visible', true)
+                    ->where($this->sellableAfterReservationsClause('availability_out_of_stock_pse'))
+                ->endUse();
+
+            return;
+        }
+
         $query
             ->filterBy('Virtual', 0)
             ->useNotExistsQuery('ProductSaleElements', 'availability_out_of_stock_pse')
                 ->filterByVisible(true)
                 ->filterByQuantity(0, Criteria::GREATER_THAN)
+                ->_or()
+                ->where(self::sellsBelowZeroClause('availability_out_of_stock_pse'))
             ->endUse();
+    }
+
+    /**
+     * A sale element out of stock that is still open for sale: its sale mode sells without limit, or
+     * sells below zero and its preorder limit is not used up (the stock plus the limit is above zero).
+     * Reservations of other carts are not looked at: a facet is a count over the catalogue, not an
+     * answer for a cart.
+     */
+    private static function sellsBelowZeroClause(string $alias): string
+    {
+        return \sprintf(
+            '%1$s.out_of_stock_policy = %2$d OR (%1$s.out_of_stock_policy = %3$d AND %1$s.quantity + GREATEST(COALESCE(%1$s.preorder_limit, 0), 0) > 0)',
+            $alias,
+            OutOfStockPolicy::Unlimited->value,
+            OutOfStockPolicy::Limited->value,
+        );
+    }
+
+    private function reservesStock(): bool
+    {
+        return null !== $this->stockSettings && $this->stockSettings->reservationEnabled();
+    }
+
+    /**
+     * When the shop reserves its stock: a sale element is still for sale when its sale mode sells
+     * without limit, or when its stock (plus its preorder limit when it sells below zero) is above
+     * what the carts hold of it right now. The cart of the visitor does not count, as everywhere else,
+     * when it is known without opening a session ({@see VisitorCart}: a started session, a guest or
+     * customer token); a visitor whose session is not started has no cart here, and every cart counts.
+     * The sale unit of the cart is not looked at: a facet is a count over the catalogue, not an answer
+     * for a cart, so a reservation on the own stock of another sale unit is still counted here.
+     */
+    private function sellableAfterReservationsClause(string $alias): string
+    {
+        $ownCartId = $this->visitorCart?->currentId();
+        $reserved = \sprintf(
+            '(SELECT COALESCE(SUM(`reserving_line`.`quantity`), 0) FROM `cart_item` `reserving_line` WHERE `reserving_line`.`product_sale_elements_id` = %s.id AND `reserving_line`.`reserved_until` > NOW()%s)',
+            $alias,
+            null === $ownCartId ? '' : \sprintf(' AND `reserving_line`.`cart_id` <> %d', $ownCartId),
+        );
+
+        return \sprintf(
+            '(%1$s.out_of_stock_policy = %2$d OR %1$s.quantity + (CASE WHEN %1$s.out_of_stock_policy = %3$d THEN GREATEST(COALESCE(%1$s.preorder_limit, 0), 0) ELSE 0 END) - %4$s > 0)',
+            $alias,
+            OutOfStockPolicy::Unlimited->value,
+            OutOfStockPolicy::Limited->value,
+            $reserved,
+        );
     }
 
     private function value(int $id, string $locale): FilterValue

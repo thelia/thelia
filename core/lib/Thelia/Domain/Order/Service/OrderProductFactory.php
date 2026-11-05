@@ -41,9 +41,11 @@ readonly class OrderProductFactory
         VirtualProductContext $virtualContext,
         TaxRuleI18n $taxRuleI18n,
         ConnectionInterface $connection,
+        bool $isPreorder = false,
+        ?string $restockDate = null,
     ): OrderProduct {
         return $this->saveLineOf(
-            $this->lineOfCartItem($placedOrder, $product, $productSaleElements, $productI18n, $cartItem, $virtualContext, $taxRuleI18n),
+            self::markedAsPreorder($this->lineOfCartItem($placedOrder, $product, $productSaleElements, $productI18n, $cartItem, $virtualContext, $taxRuleI18n), $isPreorder, $restockDate),
             $connection,
         );
     }
@@ -64,11 +66,17 @@ readonly class OrderProductFactory
         VirtualProductContext $virtualContext,
         TaxRuleI18n $taxRuleI18n,
         ConnectionInterface $connection,
+        bool $isPreorder = false,
+        ?string $restockDate = null,
     ): OrderProduct {
         return $this->saveLineOf(
-            $this->lineOfCartItem($placedOrder, $product, $productSaleElements, $productI18n, $cartItem, $virtualContext, $taxRuleI18n)
-                ->setLineType(OrderProduct::LINE_TYPE_BUNDLE)
-                ->setWeight(self::bundleWeightOf($productSaleElements)),
+            self::markedAsPreorder(
+                $this->lineOfCartItem($placedOrder, $product, $productSaleElements, $productI18n, $cartItem, $virtualContext, $taxRuleI18n)
+                    ->setLineType(OrderProduct::LINE_TYPE_BUNDLE)
+                    ->setWeight(self::bundleWeightOf($productSaleElements)),
+                $isPreorder,
+                $restockDate,
+            ),
             $connection,
         );
     }
@@ -89,21 +97,27 @@ readonly class OrderProductFactory
         float $quantity,
         VirtualProductContext $virtualContext,
         ConnectionInterface $connection,
+        bool $isPreorder = false,
+        ?string $restockDate = null,
     ): OrderProduct {
         $weight = (float) $bundleLine->getWeight() > 0
             ? '0'
             : ($productSaleElements->getWeight() !== null ? (string) $productSaleElements->getWeight() : null);
 
         return $this->saveLineOf(
-            $this->lineOf($placedOrder, $product, $productSaleElements, $productI18n, $virtualContext)
-                ->setLineType(OrderProduct::LINE_TYPE_BUNDLE_COMPONENT)
-                ->setParent($bundleLine->getId())
-                ->setQuantity($quantity)
-                ->setPrice('0')
-                ->setPromoPrice('0')
-                ->setWasInPromo(0)
-                ->setIsOffered(0)
-                ->setWeight($weight),
+            self::markedAsPreorder(
+                $this->lineOf($placedOrder, $product, $productSaleElements, $productI18n, $virtualContext)
+                    ->setLineType(OrderProduct::LINE_TYPE_BUNDLE_COMPONENT)
+                    ->setParent($bundleLine->getId())
+                    ->setQuantity($quantity)
+                    ->setPrice('0')
+                    ->setPromoPrice('0')
+                    ->setWasInPromo(0)
+                    ->setIsOffered(0)
+                    ->setWeight($weight),
+                $isPreorder,
+                $restockDate,
+            ),
             $connection,
         );
     }
@@ -184,6 +198,19 @@ readonly class OrderProductFactory
             ->setWeight($productSaleElements->getWeight() !== null ? (string) $productSaleElements->getWeight() : null)
             ->setEanCode($productSaleElements->getEanCode())
             ->setMpn($productSaleElements->getMpn());
+    }
+
+    /**
+     * Freezes on the line whether it was sold below zero stock, and the restock date the sale
+     * element had at that moment: what the buyer was promised, whatever the catalogue says later.
+     */
+    private static function markedAsPreorder(OrderProduct $orderProduct, bool $isPreorder, ?string $restockDate): OrderProduct
+    {
+        if ($isPreorder) {
+            $orderProduct->setIsPreorder(1)->setRestockDate($restockDate);
+        }
+
+        return $orderProduct;
     }
 
     private function saveLineOf(OrderProduct $orderProduct, ConnectionInterface $connection): OrderProduct

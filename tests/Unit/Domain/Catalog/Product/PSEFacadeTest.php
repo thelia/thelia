@@ -22,6 +22,8 @@ use Thelia\Domain\Catalog\Product\DTO\ProductWithPSECreateDTO;
 use Thelia\Domain\Catalog\Product\DTO\PSECreateDTO;
 use Thelia\Domain\Catalog\Product\DTO\PSEUpdateDTO;
 use Thelia\Domain\Catalog\Product\PSEFacade;
+use Thelia\Domain\Catalog\Stock\CallerTransaction;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 
@@ -33,7 +35,7 @@ class PSEFacadeTest extends TestCase
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->facade = new PSEFacade($this->dispatcher);
+        $this->facade = new PSEFacade($this->dispatcher, new StockLevelAnnouncer($this->dispatcher, new CallerTransaction()));
     }
 
     public function testPSECreateDTOToArray(): void

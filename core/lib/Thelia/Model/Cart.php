@@ -26,6 +26,7 @@ use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleLineContents;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
@@ -248,7 +249,16 @@ class Cart extends BaseCart
             return null === $cartLineAvailability || $cartLineAvailability->forLine($productSaleElements, $composition) >= $cartItem->getQuantity();
         }
 
-        return ($saleUnitQuantities[(int) $productSaleElements->getId()] ?? (float) $productSaleElements->getQuantity()) >= $cartItem->getQuantity()
+        // What the sale element may still sell: its stock (the sale unit's own when it keeps one) and what
+        // its sale mode allows below zero, less what the carts other than the one copied hold of it.
+        $ceiling = SellableStock::ceilingOfPse($productSaleElements, $saleUnitQuantities[(int) $productSaleElements->getId()] ?? null);
+
+        if (null !== $ceiling && null !== $cartLineAvailability) {
+            $ceiling -= $cartLineAvailability->reservedByOtherCarts($productSaleElements, $this);
+        }
+
+        return null === $ceiling
+            || $ceiling >= $cartItem->getQuantity()
             || 1 === $productSaleElements->getProduct()->getVirtual();
     }
 

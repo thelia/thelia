@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
+use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\VisitorSellableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Form\Exception\StockNotFoundException;
@@ -40,6 +42,7 @@ class CartAdd extends BaseForm
     public function __construct(
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
         protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
+        protected readonly ?VisitorSellableStock $visitorSellableStock = null,
     ) {
     }
 
@@ -147,12 +150,18 @@ class CartAdd extends BaseForm
                 return;
             }
 
-            // The stock of the sale unit the visitor buys from, when it keeps one, is the
-            // one the cart and the checkout judge on.
-            $availableQuantity = $this->saleUnitAvailableStock?->availableQuantity($productSaleElements)
-                ?? (float) $productSaleElements->getQuantity();
+            // What the sale element may sell is what the cart and the checkout judge on: the stock of
+            // the sale unit the visitor buys from when it keeps one, and what the sale mode of the
+            // sale element allows below zero, less what the other carts hold (the cart of the visitor
+            // excluded, every cart without one). Null: it sells without limit.
+            $availableQuantity = null !== $this->visitorSellableStock
+                ? $this->visitorSellableStock->forPse($productSaleElements)
+                : SellableStock::ceilingOfPse(
+                    $productSaleElements,
+                    $this->saleUnitAvailableStock?->availableQuantity($productSaleElements),
+                );
 
-            if ($availableQuantity < $value && 0 === $product->getVirtual() && ConfigQuery::checkAvailableStock()) {
+            if (null !== $availableQuantity && $availableQuantity < $value && 0 === $product->getVirtual() && ConfigQuery::checkAvailableStock()) {
                 $context->addViolation(Translator::getInstance()->trans('quantity value is not valid'));
             }
         }

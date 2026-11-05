@@ -17,6 +17,9 @@ namespace Thelia\Domain\Checkout;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Cart\Service\CartSelectionService;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationConflictException;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRefusedException;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Service\CheckoutPaymentService;
 use Thelia\Domain\Checkout\Service\CheckoutProgressionService;
@@ -39,31 +42,58 @@ final readonly class CheckoutFacade
         private ShippingFacade $shippingFacade,
         private CheckoutProgressionService $progressionService,
         private ExpressPaymentCheckoutGuard $expressPaymentGuard,
+        private StockReservationService $stockReservation,
     ) {
     }
 
     /**
-     * Select the delivery address on the cart and refresh shipping.
+     * Holds the stock of the lines of the cart for the duration the shop sets, from now on: the
+     * buyer is in the checkout. Every step below does it too; a theme calls this one as the buyer
+     * enters the checkout, on a page that selects nothing yet. Nothing is done when the shop does
+     * not reserve its stock.
+     *
+     * @throws StockReservationRefusedException  a line asks more than what the other carts leave; nothing is held
+     * @throws StockReservationConflictException another cart took the same stock at the same moment; nothing is held
+     */
+    public function holdStock(Cart $cart): void
+    {
+        $this->stockReservation->holdForCheckout($cart);
+    }
+
+    /**
+     * Select the delivery address on the cart and refresh shipping. The stock of the lines is held
+     * once more (holdStock()).
+     *
+     * @throws StockReservationRefusedException
      */
     public function selectDeliveryAddress(CheckoutDTO $dto): void
     {
         $this->cartSelectionService->setDeliveryAddress($dto);
+        $this->holdStock($dto->getCart());
     }
 
     /**
-     * Select the invoice address on the cart and refresh shipping.
+     * Select the invoice address on the cart and refresh shipping. The stock of the lines is held
+     * once more (holdStock()).
+     *
+     * @throws StockReservationRefusedException
      */
     public function selectInvoiceAddress(CheckoutDTO $dto): void
     {
         $this->cartSelectionService->setInvoiceAddress($dto);
+        $this->holdStock($dto->getCart());
     }
 
     /**
-     * Select the delivery module on the cart and refresh shipping.
+     * Select the delivery module on the cart and refresh shipping. The stock of the lines is held
+     * once more (holdStock()).
+     *
+     * @throws StockReservationRefusedException
      */
     public function selectDeliveryModule(CheckoutDTO $dto): void
     {
         $this->cartSelectionService->setDeliveryModule($dto);
+        $this->holdStock($dto->getCart());
     }
 
     /**
@@ -72,22 +102,28 @@ final readonly class CheckoutFacade
      *
      * @throws PaymentMethodNotOwnedException
      * @throws StoredMethodNotSelectableException
+     * @throws StockReservationRefusedException
+     * @throws StockReservationConflictException
      */
     public function selectPaymentModule(CheckoutDTO $dto): void
     {
         $this->cartSelectionService->setPaymentModule($dto);
+        $this->holdStock($dto->getCart());
     }
 
     /**
      * Validate the cart is ready for order placement: every step the installed code
      * declares is asked about it, in the order of the tunnel, whatever the merchant
-     * turned off — removing a step removes its screen, never its check.
+     * turned off — removing a step removes its screen, never its check. The stock of the lines
+     * is then held once more (holdStock()).
      *
-     * @throws \Exception If underlying services raise domain exceptions
+     * @throws StockReservationRefusedException
+     * @throws \Exception                       If underlying services raise domain exceptions
      */
     public function validateForOrder(Cart $cart): void
     {
         $this->validationService->validateForOrder($cart);
+        $this->holdStock($cart);
     }
 
     /**

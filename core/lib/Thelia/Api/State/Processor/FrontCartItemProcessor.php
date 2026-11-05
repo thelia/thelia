@@ -39,6 +39,7 @@ use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -77,6 +78,7 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         private EventDispatcherInterface $dispatcher,
         private CartLineAvailability $cartLineAvailability,
         private CartCompositionResolver $cartCompositionResolver,
+        private ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -119,6 +121,10 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
             return null;
         }
 
+        // Once the line is committed, in a transaction of its own: held inside the one above, the
+        // hold would wait on the stock row the write of the line shares with another buyer.
+        $this->stockReservation?->holdAfterCartChange($cartItem->getCart());
+
         return $this->transformer->modelToResource(
             resourceClass: CartItemResource::class,
             propelModel: $cartItem,
@@ -160,7 +166,7 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
         // The stock of a bundle is judged once, by the guard of the addition, from the composition
         // handed over below.
         if (null === $composition) {
-            $this->assertStockFor($saleElements, $inLine + $quantity);
+            $this->assertStockFor($saleElements, $inLine + $quantity, $cart);
         }
 
         $before = $this->quantitiesOfTheLines((int) $cart->getId());
@@ -205,13 +211,13 @@ final readonly class FrontCartItemProcessor implements ProcessorInterface
      * decided in one place (CartLineAvailability); the lines of a bundle are judged by the guard
      * of the addition, which holds the composition.
      */
-    private function assertStockFor(ProductSaleElements $saleElements, float $quantity): void
+    private function assertStockFor(ProductSaleElements $saleElements, float $quantity, Cart $cart): void
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return;
         }
 
-        if ($this->cartLineAvailability->forLine($saleElements) < $quantity) {
+        if ($this->cartLineAvailability->forLine($saleElements, null, $cart) < $quantity) {
             throw self::notEnoughStockFor($saleElements);
         }
     }

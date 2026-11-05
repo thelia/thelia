@@ -1,6 +1,103 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------------------------------------------------
+-- Stock: sale at zero stock, reservation, low stock threshold
+--
+-- `product_sale_elements.out_of_stock_policy` says what happens at zero stock
+-- (0 refuse, 1 sell without limit, 2 sell up to `preorder_limit` units below
+-- zero). The defaults (refuse, no limit, no date, no threshold) leave every
+-- existing shop behaving as before; no row is rewritten.
+-- `cart_item.reserved_until` holds the stock of a line for its cart until that
+-- moment; a past or empty value holds nothing.
+-- `cart_item.reserved_quantity` is the quantity the listeners of the reservations
+-- were told the line holds, written with `reserved_until` and emptied when the
+-- line is released; an empty value on a line that has a date reads as its quantity.
+-- `cart_item.reserved_since` is when the line was first held since its last
+-- release, written with the first hold and emptied with the release: a hold is
+-- never pushed back past a bound from that moment.
+-- `order_product.is_preorder` and `restock_date` freeze, when the order is
+-- placed, whether the line was sold above the physical stock.
+--
+-- `idx_cart_item_reserved_until` serves the purge of the dates that have run out.
+--
+-- Every column and the index are added through PREPARE/EXECUTE only when
+-- missing, so the script can be replayed. This block stays before any DML of
+-- the script.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'out_of_stock_policy');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `out_of_stock_policy` TINYINT DEFAULT 0 NOT NULL COMMENT \'what happens at zero stock: 0 refuse the sale, 1 sell without limit, 2 sell up to preorder_limit units below zero\' AFTER `manufacturer_brand_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'preorder_limit');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `preorder_limit` FLOAT COMMENT \'units that can be sold below zero stock when out_of_stock_policy is 2\' AFTER `out_of_stock_policy`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'restock_date');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `restock_date` DATE COMMENT \'date the stock is expected again, shown on preorders\' AFTER `preorder_limit`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'low_stock_threshold');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `low_stock_threshold` FLOAT COMMENT \'stock level at or under which the shop owner is alerted; null: the shop-wide threshold\' AFTER `restock_date`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- `bundle_composition` is only added further down by the bundle block: on a
+-- 3.3 shop the column goes after `offered_by_coupon_id`, and the bundle block
+-- then slides its own column in between, as on a fresh install.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'reserved_until');
+SET @after_column := IF((SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'bundle_composition') > 0, 'bundle_composition', 'offered_by_coupon_id');
+SET @statement := IF(@add_column, CONCAT('ALTER TABLE `cart_item` ADD `reserved_until` DATETIME COMMENT \'the stock of the line is held for the cart until this moment; null or past: not held\' AFTER `', @after_column, '`'), 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- `reserved_until` is added just above, so it is always there to be followed.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'reserved_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `reserved_quantity` FLOAT COMMENT \'the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told\' AFTER `reserved_until`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- `reserved_quantity` is added just above, so it is always there to be followed.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'reserved_since');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `reserved_since` DATETIME COMMENT \'the moment the line was first held since its last release; a hold is never pushed back past a bound from it\' AFTER `reserved_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'is_preorder');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `is_preorder` TINYINT DEFAULT 0 NOT NULL COMMENT \'the line was sold above the physical stock, on preorder\' AFTER `virtual_document`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'restock_date');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `restock_date` DATE COMMENT \'restock date of the sale element when the line was ordered, frozen on preorder lines\' AFTER `is_preorder`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'idx_cart_item_pse_reserved_until');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `idx_cart_item_pse_reserved_until` (`product_sale_elements_id`, `reserved_until`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'idx_cart_item_reserved_until');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `idx_cart_item_reserved_until` (`reserved_until`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+-- ---------------------------------------------------------------------
 -- Promotion priority, stop and exclusions
 --
 -- `priority` orders the promotions that compete for a cart (lowest first),
@@ -593,6 +690,85 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@customer_group_resource_id, 'it_IT', 'Gruppi di clienti', NULL, NULL, NULL),
     (@customer_group_resource_id, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
     (@customer_group_resource_id, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL);
+
+-- ---------------------------------------------------------------------
+-- Stock settings and the low stock alert message
+--
+-- Reservation is off, starts at the checkout and lasts 15 minutes; the shop
+-- wide low stock threshold is 5. INSERT IGNORE leaves alone a shop that
+-- already chose a value. The titles are filled the same way as the express
+-- payment zones above: only the rows that are missing or empty.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('stock_reservation_enabled', '0', 0, 0, NOW(), NOW()),
+    ('stock_reservation_scope', 'checkout', 0, 0, NOW(), NOW()),
+    ('stock_reservation_duration', '15', 0, 0, NOW(), NOW()),
+    ('low_stock_threshold', '5', 0, 0, NOW(), NOW());
+
+DROP TEMPORARY TABLE IF EXISTS `config_title_seed`;
+
+CREATE TEMPORARY TABLE `config_title_seed` (
+    `name` VARCHAR(255) NOT NULL,
+    `locale` CHAR(5) NOT NULL,
+    `title` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('stock_reservation_enabled', 'en_US', 'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)'),
+    ('stock_reservation_enabled', 'fr_FR', 'Réserver le stock des articles d''un panier pendant que le client commande (1 = oui, 0 = non)'),
+    ('stock_reservation_enabled', 'de_DE', 'Den Bestand der Artikel eines Warenkorbs während der Bestellung reservieren (1 = ja, 0 = nein)'),
+    ('stock_reservation_enabled', 'es_ES', 'Reservar el stock de los artículos de un carrito mientras el cliente finaliza la compra (1 = sí, 0 = no)'),
+    ('stock_reservation_enabled', 'nl_NL', 'De voorraad van de artikelen in een winkelwagen reserveren terwijl de klant afrekent (1 = ja, 0 = nee)'),
+    ('stock_reservation_enabled', 'ru_RU', 'Резервировать запас товаров корзины, пока клиент оформляет заказ (1 = да, 0 = нет)'),
+    ('stock_reservation_scope', 'en_US', 'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)'),
+    ('stock_reservation_scope', 'fr_FR', 'Moment où le stock d''un panier est réservé : checkout (dès l''entrée dans le tunnel de commande) ou cart (dès la mise au panier)'),
+    ('stock_reservation_scope', 'de_DE', 'Wann der Bestand eines Warenkorbs reserviert wird: checkout (ab Beginn der Bestellung) oder cart (sobald ein Artikel im Warenkorb liegt)'),
+    ('stock_reservation_scope', 'es_ES', 'Momento en que se reserva el stock de un carrito: checkout (desde el inicio del pedido) o cart (en cuanto un artículo está en el carrito)'),
+    ('stock_reservation_scope', 'nl_NL', 'Wanneer de voorraad van een winkelwagen wordt gereserveerd: checkout (vanaf het begin van het afrekenen) of cart (zodra een artikel in de winkelwagen ligt)'),
+    ('stock_reservation_scope', 'ru_RU', 'Когда резервируется запас корзины: checkout (с начала оформления заказа) или cart (как только товар попал в корзину)'),
+    ('stock_reservation_duration', 'en_US', 'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)'),
+    ('stock_reservation_duration', 'fr_FR', 'Minutes pendant lesquelles une réservation de stock est conservée, prolongée à chaque étape du tunnel de commande (15 si invalide)'),
+    ('stock_reservation_duration', 'de_DE', 'Minuten, die eine Bestandsreservierung gehalten wird, bei jedem Bestellschritt verlängert (15 bei ungültigem Wert)'),
+    ('stock_reservation_duration', 'es_ES', 'Minutos que se mantiene una reserva de stock, ampliada en cada paso del pedido (15 si no es válido)'),
+    ('stock_reservation_duration', 'nl_NL', 'Minuten dat een voorraadreservering wordt vastgehouden, bij elke stap van het afrekenen verlengd (15 bij een ongeldige waarde)'),
+    ('stock_reservation_duration', 'ru_RU', 'Минуты хранения резерва запаса, продлевается на каждом шаге оформления заказа (15 при неверном значении)'),
+    ('low_stock_threshold', 'en_US', 'Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own'),
+    ('low_stock_threshold', 'fr_FR', 'Niveau de stock à partir duquel le gérant est averti qu''une déclinaison s''épuise (5 si invalide), une déclinaison peut fixer le sien'),
+    ('low_stock_threshold', 'de_DE', 'Bestandsmenge, ab der der Shopbetreiber vor einer knappen Variante gewarnt wird (5 bei ungültigem Wert), eine Variante kann einen eigenen Wert festlegen'),
+    ('low_stock_threshold', 'es_ES', 'Nivel de stock a partir del cual se avisa al gestor de que una variante se agota (5 si no es válido), una variante puede fijar el suyo'),
+    ('low_stock_threshold', 'nl_NL', 'Voorraadniveau waarop de winkeleigenaar wordt gewaarschuwd dat een variant bijna op is (5 bij een ongeldige waarde), een variant kan een eigen waarde instellen'),
+    ('low_stock_threshold', 'ru_RU', 'Уровень запаса, при котором владелец магазина получает уведомление о нехватке комбинации (5 при неверном значении), комбинация может задать свой');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `config_title_seed`.`locale`, `config_title_seed`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name`;
+
+UPDATE `config_i18n`
+INNER JOIN `config` ON `config`.`id` = `config_i18n`.`id`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name` AND `config_title_seed`.`locale` = `config_i18n`.`locale`
+SET `config_i18n`.`title` = `config_title_seed`.`title`
+WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
+
+DROP TEMPORARY TABLE `config_title_seed`;
+
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('low_stock_alert', NULL, 'low_stock_alert.txt', 'low_stock_alert.html', NOW(), NOW());
+
+-- Read back by name rather than from LAST_INSERT_ID(): on a replay the insert
+-- above is ignored and hands back no id at all.
+SET @low_stock_alert_message_id := (SELECT `id` FROM `message` WHERE `name` = 'low_stock_alert');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@low_stock_alert_message_id, 'cs_CZ', NULL, 'Nízký stav zásob na {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'de_DE', 'An den Shopbetreiber gesendete Warnung bei knappem Bestand', 'Geringer Bestand bei {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'en_US', 'Message sent to the shop owner when the stock of a sale element runs low', 'Low stock on {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'es_ES', 'Aviso enviado al gestor de la tienda cuando se agota el stock de una variante', 'Stock bajo en {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'fr_FR', 'Message envoyé au gérant de la boutique quand le stock d''une déclinaison s''épuise', 'Stock bas sur {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'it_IT', NULL, 'Scorte basse su {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'nl_NL', 'Bericht aan de winkeleigenaar wanneer de voorraad van een variant bijna op is', 'Lage voorraad bij {{ config("store_name") }}'),
+    (@low_stock_alert_message_id, 'ru_RU', 'Уведомление владельцу магазина о нехватке запаса комбинации', 'Низкий запас в {{ config("store_name") }}');
 
 -- ---------------------------------------------------------------------
 -- Newsletter switch
