@@ -16,11 +16,19 @@ namespace Thelia\Tests\Integration\Action;
 
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 
 final class NewsletterActionTest extends ActionIntegrationTestCase
 {
+    protected function tearDown(): void
+    {
+        ConfigQuery::resetCache();
+
+        parent::tearDown();
+    }
+
     public function testSubscribePersistsNewEntry(): void
     {
         $event = new NewsletterEvent('john.doe+nltest@example.com', 'en_US');
@@ -99,5 +107,105 @@ final class NewsletterActionTest extends ActionIntegrationTestCase
 
         $reloaded = NewsletterQuery::create()->findPk($id);
         self::assertSame('New', $reloaded->getFirstname());
+    }
+
+    public function testTheSettingIsOnByDefault(): void
+    {
+        self::assertTrue(ConfigQuery::isNewsletterEnabled());
+    }
+
+    public function testSubscribeRecordsNothingAndStopsPropagationWhenTheNewsletterIsOff(): void
+    {
+        $this->switchNewsletter(false);
+        $laterListenerCalled = false;
+        $this->dispatcher->addListener(
+            TheliaEvents::NEWSLETTER_SUBSCRIBE,
+            static function () use (&$laterListenerCalled): void {
+                $laterListenerCalled = true;
+            },
+            0,
+        );
+
+        $event = new NewsletterEvent('off+nltest@example.com', 'en_US');
+        $event->setFirstname('Off')->setLastname('Shop');
+        $this->dispatch($event, TheliaEvents::NEWSLETTER_SUBSCRIBE);
+
+        self::assertNull(NewsletterQuery::create()->findOneByEmail('off+nltest@example.com'));
+        self::assertTrue($event->isPropagationStopped());
+        self::assertFalse($laterListenerCalled, 'A listener behind the sign-up must not act on an address that was not kept.');
+    }
+
+    public function testAnUnsubscribedAddressStaysUnsubscribedOnANewSignUpWhenTheNewsletterIsOff(): void
+    {
+        $id = $this->subscribeThenUnsubscribe('left+nltest@example.com');
+        $this->switchNewsletter(false);
+
+        $again = new NewsletterEvent('left+nltest@example.com', 'en_US');
+        $again->setFirstname('Left')->setLastname('Shop');
+        $this->dispatch($again, TheliaEvents::NEWSLETTER_SUBSCRIBE);
+
+        self::assertSame(1, (int) NewsletterQuery::create()->findPk($id)->getUnsubscribed());
+    }
+
+    public function testUpdateDoesNotResubscribeWhenTheNewsletterIsOffButStillSavesTheRest(): void
+    {
+        $id = $this->subscribeThenUnsubscribe('stale+nltest@example.com');
+        $this->switchNewsletter(false);
+
+        $update = new NewsletterEvent('stale+nltest@example.com', 'en_US');
+        $update->setId((string) $id)->setFirstname('Renamed')->setLastname('Shop');
+        $this->dispatch($update, TheliaEvents::NEWSLETTER_UPDATE);
+
+        $reloaded = NewsletterQuery::create()->findPk($id);
+        self::assertSame(1, (int) $reloaded->getUnsubscribed());
+        self::assertSame('Renamed', $reloaded->getFirstname());
+    }
+
+    public function testUnsubscribeStillWorksWhenTheNewsletterIsOff(): void
+    {
+        $event = new NewsletterEvent('quit+nltest@example.com', 'en_US');
+        $event->setFirstname('Quit')->setLastname('Shop');
+        $this->dispatch($event, TheliaEvents::NEWSLETTER_SUBSCRIBE);
+        $id = $event->getNewsletter()->getId();
+        $this->switchNewsletter(false);
+
+        $unsub = new NewsletterEvent('quit+nltest@example.com', 'en_US');
+        $unsub->setId((string) $id);
+        $this->dispatch($unsub, TheliaEvents::NEWSLETTER_UNSUBSCRIBE);
+
+        self::assertSame(1, (int) NewsletterQuery::create()->findPk($id)->getUnsubscribed());
+    }
+
+    public function testSignUpWorksAgainWhenTheNewsletterIsBackOn(): void
+    {
+        $id = $this->subscribeThenUnsubscribe('back+nltest@example.com');
+        $this->switchNewsletter(false);
+        $this->switchNewsletter(true);
+
+        $again = new NewsletterEvent('back+nltest@example.com', 'en_US');
+        $again->setFirstname('Back')->setLastname('Shop');
+        $this->dispatch($again, TheliaEvents::NEWSLETTER_SUBSCRIBE);
+
+        self::assertSame($id, $again->getNewsletter()->getId());
+        self::assertSame(0, (int) $again->getNewsletter()->getUnsubscribed());
+    }
+
+    private function switchNewsletter(bool $enabled): void
+    {
+        ConfigQuery::write('newsletter_enabled', $enabled ? '1' : '0');
+    }
+
+    private function subscribeThenUnsubscribe(string $email): int
+    {
+        $event = new NewsletterEvent($email, 'en_US');
+        $event->setFirstname('Some')->setLastname('One');
+        $this->dispatch($event, TheliaEvents::NEWSLETTER_SUBSCRIBE);
+        $id = $event->getNewsletter()->getId();
+
+        $unsub = new NewsletterEvent($email, 'en_US');
+        $unsub->setId((string) $id);
+        $this->dispatch($unsub, TheliaEvents::NEWSLETTER_UNSUBSCRIBE);
+
+        return $id;
     }
 }
