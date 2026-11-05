@@ -38,7 +38,6 @@ use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Map\OrderPostageTaxTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
-use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddressQuery;
@@ -50,7 +49,6 @@ use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderProductTaxQuery;
 use Thelia\Model\OrderReturnLineQuery;
 use Thelia\Model\OrderShipmentItemQuery;
-use Thelia\Model\OrderVersionQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -122,6 +120,10 @@ final readonly class OrderEditor
             $lines = $this->linesOf($order);
             $this->assertOperations($lines, $edit);
 
+            if ($this->movesNothing($order, $lines, $edit)) {
+                throw new OrderEditRefusedException(OrderEditRefusal::NothingToEdit);
+            }
+
             if (!$simulation) {
                 $this->dispatcher->dispatch(new OrderEditEvent($order, $edit), TheliaEvents::ORDER_BEFORE_EDIT);
             }
@@ -129,6 +131,10 @@ final readonly class OrderEditor
             $before = $simulation ? $this->totalsOf($order) : null;
             $summary = $this->apply($order, $lines, $edit, $connection);
             ProductSaleElementsTableMap::clearInstancePool();
+
+            if ($this->changedNothing($summary)) {
+                throw new OrderEditRefusedException(OrderEditRefusal::NothingToEdit);
+            }
 
             Order::forgetCachedTotals((int) $order->getId());
             $this->assertDiscountIsCovered($order);
@@ -163,6 +169,33 @@ final readonly class OrderEditor
         }
 
         return null;
+    }
+
+    /**
+     * @param array<int, OrderProduct> $lines
+     */
+    private function movesNothing(Order $order, array $lines, OrderEdit $edit): bool
+    {
+        if ([] !== $edit->addedLines || [] !== $edit->removedLines || [] !== $edit->unitPrices || null !== $edit->untaxedPostage) {
+            return false;
+        }
+
+        foreach ($edit->quantities as $lineId => $quantity) {
+            if (abs($quantity - (float) $lines[$lineId]->getQuantity()) >= self::QUANTITY_TOLERANCE) {
+                return false;
+            }
+        }
+
+        return null === $edit->discount || 0 === bccomp($edit->discount, (string) $order->getDiscount(), 6);
+    }
+
+    /**
+     * @param array<string, mixed> $summary
+     */
+    private function changedNothing(array $summary): bool
+    {
+        return [] === $summary['added'] && [] === $summary['removed'] && [] === $summary['quantities'] && [] === $summary['prices']
+            && null === $summary['discount'] && null === $summary['postage'];
     }
 
     private function restore(Order $order): void
@@ -482,12 +515,14 @@ final readonly class OrderEditor
         $promoPrice = $added->unitPrice ?? (string) $prices->getPromoPrice();
         $wasInPromo = null === $added->unitPrice && $promo ? 1 : 0;
 
+        $virtual = $this->virtualProductHandler->resolve($this->dispatcher, $order, $product, (int) $productSaleElements->getId());
+
         $line = $this->orderProductFactory->createFromCatalog(
             $order,
             $product,
             $productSaleElements,
             $this->translationProvider->getProductTranslation($locale, (int) $product->getId()),
-            $this->virtualProductHandler->resolve($this->dispatcher, $order, $product, (int) $productSaleElements->getId()),
+            $virtual,
             $this->translationProvider->getTaxRuleTranslation($locale, (int) $product->getTaxRuleId()),
             $added->quantity,
             $price,
@@ -500,7 +535,7 @@ final readonly class OrderEditor
 
         $this->replaceTaxes($line, $product, $country, $locale, $vatExempted, $connection);
         $this->orderProductFactory->persistAttributeCombinations($line, $productSaleElements, $locale, $connection);
-        $this->moveStock($order, $line, $added->quantity, $holdsStock, $saleUnitId, $connection);
+        $this->moveStock($order, $line, $added->quantity, $holdsStock, $saleUnitId, $connection, $virtual->useStock);
 
         return ['ref' => $line->getProductSaleElementsRef(), 'quantity' => $added->quantity, 'price' => (string) ($wasInPromo ? $promoPrice : $price)];
     }
@@ -529,22 +564,21 @@ final readonly class OrderEditor
             return false;
         }
 
-        if (OrderVersionQuery::create()->filterById($order->getId())->select(OrderVersionTableMap::COL_STATUS_ID)->distinct()->count() > 1) {
-            return false;
-        }
-
-        return $order->isStockManagedOnOrderCreation($this->dispatcher);
+        return $order->isStockStillGovernedByCreation($this->dispatcher);
     }
 
-    private function moveStock(Order $order, OrderProduct $line, float $delta, bool $holdsStock, ?int $saleUnitId, ConnectionInterface $connection): void
+    private function moveStock(Order $order, OrderProduct $line, float $delta, bool $holdsStock, ?int $saleUnitId, ConnectionInterface $connection, ?bool $useStock = null): void
     {
         if (!$holdsStock || abs($delta) < self::QUANTITY_TOLERANCE || !$line->isProductLine()) {
             return;
         }
 
-        $product = ProductQuery::create()->findOneByRef($line->getProductRef());
+        if (null === $useStock) {
+            $product = ProductQuery::create()->findOneByRef($line->getProductRef());
+            $useStock = null === $product || $this->virtualProductHandler->resolve($this->dispatcher, $order, $product, (int) $line->getProductSaleElementsId())->useStock;
+        }
 
-        if (null !== $product && !$this->virtualProductHandler->resolve($this->dispatcher, $order, $product, (int) $line->getProductSaleElementsId())->useStock) {
+        if (!$useStock) {
             return;
         }
 

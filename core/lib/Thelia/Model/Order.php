@@ -30,6 +30,7 @@ use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Module\BaseModuleInterface;
 use Thelia\Module\PaymentModuleInterface;
 
@@ -959,6 +960,15 @@ class Order extends BaseOrder
         );
 
         return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+    }
+
+    public function isStockStillGovernedByCreation(EventDispatcherInterface $dispatcher): bool
+    {
+        if (OrderVersionQuery::create()->filterById($this->getId())->select(OrderVersionTableMap::COL_STATUS_ID)->distinct()->count() > 1) {
+            return false;
+        }
+
+        return $this->isStockManagedOnOrderCreation($dispatcher);
     }
 
     protected function getCart(): ?Cart

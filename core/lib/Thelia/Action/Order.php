@@ -58,14 +58,12 @@ use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Model\OrderVersionQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tools\URL;
 
@@ -498,15 +496,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         // 2) The order is currently unpaid, and will become paid (remove products from stock, except if was done at order creation $manageStockOnCreation == false)
         // 3) The order is currently NOT PAID, and will become canceled or the like (get products back in stock if it was done at order creation $manageStockOnCreation == true)
 
-        // We consider the ManageStockOnCreation flag only if the order status as not yet changed.
-        // Count distinct order statuses (e.g. NOT_PAID to something else) in the order version table.
-        if (OrderVersionQuery::create()->filterById($order->getId())->select(OrderVersionTableMap::COL_STATUS_ID)->distinct()->count() > 1) {
-            // A status change occured. Ignore $manageStockOnCreation
-            $manageStockOnCreation = false;
-        } else {
-            // A status has not yet occured. Consider the ManageStockOnCreation flag
-            $manageStockOnCreation = $order->isStockManagedOnOrderCreation($dispatcher);
-        }
+        $manageStockOnCreation = $order->isStockStillGovernedByCreation($dispatcher);
 
         if (($order->isPaid(false) && $newStatus->isNotPaid(false)) // Case 1
             || ($order->isNotPaid(true) && $newStatus->isNotPaid(false) && true === $manageStockOnCreation) // Case 3

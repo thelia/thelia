@@ -396,6 +396,33 @@ final class OrderEditorTest extends IntegrationTestCase
         self::assertSame(1, OrderProductQuery::create()->filterByOrderId($this->order->getId())->count());
     }
 
+    public function testAnEditThatChangesNothingIsRefusedAndLeavesNoHistory(): void
+    {
+        $line = OrderProductQuery::create()->findPk($this->lineId());
+        $edit = new OrderEdit(quantities: [$this->lineId() => (float) $line->getQuantity()], discount: (string) $this->order->getDiscount());
+        $written = static fn (self $test): int => OrderHistoryQuery::create()->filterByOrderId($test->order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count();
+        $before = $written($this);
+        $announced = 0;
+        $listener = static function () use (&$announced): void {
+            ++$announced;
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::ORDER_BEFORE_EDIT, $listener);
+
+        try {
+            $this->editor->edit($this->order, $edit);
+            self::fail('An edit that moves nothing must be refused.');
+        } catch (OrderEditRefusedException $refusal) {
+            self::assertStringContainsString('('.OrderEditRefusal::NothingToEdit->value.')', $refusal->getMessage());
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::ORDER_BEFORE_EDIT, $listener);
+        }
+
+        self::assertSame(0, $announced, 'The listeners are not told of an edit that moves nothing.');
+
+        self::assertSame($before, $written($this), 'A refused edit leaves nothing in the history.');
+    }
+
     /**
      * @dataProvider invalidEdits
      */
@@ -573,6 +600,26 @@ final class OrderEditorTest extends IntegrationTestCase
         $line = OrderProductQuery::create()->filterByOrderId($this->order->getId())->filterByProductRef($other->getRef())->findOne();
         self::assertNotNull($line);
         self::assertEqualsWithDelta(90.0, (float) $line->getPrice(), 0.0001);
+    }
+
+    public function testAnAddedLineAsksTheVirtualProductListenersOnlyOnce(): void
+    {
+        $other = $this->createFixtureFactory()->product($this->createFixtureFactory()->category(), $this->createFixtureFactory()->taxRule(['isDefault' => false]), $this->createFixtureFactory()->currency(), ['title' => 'Asked once', 'baseQuantity' => 10]);
+        $other->setVirtual(1)->save();
+        $asked = 0;
+        $listener = static function () use (&$asked): void {
+            ++$asked;
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE, $listener);
+
+        try {
+            $this->editor->edit($this->order, new OrderEdit(addedLines: [new AddedOrderLine((int) $other->getDefaultSaleElements()->getId(), 1.0)]));
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE, $listener);
+        }
+
+        self::assertSame(1, $asked, 'The listeners of a virtual product are asked once for a line, not again for its stock.');
     }
 
     public function testThePostageOfAnOrderPlacedWithASingleRuleIsLeftAloneWhenTheShopSpreadsTheTaxLater(): void
