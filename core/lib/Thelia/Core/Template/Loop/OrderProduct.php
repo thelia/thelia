@@ -186,6 +186,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set('PARENT', $orderProduct->getParent())
                 ->set('EAN_CODE', $orderProduct->getEanCode())
                 ->set('MPN', $orderProduct->getMpn())
+                ->set('IS_PREORDER', $orderProduct->getIsPreorder() ? 1 : 0)
+                ->set('RESTOCK_DATE', $orderProduct->getRestockDate())
                 ->set('CART_ITEM_ID', $orderProduct->getCartItemId())
 
                 ->set('REAL_PRICE', $orderProduct->getWasInPromo() ? $orderProduct->getPromoPrice() : $orderProduct->getPrice())

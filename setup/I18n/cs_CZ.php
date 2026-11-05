@@ -37,4 +37,5 @@ return [
     'Customer rating' => 'Hodnocení zákazníků',
     'Price' => 'Cena',
     'Configuration background jobs' => 'Konfigurace úloh na pozadí',
+    'Low stock on {{ config("store_name") }}' => 'Nízký stav zásob na {{ config("store_name") }}',
 ];

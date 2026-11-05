@@ -26,16 +26,27 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Order\OrderPayTotalEvent;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
+use Thelia\Domain\Catalog\Stock\PreorderRule;
+use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
+use Thelia\Domain\Order\Exception\OrderStatusChangeConflictException;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
+use Thelia\Domain\Order\Service\PackPreorder;
+use Thelia\Domain\Order\Service\PaymentStockLock;
 use Thelia\Domain\Order\Service\StockDecrementer;
+use Thelia\Domain\Order\Service\StockMovement;
+use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
@@ -51,9 +62,9 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\OrderVersionQuery;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tools\URL;
 
@@ -82,6 +93,9 @@ class Order extends BaseAction implements EventSubscriberInterface
         protected PaymentCartContext $paymentCartContext,
         protected CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
         protected ?StockDecrementer $stockDecrementer = null,
+        protected ?StockReservationService $stockReservation = null,
+        protected ?StockLevelAnnouncer $stockLevelAnnouncer = null,
+        protected ?PaymentStockLock $paymentStockLock = null,
     ) {
     }
 
@@ -378,11 +392,56 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
+        // Read before the transaction: what the payment takes from the stock, when the shop reserves
+        // it and the stock was left for the payment, and the operation the listeners answer for it
+        // (the admin API worked both out already, before its own transaction).
+        $stockLock = $this->stockLock();
+        $stockPlan = $event->getStockPlan() ?? $stockLock?->planFor($order, $newStatus, $dispatcher);
+        $releaseTheCart = $this->leavesTheUnpaidStatus($order, $newStatus);
+
         // Prevent partial stock update on status change.
         $con->beginTransaction();
 
         try {
-            $this->updateQuantity($order, $newStatus, $dispatcher);
+            // The locks come in the same order on every path that changes a status (the admin API
+            // takes them so): the row of the order first, then the stock rows in ascending id.
+            // Taken the other way round, two requests on the same order wait for each other.
+            $statusIdUnderLock = null === $order->getId() ? null : OrderQuery::create()->lockStatusIdForUpdate((int) $order->getId(), $con);
+
+            // Before anything else is read in the transaction: the stock rows the payment takes
+            // from, so that the reservations of the other carts are read as they stand.
+            $stockLock?->lock($stockPlan->rows ?? [], $con);
+
+            // The model of the order was read before the lock. Another request may have moved the
+            // status since (the notification of a payment and the return of the browser confirm
+            // the same payment): it is judged on the status stored, never on the one that was read.
+            if (null !== $statusIdUnderLock && $statusIdUnderLock !== (int) $order->getStatusId()) {
+                $order->reload(false, $con);
+                $event->setPreviousStatusId($order->getStatusId());
+
+                if ($statusIdUnderLock === $newStatus) {
+                    // Already where the change leads: nothing to take, nothing to tell.
+                    $event->setOrder($order);
+                    $con->commit();
+
+                    return;
+                }
+
+                $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+                $releaseTheCart = $this->leavesTheUnpaidStatus($order, $newStatus);
+            }
+
+            $operation = null === $stockPlan || null === $statusIdUnderLock
+                ? null
+                : $stockPlan->operationFor($statusIdUnderLock, (int) $order->getStatusId(), $newStatus);
+
+            $stockChanges = $this->updateQuantity($order, $newStatus, $dispatcher, $operation);
+
+            // A stock left for the payment was held by the cart of the order until now: it is sold,
+            // or the order is given up.
+            if ($releaseTheCart) {
+                $this->stockReservation?->releaseCart((int) $order->getCartId(), $con);
+            }
 
             $order->setStatusId($newStatus)->save();
 
@@ -392,7 +451,22 @@ class Order extends BaseAction implements EventSubscriberInterface
         } catch (\Throwable $exception) {
             $con->rollBack();
 
+            // Another request took a lock this one needed and the database broke the tie: nothing
+            // of this change stands, and asked again it is judged on what the other one left.
+            if (!$exception instanceof OrderStatusChangeConflictException && LockConflictDetector::isLockConflict($exception)) {
+                throw new OrderStatusChangeConflictException($exception);
+            }
+
             throw $exception;
+        }
+
+        // After the commit, never inside it: a listener meets the stock as the change left it, and
+        // the status stays changed whatever the listeners do. Inside the transaction of a caller
+        // (the admin API), once that one is over, and never when it is rolled back.
+        if (null !== $this->stockLevelAnnouncer) {
+            $this->stockLevelAnnouncer->announceChanges($stockChanges);
+        } else {
+            StockLevelAnnouncer::tell($dispatcher, $stockChanges);
         }
     }
 
@@ -455,29 +529,57 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Update order products stock after an order status change.
      *
-     * @param int $newStatus the new status ID
+     * @param int                                                  $newStatus the new status ID
+     * @param GetStockUpdateOperationOnOrderStatusChangeEvent|null $operation what the listeners answered already for this very change, asked again when null
+     *
+     * @return list<StockLevelChange> what the change did to the stock of each sale element, for the event sent once it is committed
      *
      * @throws \Exception
      * @throws PropelException
      */
-    protected function updateQuantity(ModelOrder $order, int $newStatus, EventDispatcherInterface $dispatcher): void
+    protected function updateQuantity(ModelOrder $order, int $newStatus, EventDispatcherInterface $dispatcher, ?GetStockUpdateOperationOnOrderStatusChangeEvent $operation = null): array
     {
         if ($newStatus === $order->getStatusId() || null === $newStatusModel = OrderStatusQuery::create()->findPk($newStatus)) {
-            return;
+            return [];
         }
-        $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
-        $dispatcher->dispatch(
-            $operationEvent,
-            TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE,
-        );
+
+        $operationEvent = $operation;
+
+        if (null === $operationEvent) {
+            $operationEvent = new GetStockUpdateOperationOnOrderStatusChangeEvent($order, $newStatusModel);
+            $dispatcher->dispatch(
+                $operationEvent,
+                TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE,
+            );
+        }
 
         if ($operationEvent->getOperation() === $operationEvent::DO_NOTHING) {
-            return;
+            return [];
         }
         // In the ascending id of the sale element, the order the placement locked the stock rows
         // in: two orders moving the same rows the other way round would wait for each other.
         $orderProductList = $order->getOrderProducts()->getData();
         usort($orderProductList, static fn (OrderProduct $first, OrderProduct $second): int => (int) $first->getProductSaleElementsId() <=> (int) $second->getProductSaleElementsId());
+
+        $checkAvailableStock = ConfigQuery::checkAvailableStock();
+        $decreasing = $operationEvent->getOperation() === $operationEvent::DECREASE_STOCK;
+        $cartId = (int) $order->getCartId();
+
+        // What the other carts hold of the stock the change takes, read once, after the stock rows
+        // were locked (updateStatus()); nothing is read when the shop does not reserve.
+        $reservedByOtherCarts = $decreasing && $checkAvailableStock && null !== $this->stockReservation
+            ? $this->stockReservation->reservedByOtherCartsOf(
+                PaymentStockLock::stockRowsOf($orderProductList),
+                $order->getSaleUnitId(),
+                $cartId > 0 ? $cartId : null,
+                Propel::getConnection(OrderTableMap::DATABASE_NAME),
+            )
+            : [];
+
+        /** @var array<int, StockLevelChange> $changes one per sale element, from the stock before the first line to the stock after the last */
+        $changes = [];
+        /** @var array<int, list<StockMovement|null>> $componentMovementsByPack what the take of each component did, by the line of its pack */
+        $componentMovementsByPack = [];
 
         foreach ($orderProductList as $orderProduct) {
             // The sale element of a pack holds no stock: what the pack took is carried by
@@ -487,35 +589,133 @@ class Order extends BaseAction implements EventSubscriberInterface
             }
 
             $productSaleElementsId = $orderProduct->getProductSaleElementsId();
+            $reserved = $reservedByOtherCarts[(int) $productSaleElementsId] ?? 0.0;
 
-            if ($this->movesSaleUnitStock($order, $productSaleElementsId)) {
-                $this->updateSaleUnitQuantity($order, $orderProduct, $operationEvent);
+            $movement = $this->movesSaleUnitStock($order, $productSaleElementsId)
+                ? $this->updateSaleUnitQuantity($order, $orderProduct, $operationEvent, $reserved)
+                : $this->updateNationalQuantity($orderProduct, $operationEvent, $checkAvailableStock, $reserved);
 
+            if (null !== $movement && !$movement->onSaleUnitStock()) {
+                $changes[$movement->productSaleElementsId] = new StockLevelChange(
+                    $movement->productSaleElementsId,
+                    isset($changes[$movement->productSaleElementsId]) ? $changes[$movement->productSaleElementsId]->previousQuantity : $movement->previousQuantity,
+                    $movement->newQuantity,
+                );
+            }
+
+            // The stock taken is what the order froze as a preorder, unless the order froze it
+            // when it was placed: a line is marked once, by the take that goes below zero.
+            if (true === $movement?->preorder) {
+                $orderProduct->setIsPreorder(1)->setRestockDate($movement->restockDate)->save();
+            }
+
+            if (null !== $orderProduct->getParent()) {
+                $componentMovementsByPack[(int) $orderProduct->getParent()][] = $movement;
+            }
+        }
+
+        // A pack is a preorder when one of its components is, and waits for the latest date.
+        foreach ($orderProductList as $orderProduct) {
+            if (!isset($componentMovementsByPack[(int) $orderProduct->getId()])) {
                 continue;
             }
 
-            /** @var ProductSaleElements $productSaleElements */
-            if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                $offset = 0;
+            $packPreorder = PackPreorder::of($componentMovementsByPack[(int) $orderProduct->getId()]);
 
-                if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
-                    $offset = $orderProduct->getQuantity();
-                } elseif ($operationEvent->getOperation() === $operationEvent::DECREASE_STOCK) {
-                    /* Check if we have enough stock */
-                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                        throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
-                    }
-
-                    $offset = -$orderProduct->getQuantity();
-                }
-
-                Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
-
-                $productSaleElements
-                    ->setQuantity($productSaleElements->getQuantity() + $offset)
-                    ->save();
+            if ($packPreorder['isPreorder']) {
+                $orderProduct->setIsPreorder(1)->setRestockDate($packPreorder['restockDate'])->save();
             }
         }
+
+        return array_values($changes);
+    }
+
+    /**
+     * The shared counter of a sale element moved by a change of status: given back, or taken
+     * again when the stock was left for the payment, within what the sale element may still sell
+     * (below zero included when it sells there) less what the other carts hold.
+     *
+     * @return StockMovement|null what the change did to the stock, null when it moved nothing
+     *
+     * @throws TheliaProcessException when the sale element has not enough stock left to take the order
+     * @throws PropelException
+     */
+    private function updateNationalQuantity(
+        OrderProduct $orderProduct,
+        GetStockUpdateOperationOnOrderStatusChangeEvent $operationEvent,
+        bool $checkAvailableStock,
+        float $reservedByOtherCarts,
+    ): ?StockMovement {
+        $productSaleElements = ProductSaleElementsQuery::create()->findPk($orderProduct->getProductSaleElementsId());
+
+        if (null === $productSaleElements) {
+            return null;
+        }
+
+        $quantity = (float) $orderProduct->getQuantity();
+        $before = (float) $productSaleElements->getQuantity();
+        $policy = OutOfStockPolicy::fromStored($productSaleElements->getOutOfStockPolicy());
+        $decreasing = $operationEvent->getOperation() === $operationEvent::DECREASE_STOCK;
+        $offset = 0.0;
+
+        if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
+            $offset = $quantity;
+        } elseif ($decreasing) {
+            $ceiling = SellableStock::ceilingOf($before, $policy, $productSaleElements->getPreorderLimit());
+
+            /* Check if we have enough stock: what the sale element may still sell, below zero included when it sells there */
+            if ($checkAvailableStock && null !== $ceiling && $quantity > max(0.0, $ceiling - $reservedByOtherCarts)) {
+                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
+            }
+
+            $offset = -$quantity;
+        }
+
+        Tlog::getInstance()->addError('Product stock: '.$before.' -> '.($before + $offset));
+
+        $productSaleElements
+            ->setQuantity($before + $offset)
+            ->save();
+
+        if (0.0 === $offset) {
+            return null;
+        }
+
+        $preorder = $decreasing && $checkAvailableStock && PreorderRule::isPreorder($quantity, $before, $reservedByOtherCarts, $policy);
+
+        return new StockMovement(
+            (int) $productSaleElements->getId(),
+            null,
+            $before,
+            (float) $productSaleElements->getQuantity(),
+            $preorder,
+            $preorder ? $productSaleElements->getRestockDate('Y-m-d') : null,
+        );
+    }
+
+    /**
+     * The injected lock, or the one a caller that gave the reservation alone would get.
+     */
+    private function stockLock(): ?PaymentStockLock
+    {
+        return $this->paymentStockLock ?? (null === $this->stockReservation ? null : new PaymentStockLock($this->stockReservation));
+    }
+
+    /**
+     * Whether the change takes an unpaid order to a paid or a cancelled status, when the shop
+     * reserves its stock: what its cart still holds is then released. Nothing is read otherwise.
+     *
+     * @throws PropelException
+     */
+    private function leavesTheUnpaidStatus(ModelOrder $order, int $newStatus): bool
+    {
+        if (null === $this->stockReservation || !$this->stockReservation->isActive() || $newStatus === $order->getStatusId() || (int) $order->getCartId() <= 0) {
+            return false;
+        }
+
+        $newStatusModel = OrderStatusQuery::create()->findPk($newStatus);
+
+        return null !== $newStatusModel && $order->isNotPaid() && ($newStatusModel->isPaid(false) || $newStatusModel->isCancelled());
     }
 
     /**
@@ -531,13 +731,16 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @return StockMovement|null what a decrease did to the stock of the unit
+     *
      * @throws TheliaProcessException when the sale unit has not enough stock left to take the order again
      */
     private function updateSaleUnitQuantity(
         ModelOrder $order,
         OrderProduct $orderProduct,
         GetStockUpdateOperationOnOrderStatusChangeEvent $operationEvent,
-    ): void {
+        float $reservedByOtherCarts,
+    ): ?StockMovement {
         $productSaleElementsId = (int) $orderProduct->getProductSaleElementsId();
         $quantity = (float) $orderProduct->getQuantity();
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
@@ -545,23 +748,25 @@ class Order extends BaseAction implements EventSubscriberInterface
         if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
             $this->stockDecrementer?->increment($productSaleElementsId, $quantity, $connection, $order->getSaleUnitId());
 
-            return;
+            return null;
         }
 
         if ($operationEvent->getOperation() !== $operationEvent::DECREASE_STOCK) {
-            return;
+            return null;
         }
 
         $checkAvailableStock = ConfigQuery::checkAvailableStock();
 
         try {
-            $this->stockDecrementer?->decrement(
+            return $this->stockDecrementer?->decrement(
                 $productSaleElementsId,
                 $quantity,
                 guardAvailability: $checkAvailableStock,
                 allowNegativeStock: !$checkAvailableStock,
                 connection: $connection,
                 saleUnitId: $order->getSaleUnitId(),
+                // What the other carts hold of the unit's stock stays theirs.
+                reservedByOtherCarts: $checkAvailableStock ? $reservedByOtherCarts : 0.0,
             );
         } catch (TheliaProcessException $shortage) {
             throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);

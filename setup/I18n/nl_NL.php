@@ -454,4 +454,10 @@ return [
     'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Waar de expresbetaalknoppen van de betaalmodules verschijnen, door komma\'s gescheiden uit checkout (leeg: nergens)',
     'Customer groups' => 'Klantgroepen',
     'Default customer group' => 'Standaard klantgroep',
+    'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'De voorraad van de artikelen in een winkelwagen reserveren terwijl de klant afrekent (1 = ja, 0 = nee)',
+    'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Wanneer de voorraad van een winkelwagen wordt gereserveerd: checkout (vanaf het begin van het afrekenen) of cart (zodra een artikel in de winkelwagen ligt)',
+    'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minuten dat een voorraadreservering wordt vastgehouden, bij elke stap van het afrekenen verlengd (15 bij een ongeldige waarde)',
+    'Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own' => 'Voorraadniveau waarop de winkeleigenaar wordt gewaarschuwd dat een variant bijna op is (5 bij een ongeldige waarde), een variant kan een eigen waarde instellen',
+    'Message sent to the shop owner when the stock of a sale element runs low' => 'Bericht aan de winkeleigenaar wanneer de voorraad van een variant bijna op is',
+    'Low stock on {{ config("store_name") }}' => 'Lage voorraad bij {{ config("store_name") }}',
 ];

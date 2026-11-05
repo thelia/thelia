@@ -1722,4 +1722,10 @@ return [
     'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)',
     'Customer groups' => 'Customer groups',
     'Default customer group' => 'Default customer group',
+    'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)',
+    'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)',
+    'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)',
+    'Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own' => 'Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own',
+    'Message sent to the shop owner when the stock of a sale element runs low' => 'Message sent to the shop owner when the stock of a sale element runs low',
+    'Low stock on {{ config("store_name") }}' => 'Low stock on {{ config("store_name") }}',
 ];

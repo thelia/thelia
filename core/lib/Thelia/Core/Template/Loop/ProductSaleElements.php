@@ -336,6 +336,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set('REF', $PSEValue->getRef())
                 ->set('EAN_CODE', $PSEValue->getEanCode())
                 ->set('MPN', $PSEValue->getMpn())
+                ->set('OUT_OF_STOCK_POLICY', $PSEValue->getOutOfStockPolicy())
+                ->set('PREORDER_LIMIT', $PSEValue->getPreorderLimit())
+                ->set('RESTOCK_DATE', $PSEValue->getRestockDate())
                 ->set('MANUFACTURER_BRAND_ID', $PSEValue->getEffectiveManufacturerBrandId())
                 ->set('PRODUCT_ID', $PSEValue->getProductId())
                 ->set('PRICE', $price)
@@ -344,6 +347,11 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set('PROMO_PRICE', $promoPrice)
                 ->set('PROMO_PRICE_TAX', $taxedPromoPrice - $promoPrice)
                 ->set('TAXED_PROMO_PRICE', $taxedPromoPrice);
+
+            // The threshold the shop owner is alerted at is theirs alone: never handed to a front template.
+            if ($this->getBackendContext()) {
+                $loopResultRow->set('LOW_STOCK_THRESHOLD', $PSEValue->getLowStockThreshold());
+            }
 
             $this->addOutputFields($loopResultRow, $PSEValue);
             $loopResult->addRow($loopResultRow);

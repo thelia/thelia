@@ -25,6 +25,7 @@ use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\CartItem as BaseCartItem;
@@ -169,9 +170,10 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param float|null $availableQuantity the stock to check against when it is not the
-     *                                      national counter of the sale element (the stock
-     *                                      of the sale unit the visitor buys from). A bundle line
+     * @param float|null $availableQuantity the stock to check against when it is not what the sale
+     *                                      element may sell on its own, its stock and what its sale
+     *                                      mode allows below zero, reservations aside (the caller
+     *                                      says, from SellableStock, what this cart may hold). A bundle line
      *                                      is supplied by its components, so the caller says how
      *                                      many it can supply (CartLineAvailability): the stock of
      *                                      the sale element standing for the bundle is never read,
@@ -194,7 +196,7 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
             $available = null === $this->getBundleComposition()
-                ? ($availableQuantity ?? $productSaleElements->getQuantity())
+                ? ($availableQuantity ?? SellableStock::ceilingOfPse($productSaleElements) ?? \INF)
                 : ($availableQuantity ?? \INF);
 
             if (0 === $product->getVirtual() && $available < $value) {
@@ -209,9 +211,10 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param float|null $availableQuantity the stock to check against when it is not the
-     *                                      national counter of the sale element (the stock
-     *                                      of the sale unit the visitor buys from)
+     * @param float|null $availableQuantity the stock to check against when it is not what the sale
+     *                                      element may sell on its own, its stock and what its sale
+     *                                      mode allows below zero, reservations aside (the caller
+     *                                      says, from SellableStock, what this cart may hold)
      *
      * @return $this
      *
@@ -230,7 +233,7 @@ class CartItem extends BaseCartItem
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
             $available = null === $this->getBundleComposition()
-                ? ($availableQuantity ?? $productSaleElements->getQuantity())
+                ? ($availableQuantity ?? SellableStock::ceilingOfPse($productSaleElements) ?? \INF)
                 : ($availableQuantity ?? \INF);
 
             if (0 === $product->getVirtual() && $available < $newQuantity) {

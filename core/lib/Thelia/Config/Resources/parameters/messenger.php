@@ -42,10 +42,12 @@ return static function (ContainerConfigurator $container): void {
         // the task out. The currency rates are left out by default: the update
         // overwrites every rate, the ones set by hand included. The scheduled
         // publication of contents and folders runs every minute, as the sale check:
-        // a date is honoured within the minute.
+        // a date is honoured within the minute. The expired stock reservations are
+        // cleared every ten minutes: housekeeping, an expired one is never counted.
         ->set('env(THELIA_SCHEDULE_SALE_CHECK)', '* * * * *')
         ->set('env(THELIA_SCHEDULE_MAINTENANCE_PURGE)', '30 3 * * *')
         ->set('env(THELIA_SCHEDULE_FAILED_JOBS_PURGE)', '0 4 * * *')
         ->set('env(THELIA_SCHEDULE_CURRENCY_RATES)', '')
-        ->set('env(THELIA_SCHEDULE_CONTENT_PUBLICATION)', '* * * * *');
+        ->set('env(THELIA_SCHEDULE_CONTENT_PUBLICATION)', '* * * * *')
+        ->set('env(THELIA_SCHEDULE_STOCK_RESERVATION_PURGE)', '*/10 * * * *');
 };

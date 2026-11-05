@@ -1191,4 +1191,10 @@ return [
     'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Dónde aparecen los botones de pago exprés de los módulos de pago, separados por comas entre checkout (vacío: en ningún sitio)',
     'Customer groups' => 'Grupos de clientes',
     'Default customer group' => 'Grupo de clientes por defecto',
+    'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Reservar el stock de los artículos de un carrito mientras el cliente finaliza la compra (1 = sí, 0 = no)',
+    'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Momento en que se reserva el stock de un carrito: checkout (desde el inicio del pedido) o cart (en cuanto un artículo está en el carrito)',
+    'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minutos que se mantiene una reserva de stock, ampliada en cada paso del pedido (15 si no es válido)',
+    'Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own' => 'Nivel de stock a partir del cual se avisa al gestor de que una variante se agota (5 si no es válido), una variante puede fijar el suyo',
+    'Message sent to the shop owner when the stock of a sale element runs low' => 'Aviso enviado al gestor de la tienda cuando se agota el stock de una variante',
+    'Low stock on {{ config("store_name") }}' => 'Stock bajo en {{ config("store_name") }}',
 ];

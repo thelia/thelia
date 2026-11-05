@@ -16,7 +16,9 @@ namespace Thelia\Tests\Api\Front;
 
 use Propel\Runtime\Propel;
 use Thelia\Domain\Catalog\Product\ProductFacade;
+use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Model\Category;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Map\AccessoryTableMap;
@@ -202,6 +204,28 @@ final class ProductAssociationApiTest extends ApiTestCase
             $longBlock,
             'Reading a block costs the same whatever its length: the products it points at are read for the whole page, not one by one.',
         );
+    }
+
+    /**
+     * A shop that reserves its stock reads what the other carts hold of the products of the block once
+     * for the block, not once per sale element.
+     */
+    public function testALongerBlockDoesNotCostMoreQueriesWhenTheShopReservesItsStock(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::resetCache();
+
+        try {
+            $this->queriesSpentReadingABlockOf(1);
+
+            $shortBlock = $this->queriesSpentReadingABlockOf(2);
+            $longBlock = $this->queriesSpentReadingABlockOf(6);
+        } finally {
+            ConfigQuery::resetCache();
+        }
+
+        self::assertSame($shortBlock, $longBlock, 'What the carts hold of the sale elements of the block is read for the whole block.');
     }
 
     public function testTheProductOfAPrivateDropIsNotHandedOutByTheRelationsOfAnOnlineProduct(): void
