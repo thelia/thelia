@@ -36,6 +36,7 @@ final class NewsletterActionTest extends ActionIntegrationTestCase
 
         $this->dispatch($event, TheliaEvents::NEWSLETTER_SUBSCRIBE);
 
+        self::assertTrue($event->hasNewsletter());
         $newsletter = $event->getNewsletter();
         self::assertNotNull($newsletter);
         self::assertSame('john.doe+nltest@example.com', $newsletter->getEmail());
@@ -132,6 +133,7 @@ final class NewsletterActionTest extends ActionIntegrationTestCase
 
         self::assertNull(NewsletterQuery::create()->findOneByEmail('off+nltest@example.com'));
         self::assertTrue($event->isPropagationStopped());
+        self::assertFalse($event->hasNewsletter());
         self::assertFalse($laterListenerCalled, 'A listener behind the sign-up must not act on an address that was not kept.');
     }
 
