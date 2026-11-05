@@ -23,6 +23,7 @@ class OrderEditEvent extends ActionEvent
     public function __construct(
         private readonly Order $order,
         private readonly OrderEdit $edit,
+        private readonly array $summary = [],
     ) {
     }
 
@@ -34,5 +35,15 @@ class OrderEditEvent extends ActionEvent
     public function getEdit(): OrderEdit
     {
         return $this->edit;
+    }
+
+    /**
+     * What the edit changed, as written in the order history. Empty before the edit is applied.
+     *
+     * @return array<string, mixed>
+     */
+    public function getSummary(): array
+    {
+        return $this->summary;
     }
 }
