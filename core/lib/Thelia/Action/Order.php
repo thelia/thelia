@@ -743,7 +743,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /* Check if we have enough stock: what the sale element may still sell, below zero included when it sells there */
             if ($checkAvailableStock && null !== $ceiling && $quantity > SellableStock::leftOf($ceiling, $reservedByOtherCarts)) {
-                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
+                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock');
             }
 
             $offset = -$quantity;
@@ -850,7 +850,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 reservedByOtherCarts: $checkAvailableStock ? $reservedByOtherCarts : 0.0,
             );
         } catch (TheliaProcessException $shortage) {
-            throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);
+            throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock', previous: $shortage);
         }
     }
 
