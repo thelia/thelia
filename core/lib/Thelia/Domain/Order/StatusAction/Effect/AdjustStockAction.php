@@ -228,7 +228,10 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
     }
 
     /**
-     * @return array<string, string> module code => module title
+     * The title alone can be a sentence ("There's nothing to pay for this order"): the code follows it,
+     * as on the modules page.
+     *
+     * @return array<string, string> module code => "Title (CODE)", or the code alone when the module has no title of its own
      */
     private function moduleChoices(int $moduleType): array
     {
@@ -236,7 +239,8 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
 
         foreach (ModuleQuery::create()->filterByType($moduleType)->orderByCode()->find() as $module) {
             $code = (string) $module->getCode();
-            $choices[$code] = (string) ($module->getTitle() ?: $code);
+            $title = trim((string) $module->getTitle());
+            $choices[$code] = '' === $title || $title === $code ? $code : \sprintf('%s (%s)', $title, $code);
         }
 
         return $choices;
