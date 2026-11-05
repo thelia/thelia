@@ -160,6 +160,79 @@ final class OrderEditorRollbackTest extends IntegrationTestCase
         self::assertSame($state, $editor->stateOf($order));
     }
 
+    public function testAnotherConnectionCannotLockTheOrderWhileAnEditIsRunning(): void
+    {
+        [$order, $line] = $this->aPaidOrderWithOneLine();
+        $other = $this->anotherConnection();
+        $blockedDuringTheEdit = null;
+
+        $probe = function () use ($other, $order, &$blockedDuringTheEdit): void {
+            $blockedDuringTheEdit = $this->lockIsRefused($other, (int) $order->getId());
+        };
+
+        $dispatcher = $this->getService(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class);
+        $dispatcher->addListener(\Thelia\Core\Event\TheliaEvents::ORDER_BEFORE_EDIT, $probe);
+
+        try {
+            $this->getService(OrderEditor::class)->edit($order, new OrderEdit(quantities: [(int) $line->getId() => 5.0]));
+        } finally {
+            $dispatcher->removeListener(\Thelia\Core\Event\TheliaEvents::ORDER_BEFORE_EDIT, $probe);
+        }
+
+        self::assertTrue($blockedDuringTheEdit, 'While the edit runs, a second connection must not obtain the lock of the order.');
+        self::assertFalse($this->lockIsRefused($other, (int) $order->getId()), 'Once the edit is committed the lock must be released.');
+    }
+
+    public function testAnEditWaitsForTheLockAnotherConnectionHoldsAndWritesNothingWhenItGivesUp(): void
+    {
+        [$order, $line, $pse] = $this->aPaidOrderWithOneLine();
+        $other = $this->anotherConnection();
+        $stock = (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity();
+
+        $other->beginTransaction();
+        $other->prepare('SELECT `id` FROM `order` WHERE `id` = :id FOR UPDATE')->execute(['id' => $order->getId()]);
+
+        $this->getPropelConnection()->exec('SET SESSION innodb_lock_wait_timeout = 1');
+
+        try {
+            $this->getService(OrderEditor::class)->edit($order, new OrderEdit(quantities: [(int) $line->getId() => 5.0]));
+            self::fail('An edit must wait for the lock held on the order and give up when it is not released.');
+        } catch (\Throwable $timeout) {
+            self::assertStringContainsString('Lock wait timeout', $timeout->getMessage().($timeout->getPrevious()?->getMessage() ?? ''));
+        } finally {
+            $other->rollBack();
+            $this->getPropelConnection()->exec('SET SESSION innodb_lock_wait_timeout = 50');
+        }
+
+        self::assertEqualsWithDelta(2.0, (float) OrderProductQuery::create()->findPk($line->getId())->getQuantity(), 0.0001);
+        self::assertEqualsWithDelta($stock, (float) ProductSaleElementsQuery::create()->findPk($pse->getId())->getQuantity(), 0.0001);
+        self::assertSame(0, OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count());
+    }
+
+    private function anotherConnection(): \PDO
+    {
+        $configuration = \Propel\Runtime\Propel::getServiceContainer()->getConnectionManager('TheliaMain')->getConfiguration();
+        $connection = new \PDO((string) $configuration['dsn'], (string) $configuration['user'], (string) $configuration['password'], [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        $connection->exec('SET SESSION innodb_lock_wait_timeout = 1');
+
+        return $connection;
+    }
+
+    private function lockIsRefused(\PDO $connection, int $orderId): bool
+    {
+        $connection->beginTransaction();
+
+        try {
+            $connection->prepare('SELECT `id` FROM `order` WHERE `id` = :id FOR UPDATE')->execute(['id' => $orderId]);
+
+            return false;
+        } catch (\PDOException $exception) {
+            return 1205 === ($exception->errorInfo[1] ?? null);
+        } finally {
+            $connection->rollBack();
+        }
+    }
+
     /**
      * @return array{0: \Thelia\Model\Order, 1: \Thelia\Model\OrderProduct, 2: \Thelia\Model\ProductSaleElements}
      */
