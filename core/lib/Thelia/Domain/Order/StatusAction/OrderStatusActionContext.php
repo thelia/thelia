@@ -25,12 +25,14 @@ final readonly class OrderStatusActionContext
 {
     /**
      * @param array<string, mixed> $payload
+     * @param array<string, mixed> $editSummary what an order edit changed, empty for a status change
      */
     public function __construct(
         public Order $order,
         public ?OrderStatus $previousStatus,
         public OrderStatus $newStatus,
         public array $payload,
+        public array $editSummary = [],
     ) {
     }
 }

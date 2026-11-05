@@ -163,7 +163,7 @@ final readonly class OrderEditor
         }
 
         try {
-            $this->dispatcher->dispatch(new OrderEditEvent($order, $edit), TheliaEvents::ORDER_AFTER_EDIT);
+            $this->dispatcher->dispatch(new OrderEditEvent($order, $edit, $summary), TheliaEvents::ORDER_AFTER_EDIT);
         } catch (\Throwable $throwable) {
             Tlog::getInstance()->err('A listener of the edit of order {order} failed: {ex}', ['order' => $order->getId(), 'ex' => $throwable]);
         }
