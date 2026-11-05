@@ -1189,6 +1189,7 @@ return [
     'Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)' => 'Horas que una propuesta de escritura de una herramienta de IA espera la aprobación de un administrador antes de caducar (24 si no es válido)',
     'Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)' => 'Vida máxima, en días, de un token entregado a un asistente externo para el servidor MCP (365 si no es válido)',
     'Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)' => 'Dónde aparecen los botones de pago exprés de los módulos de pago, separados por comas entre checkout (vacío: en ningún sitio)',
+    'Offer newsletter sign-up to visitors (1 = yes, 0 = no)' => 'Ofrecer a los visitantes la suscripción al boletín (1 = sí, 0 = no)',
     'Customer groups' => 'Grupos de clientes',
     'Default customer group' => 'Grupo de clientes por defecto',
 ];

@@ -81,15 +81,20 @@ class CustomerCreateForm extends AddressCreateForm
                 'label_attr' => [
                     'for' => 'password_confirmation',
                 ],
-            ])
-            // Add Newsletter
-            ->add('newsletter', CheckboxType::class, [
+            ]);
+
+        // A shop that turned its newsletter off offers no sign-up box
+        if (ConfigQuery::isNewsletterEnabled()) {
+            $this->formBuilder->add('newsletter', CheckboxType::class, [
                 'label' => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
                 'label_attr' => [
                     'for' => 'newsletter',
                 ],
                 'required' => false,
-            ])
+            ]);
+        }
+
+        $this->formBuilder
             ->add('lang_id', IntegerType::class, [
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Preferred language'),

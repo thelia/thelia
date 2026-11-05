@@ -583,4 +583,45 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@customer_group_resource_id, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
     (@customer_group_resource_id, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL);
 
+-- ---------------------------------------------------------------------
+-- Newsletter switch
+--
+-- `newsletter_enabled` turns the visitor sign-up off when it is 0. It is
+-- seeded at 1, so an updated shop keeps offering the newsletter, and
+-- INSERT IGNORE leaves a value the merchant already set. Replaying the script
+-- changes nothing.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('newsletter_enabled', '1', 0, 0, NOW(), NOW());
+
+DROP TEMPORARY TABLE IF EXISTS `config_title_seed`;
+
+CREATE TEMPORARY TABLE `config_title_seed` (
+    `name` VARCHAR(255) NOT NULL,
+    `locale` CHAR(5) NOT NULL,
+    `title` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('newsletter_enabled', 'en_US', 'Offer newsletter sign-up to visitors (1 = yes, 0 = no)'),
+    ('newsletter_enabled', 'fr_FR', 'Proposer l''inscription à la newsletter aux visiteurs (1 = oui, 0 = non)'),
+    ('newsletter_enabled', 'de_DE', 'Besuchern die Newsletter-Anmeldung anbieten (1 = ja, 0 = nein)'),
+    ('newsletter_enabled', 'es_ES', 'Ofrecer a los visitantes la suscripción al boletín (1 = sí, 0 = no)'),
+    ('newsletter_enabled', 'nl_NL', 'Bezoekers de nieuwsbriefaanmelding aanbieden (1 = ja, 0 = nee)'),
+    ('newsletter_enabled', 'ru_RU', 'Предлагать посетителям подписку на рассылку (1 = да, 0 = нет)');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `config_title_seed`.`locale`, `config_title_seed`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name`;
+
+UPDATE `config_i18n`
+INNER JOIN `config` ON `config`.`id` = `config_i18n`.`id`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name` AND `config_title_seed`.`locale` = `config_i18n`.`locale`
+SET `config_i18n`.`title` = `config_title_seed`.`title`
+WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
+
+DROP TEMPORARY TABLE `config_title_seed`;
+
 SET FOREIGN_KEY_CHECKS = 1;

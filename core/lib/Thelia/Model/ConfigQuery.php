@@ -349,6 +349,16 @@ class ConfigQuery extends BaseConfigQuery
         return '0' !== self::read('notify_newsletter_subscription', false);
     }
 
+    /**
+     * Whether the shop offers its visitors a newsletter sign-up: the sign-up
+     * events record nothing, and the registration form has no box, when it is
+     * off. Unsubscribing and the back office stay open whatever the value.
+     */
+    public static function isNewsletterEnabled(): bool
+    {
+        return '0' !== (string) self::read('newsletter_enabled', '1');
+    }
+
     public static function isCustomerEmailConfirmationEnable(): bool
     {
         return (bool) self::read('customer_email_confirmation', false);

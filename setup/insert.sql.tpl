@@ -123,7 +123,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (112, 'ai_tool_approval_ttl_hours', '24', 0, 0, NOW(), NOW()),
 (113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW()),
 (114, 'express_payment_zones', '', 0, 0, NOW(), NOW()),
-(115, 'catalog_has_bundles', '0', 0, 1, NOW(), NOW())
+(115, 'catalog_has_bundles', '0', 0, 1, NOW(), NOW()),
+(116, 'newsletter_enabled', '1', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2372,7 +2373,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (111, '{{ locale }}', {{ intl('Open (1) or close (0) the MCP server through which external assistants call the AI tools with a token', locale) }}, NULL, NULL, NULL),
     (112, '{{ locale }}', {{ intl('Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)', locale) }}, NULL, NULL, NULL),
     (113, '{{ locale }}', {{ intl('Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)', locale) }}, NULL, NULL, NULL),
-    (114, '{{ locale }}', {{ intl('Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (114, '{{ locale }}', {{ intl('Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)', locale) }}, NULL, NULL, NULL),
+    (116, '{{ locale }}', {{ intl('Offer newsletter sign-up to visitors (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
