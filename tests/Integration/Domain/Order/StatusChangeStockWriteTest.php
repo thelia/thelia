@@ -125,7 +125,7 @@ final class StatusChangeStockWriteTest extends ActionIntegrationTestCase
             $this->changeStatus($this->orderAction($decrementer), $order, OrderStatus::CODE_PAID);
             self::fail('A stock the order cannot take must refuse the status change.');
         } catch (TheliaProcessException $refusal) {
-            self::assertStringContainsString((string) $short->getRef(), $refusal->getMessage());
+            self::assertSame($short->getRef().' : Not enough stock', $refusal->getMessage());
         }
 
         self::assertSame([(int) $available->getId(), (int) $short->getId()], $decrementer->decrementedIds(), 'Both rows are asked of the database, in ascending id.');

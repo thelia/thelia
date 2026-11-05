@@ -574,7 +574,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                         continue;
                     }
 
-                    throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);
+                    throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock', previous: $shortage);
                 }
             }
         } finally {
