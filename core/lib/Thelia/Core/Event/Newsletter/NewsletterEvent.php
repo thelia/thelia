@@ -71,6 +71,15 @@ class NewsletterEvent extends ActionEvent
     }
 
     /**
+     * Whether a listener stored a subscriber on the event. A sign-up the shop refused
+     * (newsletter turned off) carries none, and getNewsletter() would fail on it.
+     */
+    public function hasNewsletter(): bool
+    {
+        return isset($this->newsletter);
+    }
+
+    /**
      * @return $this
      */
     public function setEmail(string $email): static
