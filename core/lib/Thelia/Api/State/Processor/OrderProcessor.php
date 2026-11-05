@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
@@ -27,7 +28,11 @@ use Thelia\Api\Resource\OrderStatus as OrderStatusResource;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
+use Thelia\Domain\Payment\Exception\CancellationNeedsCaptureRightException;
+use Thelia\Domain\Payment\Exception\CancellationWaitsForCaptureException;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -57,46 +62,58 @@ final readonly class OrderProcessor implements ProcessorInterface
             return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
         }
 
-        // Every write of an order goes down the locked road, whatever the request says of the
-        // status: the resource carries the status the provider read, which may be older than
-        // the row, and the persistence writes it back. One transaction around the write and
-        // the event: a refused transition must not leave the other fields of the request
-        // written while the client is told the write failed.
-        $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
-        $connection->beginTransaction();
-        $event = null;
+        $this->assertPaymentNamesUntouched($order, $data);
 
-        try {
-            // The first statement of the transaction: the listeners of the status event (the
-            // release of the payment parts asks the modules to give back what they hold) then
-            // read what another request committed before the lock was granted.
-            $lockedStatusId = OrderQuery::create()->lockStatusIdForUpdate((int) $uriVariables['id'], $connection) ?? throw new NotFoundHttpException('No such order.');
-            $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
+        $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
 
-            // The status written back is always the one read under the lock: the column itself is
-            // moved through the event only, and a status another request committed since the
-            // provider read the order is not undone by a request that never spoke of the status.
-            $data->setOrderStatus((new OrderStatusResource())->setId($lockedStatusId));
-            $resource = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-
-            if (null !== $requestedStatusId && $requestedStatusId !== $lockedStatusId) {
-                $order->reload();
-                $event = (new OrderEvent($order))->setStatus($requestedStatusId);
-                $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
-            }
-
-            $connection->commit();
-        } catch (OrderStatusTransitionRefusedException $exception) {
-            $connection->rollBack();
-
-            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
-        } catch (\Throwable $throwable) {
-            $connection->rollBack();
-
-            throw $throwable;
+        if (null === $requestedStatusId) {
+            return $this->persistUnderTheLockOfTheOrder($data, $operation, $uriVariables, $context);
         }
 
-        if (null === $event) {
+        // The status moves through the event, as from the back office, and the other fields
+        // of the request are written by the core in the transaction that writes the status:
+        // after the guards ahead of the core and the transition graph have let the change
+        // through, under the row lock of the order taken as the first statement of that
+        // transaction, so that no other request acts on the order between the two (the
+        // settlement of a payment part waits, then finds the order cancelled). The event
+        // itself is not dispatched inside a transaction of this request: its listeners call
+        // payment modules and write the payment journal under its own lock, which a
+        // transaction held open around them would outlive.
+        $resource = null;
+        $event = (new OrderEvent($order))
+            ->setStatus($requestedStatusId)
+            ->writeWithStatus(function (int $lockedStatusId) use ($data, $operation, $uriVariables, $context, &$resource): void {
+                // The status column is moved by the core only: the one written back with the
+                // other fields is the one read under the lock.
+                $data->setOrderStatus((new OrderStatusResource())->setId($lockedStatusId));
+                $resource = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+            });
+
+        try {
+            $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+        } catch (OrderStatusTransitionRefusedException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (CancellationNeedsCaptureRightException $exception) {
+            throw new AccessDeniedHttpException($exception->getMessage(), $exception);
+        } catch (CancellationWaitsForCaptureException $exception) {
+            throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
+        } catch (\InvalidArgumentException $exception) {
+            // The core refuses to move an order whose row is gone under the lock.
+            if (!OrderQuery::create()->filterById((int) $uriVariables['id'])->exists()) {
+                throw new NotFoundHttpException('No such order.', $exception);
+            }
+
+            throw $exception;
+        }
+
+        // A listener ahead of the core stopped the change without refusing it: the status
+        // stays, and the other fields are written as for a request that leaves it.
+        if (null === $resource) {
+            return $this->persistUnderTheLockOfTheOrder($data, $operation, $uriVariables, $context);
+        }
+
+        // The order already held the requested status under the lock: no transition.
+        if (null === $event->getPreviousStatusId()) {
             return $resource;
         }
 
@@ -105,6 +122,70 @@ final readonly class OrderProcessor implements ProcessorInterface
             propelModel: $event->getOrder(),
             context: $operation->getNormalizationContext() ?? [],
         );
+    }
+
+    /**
+     * Every write of an order goes down the locked road, whatever the request says of the
+     * status: the resource carries the status the provider read, which may be older than
+     * the row, and the persistence writes it back. The lock is the first statement of the
+     * transaction, so that what is read afterwards is what another request committed
+     * before the lock was granted.
+     *
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
+     */
+    private function persistUnderTheLockOfTheOrder(OrderResource $data, Operation $operation, array $uriVariables, array $context): mixed
+    {
+        $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $lockedStatusId = OrderQuery::create()->lockStatusIdForUpdate((int) $uriVariables['id'], $connection) ?? throw new NotFoundHttpException('No such order.');
+
+            // The status written back is always the one read under the lock: the column itself is
+            // moved through the event only, and a status another request committed since the
+            // provider read the order is not undone by a request that never spoke of the status.
+            $data->setOrderStatus((new OrderStatusResource())->setId($lockedStatusId));
+            $resource = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
+
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Once money moved on the order, its payment journal names the provider reference and
+     * the module of each movement: a refund or a release goes to the reference of the order,
+     * through its module. Changing either by hand would send them to another order's
+     * transaction, so they are refused; an order with no journal line takes them as before.
+     */
+    private function assertPaymentNamesUntouched(Order $order, OrderResource $data): void
+    {
+        $referenceChanged = self::referenceOf($data->getTransactionRef()) !== self::referenceOf($order->getTransactionRef());
+        $moduleChanged = $data->getPaymentModule()?->getId() !== $order->getPaymentModuleId();
+
+        if (!$referenceChanged && !$moduleChanged) {
+            return;
+        }
+
+        if (!OrderPaymentTransactionQuery::create()->filterByOrderId((int) $order->getId())->exists()) {
+            return;
+        }
+
+        throw new UnprocessableEntityHttpException(\sprintf('Order %s has a payment journal: its transaction reference and payment module are no longer changed by hand.', (string) $order->getRef()));
+    }
+
+    /**
+     * No reference and an empty one are the same: neither names a transaction.
+     */
+    private static function referenceOf(?string $transactionRef): ?string
+    {
+        return null === $transactionRef || '' === trim($transactionRef) ? null : $transactionRef;
     }
 
     /**
