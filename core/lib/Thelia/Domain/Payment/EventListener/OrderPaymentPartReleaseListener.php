@@ -32,7 +32,7 @@ use Thelia\Domain\Payment\Service\OrderPaymentPartSettlement;
  * from cancelled, is refused by OrderPaymentPartPaidStatusGuardListener while an instant part
  * of it is released; forced from the back office, it keeps its parts released.
  *
- * Inside a transaction the caller opened (the admin API), the parts are released, and the
+ * Inside a transaction the caller opened (a module may), the parts are released, and the
  * modules told, before that transaction commits: see OrderPaymentPartSettlement.
  *
  * Refunded orders are left alone: a refund across several parts is another matter.
