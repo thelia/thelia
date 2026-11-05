@@ -28,6 +28,7 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\Module;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductQuery;
@@ -36,6 +37,7 @@ use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusAction;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Module\BaseModule;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Order\MovesOrders;
 use Thelia\Tests\Support\Stock\TestCallerTransaction;
@@ -54,6 +56,28 @@ final class AdjustStockActionTest extends ActionIntegrationTestCase
         ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
         ConfigQuery::resetCache();
         parent::tearDown();
+    }
+
+    /**
+     * A title can be a sentence that names no module ("There's nothing to pay for this order"):
+     * the back office lists the modules of a limit as the modules page does.
+     */
+    public function testTheModulesOfALimitAreNamedByTheirTitleAndTheirCode(): void
+    {
+        (new Module())->setCode('StockLimitTitled')->setType(BaseModule::PAYMENT_MODULE_TYPE)->setActivate(1)
+            ->setLocale('en_US')->setTitle('Nothing to pay')->save();
+        (new Module())->setCode('StockLimitUntitled')->setType(BaseModule::PAYMENT_MODULE_TYPE)->setActivate(1)->save();
+
+        $choices = [];
+
+        foreach ($this->getService(AdjustStockAction::class)->describePayload() as $field) {
+            if (AdjustStockAction::FIELD_PAYMENT_MODULES === $field->name) {
+                $choices = $field->choices;
+            }
+        }
+
+        self::assertSame('Nothing to pay (StockLimitTitled)', $choices['StockLimitTitled'] ?? null);
+        self::assertSame('StockLimitUntitled', $choices['StockLimitUntitled'] ?? null);
     }
 
     public function testADecreaseTheStockCannotServeRefusesTheStatusChange(): void
