@@ -76,6 +76,7 @@ readonly class RecordOrderHistoryListener
 
     public function __construct(
         private OrderHistoryRecorder $orderHistoryRecorder,
+        private ?StockOperationActionListener $stockOperations = null,
     ) {
         $this->statusCodeBeforeChange = new \WeakMap();
         $this->addressBeforeCorrection = new \WeakMap();
@@ -109,6 +110,7 @@ readonly class RecordOrderHistoryListener
             $fromStatusCode,
             $toStatusCode,
             $event->getSourceModuleCode(),
+            $this->stockOperations?->takeDecisionFor($order),
         );
     }
 

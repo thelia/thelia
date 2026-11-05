@@ -44,7 +44,8 @@ final class OrderHistoryRecorderTest extends ActionIntegrationTestCase
         self::assertCount(1, $entries);
 
         self::assertSame(
-            ['from' => OrderStatus::CODE_NOT_PAID, 'to' => OrderStatus::CODE_PAID],
+            // The order of a cheque takes its stock when paid: the line says so, and that the core rule chose it.
+            ['from' => OrderStatus::CODE_NOT_PAID, 'to' => OrderStatus::CODE_PAID, 'stock' => 'decrease', 'stock_action_id' => null],
             $entries[0]->getDecodedPayload(),
         );
     }

@@ -27,6 +27,7 @@ use Thelia\Domain\Order\StatusAction\Effect\AllocateInvoiceRefAction;
 use Thelia\Domain\Order\StatusAction\Effect\ReleaseCouponsAction;
 use Thelia\Domain\Order\StatusAction\Effect\SendCustomerEmailAction;
 use Thelia\Domain\Order\StatusAction\Effect\SendShopManagersEmailAction;
+use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionInterface;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionRegistry;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionRunner;
@@ -200,8 +201,76 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 
     public function testActionsRunInPositionOrder(): void
     {
-        // The stock ends at 10 - 3 = 7 only if the increase runs before the decrease:
-        // with availability checked, decreasing 3 from 0 would be refused.
+        $ran = new \ArrayObject();
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, 'recording_second', [], 1);
+        $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, 'recording_first', [], 2);
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $event = new OrderEvent($order);
+        $event->setPreviousStatusId($this->orderStatus(OrderStatus::CODE_PAID)->getId());
+        $event->setStatus($this->orderStatus(OrderStatus::CODE_PROCESSING)->getId());
+
+        $first = new class($ran) implements OrderStatusActionInterface {
+            public function __construct(private readonly \ArrayObject $ran)
+            {
+            }
+
+            public static function getType(): string
+            {
+                return 'recording_first';
+            }
+
+            public function describePayload(): array
+            {
+                return [];
+            }
+
+            public function normalizePayload(array $payload): array
+            {
+                return [];
+            }
+
+            public function execute(OrderStatusActionContext $context): void
+            {
+                $this->ran[] = self::getType();
+            }
+        };
+        $second = new class($ran) implements OrderStatusActionInterface {
+            public function __construct(private readonly \ArrayObject $ran)
+            {
+            }
+
+            public static function getType(): string
+            {
+                return 'recording_second';
+            }
+
+            public function describePayload(): array
+            {
+                return [];
+            }
+
+            public function normalizePayload(array $payload): array
+            {
+                return [];
+            }
+
+            public function execute(OrderStatusActionContext $context): void
+            {
+                $this->ran[] = self::getType();
+            }
+        };
+
+        $this->runnerWith($first, $second)->onOrderStatusUpdate($event);
+
+        self::assertSame(['recording_second', 'recording_first'], $ran->getArrayCopy());
+    }
+
+    /**
+     * Of two stock actions on the same change, the first in position order decides the stock
+     * operation, and the later one does not move the stock a second time.
+     */
+    public function testOnlyTheFirstStockActionInPositionOrderMovesTheStock(): void
+    {
         $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, AdjustStockAction::getType(), [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE], 2);
         $this->action(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PROCESSING, AdjustStockAction::getType(), [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_INCREASE], 1);
         $productSaleElements = $this->createProductSaleElements(0);
@@ -210,7 +279,7 @@ final class OrderStatusActionRunnerTest extends ActionIntegrationTestCase
 
         $this->moveOrderTo($order, OrderStatus::CODE_PROCESSING);
 
-        self::assertSame(0.0, $this->stockOf($productSaleElements));
+        self::assertSame(3.0, $this->stockOf($productSaleElements));
         self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($order->getId())->count());
     }
 

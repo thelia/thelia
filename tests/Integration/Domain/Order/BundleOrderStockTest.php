@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Thelia\Action\Order as OrderAction;
 use Thelia\Action\OrderReturn as OrderReturnAction;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
@@ -35,6 +36,7 @@ use Thelia\Model\OrderReturnLine;
 use Thelia\Model\OrderReturnStatus;
 use Thelia\Model\OrderReturnStatusQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\Product;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Integration\Domain\Catalog\Bundle\BuildsBundles;
@@ -245,9 +247,19 @@ final class BundleOrderStockTest extends ActionIntegrationTestCase
         $this->manageTheStockWhenTheOrderIsPlaced();
         [$order, $helmet, $bike] = $this->orderOfAPackWhoseFirstComponentHasTheHigherId();
 
-        $updated = $this->stockRowsUpdatedDuring(fn () => $order->setCancelled($this->dispatcher));
+        $decrementer = new RecordingStockDecrementer($this->getService(SaleUnitStockResolver::class));
+        $real = $this->getService(OrderAction::class);
+        $collaborators = (fn (): array => get_object_vars($this))->call($real);
+        $collaborators['stockDecrementer'] = $decrementer;
+        $action = new OrderAction(...$collaborators);
 
-        self::assertSame([$this->saleElementsIdOf($helmet), $this->saleElementsIdOf($bike)], $updated, 'The rows are locked by ascending id, as the order took them.');
+        $action->updateStatus(
+            (new OrderEvent($order))->setStatus(OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED)->getId()),
+            TheliaEvents::ORDER_UPDATE_STATUS,
+            $this->dispatcher,
+        );
+
+        self::assertSame([$this->saleElementsIdOf($helmet), $this->saleElementsIdOf($bike)], $decrementer->incrementedIds(), 'The rows are locked by ascending id, as the order took them.');
     }
 
     public function testTheAdjustmentOfAStatusMovesTheStockInTheAscendingIdOfTheSaleElements(): void
@@ -398,23 +410,6 @@ final class BundleOrderStockTest extends ActionIntegrationTestCase
         $this->addBundleLine($cart, $pack, [(int) $bikeItem->getId() => '1', (int) $helmetItem->getId() => '1']);
 
         return [$this->placeOrder($cart, $customer, $currency, $lang), $helmet, $bike, $customer, $withASimpleLineFirst ? $lock : null];
-    }
-
-    /**
-     * @return list<int> the sale elements whose stock row the model updates, in the order of the statements
-     */
-    private function stockRowsUpdatedDuring(callable $run): array
-    {
-        $updated = [];
-        $statements = $this->statementsDuring($run);
-
-        foreach ($statements as $statement) {
-            if (1 === preg_match('/^UPDATE `product_sale_elements` SET .* WHERE `product_sale_elements`.`id`=(\d+)$/s', $statement, $match)) {
-                $updated[] = (int) $match[1];
-            }
-        }
-
-        return $updated;
     }
 
     /**

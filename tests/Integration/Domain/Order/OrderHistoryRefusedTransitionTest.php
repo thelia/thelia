@@ -91,7 +91,7 @@ final class OrderHistoryRefusedTransitionTest extends ActionIntegrationTestCase
 
         self::assertNotNull($entry, 'An allowed status change is recorded the way it always was.');
         self::assertSame(
-            ['from' => OrderStatus::CODE_SENT, 'to' => OrderStatus::CODE_REFUNDED],
+            ['from' => OrderStatus::CODE_SENT, 'to' => OrderStatus::CODE_REFUNDED, 'stock' => 'increase', 'stock_action_id' => null],
             $entry->getDecodedPayload(),
         );
     }

@@ -20,6 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\Exception\InvalidOrderStatusActionPayloadException;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
+use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\Exception\EmailNotSentException;
@@ -81,6 +82,13 @@ final class OrderStatusActionRunner
         $order = $event->getOrder();
 
         foreach ($this->actionsFor($previousStatusId, $newStatusId) as $action) {
+            // A stock action is not run here: StockOperationActionResolver already chose the
+            // stock operation with it, and the core moved the stock in the transaction of the
+            // status change. Running it again would move the stock twice.
+            if (AdjustStockAction::getType() === $action->getActionType()) {
+                continue;
+            }
+
             $this->run($action, $order, static fn (array $payload): OrderStatusActionContext => $context($payload, $order, $previousStatus, $newStatus));
         }
     }
@@ -180,7 +188,11 @@ final class OrderStatusActionRunner
         return \sprintf('The action failed (%s). See the server log for details.', $throwable::class);
     }
 
-    private function recordFailure(OrderStatusAction $action, Order $order, string $message): void
+    /**
+     * Keeps a failure for the back office to show on the action, and in the server log.
+     * Never throws: a failure that cannot be kept must not undo the status change.
+     */
+    public function recordFailure(OrderStatusAction $action, Order $order, string $message): void
     {
         Tlog::getInstance()->addError(\sprintf(
             'Order status action #%d (%s) failed on order %s: %s',

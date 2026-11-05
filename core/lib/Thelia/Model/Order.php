@@ -30,6 +30,7 @@ use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Map\OrderVersionTableMap;
 use Thelia\Module\BaseModuleInterface;
 use Thelia\Module\PaymentModuleInterface;
 
@@ -949,6 +950,19 @@ class Order extends BaseOrder
         );
 
         return $event->getManageStock() ?? $paymentModule->manageStockOnCreation();
+    }
+
+    /**
+     * Whether the order already left the status it was placed with, read from its versions:
+     * until then, the stock it took at creation (or did not take) is still what decides.
+     */
+    public function hasChangedStatusSinceCreation(): bool
+    {
+        return OrderVersionQuery::create()
+            ->filterById($this->getId())
+            ->select(OrderVersionTableMap::COL_STATUS_ID)
+            ->distinct()
+            ->count() > 1;
     }
 
     protected function getCart(): ?Cart

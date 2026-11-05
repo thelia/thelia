@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Order\StatusAction\StockOperationDecision;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\OrderHistoryTableMap;
 use Thelia\Model\OrderHistory;
@@ -205,11 +206,16 @@ final readonly class OrderHistoryRecorder
         );
     }
 
+    /**
+     * @param StockOperationDecision|null $stockDecision the stock operation the change applied: kept on
+     *                                                   the line when it moved the stock or a stock action chose it
+     */
     public function recordStatusChanged(
         int $orderId,
         ?string $fromStatusCode,
         string $toStatusCode,
         ?string $moduleCode = null,
+        ?StockOperationDecision $stockDecision = null,
     ): void {
         // A transition to the status the order already has is not a change: the back
         // office resubmits the same status, and a gateway notifies "paid" on an order
@@ -218,10 +224,17 @@ final readonly class OrderHistoryRecorder
             return;
         }
 
+        $payload = ['from' => $fromStatusCode, 'to' => $toStatusCode];
+
+        if (null !== $stockDecision && ($stockDecision->movesStock() || null !== $stockDecision->actionId)) {
+            $payload['stock'] = $stockDecision->operationName();
+            $payload['stock_action_id'] = $stockDecision->actionId;
+        }
+
         $this->record(
             $orderId,
             OrderHistoryEventType::STATUS_CHANGED->value,
-            ['from' => $fromStatusCode, 'to' => $toStatusCode],
+            $payload,
             moduleCode: $moduleCode,
         );
     }
