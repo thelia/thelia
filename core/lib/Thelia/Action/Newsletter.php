@@ -36,6 +36,14 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
 
     public function subscribe(NewsletterEvent $event): void
     {
+        if (!ConfigQuery::isNewsletterEnabled()) {
+            // Nothing is recorded, and the listeners behind this one (confirmation email,
+            // module synchronisations) must not act on an address that was not kept.
+            $event->stopPropagation();
+
+            return;
+        }
+
         // test if the email is already registered and unsubscribed
         if (null === $newsletter = NewsletterQuery::create()->findOneByEmail($event->getEmail())) {
             $newsletter = new NewsletterModel();
@@ -76,9 +84,14 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         $nl->setEmail($event->getEmail())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
-            ->setUnsubscribed(0)
-            ->setLocale($event->getLocale())
-            ->save();
+            ->setLocale($event->getLocale());
+
+        // An address that left stays out while the shop has no newsletter.
+        if (ConfigQuery::isNewsletterEnabled()) {
+            $nl->setUnsubscribed(0);
+        }
+
+        $nl->save();
 
         $event->setNewsletter($nl);
     }
