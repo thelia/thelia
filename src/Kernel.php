@@ -27,6 +27,14 @@ class Kernel extends TheliaKernel
         $container->import('../config/{packages}/*.yaml');
         $container->import('../config/{packages}/'.$this->environment.'/*.yaml');
 
+        // What only the suites need (tests/Support) is registered here, never in the core's own
+        // configuration, which names no class of the autoload-dev.
+        $testServices = \dirname(__DIR__).'/tests/Support/config/services.php';
+
+        if ('test' === $this->environment && is_file($testServices)) {
+            $container->import($testServices);
+        }
+
         if (is_file(\dirname(__DIR__).'/config/services.yaml')) {
             $container->import('../config/services.yaml');
             $container->import('../config/{services}_'.$this->environment.'.yaml');

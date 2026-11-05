@@ -16,6 +16,9 @@ namespace Thelia\Domain\Catalog\Bundle;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Stock\DatabaseReservedQuantity;
+use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
@@ -29,7 +32,8 @@ use Thelia\Model\ProductSaleElementsQuery;
  * is not a bundle itself. A bundle one of whose retained components is not sellable is not.
  *
  * The stock is the one the cart reads: the own stock of the current sale unit when it keeps
- * one for the sale element, the national counter otherwise.
+ * one for the sale element, the national counter otherwise, plus what the sale mode of the
+ * component allows below zero.
  *
  * Whether the current visitor may see the product of a component (a private drop, a rule of a
  * module) is a different question with a different answer for each visitor, asked of
@@ -41,6 +45,7 @@ final readonly class BundleComponentReader
     public function __construct(
         private SaleUnitAvailableStock $saleUnitAvailableStock,
         private ProductVisibility $productVisibility,
+        private ?DatabaseReservedQuantity $reservedQuantity = null,
     ) {
     }
 
@@ -73,13 +78,17 @@ final readonly class BundleComponentReader
     }
 
     /**
-     * One query for the sale elements, one more for the stock of the sale unit when a unit is resolved.
+     * One query for the sale elements, one more for the stock of the sale unit when a unit is resolved,
+     * one more for what the carts hold when the shop reserves its stock.
      *
      * @param list<int|null> $productSaleElementsIds a null (an orphaned item) is ignored
+     * @param int|null       $excludedCartId         the cart asking, whose own reservations are not held against it;
+     *                                               null counts what every cart holds
+     * @param int|null       $saleUnitId             the sale unit of that cart, for the stock its reservations are counted on
      *
      * @return array<int, BundleComponent> keyed by sale element id; a sale element that does not exist is absent
      */
-    public function read(array $productSaleElementsIds): array
+    public function read(array $productSaleElementsIds, ?int $excludedCartId = null, ?int $saleUnitId = null): array
     {
         $productSaleElementsIds = array_values(array_unique(array_map('intval', array_filter($productSaleElementsIds, static fn (?int $id): bool => null !== $id))));
 
@@ -93,21 +102,32 @@ final readonly class BundleComponentReader
             ->withColumn('Product.Visible', 'ProductVisible')
             ->withColumn('Product.IsBundle', 'ProductIsBundle')
             ->withColumn('Product.Virtual', 'ProductVirtual')
-            ->select(['Id', 'ProductId', 'Quantity', 'Visible', 'ProductVisible', 'ProductIsBundle', 'ProductVirtual'])
+            ->select(['Id', 'ProductId', 'Quantity', 'OutOfStockPolicy', 'PreorderLimit', 'Visible', 'ProductVisible', 'ProductIsBundle', 'ProductVirtual'])
             ->find();
 
         $ownQuantities = $this->saleUnitAvailableStock->ownQuantities($productSaleElementsIds);
+        $reserved = $this->reservedQuantity?->reservedByOtherCartsOf($productSaleElementsIds, $saleUnitId, $excludedCartId) ?? [];
         $components = [];
 
         foreach ($rows as $row) {
             $id = (int) $row['Id'];
+
+            // The one rule of what may be sold (SellableStock): the stock the cart reads, and
+            // what the sale mode of the component allows below zero, less what the carts hold.
+            $physical = $ownQuantities[$id] ?? (float) $row['Quantity'];
+            $ceiling = SellableStock::ceilingOf(
+                $physical,
+                OutOfStockPolicy::fromStored(null === $row['OutOfStockPolicy'] ? null : (int) $row['OutOfStockPolicy']),
+                null === $row['PreorderLimit'] ? null : (float) $row['PreorderLimit'],
+            );
 
             $components[$id] = new BundleComponent(
                 $id,
                 (int) $row['ProductId'],
                 self::satisfiesSellability((bool) $row['Visible'], (bool) $row['ProductVisible'], (bool) $row['ProductIsBundle']),
                 (bool) $row['ProductVirtual'],
-                $ownQuantities[$id] ?? (float) $row['Quantity'],
+                null === $ceiling ? 0.0 : max(0.0, $ceiling - ($reserved[$id] ?? 0.0)),
+                null === $ceiling,
             );
         }
 

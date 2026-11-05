@@ -19,6 +19,7 @@ use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\QuickOrder\DTO\Candidate;
@@ -184,13 +185,15 @@ final readonly class ReferenceResolver
         $isBundle = isset($bundleStocks[$productId]);
 
         if (ConfigQuery::checkAvailableStock() && ($isBundle || 0 === (int) $chosen->getProduct()->getVirtual())) {
-            $stock = $isBundle ? (float) $bundleStocks[$productId] : (float) $chosen->getQuantity();
+            // What a sale element may sell, below zero stock included when its sale mode allows it
+            // (SellableStock); null when it sells without limit.
+            $stock = $isBundle ? (float) $bundleStocks[$productId] : SellableStock::ceilingOfPse($chosen);
 
-            if ($stock <= 0) {
+            if (null !== $stock && $stock <= 0) {
                 return new QuickOrderLine($line->reference, $line->quantity, LineStatus::Unavailable, $saleElementsId, $productId, $title, availableQuantity: 0.0);
             }
 
-            if ($line->quantity > $stock) {
+            if (null !== $stock && $line->quantity > $stock) {
                 return new QuickOrderLine($line->reference, $line->quantity, LineStatus::QuantityRefused, $saleElementsId, $productId, $title, availableQuantity: $stock);
             }
         }

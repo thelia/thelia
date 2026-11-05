@@ -20,6 +20,7 @@ use Thelia\Core\TheliaKernel;
 use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Bundle\Exception\BundleWriteConflictException;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Order\Exception\OrderStatusChangeConflictException;
 use Thelia\Domain\Payment\Exception\CancelledOrderPaymentRefusedException;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Payment\Exception\GuestCannotStorePaymentMethodException;
@@ -73,6 +74,9 @@ return static function (ContainerConfigurator $container): void {
             // them and answer on their own; the admin ones let them through.
             BundleDefinitionException::class => 422,
             BundleWriteConflictException::class => 409,
+            // A change of status the database broke a lock conflict of (deadlock): nothing was
+            // written, asked again it is judged on what the other request left.
+            OrderStatusChangeConflictException::class => 409,
             InvalidBundleCompositionException::class => 422,
         ],
         'defaults' => [

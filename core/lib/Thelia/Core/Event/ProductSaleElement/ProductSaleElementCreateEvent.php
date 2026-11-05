@@ -18,6 +18,8 @@ use Thelia\Model\Product;
 
 class ProductSaleElementCreateEvent extends ProductSaleElementEvent
 {
+    use StockSettingsFieldsTrait;
+
     protected $product;
     protected $attribute_av_list;
     protected $currency_id;

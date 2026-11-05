@@ -20,6 +20,8 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Catalog\Bundle\BundleAvailability;
+use Thelia\Domain\Catalog\Stock\ReservedQuantityProvider;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
@@ -75,6 +77,7 @@ class OfferedCartLineService implements ResetInterface
         private readonly CartLinePricer $cartLinePricer,
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
         private readonly ?BundleAvailability $bundleAvailability = null,
+        private readonly ?ReservedQuantityProvider $reservedQuantityProvider = null,
     ) {
     }
 
@@ -241,7 +244,7 @@ class OfferedCartLineService implements ResetInterface
     private function updateOfferedLine(CartItem $line, OfferedLineRequest $request, string $label, Cart $cart): bool
     {
         $productSaleElements = $line->getProductSaleElements();
-        $grantable = $this->grantableQuantity($line->getProduct(), $productSaleElements, $request->quantity);
+        $grantable = $this->grantableQuantity($line->getProduct(), $productSaleElements, $request->quantity, $cart);
 
         if (0 === $grantable) {
             $this->unavailablePromotions[$request->couponId] = $label;
@@ -295,7 +298,7 @@ class OfferedCartLineService implements ResetInterface
             return false;
         }
 
-        $grantable = $this->grantableQuantity($product, $productSaleElements, $request->quantity);
+        $grantable = $this->grantableQuantity($product, $productSaleElements, $request->quantity, $cart);
 
         if (0 === $grantable) {
             $this->unavailablePromotions[$request->couponId] = $label;
@@ -355,7 +358,7 @@ class OfferedCartLineService implements ResetInterface
      * is not checked (config, virtual product), what is left when it is, for a bundle
      * what its components supply. Zero means the promotion cannot be granted at all.
      */
-    private function grantableQuantity(Product $product, ProductSaleElements $productSaleElements, int $requestedQuantity): int
+    private function grantableQuantity(Product $product, ProductSaleElements $productSaleElements, int $requestedQuantity, Cart $cart): int
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return $requestedQuantity;
@@ -372,7 +375,16 @@ class OfferedCartLineService implements ResetInterface
             return $requestedQuantity;
         }
 
-        return max(0, min($requestedQuantity, (int) $productSaleElements->getQuantity()));
+        // What the sale element may still sell, below zero stock included when its sale mode allows it,
+        // less what the other carts hold of it.
+        $ceiling = SellableStock::ceilingOfPse($productSaleElements);
+        $cartId = (int) $cart->getId();
+
+        if (null !== $ceiling && null !== $this->reservedQuantityProvider) {
+            $ceiling -= $this->reservedQuantityProvider->reservedByOtherCarts((int) $productSaleElements->getId(), $cart->getSaleUnitId(), $cartId > 0 ? $cartId : null);
+        }
+
+        return null === $ceiling ? $requestedQuantity : max(0, min($requestedQuantity, (int) $ceiling));
     }
 
     /**

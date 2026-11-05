@@ -170,6 +170,7 @@ final readonly class BundleCompositionResolver
         }
 
         return $component->virtual
+            || $component->unlimited
             || !ConfigQuery::checkAvailableStock()
             || (int) round(max(0.0, $component->availableQuantity) * BundleDecimal::SCALE) >= $micro;
     }

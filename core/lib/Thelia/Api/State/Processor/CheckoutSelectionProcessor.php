@@ -20,6 +20,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
@@ -42,6 +43,7 @@ use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
 use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
+use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Address;
@@ -96,7 +98,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
                 $data instanceof CheckoutInvoiceAddressInput => $this->selectInvoiceAddress($cart, $data),
                 $data instanceof CheckoutDeliveryModuleInput => $this->selectDeliveryModule($cart, $data),
                 $data instanceof CheckoutPaymentModuleInput => $this->selectPaymentModule($cart, $data),
-                $data instanceof CheckoutDeliveryDateInput => $this->cartFacade->chooseDeliveryDate($cart, $data->deliveryDate, $data->deliverySlotId),
+                $data instanceof CheckoutDeliveryDateInput => $this->chooseDeliveryDate($cart, $data),
                 default => throw new UnprocessableEntityHttpException('Unsupported checkout selection.'),
             };
         } catch (GuestCheckoutNotAllowedException $refusal) {
@@ -126,6 +128,11 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             // A stored method of another customer reads like a missing one, and none of
             // these messages carries the provider reference.
             throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
+        } catch (StockShortageException $shortage) {
+            // A line the stock left by the other carts no longer covers, or a tie with another
+            // cart: a conflict with the state of the stock, as when the order is placed. The
+            // message names the product to take out, or asks to try again.
+            throw new ConflictHttpException($shortage->getMessage(), $shortage);
         }
 
         // The selection wrote through events and services that hold their own instances
@@ -143,13 +150,28 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
     }
 
     /**
+     * A step of the checkout like the others: the stock of the lines is held again once the day is chosen.
+     *
+     * @throws StockShortageException the stock of a line is no longer there for this cart
+     */
+    private function chooseDeliveryDate(Cart $cart, CheckoutDeliveryDateInput $input): void
+    {
+        $this->cartFacade->chooseDeliveryDate($cart, $input->deliveryDate, $input->deliverySlotId);
+        $this->checkoutFacade->holdStock($cart);
+    }
+
+    /**
      * @throws PropelException
+     * @throws StockShortageException the stock of a line is no longer there for this cart
      */
     private function selectDeliveryAddress(Cart $cart, CheckoutDeliveryAddressInput $input): void
     {
         $address = $this->addressOfTheAccount($cart, $input->addressId);
 
         if ($this->isAlreadyCopiedOnto($cart->getCartAddressRelatedByAddressDeliveryId(), $address)) {
+            // Nothing to select, still a step of the checkout: the stock is held again.
+            $this->checkoutFacade->holdStock($cart);
+
             return;
         }
 
@@ -158,12 +180,15 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
 
     /**
      * @throws PropelException
+     * @throws StockShortageException the stock of a line is no longer there for this cart
      */
     private function selectInvoiceAddress(Cart $cart, CheckoutInvoiceAddressInput $input): void
     {
         $address = $this->addressOfTheAccount($cart, $input->addressId);
 
         if ($this->isAlreadyCopiedOnto($cart->getCartAddressRelatedByAddressInvoiceId(), $address)) {
+            $this->checkoutFacade->holdStock($cart);
+
             return;
         }
 
@@ -172,6 +197,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
 
     /**
      * @throws PropelException
+     * @throws StockShortageException the stock of a line is no longer there for this cart
      */
     private function selectDeliveryModule(Cart $cart, CheckoutDeliveryModuleInput $input): void
     {
@@ -181,6 +207,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         $this->cartGuard->refuseACarrierTheProductsExclude($cart, $module->getId());
 
         if ($cart->getDeliveryModuleId() === $module->getId()) {
+            $this->checkoutFacade->holdStock($cart);
+
             return;
         }
 
@@ -191,6 +219,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
      * @throws PropelException
      * @throws CustomerPaymentMethodException
      * @throws InvalidPaymentException        when the group of the buyer does not list the module
+     * @throws StockShortageException         the stock of a line is no longer there for this cart
      */
     private function selectPaymentModule(Cart $cart, CheckoutPaymentModuleInput $input): void
     {
@@ -203,6 +232,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             $cart->getPaymentModuleId() === $module->getId()
             && $cart->getCustomerPaymentMethodId() === $input->customerPaymentMethodId
         ) {
+            $this->checkoutFacade->holdStock($cart);
+
             return;
         }
 

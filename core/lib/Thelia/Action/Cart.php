@@ -44,6 +44,7 @@ use Thelia\Domain\Cart\Service\CartLineVisibility;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\SaleUnit\Cart\CartLineChange;
@@ -101,6 +102,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?CartLineVisibility $cartLineVisibility = null,
         protected ?CartLineAvailability $cartLineAvailability = null,
         protected ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
+        protected ?SellableStock $sellableStock = null,
     ) {
     }
 
@@ -306,7 +308,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         // The stock of the sale unit the visitor buys from, when it keeps one: the
         // national counter may well cover a quantity the unit itself cannot sell.
-        $saleUnitQuantity = $this->saleUnitAvailableStock?->ownQuantity((int) $productSaleElements->getId());
+        $ownStockQuantity = $this->saleUnitAvailableStock?->ownQuantity((int) $productSaleElements->getId());
+        $saleUnitQuantity = $ownStockQuantity;
 
         // The line of a bundle is supplied by its components, whose stock the guard of
         // CART_ADDITEM has already judged out loud (BundleCartAdditionGuard): the stock of the
@@ -316,17 +319,25 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $saleUnitQuantity = ConfigQuery::checkAvailableStock()
                 ? ($event->getBundleAvailability() ?? $this->cartLineAvailability?->forLine($productSaleElements, $bundleComposition))
                 : null;
-        } elseif (null !== $saleUnitQuantity || !$appends) {
-            // A new line is checked here, whoever adds it (the cart form, the API, a
-            // module through CartFacade): nothing else stands between it and the cart.
-            // An addition to a line on the national counter keeps the cap of
-            // CartItem::addQuantity().
-            $this->assertStock(
-                $productSaleElements,
-                ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity
-                    + $this->quantityInOtherLines($cart, $productSaleElements, $appends ? $cartItem : null),
-                $saleUnitQuantity ?? (float) $productSaleElements->getQuantity(),
-            );
+        } else {
+            // What the cart may hold of the sale element, from the one place that decides it:
+            // its stock, what its sale mode allows below zero, less what other carts reserve.
+            // Null when nothing limits it.
+            $sellableQuantity = $this->sellableQuantityFrom($productSaleElements, $cart, $ownStockQuantity ?? (float) $productSaleElements->getQuantity());
+            $saleUnitQuantity = $sellableQuantity ?? \INF;
+
+            if (null !== $ownStockQuantity || !$appends) {
+                // A new line is checked here, whoever adds it (the cart form, the API, a
+                // module through CartFacade): nothing else stands between it and the cart.
+                // An addition to a line on the national counter keeps the cap of
+                // CartItem::addQuantity(), at the sellable quantity.
+                $this->assertStock(
+                    $productSaleElements,
+                    ($appends ? (float) $cartItem->getQuantity() : 0.0) + $quantity
+                        + $this->quantityInOtherLines($cart, $productSaleElements, $appends ? $cartItem : null),
+                    $sellableQuantity,
+                );
+            }
         }
 
         if ($appends) {
@@ -590,7 +601,40 @@ class Cart extends BaseAction implements EventSubscriberInterface
             return $this->cartLineAvailability?->forLine($cartItem->getProductSaleElements(), $composition);
         }
 
-        return $this->saleUnitAvailableStock?->ownQuantity((int) $cartItem->getProductSaleElementsId());
+        // The ceiling of a line is the sellable quantity of its sale element; a sale element that
+        // sells without limit has none (INF), and a virtual product is never checked.
+        $productSaleElements = $cartItem->getProductSaleElements();
+
+        return $this->sellableQuantityOf($productSaleElements, $cartItem->getCart()) ?? \INF;
+    }
+
+    /**
+     * What a cart may hold of a sale element: the stock it sells from (the own stock of the
+     * sale unit when it keeps one, the national counter otherwise), what the sale mode of the
+     * sale element allows below zero, less what other carts keep reserved. Null when nothing
+     * limits it. Whether the shop checks the stock, and whether the product is virtual, is
+     * the caller's to judge.
+     */
+    private function sellableQuantityOf(ProductSaleElements $productSaleElements, CartModel $cart): ?float
+    {
+        return $this->sellableQuantityFrom(
+            $productSaleElements,
+            $cart,
+            $this->saleUnitAvailableStock?->availableQuantity($productSaleElements) ?? (float) $productSaleElements->getQuantity(),
+        );
+    }
+
+    /** {@see sellableQuantityOf()}, the stock the cart sells from read already. */
+    private function sellableQuantityFrom(ProductSaleElements $productSaleElements, CartModel $cart, float $physicalQuantity): ?float
+    {
+        $cartId = (int) $cart->getId();
+
+        return ($this->sellableStock ?? SellableStock::withoutReservations())->forPse(
+            $productSaleElements,
+            $physicalQuantity,
+            $cart->getSaleUnitId(),
+            $cartId > 0 ? $cartId : null,
+        );
     }
 
     /**
@@ -617,13 +661,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * A line is refused beyond the stock it sells from (the sale unit's own stock when
-     * it keeps one, the national counter otherwise), unless the shop does not check
-     * the stock or the product is virtual: the rule of the CartAdd form.
+     * A line is refused beyond what the sale element may sell (its stock, the sale unit's
+     * own stock when it keeps one, and what its sale mode allows below zero; null when it
+     * sells without limit), unless the shop does not check the stock or the product is
+     * virtual: the rule of the CartAdd form.
      *
      * @throws NotEnoughStockException
      */
-    private function assertStock(ProductSaleElements $productSaleElements, float $requestedQuantity, float $availableQuantity): void
+    private function assertStock(ProductSaleElements $productSaleElements, float $requestedQuantity, ?float $availableQuantity): void
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return;
@@ -631,7 +676,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $product = $productSaleElements->getProduct();
 
-        if (0 !== (int) $product->getVirtual() || $requestedQuantity <= $availableQuantity) {
+        if (0 !== (int) $product->getVirtual() || null === $availableQuantity || $requestedQuantity <= $availableQuantity) {
             return;
         }
 
@@ -851,11 +896,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
             if ($checkStock && (null !== $composition || 0 === (int) $productSaleElements->getProduct()->getVirtual())) {
                 $available = null !== $composition && null !== $this->cartLineAvailability
                     ? $this->cartLineAvailability->forLine($productSaleElements, $composition)
-                    : ($this->saleUnitStockResolver?->availableQuantity(
+                    : (($this->sellableStock ?? SellableStock::withoutReservations())->forPse(
+                        $productSaleElements,
+                        $this->saleUnitStockResolver?->availableQuantity(
+                            $saleUnitId,
+                            (int) $productSaleElements->getId(),
+                            (float) $productSaleElements->getQuantity(),
+                        ),
                         $saleUnitId,
-                        (int) $productSaleElements->getId(),
-                        (float) $productSaleElements->getQuantity(),
-                    ) ?? (float) $productSaleElements->getQuantity());
+                        (int) $cart->getId() > 0 ? (int) $cart->getId() : null,
+                    ) ?? \INF);
 
                 if ($available <= 0) {
                     $changes[] = $this->lineChange($cartItem, $quantity, 0.0, $price, $price);
