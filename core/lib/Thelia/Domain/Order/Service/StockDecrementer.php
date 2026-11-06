@@ -17,6 +17,7 @@ namespace Thelia\Domain\Order\Service;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Domain\Catalog\Stock\PreorderRule;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Order\Exception\StockTakeRefusedException;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Exception\TheliaProcessException;
@@ -40,10 +41,6 @@ use Thelia\Exception\TheliaProcessException;
 readonly class StockDecrementer
 {
     private const SALE_UNIT_TABLE = 'sale_unit_product_sale_elements';
-
-    /** What the guard allows below zero, written against the row of the sale element aliased `pse`. */
-    private const ALLOWED_BELOW_ZERO = 'CASE WHEN `pse`.`out_of_stock_policy` = '.OutOfStockPolicy::Limited->value
-        .' THEN GREATEST(COALESCE(`pse`.`preorder_limit`, 0), 0) ELSE 0 END';
 
     public function __construct(private SaleUnitStockResolver $saleUnitStockResolver)
     {
@@ -224,7 +221,7 @@ readonly class StockDecrementer
             // What other carts hold is theirs: only a reservation that is there changes the statement.
             $reserved = $take->reservedByOtherCarts > 0 ? ' - :reserved' : '';
             $where .= ' AND (`pse`.`out_of_stock_policy` = '.OutOfStockPolicy::Unlimited->value
-                ." OR $stock + ".self::ALLOWED_BELOW_ZERO."$reserved >= :quantity)";
+                ." OR $stock + ".SellableStock::allowedBelowZeroSql('`pse`')."$reserved >= :quantity)";
         }
 
         $statement = $connection->prepare("UPDATE $table SET $set WHERE $where");
