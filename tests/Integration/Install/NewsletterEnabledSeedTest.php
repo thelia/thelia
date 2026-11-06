@@ -81,8 +81,13 @@ final class NewsletterEnabledSeedTest extends IntegrationTestCase
     {
         $sql = (string) file_get_contents(THELIA_SETUP_DIRECTORY.'update'.\DIRECTORY_SEPARATOR.'sql'.\DIRECTORY_SEPARATOR.'3.4.0.sql');
         $start = strpos($sql, '-- Newsletter switch');
-        $end = strpos($sql, 'SET FOREIGN_KEY_CHECKS = 1;', (int) $start);
         self::assertNotFalse($start, '3.4.0.sql no longer holds the newsletter switch block.');
+
+        // The block ends where the next section of the script starts (the rule under its own
+        // header comes first), or at the end of the script when it is the last section.
+        $headerEnd = strpos($sql, "\n-- ---", $start);
+        $nextSection = false === $headerEnd ? false : strpos($sql, "\n-- ---", $headerEnd + 1);
+        $end = false === $nextSection ? strpos($sql, 'SET FOREIGN_KEY_CHECKS = 1;', $start) : $nextSection;
         self::assertNotFalse($end);
 
         $connection = Propel::getWriteConnection(ConfigTableMap::DATABASE_NAME);
