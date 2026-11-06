@@ -37,6 +37,7 @@ use Thelia\Domain\Module\Exception\ModuleException;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
 use Thelia\Domain\Payment\Service\OrderPaymentPartSettlement;
+use Thelia\Domain\Payment\Service\OrderWithNothingToPay;
 use Thelia\Domain\Payment\StoredPaymentMethodPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\LangQuery;
@@ -66,6 +67,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         protected CustomerPaymentMethodService $customerPaymentMethods,
         protected StoredPaymentMethodPayment $storedPaymentMethodPayment,
         protected OrderPaymentPartSettlement $orderPaymentPartSettlement,
+        protected OrderWithNothingToPay $orderWithNothingToPay,
     ) {
     }
 
@@ -589,6 +591,13 @@ class Module extends BaseAction implements EventSubscriberInterface
         // before this listener): the module that holds them has nothing left to charge,
         // and asked to pay it would turn the order paid a second time.
         if ($paymentModuleInstance instanceof InstantPaymentModuleInterface && $this->orderPaymentPartSettlement->isPaidByInstantPartsOnly($order)) {
+            return;
+        }
+
+        // Nothing is left to pay, and the core has turned the order paid (before this listener,
+        // see OrderWithNothingToPayListener): the module would be asked to charge nothing. An
+        // order the core could not turn paid is still the module's to charge.
+        if ($order->isPaid(false) && $this->orderWithNothingToPay->hasNothingToPay($order)) {
             return;
         }
 
