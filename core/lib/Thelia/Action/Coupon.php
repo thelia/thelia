@@ -31,6 +31,7 @@ use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Service\CouponExclusionWriter;
@@ -527,7 +528,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     ->setCouponId($couponModel->getId())
                     ->setCode($couponModel->getCode())
                     ->setType($couponModel->getType())
-                    ->setAmount((string) round($consumedCoupon->exec(), 2))
+                    ->setAmount((string) MoneyRounding::toTheCent($consumedCoupon->exec()))
                     ->setTitle($couponModel->getTitle())
                     ->setShortDescription($couponModel->getShortDescription())
                     ->setDescription($couponModel->getDescription())

@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\Order\OrderProductEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
 class OrderProduct extends BaseOrderProduct
@@ -163,7 +164,7 @@ class OrderProduct extends BaseOrderProduct
             return $unitPrice + $unitTax;
         }
 
-        return round($unitPrice, 2) + round($unitTax, 2);
+        return MoneyRounding::toTheCent($unitPrice) + MoneyRounding::toTheCent($unitTax);
     }
 
     /**
@@ -178,7 +179,7 @@ class OrderProduct extends BaseOrderProduct
      */
     public function roundUnitAmount(float $amount): float
     {
-        return ConfigQuery::isRoundingModeRoundingOfSums($this->getOrderId()) ? $amount : round($amount, 2);
+        return ConfigQuery::isRoundingModeRoundingOfSums($this->getOrderId()) ? $amount : MoneyRounding::toTheCent($amount);
     }
 
     /**
@@ -216,8 +217,8 @@ class OrderProduct extends BaseOrderProduct
 
             return [
                 'untaxed' => $unitPrice * $quantity,
-                'taxed' => round($taxedUnitPrice, 2) * $quantity,
-                'tax' => round($unitTax * $quantity, 2),
+                'taxed' => MoneyRounding::toTheCent($taxedUnitPrice) * $quantity,
+                'tax' => MoneyRounding::toTheCent($unitTax * $quantity),
                 'unitTax' => $unitTax,
                 'taxedUnitPrice' => $taxedUnitPrice,
             ];
@@ -228,8 +229,8 @@ class OrderProduct extends BaseOrderProduct
         // unrounded: a price per gram or per millilitre is nothing once cut to the cent.
         if (ConfigQuery::isRoundingModeRoundingOfSums($orderId)) {
             $taxedUnitPrice = $this->getTaxedUnitPrice($onPromo, $unitTax);
-            $untaxed = round($unitPrice * $quantity, 2);
-            $taxed = round($taxedUnitPrice * $quantity, 2);
+            $untaxed = MoneyRounding::toTheCent($unitPrice * $quantity);
+            $taxed = MoneyRounding::toTheCent($taxedUnitPrice * $quantity);
 
             return [
                 'untaxed' => $untaxed,
@@ -238,18 +239,18 @@ class OrderProduct extends BaseOrderProduct
                 // disagreeing by a cent, and an invoice whose lines and whose footer state
                 // different amounts. Order::getTotalAmount() reads the tax of an order as the
                 // gap between its taxed and its untaxed total; a line reads it the same way.
-                'tax' => round($taxed - $untaxed, 2),
+                'tax' => MoneyRounding::toTheCent($taxed - $untaxed),
                 'unitTax' => $unitTax,
                 'taxedUnitPrice' => $taxedUnitPrice,
             ];
         }
 
         // Sum of roundings: the unit price and its tax are cut to the cent, then multiplied.
-        $unitTax = round($unitTax, 2);
+        $unitTax = MoneyRounding::toTheCent($unitTax);
         $taxedUnitPrice = $this->getTaxedUnitPrice($onPromo, $unitTax);
 
         return [
-            'untaxed' => round($unitPrice, 2) * $quantity,
+            'untaxed' => MoneyRounding::toTheCent($unitPrice) * $quantity,
             'taxed' => $taxedUnitPrice * $quantity,
             'tax' => $unitTax * $quantity,
             'unitTax' => $unitTax,

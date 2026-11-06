@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Quantity;
 
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Model\ProductSaleElements;
 
 /**
@@ -35,7 +36,7 @@ final readonly class ReferenceUnitPriceCalculator
         }
 
         return new ReferenceUnitPrice(
-            round($displayedPrice / $rule->unitQuantity * $rule->referenceUnitQuantity, 2),
+            MoneyRounding::toTheCent($displayedPrice / $rule->unitQuantity * $rule->referenceUnitQuantity),
             $rule->referenceUnitQuantity,
             $rule->unitCode,
         );

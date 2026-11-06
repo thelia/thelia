@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponExpiredException;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
@@ -95,7 +96,7 @@ class CouponManager implements ResetInterface
             }
         }
 
-        return round($discount, 2);
+        return MoneyRounding::toTheCent($discount);
     }
 
     /**
