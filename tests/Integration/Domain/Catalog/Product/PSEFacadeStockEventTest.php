@@ -165,6 +165,43 @@ final class PSEFacadeStockEventTest extends ActionIntegrationTestCase
         self::assertEquals([new StockLevelChange($id, 22.0, 17.0)], $this->changes);
     }
 
+    /**
+     * 22 -> 20 inside a transaction, then 20 -> 17 once it is committed: told once, from 22 to 17,
+     * and the threshold of 18 is crossed once, not twice.
+     */
+    public function testAChangeAfterTheCommitTakesOverTheChangeThatWaitedForIt(): void
+    {
+        $connection = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+        $announcer = $this->getService(StockLevelAnnouncer::class);
+        $facade = $this->getService(PSEFacade::class);
+        $saleElements = $this->product?->getDefaultSaleElements();
+        $saleElements?->setLowStockThreshold(18)->save();
+        $id = (int) $saleElements?->getId();
+        $lowStockSignals = 0;
+        $lowStockListener = static function () use (&$lowStockSignals): void {
+            ++$lowStockSignals;
+        };
+        $this->dispatcher->addListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED, $lowStockListener);
+
+        try {
+            $connection->beginTransaction();
+
+            try {
+                $facade->decreaseStock($id, 2);
+            } finally {
+                $connection->commit();
+            }
+
+            $facade->decreaseStock($id, 3);
+            $announcer->flush();
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED, $lowStockListener);
+        }
+
+        self::assertEquals([new StockLevelChange($id, 22.0, 17.0)], $this->changes);
+        self::assertSame(1, $lowStockSignals);
+    }
+
     public function testTheEndOfTheRequestTheCommandAndTheMessageTellTheChangesThatWaited(): void
     {
         $events = StockLevelAnnouncer::getSubscribedEvents();
