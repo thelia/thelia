@@ -29,6 +29,7 @@ use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Cart\Discount\CartDiscountLines;
 use Thelia\Domain\Promotion\Coupon\CouponFactory;
 use Thelia\Domain\Promotion\Coupon\Exception\CouponNoUsageLeftException;
 use Thelia\Domain\Promotion\Coupon\Service\CouponExclusionWriter;
@@ -68,6 +69,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     protected readonly CouponExclusionWriter $couponExclusionWriter;
 
+    protected readonly CartDiscountLines $cartDiscountLines;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected CouponFactory $couponFactory,
@@ -79,9 +82,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected OfferedCartLineService $offeredCartLineService,
         protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
         ?CouponExclusionWriter $couponExclusionWriter = null,
+        ?CartDiscountLines $cartDiscountLines = null,
     ) {
         // Last and optional so that a module building the action itself keeps its call.
         $this->couponExclusionWriter = $couponExclusionWriter ?? new CouponExclusionWriter();
+        $this->cartDiscountLines = $cartDiscountLines ?? new CartDiscountLines([]);
     }
 
     private function surchargeLeftByTheCoupon(Cart $cart): ?OrderPostage
@@ -176,10 +181,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $isValid = $coupon->isMatching();
         if ($isValid) {
             $this->couponManager->pushCouponInSession($event->getCode());
-            $totalDiscount = $this->couponManager->getDiscount();
+            $cart = $this->getSession()?->getSessionCart($dispatcher);
+            $totalDiscount = $this->couponManager->getDiscount($this->discountLinesTotal($cart));
 
-            $this->getSession()?->getSessionCart($dispatcher)
-                ->setDiscount((string) $totalDiscount)
+            $cart
+                ?->setDiscount((string) $totalDiscount)
                 ->save();
 
             $this->getSession()?->getOrder()
@@ -209,9 +215,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $this->offeredCartLineService->reconcile($this->couponManager->getCouponsKept(), $cart);
         }
 
-        $discount = $this->couponManager->getDiscount();
-
         $pricedCart = $session->getSessionCart($dispatcher);
+        $discount = $this->couponManager->getDiscount($this->discountLinesTotal($pricedCart));
+
         $pricedCart
             ->setDiscount((string) $discount)
             ->save();
@@ -219,6 +225,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         $session->getOrder()
             ->setDiscount((string) $discount);
+    }
+
+    /**
+     * What the modules take off the cart under their own name, added to the discount of the promotions.
+     */
+    private function discountLinesTotal(?Cart $cart): float
+    {
+        return null === $cart ? 0.0 : CartDiscountLines::total($this->cartDiscountLines->of($cart));
     }
 
     public function reconcileWithVatExemption(): void
@@ -273,10 +287,15 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Whether the discount carried by this cart can be the work of a coupon: a code
      * the buyer typed, a line a promotion offered, or an automatic promotion the shop
      * declares — disabled ones included, since a promotion withdrawn since the last
-     * cart change is exactly the case to catch.
+     * cart change is exactly the case to catch. A module that declares discount lines
+     * puts its amount in the same discount, so it is priced again too.
      */
     private function couponsCanExplainTheDiscount(?Cart $cart): bool
     {
+        if ($this->cartDiscountLines->haveProviders()) {
+            return true;
+        }
+
         if ([] !== ($this->getSession()?->getConsumedCoupons() ?? [])) {
             return true;
         }
@@ -603,6 +622,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_SALE_UNIT_SWITCHED => ['updateOrderDiscount', 10],
             TheliaEvents::CART_LINES_REPRICED => ['updateOrderDiscount', 10],
             TheliaEvents::CART_LINES_REMOVED => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_DISCOUNT_LINES_CHANGED => ['updateOrderDiscount', 10],
             TheliaEvents::CUSTOMER_LOGIN => ['updateOrderDiscount', 10],
             AddressEvent::POST_UPDATE => ['updateOrderDiscount', 10],
             // The promotions conditioned on the shipping choice (MatchDeliveryModules,

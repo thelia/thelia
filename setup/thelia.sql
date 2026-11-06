@@ -3155,6 +3155,30 @@ CREATE TABLE `order_coupon`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- order_discount_line
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_discount_line`;
+
+CREATE TABLE `order_discount_line`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_id` INTEGER NOT NULL,
+    `line_key` VARCHAR(64) NOT NULL COMMENT 'what identifies the line for good, prefixed with the code of the module that declared it',
+    `label` VARCHAR(255) NOT NULL COMMENT 'what the buyer read, in the language of the order',
+    `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'what the line took off the order, tax included',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_discount_line_order_id` (`order_id`),
+    CONSTRAINT `fk_order_discount_line_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- coupon_country
 -- ---------------------------------------------------------------------
 

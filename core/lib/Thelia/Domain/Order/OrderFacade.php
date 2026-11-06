@@ -32,6 +32,7 @@ use Thelia\Domain\Order\Service\BundleOrderComponent;
 use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\Order\Service\GiftWrappingLineFactory;
 use Thelia\Domain\Order\Service\OrderAddressPersister;
+use Thelia\Domain\Order\Service\OrderDiscountLineRecorder;
 use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
 use Thelia\Domain\Order\Service\OrderRefGeneratorInterface;
@@ -94,6 +95,7 @@ readonly class OrderFacade
         private OrderPaymentComposer $orderPaymentComposer,
         private BundleOrderPlanner $bundleOrderPlanner,
         private BundleComponentReader $bundleComponentReader,
+        private OrderDiscountLineRecorder $orderDiscountLineRecorder,
     ) {
     }
 
@@ -324,6 +326,9 @@ readonly class OrderFacade
             }
 
             $this->persistPaymentParts($placedOrder, $cart, $connection);
+
+            // What the modules took off under their own name, frozen beside the promotions.
+            $this->orderDiscountLineRecorder->record($placedOrder, $cart, $connection);
 
             // Allocate the ref from the gapless sequence as the very last
             // operation: the counter lock is only held for the commit window,

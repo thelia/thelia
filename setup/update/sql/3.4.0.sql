@@ -54,6 +54,21 @@ EXECUTE create_table_statement;
 DEALLOCATE PREPARE create_table_statement;
 
 -- ---------------------------------------------------------------------
+-- Discount lines of the modules
+--
+-- `order_discount_line` freezes on an order what a module took off it under
+-- its own name (a gift card, a store credit), the way `order_coupon` freezes
+-- the promotions. Existing orders have none: no row is written. Created
+-- through PREPARE/EXECUTE for the reason given above.
+-- ---------------------------------------------------------------------
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_discount_line');
+SET @statement := IF(@create_table, 'CREATE TABLE `order_discount_line` (`id` INTEGER NOT NULL AUTO_INCREMENT, `order_id` INTEGER NOT NULL, `line_key` VARCHAR(64) NOT NULL COMMENT \'what identifies the line for good, prefixed with the code of the module that declared it\', `label` VARCHAR(255) NOT NULL COMMENT \'what the buyer read, in the language of the order\', `amount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT \'what the line took off the order, tax included\', `created_at` DATETIME, `updated_at` DATETIME, PRIMARY KEY (`id`), INDEX `idx_order_discount_line_order_id` (`order_id`), CONSTRAINT `fk_order_discount_line_order_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+-- ---------------------------------------------------------------------
 -- AI reasoning effort
 --
 -- `ai_tier_assignment.effort` is the effort of a tier, `ai_usage_setting.effort`

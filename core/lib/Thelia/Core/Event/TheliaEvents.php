@@ -300,6 +300,13 @@ final class TheliaEvents
      */
     public const CART_LINES_REMOVED = 'cart.lines.removed';
 
+    /**
+     * Sent (CartEvent) by a module whose discount lines changed while the cart did not (the buyer
+     * chose to spend a balance): the discount of the session cart is priced again with the lines
+     * of the modules and the promotions ({@see \Thelia\Domain\Cart\Discount\CartDiscountLineProviderInterface}).
+     */
+    public const CART_DISCOUNT_LINES_CHANGED = 'cart.discount_lines.changed';
+
     /** sent when a new item is added to current cart. */
     public const AFTER_CARTADDITEM = 'cart.after.addItem';
 
