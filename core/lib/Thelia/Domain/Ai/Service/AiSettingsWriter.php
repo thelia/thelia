@@ -221,7 +221,7 @@ final readonly class AiSettingsWriter
         ?int $pinnedModelId = null,
         array $guardrails = [],
         bool $transparencyNotice = true,
-        bool $provenanceMark = true,
+        bool $provenanceMark = false,
         bool $storePrompt = false,
         ?int $promptRetentionDays = null,
         ?string $effort = null,
