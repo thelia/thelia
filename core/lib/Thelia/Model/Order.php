@@ -158,6 +158,19 @@ class Order extends BaseOrder
     }
 
     /**
+     * Holds the row lock of the order until the transaction of the connection ends, and forgets the lines read before it:
+     * an edit of the lines and a status change take it in turn, so each works on the lines the other left.
+     */
+    public function lockForUpdate(ConnectionInterface $connection): void
+    {
+        $statement = $connection->prepare('SELECT `id` FROM `order` WHERE `id` = :id FOR UPDATE');
+        $statement->bindValue(':id', $this->getId(), \PDO::PARAM_INT);
+        $statement->execute();
+
+        OrderProductTableMap::clearInstancePool();
+    }
+
+    /**
      * @throws PropelException
      */
     public function preSave(?ConnectionInterface $con = null): bool

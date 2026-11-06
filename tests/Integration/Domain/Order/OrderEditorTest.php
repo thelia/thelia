@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -125,7 +126,6 @@ final class OrderEditorTest extends IntegrationTestCase
     {
         $catalogue = (string) OrderProductQuery::create()->findPk($this->line->getId())->getPrice();
 
-        $this->editor->edit($this->order, new OrderEdit(unitPrices: [(int) $this->line->getId() => '10.000000']));
         $this->editor->edit($this->order, new OrderEdit(unitPrices: [(int) $this->line->getId() => '15.500000']));
 
         $reloaded = OrderProductQuery::create()->findPk($this->line->getId());
@@ -344,13 +344,18 @@ final class OrderEditorTest extends IntegrationTestCase
         );
     }
 
-    public function testALineCannotBeRemovedFromAPaidOrder(): void
+    public function testALineRemovedFromAPaidOrderGivesItsStockBackAndLowersTheTotal(): void
     {
         $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
         $otherLine = $this->aLine($other, 1.0, '25.000000');
+        $stock = $this->stockOf($other->getDefaultSaleElements());
+        $totalBefore = $this->totalOf();
 
-        $this->expectRefusal(OrderEditRefusal::PaidOrderLineRemoval);
         $this->editor->edit($this->order, new OrderEdit(removedLines: [(int) $otherLine->getId()]));
+
+        self::assertNull(OrderProductQuery::create()->findPk($otherLine->getId()));
+        self::assertEqualsWithDelta($stock + 1, $this->stockOf($other->getDefaultSaleElements()), 0.0001);
+        self::assertEqualsWithDelta($totalBefore - 30.0, $this->totalOf(), 0.0001);
     }
 
     public function testAShortageRefusesTheEdit(): void
@@ -367,13 +372,30 @@ final class OrderEditorTest extends IntegrationTestCase
         $this->editor->edit($this->order, new OrderEdit(discount: '1.000000'));
     }
 
-    public function testAnInvoicedOrderIsRefusedWhenInvoicesAreNumberedAutomatically(): void
+    #[DataProvider('numberingSettings')]
+    public function testAnInvoicedOrderIsRefusedWhateverTheNumberingSetting(string $numbering): void
     {
-        ConfigQuery::write('invoice_ref_auto', '1');
-        $this->order->setInvoiceRef('2026-0001')->save();
+        $previous = ConfigQuery::read('invoice_ref_auto');
+        ConfigQuery::write('invoice_ref_auto', $numbering);
 
-        $this->expectRefusal(OrderEditRefusal::InvoiceIssued);
-        $this->editor->edit($this->order, new OrderEdit(discount: '1.000000'));
+        try {
+            $other = $this->aLine($this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]), 1.0, '25.000000');
+            $this->order->setInvoiceRef('2026-000042')->save();
+
+            $this->expectRefusal(OrderEditRefusal::InvoiceIssued);
+            $this->editor->edit($this->order, new OrderEdit(removedLines: [(int) $other->getId()]));
+        } finally {
+            ConfigQuery::write('invoice_ref_auto', (string) $previous);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function numberingSettings(): iterable
+    {
+        yield 'automatic numbering' => ['1'];
+        yield 'number posed by a status action or a module' => ['0'];
     }
 
     public function testTheLastLineCannotBeRemoved(): void
@@ -394,6 +416,81 @@ final class OrderEditorTest extends IntegrationTestCase
         ));
 
         self::assertSame(1, OrderProductQuery::create()->filterByOrderId($this->order->getId())->count());
+    }
+
+    public function testAnUnchangedPriceIsRefusedLikeAnUnchangedQuantity(): void
+    {
+        $line = OrderProductQuery::create()->findPk($this->lineId());
+        $written = static fn (self $test): int => OrderHistoryQuery::create()->filterByOrderId($test->order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count();
+        $before = $written($this);
+        $announced = 0;
+        $listener = static function () use (&$announced): void {
+            ++$announced;
+        };
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $dispatcher->addListener(TheliaEvents::ORDER_BEFORE_EDIT, $listener);
+        $dispatcher->addListener(TheliaEvents::ORDER_AFTER_EDIT, $listener);
+
+        try {
+            $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => (string) $line->getPrice()]));
+            self::fail('A price equal to the stored one moves nothing and must be refused.');
+        } catch (OrderEditRefusedException $refusal) {
+            self::assertStringContainsString('('.OrderEditRefusal::NothingToEdit->value.')', $refusal->getMessage());
+        } finally {
+            $dispatcher->removeListener(TheliaEvents::ORDER_BEFORE_EDIT, $listener);
+            $dispatcher->removeListener(TheliaEvents::ORDER_AFTER_EDIT, $listener);
+        }
+
+        self::assertSame(0, $announced, 'No listener hears of a price that did not change.');
+        self::assertSame($before, $written($this), 'A refused edit leaves nothing in the history.');
+    }
+
+    public function testAnUnchangedPriceBesideAChangedQuantityIsLeftOutOfTheEdit(): void
+    {
+        $other = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $otherLine = $this->aLine($other, 1.0, '25.000000');
+        $taxIds = OrderProductTaxQuery::create()->filterByOrderProductId($otherLine->getId())->find()->getPrimaryKeys();
+
+        $this->editor->edit($this->order, new OrderEdit(
+            quantities: [$this->lineId() => 3.0],
+            unitPrices: [(int) $otherLine->getId() => '25'],
+        ));
+
+        $payload = OrderHistoryQuery::create()->filterByOrderId($this->order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->findOne()->getDecodedPayload();
+        self::assertSame([], $payload['prices']);
+        self::assertCount(1, $payload['quantities']);
+        self::assertSame(0, (int) OrderProductQuery::create()->findPk($otherLine->getId())->getWasInPromo(), 'The unchanged line is not forced.');
+        self::assertSame($taxIds, OrderProductTaxQuery::create()->filterByOrderProductId($otherLine->getId())->find()->getPrimaryKeys(), 'Its taxes are not written again.');
+    }
+
+    public function testTwoIdenticalEditsInARowAreBothWrittenInTheHistory(): void
+    {
+        $gadget = $this->aProduct(['title' => 'Gadget', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $added = new OrderEdit(addedLines: [new AddedOrderLine((int) $gadget->getDefaultSaleElements()->getId(), 1.0)]);
+
+        $this->editor->edit($this->order, $added);
+        $this->editor->edit($this->order, $added);
+
+        self::assertSame(2, OrderProductQuery::create()->filterByOrderId($this->order->getId())->filterByProductRef($gadget->getRef())->count());
+        self::assertSame(2, OrderHistoryQuery::create()->filterByOrderId($this->order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->count());
+    }
+
+    public function testUnchangedValuesSentAgainNeverRefuseAnEdit(): void
+    {
+        $gone = $this->aProduct(['title' => 'Gone', 'basePrice' => 25.0, 'baseQuantity' => 7]);
+        $goneLine = $this->aLine($gone, 1.0, '25.000000');
+        $shippedLine = $this->aLine($this->aProduct(['title' => 'Shipped', 'basePrice' => 15.0, 'baseQuantity' => 7]), 1.0, '15.000000');
+        $shipment = (new OrderShipment())->setOrderId((int) $this->order->getId())->setRef('SHIPMENT-'.$this->order->getId())->setStatus('draft');
+        $shipment->save($this->getPropelConnection());
+        (new OrderShipmentItem())->setOrderShipmentId((int) $shipment->getId())->setOrderProductId((int) $shippedLine->getId())->setQuantity(1.0)->save($this->getPropelConnection());
+        $goneLine->setProductRef('GONE-'.$goneLine->getId())->save($this->getPropelConnection());
+
+        $this->editor->edit($this->order, new OrderEdit(
+            quantities: [$this->lineId() => 3.0, (int) $shippedLine->getId() => 1.0],
+            unitPrices: [(int) $goneLine->getId() => '25.000000', (int) $shippedLine->getId() => '15'],
+        ));
+
+        self::assertEqualsWithDelta(3.0, (float) OrderProductQuery::create()->findPk($this->lineId())->getQuantity(), 0.0001);
     }
 
     public function testAnEditThatChangesNothingIsRefusedAndLeavesNoHistory(): void
@@ -525,27 +622,69 @@ final class OrderEditorTest extends IntegrationTestCase
         self::assertSame(0, OrderProductTaxQuery::create()->filterByOrderProductId($this->line->getId())->count());
     }
 
+    public function testALineEditOfAnExemptedOrderKeepsThePostageVatItWasFrozenWith(): void
+    {
+        $invoice = $this->exemptedWith('6.00');
+        $this->order->setPostage('10.000000')->setPostageTax('0')->setDeliveryModuleId((int) ModuleQuery::create()->findOneByCode('Cheque')->getId())->save($this->getPropelConnection());
+
+        $this->editor->edit($this->order, new OrderEdit(quantities: [$this->lineId() => 3.0]));
+
+        self::assertEqualsWithDelta(3.0, (float) OrderProductQuery::create()->findPk($this->lineId())->getQuantity(), 0.0001);
+        self::assertEqualsWithDelta(10.0, (float) OrderQuery::create()->findPk($this->order->getId())->getPostage(), 0.0001);
+        self::assertEqualsWithDelta(8.0, $this->exemptedVatOf($invoice), 0.0001, '4.00 on the goods and 2.00 on the postage, frozen; the goods now carry 6.00.');
+    }
+
+    public function testALineEditOfAnExemptedOrderDoesNotNeedItsCarrierStillInstalled(): void
+    {
+        $this->exemptedWith('6.00');
+        $this->order->setPostage('10.000000')->setPostageTax('0')->setDeliveryModuleId(null)->setDeliveryModuleTitle('Gone carrier')->save($this->getPropelConnection());
+
+        $this->editor->edit($this->order, new OrderEdit(quantities: [$this->lineId() => 3.0]));
+
+        self::assertEqualsWithDelta(3.0, (float) OrderProductQuery::create()->findPk($this->lineId())->getQuantity(), 0.0001);
+    }
+
     public function testTheExemptedVatAmountFollowsTheEditedLines(): void
     {
-        $invoice = OrderAddressQuery::create()->findPk($this->order->getInvoiceOrderAddressId());
-        $invoice->setVatExempted(1)->setVatExemptedAmount('99.00')->save();
+        $invoice = $this->exemptedWith('5.00');
 
-        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '20.000000'], untaxedPostage: '0'));
+        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '20.000000']));
 
-        self::assertEqualsWithDelta(8.0, (float) OrderAddressQuery::create()->findPk($invoice->getId())->getVatExemptedAmount(), 0.0001);
+        self::assertEqualsWithDelta(9.0, $this->exemptedVatOf($invoice), 0.0001, '1.00 frozen on the postage, the goods go from 4.00 to 8.00.');
     }
 
     public function testTheExemptedVatAmountSharesTheDiscountOfTheEditedOrder(): void
     {
-        $invoice = OrderAddressQuery::create()->findPk($this->order->getInvoiceOrderAddressId());
-        $invoice->setVatExempted(1)->setVatExemptedAmount('99.00')->save();
+        $invoice = $this->exemptedWith('5.00');
 
-        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '20.000000'], discount: '10.000000', untaxedPostage: '0'));
+        $this->editor->edit($this->order, new OrderEdit(unitPrices: [$this->lineId() => '20.000000'], discount: '10.000000'));
 
-        self::assertEqualsWithDelta(6.0, (float) OrderAddressQuery::create()->findPk($invoice->getId())->getVatExemptedAmount(), 0.0001);
+        self::assertEqualsWithDelta(7.0, $this->exemptedVatOf($invoice), 0.0001, '1.00 frozen on the postage, the goods go from 4.00 to 8.00 less a quarter.');
     }
 
-    public function testThePostageBreakdownFollowsTheEditedLinesWhenTheShopSpreadsTheTax(): void
+    public function testANewPostageMovesTheExemptedVatByItsOwnVatOnly(): void
+    {
+        $invoice = $this->exemptedWith('5.00');
+
+        $this->withDeliveryTaxRule(function () use ($invoice): void {
+            $this->order->setPostage('5.000000')->setPostageTax('0')->save();
+
+            $this->editor->edit($this->order, new OrderEdit(untaxedPostage: '10.000000'));
+
+            self::assertEqualsWithDelta(6.0, $this->exemptedVatOf($invoice), 0.0001, 'The postage VAT goes from 1.00 to 2.00, the goods keep their 4.00.');
+        });
+    }
+
+    public function testAnExemptedOrderWithoutAFrozenAmountKeepsNone(): void
+    {
+        $invoice = $this->exemptedWith(null);
+
+        $this->editor->edit($this->order, new OrderEdit(quantities: [$this->lineId() => 3.0]));
+
+        self::assertNull(OrderAddressQuery::create()->findPk($invoice)->getVatExemptedAmount());
+    }
+
+    public function testAnExplicitPostageIsSplitOverTheGoodsWhenTheShopSpreadsTheTaxAndALineEditLeavesItAlone(): void
     {
         $previous = ConfigQuery::read('postage_tax_strategy');
         ConfigQuery::write('postage_tax_strategy', 'pro_rata');
@@ -580,8 +719,8 @@ final class OrderEditorTest extends IntegrationTestCase
             $sum = array_sum(array_map(static fn ($row): float => (float) $row->getAmount(), iterator_to_array(OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->find())));
 
             self::assertEqualsWithDelta($sum, (float) $order->getPostageTax(), 0.0001);
-            self::assertEqualsWithDelta(10.0, (float) $order->getPostage() - (float) $order->getPostageTax(), 0.0001);
-            self::assertEqualsWithDelta(1.25, (float) $order->getPostageTax(), 0.0001);
+            self::assertEqualsWithDelta(1.5, (float) $order->getPostageTax(), 0.0001);
+            self::assertEqualsWithDelta(11.5, (float) $order->getPostage(), 0.0001);
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
         }
@@ -647,6 +786,32 @@ final class OrderEditorTest extends IntegrationTestCase
             self::assertEqualsWithDelta(12.0, (float) $order->getPostage(), 0.0001);
             self::assertEqualsWithDelta(2.0, (float) $order->getPostageTax(), 0.0001);
             self::assertSame(0, OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->count());
+        } finally {
+            ConfigQuery::write('postage_tax_strategy', (string) $previous);
+        }
+    }
+
+    public function testALineEditNeverChangesThePostageOfAnOrderPlacedWithASpreadTaxWhenTheShopGoesBackToASingleRule(): void
+    {
+        $previous = ConfigQuery::read('postage_tax_strategy');
+        ConfigQuery::write('postage_tax_strategy', 'single_rule');
+
+        try {
+            $connection = $this->getPropelConnection();
+            $this->order->setPostage('12.000000')->setPostageTax('2.000000')->save($connection);
+            OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->delete($connection);
+            (new OrderPostageTax())->setOrderId($this->order->getId())->setTitle('VAT 20')->setUntaxedAmount('10')->setAmount('2')->save($connection);
+
+            $this->editor->edit($this->order, new OrderEdit(quantities: [$this->lineId() => 4.0]));
+
+            $order = OrderQuery::create()->findPk($this->order->getId());
+            $rows = OrderPostageTaxQuery::create()->filterByOrderId($this->order->getId())->find();
+
+            self::assertEqualsWithDelta(12.0, (float) $order->getPostage(), 0.0001);
+            self::assertEqualsWithDelta(2.0, (float) $order->getPostageTax(), 0.0001);
+            self::assertCount(1, $rows);
+            self::assertEqualsWithDelta(2.0, (float) $rows->getFirst()->getAmount(), 0.0001);
+            self::assertNull($this->historyPostage(), 'The history does not say the postage moved.');
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
         }
@@ -853,6 +1018,11 @@ final class OrderEditorTest extends IntegrationTestCase
         $dispatcher->removeListener(TheliaEvents::GENERATE_PDF, $capture);
     }
 
+    private function historyPostage(): mixed
+    {
+        return OrderHistoryQuery::create()->filterByOrderId($this->order->getId())->filterByEventType(OrderHistoryEventType::ORDER_EDITED->value)->findOne()?->getDecodedPayload()['postage'] ?? null;
+    }
+
     /**
      * @return array{from: string, to: string}
      */
@@ -930,6 +1100,20 @@ final class OrderEditorTest extends IntegrationTestCase
         }
 
         return $country;
+    }
+
+    private function exemptedWith(?string $frozenAmount): int
+    {
+        $invoice = OrderAddressQuery::create()->findPk($this->order->getInvoiceOrderAddressId());
+        $invoice->setVatExempted(1)->setVatExemptedAmount($frozenAmount)->save();
+        OrderProductTaxQuery::create()->filterByOrderProductId($this->line->getId())->delete();
+
+        return (int) $invoice->getId();
+    }
+
+    private function exemptedVatOf(int $invoiceAddressId): float
+    {
+        return (float) OrderAddressQuery::create()->findPk($invoiceAddressId)->getVatExemptedAmount();
     }
 
     private function placeAnOrder(string $statusCode): void
