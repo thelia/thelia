@@ -39,6 +39,18 @@ final readonly class AiTextTranslator
         return Translator::getInstance()->trans($id, $parameters, 'core', $this->locale($locale));
     }
 
+    /**
+     * A text a module declared, such as the purpose of its usage: looked up in the domain of the module first
+     * (its `I18n/<locale>.php`, the module code in lower case), then in `core`, else the text as written.
+     */
+    public function transFromModule(string $id, string $module, ?string $locale = null): string
+    {
+        $locale = $this->locale($locale);
+        $translated = Translator::getInstance()->trans($id, [], strtolower($module), $locale, false);
+
+        return '' !== $translated ? $translated : $this->trans($id, [], $locale);
+    }
+
     public function locale(?string $locale = null): string
     {
         if (null !== $locale && '' !== $locale) {

@@ -72,7 +72,7 @@ final readonly class AiUsageSettingWriteProcessor implements ProcessorInterface
                 $data->getPinnedModelId(),
                 $data->getGuardrails() ?? [],
                 $data->getTransparencyNotice() ?? true,
-                $data->getProvenanceMark() ?? true,
+                $data->getProvenanceMark() ?? false,
                 $data->getStorePrompt() ?? false,
                 $data->getPromptRetentionDays(),
                 $data->getEffort(),
