@@ -61,6 +61,21 @@ final readonly class SellableStock
     }
 
     /**
+     * {@see ceilingOf()} for a query: what the policy allows below zero, written against the row of
+     * the sale element named by $alias (0 when it refuses; a policy without limit is the caller's).
+     *
+     * @param string $alias an SQL identifier written in the code, never a value from a request
+     */
+    public static function allowedBelowZeroSql(string $alias): string
+    {
+        return \sprintf(
+            'CASE WHEN %1$s.`out_of_stock_policy` = %2$d THEN GREATEST(COALESCE(%1$s.`preorder_limit`, 0), 0) ELSE 0 END',
+            $alias,
+            OutOfStockPolicy::Limited->value,
+        );
+    }
+
+    /**
      * What a sale element may still sell, without reservations. Null means without limit.
      */
     public static function ceilingOfPse(ProductSaleElements $productSaleElements, ?float $physicalQuantity = null): ?float

@@ -22,6 +22,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilter
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Domain\Catalog\Stock\VisitorCart;
 use Thelia\Model\ConfigQuery;
@@ -203,10 +204,11 @@ final readonly class AvailabilityFilter implements TheliaFilterInterface, Thelia
     private static function sellsBelowZeroClause(string $alias): string
     {
         return \sprintf(
-            '%1$s.out_of_stock_policy = %2$d OR (%1$s.out_of_stock_policy = %3$d AND %1$s.quantity + GREATEST(COALESCE(%1$s.preorder_limit, 0), 0) > 0)',
+            '%1$s.out_of_stock_policy = %2$d OR (%1$s.out_of_stock_policy = %3$d AND %1$s.quantity + %4$s > 0)',
             $alias,
             OutOfStockPolicy::Unlimited->value,
             OutOfStockPolicy::Limited->value,
+            SellableStock::allowedBelowZeroSql($alias),
         );
     }
 
@@ -234,10 +236,10 @@ final readonly class AvailabilityFilter implements TheliaFilterInterface, Thelia
         );
 
         return \sprintf(
-            '(%1$s.out_of_stock_policy = %2$d OR %1$s.quantity + (CASE WHEN %1$s.out_of_stock_policy = %3$d THEN GREATEST(COALESCE(%1$s.preorder_limit, 0), 0) ELSE 0 END) - %4$s > 0)',
+            '(%1$s.out_of_stock_policy = %2$d OR %1$s.quantity + (%3$s) - %4$s > 0)',
             $alias,
             OutOfStockPolicy::Unlimited->value,
-            OutOfStockPolicy::Limited->value,
+            SellableStock::allowedBelowZeroSql($alias),
             $reserved,
         );
     }
