@@ -34,6 +34,19 @@ class ReportMailing extends BaseReportMailing
     }
 
     /**
+     * The addresses that are still recipients of the mailing, compared without case: an
+     * address the merchant removed is no longer sent anything, a retry included.
+     *
+     * @param list<string> $addresses
+     *
+     * @return list<string>
+     */
+    public function keepCurrentRecipients(array $addresses): array
+    {
+        return array_values(array_uintersect($addresses, $this->getRecipientList(), strcasecmp(...)));
+    }
+
+    /**
      * @return list<string>
      */
     public function getPendingRecipientList(): array

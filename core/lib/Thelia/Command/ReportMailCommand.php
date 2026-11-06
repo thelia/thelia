@@ -14,17 +14,15 @@ declare(strict_types=1);
 
 namespace Thelia\Command;
 
-use Psr\Clock\ClockInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Thelia\Domain\Reporting\Mailing\ReportMailer;
+use Thelia\Domain\Reporting\Mailing\ImmediateReportSender;
 use Thelia\Model\ReportMailingQuery;
 
 /**
  * Sends one report now, whatever its schedule says, over the period relative to today.
- * What was sent for the schedule is left alone: only the date of the last send moves.
  *
  * The output holds ids and counts only, as the one of report:send-due.
  */
@@ -32,8 +30,7 @@ use Thelia\Model\ReportMailingQuery;
 class ReportMailCommand extends ContainerAwareCommand
 {
     public function __construct(
-        private readonly ReportMailer $reportMailer,
-        private readonly ClockInterface $clock,
+        private readonly ImmediateReportSender $sender,
     ) {
         parent::__construct();
     }
@@ -56,10 +53,13 @@ class ReportMailCommand extends ContainerAwareCommand
 
         $this->initRequest();
 
-        $now = new \DateTimeImmutable($this->clock->now()->format('Y-m-d H:i:s'));
-        $result = $this->reportMailer->send($mailing, $now);
+        $result = $this->sender->send($mailing);
 
-        $mailing->setLastSentAt($now)->save();
+        if (null === $result) {
+            $output->writeln(\sprintf('<comment>Mailing #%d is being sent by another run, nothing was sent: try again in a few minutes.</comment>', $id));
+
+            return self::FAILURE;
+        }
 
         $output->writeln(\sprintf('Mailing #%d: %d sent, %d failed, %d rejected.', $id, \count($result->delivered), \count($result->failed), \count($result->rejected)));
 

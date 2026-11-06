@@ -24,10 +24,13 @@ use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Domain\Reporting\Mailing\ImmediateReportSender;
 use Thelia\Domain\Reporting\Mailing\ReportDownloadLinkGenerator;
 use Thelia\Domain\Reporting\Mailing\ReportDueResolver;
 use Thelia\Domain\Reporting\Mailing\ReportMailer;
+use Thelia\Domain\Reporting\Mailing\ReportMailingLock;
 use Thelia\Domain\Reporting\Mailing\ReportMailingSettings;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ReportMailing;
 use Thelia\Model\ReportMailingQuery;
 use Thelia\Tests\Integration\Domain\Reporting\Mailing\ReportMailingTestCase;
@@ -221,7 +224,7 @@ final class ReportSendDueCommandTest extends ReportMailingTestCase
     {
         $this->orderYesterday();
         $mailing = $this->mailing();
-        $held = $this->lockFactory()->createLock('report_mailing.'.$mailing->getId());
+        $held = $this->lockFactory()->createLock(ReportMailingLock::KEY_PREFIX.$mailing->getId());
         self::assertTrue($held->acquire());
 
         try {
@@ -237,6 +240,92 @@ final class ReportSendDueCommandTest extends ReportMailingTestCase
         $after = $this->runSendDue();
         self::assertEmailCount(1);
         self::assertSame(0, $after->getStatusCode());
+    }
+
+    public function testARetryIsNotSentToARecipientTheMerchantRemoved(): void
+    {
+        $this->orderYesterday();
+        $mailing = $this->mailing(['kept@example.com', 'removed@example.com']);
+        $this->mailerFactory = new RefusingMailerFactory(
+            $this->getService(TemplateHelperInterface::class),
+            $this->getService(ParserResolver::class),
+            $this->getService(MailerInterface::class),
+            self::getContainer()->get('mailer.transports'),
+            ['kept@example.com', 'removed@example.com'],
+        );
+
+        $this->runSendDue();
+        self::assertSame(['kept@example.com', 'removed@example.com'], ReportMailingQuery::create()->findPk($mailing->getId())->getPendingRecipientList());
+
+        // The merchant removes one of the two, with another case for the one kept.
+        ReportMailingQuery::create()->findPk($mailing->getId())->setRecipients('KEPT@example.com')->save();
+        $this->mailerFactory = null;
+        $retry = $this->runSendDue();
+
+        self::assertSame(0, $retry->getStatusCode(), $retry->getDisplay());
+        self::assertEmailCount(1);
+        self::assertEmailAddressContains($this->sentEmail(0), 'To', 'kept@example.com');
+        self::assertNull(ReportMailingQuery::create()->findPk($mailing->getId())->getPendingRecipients());
+    }
+
+    public function testARetryWhoseRecipientsWereAllRemovedSendsNothingAndEndsThePeriod(): void
+    {
+        $this->orderYesterday();
+        $mailing = $this->mailing(['removed@example.com']);
+        $mailing
+            ->setRecipients('someone.else@example.com')
+            ->setLastPeriodEnd((new \DateTimeImmutable('yesterday'))->format('Y-m-d'))
+            ->setPendingRecipientList(['removed@example.com'])
+            ->setPendingAttempts(0)
+            ->save();
+
+        $tester = $this->runSendDue();
+
+        self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertEmailCount(0);
+        self::assertNull(ReportMailingQuery::create()->findPk($mailing->getId())->getPendingRecipients());
+        self::assertSame('', trim($this->runSendDue()->getDisplay()), 'nothing is due any more for the period');
+    }
+
+    public function testASendThatFailsAsAWholeIsGivenUpAfterThreeTries(): void
+    {
+        $this->orderYesterday();
+        $mailing = $this->mailing(['one@example.com']);
+        ConfigQuery::write('store_email', '');
+        $reload = static fn (): ReportMailing => ReportMailingQuery::create()->findPk($mailing->getId());
+
+        foreach ([0, 1, 2] as $attemptsAfterTheRun) {
+            $run = $this->runSendDue();
+            self::assertSame(1, $run->getStatusCode());
+            self::assertStringContainsString(\sprintf('Mailing #%d could not be sent', $mailing->getId()), $run->getDisplay());
+            self::assertSame($attemptsAfterTheRun, $reload()->getPendingAttempts());
+        }
+
+        self::assertNull($reload()->getPendingRecipients(), 'given up for the period after the third try');
+
+        $fourth = $this->runSendDue();
+        self::assertSame(0, $fourth->getStatusCode());
+        self::assertSame('', trim($fourth->getDisplay()), 'the fourth run sends nothing');
+        self::assertEmailCount(0);
+    }
+
+    public function testReportMailRefusesAMailingAnotherRunIsSending(): void
+    {
+        $this->orderYesterday();
+        $mailing = $this->mailing();
+        $held = $this->lockFactory()->createLock(ReportMailingLock::KEY_PREFIX.$mailing->getId());
+        self::assertTrue($held->acquire());
+
+        try {
+            $tester = $this->runMail($mailing);
+        } finally {
+            $held->release();
+        }
+
+        self::assertSame(1, $tester->getStatusCode());
+        self::assertStringContainsString(\sprintf('Mailing #%d is being sent by another run, nothing was sent', $mailing->getId()), $tester->getDisplay());
+        self::assertEmailCount(0);
+        self::assertNull(ReportMailingQuery::create()->findPk($mailing->getId())->getLastSentAt());
     }
 
     public function testTheDryRunTellsWhatIsDueAndSendsNothing(): void
@@ -291,7 +380,7 @@ final class ReportSendDueCommandTest extends ReportMailingTestCase
 
     private function runSendDue(bool $dryRun = false): CommandTester
     {
-        $command = new ReportSendDueCommand($this->reportMailer(), new ReportDueResolver(), $this->lockFactory(), new MockClock());
+        $command = new ReportSendDueCommand($this->reportMailer(), new ReportDueResolver(), new ReportMailingLock($this->lockFactory()), new MockClock());
         $command->setContainer(self::getContainer());
 
         $tester = new CommandTester($command);
@@ -310,7 +399,7 @@ final class ReportSendDueCommandTest extends ReportMailingTestCase
 
     private function mailCommand(): ReportMailCommand
     {
-        $command = new ReportMailCommand($this->reportMailer(), new MockClock());
+        $command = new ReportMailCommand(new ImmediateReportSender($this->reportMailer(), new ReportMailingLock($this->lockFactory()), new MockClock()));
         $command->setContainer(self::getContainer());
 
         return $command;
