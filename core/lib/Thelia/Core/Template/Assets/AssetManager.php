@@ -191,7 +191,7 @@ class AssetManager implements AssetManagerInterface
 
         Tlog::getInstance()->addDebug('Asset destination full path: '.$assetDestinationPath);
 
-        if (!file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
+        if ($this->isOutdated($assetSource, $assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
             Tlog::getInstance()->addDebug('Writing asset to '.$assetDestinationPath);
             (new Filesystem())->copy($assetSource, $assetDestinationPath, true);
         }
@@ -204,6 +204,24 @@ class AssetManager implements AssetManagerInterface
             .'/'.trim($outputRelativeWebPath, '/')
             .'/'.trim($assetFileDirectoryInAssetDirectory, '/')
             .'/'.ltrim($assetName, '/');
+    }
+
+    /**
+     * A published copy is outdated when it is missing or no longer matches its
+     * source, by size or by date: after a module update, the copy of the
+     * previous version is replaced. Filesystem::copy() gives the copy the date
+     * of its source, so an up-to-date copy matches on both.
+     */
+    private function isOutdated(string $assetSource, string $assetDestinationPath): bool
+    {
+        if (!file_exists($assetDestinationPath)) {
+            return true;
+        }
+
+        clearstatcache(true, $assetDestinationPath);
+
+        return filesize($assetSource) !== filesize($assetDestinationPath)
+            || filemtime($assetSource) !== filemtime($assetDestinationPath);
     }
 
     private function normalizePath(string $path): string
