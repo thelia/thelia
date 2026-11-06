@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\OrderReturn\Service;
 
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
@@ -51,8 +52,8 @@ final readonly class RefundAmountCalculator
 
         if (!$this->isRoundingOfSums($orderProduct)) {
             // Sum of roundings: each unit amount is charged rounded to the cent.
-            $unitPrice = round($unitPrice, 2);
-            $unitTax = round($unitTax, 2);
+            $unitPrice = MoneyRounding::toTheCent($unitPrice);
+            $unitTax = MoneyRounding::toTheCent($unitTax);
         }
 
         return $unitPrice + $unitTax;
@@ -146,7 +147,7 @@ final readonly class RefundAmountCalculator
 
         if ($this->isRoundingOfSums($orderProduct)) {
             // Rounding of sums: only the line total is rounded.
-            $lineTotal = round($lineTotal, 2);
+            $lineTotal = MoneyRounding::toTheCent($lineTotal);
         }
 
         return $lineTotal;
@@ -163,7 +164,7 @@ final readonly class RefundAmountCalculator
             return $amount;
         }
 
-        return round($amount, 2);
+        return MoneyRounding::toTheCent($amount);
     }
 
     /**

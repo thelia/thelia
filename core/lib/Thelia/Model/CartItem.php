@@ -25,6 +25,7 @@ use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\CartItem as BaseCartItem;
@@ -389,7 +390,7 @@ class CartItem extends BaseCartItem
      */
     private function lineTotal(float $unitPrice): float
     {
-        return round($this->summedLineTotal($unitPrice), 2);
+        return MoneyRounding::toTheCent($this->summedLineTotal($unitPrice));
     }
 
     /**
@@ -402,9 +403,9 @@ class CartItem extends BaseCartItem
     private function summedLineTotal(float $unitPrice): float
     {
         if (ConfigQuery::isRoundingModeRoundingOfSums()) {
-            return round($unitPrice * $this->getQuantity(), 2);
+            return MoneyRounding::toTheCent($unitPrice * $this->getQuantity());
         }
 
-        return round($unitPrice, 2) * $this->getQuantity();
+        return MoneyRounding::toTheCent($unitPrice) * $this->getQuantity();
     }
 }
