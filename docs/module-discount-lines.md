@@ -69,6 +69,37 @@ page read the rows through `Order::getOrderDiscountLines()`; the module charges
 the buyer's balance with the amount of its row, not with what its provider
 would say later.
 
+## Charging the line
+
+Each row written is announced with `TheliaEvents::ORDER_DISCOUNT_LINE_RECORD`
+(an `OrderDiscountLineEvent`), inside the transaction of the order, before its
+commit. The listener of the module checks the key of the line, then writes what
+it charges with the connection of the event, so that both stand or fall with
+the order:
+
+```php
+public function onDiscountLineRecord(OrderDiscountLineEvent $event): void
+{
+    $line = $event->getLine();
+
+    if ('StoreCredit.balance' !== $line->getLineKey()) {
+        return;
+    }
+
+    // Lock the balance, check it still covers the line, write the spending.
+    $this->ledger->spend(
+        $event->getOrder()->getCustomerId(),
+        $line->getAmount(),
+        $event->getOrder()->getId(),
+        $event->getConnection(),
+    );
+}
+```
+
+Throwing refuses the order: the transaction is rolled back and the exception
+reaches the buyer. A line granted nothing is neither written nor announced. The
+order has no ref yet when the event is sent.
+
 ## Tests
 
 `tests/Integration/Domain/Cart/ModuleDiscountLinesTest.php`.

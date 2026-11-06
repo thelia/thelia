@@ -14,12 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Cart;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Action\Coupon as CouponAction;
 use Thelia\Api\Service\DataAccess\AttributeAccessService;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
+use Thelia\Core\Event\Order\OrderDiscountLineEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Cart\Discount\CartDiscountLine;
 use Thelia\Domain\Cart\Discount\CartDiscountLineProviderInterface;
@@ -55,6 +57,9 @@ final class ModuleDiscountLinesTest extends ActionIntegrationPromotionTestCase
 
     private CartDiscountLines $lines;
 
+    /** What the order announces its discount lines with: the modules listen to the kernel's. */
+    private EventDispatcher $lineDispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -76,9 +81,10 @@ final class ModuleDiscountLinesTest extends ActionIntegrationPromotionTestCase
         AttributeAccessService::clearCache();
         $this->attributeAccess = self::rebuilt($this->getService(AttributeAccessService::class), ['cartDiscountLines' => $lines]);
         $this->couponAction = self::rebuilt($this->getService(CouponAction::class), ['cartDiscountLines' => $lines]);
+        $this->lineDispatcher = new EventDispatcher();
         $this->orderFacade = self::rebuilt(
             $this->getService(OrderFacade::class),
-            ['orderDiscountLineRecorder' => new OrderDiscountLineRecorder($lines)],
+            ['orderDiscountLineRecorder' => new OrderDiscountLineRecorder($lines, $this->lineDispatcher)],
         );
     }
 
@@ -217,6 +223,105 @@ final class ModuleDiscountLinesTest extends ActionIntegrationPromotionTestCase
         self::assertSame('TestCredit.balance', $rows[0]->getLineKey());
         self::assertSame('Store credit', $rows[0]->getLabel());
         self::assertSame(3.0, (float) $rows[0]->getAmount(), 'What the module declared when the order was placed, not what it says now.');
+    }
+
+    /**
+     * The module charges the balance where the line is written: in the transaction of the
+     * order, with its connection, the row already readable there.
+     */
+    public function testEachLineWrittenIsAnnouncedInTheTransactionOfTheOrder(): void
+    {
+        $this->moduleLines = [
+            new CartDiscountLine('TestCredit.balance', 'Store credit', 3.0),
+            new CartDiscountLine('TestGift.card', 'Gift card', 2.0),
+        ];
+
+        /** @var list<array{key: string, amount: float, orderId: int|null, inTransaction: bool, readBack: float}> $announced */
+        $announced = [];
+        $this->lineDispatcher->addListener(
+            TheliaEvents::ORDER_DISCOUNT_LINE_RECORD,
+            static function (OrderDiscountLineEvent $event) use (&$announced): void {
+                $connection = $event->getConnection();
+                $readBack = OrderDiscountLineQuery::create()->findPk($event->getLine()->getId(), $connection);
+
+                $announced[] = [
+                    'key' => $event->getLine()->getLineKey(),
+                    'amount' => (float) $event->getLine()->getAmount(),
+                    'orderId' => $event->getOrder()->getId(),
+                    'inTransaction' => $connection->inTransaction(),
+                    'readBack' => (float) $readBack?->getAmount(),
+                ];
+            },
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product(['basePrice' => 100.0]));
+        $this->priceTheDiscount();
+
+        $order = $this->placeOrder($this->reloaded($cart));
+
+        self::assertSame(
+            [
+                ['key' => 'TestCredit.balance', 'amount' => 3.0, 'orderId' => $order->getId(), 'inTransaction' => true, 'readBack' => 3.0],
+                ['key' => 'TestGift.card', 'amount' => 2.0, 'orderId' => $order->getId(), 'inTransaction' => true, 'readBack' => 2.0],
+            ],
+            $announced,
+            'One announcement per row written, with what the line was granted.',
+        );
+    }
+
+    /**
+     * The first line takes the whole worth of the goods: the second is granted nothing, so
+     * nothing is charged for it.
+     */
+    public function testALineGrantedNothingIsNotAnnounced(): void
+    {
+        $this->moduleLines = [
+            new CartDiscountLine('TestCredit.balance', 'Store credit', 12.0),
+            new CartDiscountLine('TestGift.card', 'Gift card', 5.0),
+        ];
+
+        /** @var list<string> $announced */
+        $announced = [];
+        $this->lineDispatcher->addListener(
+            TheliaEvents::ORDER_DISCOUNT_LINE_RECORD,
+            static function (OrderDiscountLineEvent $event) use (&$announced): void {
+                $announced[] = $event->getLine()->getLineKey();
+            },
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product(['basePrice' => 10.0]));
+        $this->priceTheDiscount();
+        $this->placeOrder($this->reloaded($cart));
+
+        self::assertSame(['TestCredit.balance'], $announced);
+    }
+
+    /**
+     * A balance that no longer covers the line refuses the order: the refusal reaches the
+     * buyer, and the transaction of the order is rolled back (what the rollback undoes is
+     * not visible inside the transaction the test case wraps around each test).
+     */
+    public function testAModuleThatRefusesItsLineRefusesTheOrder(): void
+    {
+        $this->moduleLines = [new CartDiscountLine('TestCredit.balance', 'Store credit', 3.0)];
+
+        $refusal = new \RuntimeException('The balance no longer covers the line.');
+        $this->lineDispatcher->addListener(
+            TheliaEvents::ORDER_DISCOUNT_LINE_RECORD,
+            static function () use ($refusal): void {
+                throw $refusal;
+            },
+        );
+
+        $cart = $this->newEmptyCart();
+        $this->addItem($cart, $this->product(['basePrice' => 100.0]));
+        $this->priceTheDiscount();
+
+        $this->expectExceptionObject($refusal);
+
+        $this->placeOrder($this->reloaded($cart));
     }
 
     /**

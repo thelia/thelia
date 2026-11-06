@@ -370,6 +370,14 @@ final class TheliaEvents
     public const ORDER_PAYMENT_PART_RELEASE = 'action.order.paymentPart.release';
 
     /**
+     * Sent (OrderDiscountLineEvent) for each discount line of a module written on an order
+     * being placed, inside the transaction of the order and before its commit. The module whose
+     * key the line carries charges the amount with the connection of the event; throwing rolls
+     * the whole order back. The order has no ref yet.
+     */
+    public const ORDER_DISCOUNT_LINE_RECORD = 'action.order.discountLine.record';
+
+    /**
      * Shipments: a parcel, or a set of parcels leaving together, carrying part or all
      * of an order. Dispatched once the shipment is committed, to announce what
      * happened (history, e-mails, modules), never to perform it: the writer is
