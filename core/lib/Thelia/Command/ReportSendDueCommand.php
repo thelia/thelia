@@ -19,9 +19,9 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Lock\LockFactory;
 use Thelia\Domain\Reporting\Mailing\ReportDueResolver;
 use Thelia\Domain\Reporting\Mailing\ReportMailer;
+use Thelia\Domain\Reporting\Mailing\ReportMailingLock;
 use Thelia\Log\Tlog;
 use Thelia\Model\ReportMailingQuery;
 
@@ -34,17 +34,10 @@ use Thelia\Model\ReportMailingQuery;
 #[AsCommand(name: 'report:send-due', description: 'Send the report mailings that are due, each period once.')]
 class ReportSendDueCommand extends ContainerAwareCommand
 {
-    /**
-     * A mailing is sent by one run at a time: the second one skips it and says so. The
-     * lock dies with its process, and with a store that honours it, after this many
-     * seconds should the process hang.
-     */
-    private const float LOCK_TTL_SECONDS = 900.0;
-
     public function __construct(
         private readonly ReportMailer $reportMailer,
         private readonly ReportDueResolver $dueResolver,
-        private readonly LockFactory $lockFactory,
+        private readonly ReportMailingLock $lock,
         private readonly ClockInterface $clock,
     ) {
         parent::__construct();
@@ -85,9 +78,10 @@ class ReportSendDueCommand extends ContainerAwareCommand
                     continue;
                 }
 
-                $lock = $this->lockFactory->createLock('report_mailing.'.$id, self::LOCK_TTL_SECONDS);
+                // A mailing is sent by one process at a time, a send asked from the back office included.
+                $lock = $this->lock->acquire($id);
 
-                if (!$lock->acquire()) {
+                if (null === $lock) {
                     $output->writeln(\sprintf('<comment>Mailing #%d is being sent by another run, skipped.</comment>', $id));
 
                     continue;
@@ -105,22 +99,42 @@ class ReportSendDueCommand extends ContainerAwareCommand
 
                     // The period is noted before the first mail and the waiting list shrinks with each
                     // recipient served: a run killed midway leaves the next one only those still to serve.
-                    $waiting = $due->onlyRecipients ?? $mailing->getRecipientList();
+                    // A retry goes only to the addresses that are still recipients: one the merchant
+                    // removed after a failed send is not sent the figures.
+                    $waiting = null === $due->onlyRecipients ? $mailing->getRecipientList() : $mailing->keepCurrentRecipients($due->onlyRecipients);
+
+                    if (null !== $due->onlyRecipients && [] === $waiting) {
+                        $mailing->setPendingRecipientList([])->save();
+
+                        continue;
+                    }
+
                     $mailing
                         ->setLastPeriodEnd($due->periodEnd->format('Y-m-d'))
                         ->setPendingRecipientList($waiting)
                         ->setPendingAttempts(null === $due->onlyRecipients ? 0 : $due->attempt - 1)
                         ->save();
 
-                    $result = $this->reportMailer->send(
-                        $mailing,
-                        $due->occurrence,
-                        $due->onlyRecipients,
-                        static function (string $served) use ($mailing, &$waiting): void {
-                            $waiting = array_values(array_diff($waiting, [$served]));
-                            $mailing->setPendingRecipientList($waiting)->save();
-                        },
-                    );
+                    try {
+                        $result = $this->reportMailer->send(
+                            $mailing,
+                            $due->occurrence,
+                            $waiting,
+                            static function (string $served) use ($mailing, &$waiting): void {
+                                $waiting = array_values(array_diff($waiting, [$served]));
+                                $mailing->setPendingRecipientList($waiting)->save();
+                            },
+                        );
+                    } catch (\Throwable $notSent) {
+                        // A send that fails as a whole (no sender address, export or storage failure) is a
+                        // try too: the period is given up after the last one, as a refused recipient is.
+                        if ($due->lastAttempt) {
+                            $mailing->setPendingRecipientList([])->save();
+                            $this->warnGivenUp($id, \count($waiting));
+                        }
+
+                        throw $notSent;
+                    }
 
                     $abandoned = $due->lastAttempt ? \count($result->failed) : 0;
 
@@ -135,8 +149,7 @@ class ReportSendDueCommand extends ContainerAwareCommand
                 $output->writeln(\sprintf('Mailing #%d: %d sent, %d failed, %d rejected.', $id, \count($result->delivered), \count($result->failed), \count($result->rejected)));
 
                 if ($abandoned > 0) {
-                    // The count and the mailing only, here too: the addresses stay out of the logs.
-                    Tlog::getInstance()->addWarning(\sprintf('Report mailing #%d: %d recipient(s) still failing after %d tries are given up for this period.', $id, $abandoned, ReportDueResolver::MAX_ATTEMPTS));
+                    $this->warnGivenUp($id, $abandoned);
                 }
 
                 if ([] !== $result->rejected) {
@@ -154,5 +167,11 @@ class ReportSendDueCommand extends ContainerAwareCommand
         }
 
         return 0 === $failures ? self::SUCCESS : self::FAILURE;
+    }
+
+    private function warnGivenUp(int $mailingId, int $recipients): void
+    {
+        // The count and the mailing only: the addresses stay out of the logs.
+        Tlog::getInstance()->addWarning(\sprintf('Report mailing #%d: %d recipient(s) still failing after %d tries are given up for this period.', $mailingId, $recipients, ReportDueResolver::MAX_ATTEMPTS));
     }
 }

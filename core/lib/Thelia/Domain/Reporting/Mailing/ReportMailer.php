@@ -56,7 +56,7 @@ final readonly class ReportMailer
 
     /**
      * @param \DateTimeImmutable $reference      the day the period is relative to
-     * @param list<string>|null  $onlyRecipients when given, only these addresses get the report
+     * @param list<string>|null  $onlyRecipients when given, only those of these addresses that are still recipients of the mailing get the report
      * @param \Closure|null      $onServed       called with each address once it is dealt with for good, delivered or rejected
      *                                           as invalid, so that a caller can note its progress: a failure is not served
      */
@@ -66,7 +66,7 @@ final readonly class ReportMailer
         $period = ReportPeriod::from((string) $mailing->getPeriod())->resolve($reference);
         $locale = (string) $mailing->getLocale();
         $language = LangQuery::create()->findOneByLocale($locale) ?? Lang::getDefaultLanguage();
-        $recipients = $onlyRecipients ?? $mailing->getRecipientList();
+        $recipients = null === $onlyRecipients ? $mailing->getRecipientList() : $mailing->keepCurrentRecipients($onlyRecipients);
 
         $storeEmail = (string) ConfigQuery::getStoreEmail();
 
