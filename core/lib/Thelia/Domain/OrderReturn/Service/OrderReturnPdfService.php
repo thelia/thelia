@@ -86,6 +86,10 @@ final readonly class OrderReturnPdfService
                 'title' => (string) $orderProduct?->getTitle(),
                 'ref' => (string) $orderProduct?->getProductRef(),
                 'quantity' => (float) $line->getQuantity(),
+                // Frozen on the order line the return refers to: 0 and null for a line placed
+                // before quantities had decimals.
+                'quantity_decimals' => $orderProduct?->getQuantityDecimals() ?? 0,
+                'unit_code' => $orderProduct?->getUnitCode(),
                 'refund' => $this->formatAmount((float) $line->getRefundAmount(), $symbol),
             ];
         }

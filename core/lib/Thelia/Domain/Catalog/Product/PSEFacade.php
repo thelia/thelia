@@ -27,6 +27,7 @@ use Thelia\Domain\Catalog\Product\DTO\PSECreateDTO;
 use Thelia\Domain\Catalog\Product\DTO\PSEUpdateDTO;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\PSENotFoundException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
@@ -78,6 +79,7 @@ final readonly class PSEFacade
             ->setEanCode($dto->eanCode)
             ->setMpn($dto->mpn)
             ->setManufacturerBrandId($dto->manufacturerBrandId)
+            ->setQuantityRule($dto->quantityRule)
             ->setTaxRuleId($dto->taxRuleId)
             ->setFromDefaultCurrency($dto->fromDefaultCurrency ? 1 : 0);
 
@@ -178,7 +180,8 @@ final readonly class PSEFacade
             throw PSENotFoundException::withId($pseId);
         }
 
-        $pse->setQuantity($quantity)->save();
+        // A stock holds the decimals the combination is sold with.
+        $pse->setQuantity((new QuantityPolicy())->assertStockFits($quantity, $pse))->save();
     }
 
     public function decreaseStock(int $pseId, float $quantity): void
@@ -189,7 +192,7 @@ final readonly class PSEFacade
             throw PSENotFoundException::withId($pseId);
         }
 
-        $newQuantity = max(0, $pse->getQuantity() - $quantity);
+        $newQuantity = max(0, $pse->getQuantity() - (new QuantityPolicy())->assertStockFits($quantity, $pse));
         $pse->setQuantity($newQuantity)->save();
     }
 
@@ -201,7 +204,7 @@ final readonly class PSEFacade
             throw PSENotFoundException::withId($pseId);
         }
 
-        $pse->setQuantity($pse->getQuantity() + $quantity)->save();
+        $pse->setQuantity($pse->getQuantity() + (new QuantityPolicy())->assertStockFits($quantity, $pse))->save();
     }
 
     private function getProductById(int $productId): ?Product

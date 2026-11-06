@@ -22,7 +22,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Exception\TheliaProcessException;
@@ -243,11 +245,12 @@ class Order extends BaseOrder
 
         $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
         $textPromoPrice = ConfigQuery::isOrderWithTextPromoPrice((int) $this->getId());
-        $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice;
+        $floatLineRounding = ConfigQuery::isOrderWithFloatLineRounding((int) $this->getId());
+        $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice.'-'.(int) $floatLineRounding;
 
         if (!isset($queryResult[$id]) || null === $queryResult[$id]) {
             $con = Propel::getConnection();
-            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice));
+            $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice, $floatLineRounding));
 
             if (false === $stmt->execute([':order_id' => $this->getId()])) {
                 throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
@@ -256,8 +259,11 @@ class Order extends BaseOrder
             $queryResult[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
-        $total = (float) $queryResult[$id]->total_taxed_price;
-        $tax = $total - (float) $queryResult[$id]->total_untaxed_price;
+        // The order is charged in cents, as Cart::getTaxedAmount() and Cart::getTotalAmount()
+        // round the cart. A line sold by measure is where it shows: 1.25 kg at 14.82 is a
+        // line of 18.525, charged 18.53, and the tax is the gap between the two rounded totals.
+        $total = MoneyRounding::toTheCent((float) $queryResult[$id]->total_taxed_price);
+        $tax = $total - MoneyRounding::toTheCent((float) $queryResult[$id]->total_untaxed_price);
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
@@ -296,7 +302,7 @@ class Order extends BaseOrder
      * text, the price of a line that is not on promotion included, and ROUND() then
      * reads it as a floating point number.
      */
-    private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice): string
+    private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice, bool $floatLineRounding): string
     {
         $roundingOfSums = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode;
 
@@ -314,12 +320,18 @@ class Order extends BaseOrder
             WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
         )';
 
-        $taxedLineTotal = OrderProductTableMap::COL_QUANTITY.' * ('.$unitPrice.' + '.$unitTaxes.')';
-        $untaxedLineTotal = OrderProductTableMap::COL_QUANTITY.' * '.$unitPrice;
+        $taxedLineTotal = self::storedQuantity().' * ('.$unitPrice.' + '.$unitTaxes.')';
+        $untaxedLineTotal = self::storedQuantity().' * '.$unitPrice;
 
+        // The quantity is a DOUBLE, and so is the line total: 1.25 x 14.82 is 18.524999…,
+        // which ROUND() would bring down to 18.52 where the cart, rounding in PHP, charges
+        // 18.53. The line is brought back to a decimal at six places before it is rounded.
+        // An order read with a text promotional price, or placed before the line totals
+        // were rounded so (ConfigQuery::isOrderWithFloatLineRounding()), was invoiced on the
+        // floating point figure, and keeps it.
         if ($roundingOfSums) {
-            $taxedLineTotal = 'ROUND('.$taxedLineTotal.', 2)';
-            $untaxedLineTotal = 'ROUND('.$untaxedLineTotal.', 2)';
+            $taxedLineTotal = 'ROUND('.self::asDecimalUnless($taxedLineTotal, $textPromoPrice || $floatLineRounding).', 2)';
+            $untaxedLineTotal = 'ROUND('.self::asDecimalUnless($untaxedLineTotal, $textPromoPrice || $floatLineRounding).', 2)';
         }
 
         return '
@@ -329,6 +341,23 @@ class Order extends BaseOrder
             FROM '.OrderProductTableMap::TABLE_NAME.'
             WHERE '.OrderProductTableMap::COL_ORDER_ID.' = :order_id
         ';
+    }
+
+    /**
+     * The quantity of a line as it was sold. The column is a binary floating point number:
+     * a quantity written with an error past the thousandth (a single precision FLOAT kept
+     * 0.7 kg as 0.69999998) would make a line of 0.7 at 0.75 come to 0.52499998 and be
+     * rounded down where the cart rounded 0.525 up. A quantity carries three decimals at
+     * most, so rounding it there gives back the quantity sold.
+     */
+    private static function storedQuantity(): string
+    {
+        return 'ROUND('.OrderProductTableMap::COL_QUANTITY.', '.QuantityScale::MAXIMUM_DECIMALS.')';
+    }
+
+    private static function asDecimalUnless(string $lineTotal, bool $invoicedOnTheFloatingPointFigure): string
+    {
+        return $invoicedOnTheFloatingPointFigure ? $lineTotal : 'CAST('.$lineTotal.' AS DECIMAL(20,6))';
     }
 
     private function promoPriceOperand(bool $textPromoPrice): string
@@ -462,7 +491,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithTaxesAfterDiscount(): float
     {
-        return round(round($this->getTotalAmount(), 2) - round((float) $this->getPostage(), 2), 2);
+        return MoneyRounding::toTheCent(MoneyRounding::toTheCent($this->getTotalAmount()) - MoneyRounding::toTheCent((float) $this->getPostage()));
     }
 
     /**
@@ -474,7 +503,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithoutTaxes(): float
     {
-        return round($this->getUntaxedTotalAmount(false, false), 2);
+        return MoneyRounding::toTheCent($this->getUntaxedTotalAmount(false, false));
     }
 
     /**
@@ -486,7 +515,7 @@ class Order extends BaseOrder
      */
     public function getTotalGoodsWithoutTaxes(): float
     {
-        return round($this->getTotalAmountWithoutTaxes() - $this->serviceLinesTotal('untaxed'), 2);
+        return MoneyRounding::toTheCent($this->getTotalAmountWithoutTaxes() - $this->serviceLinesTotal('untaxed'));
     }
 
     /**
@@ -499,7 +528,7 @@ class Order extends BaseOrder
     {
         $tax = 0;
 
-        return round(round($this->getTotalAmount($tax, false, false), 2) - $this->serviceLinesTotal('taxed'), 2);
+        return MoneyRounding::toTheCent(MoneyRounding::toTheCent($this->getTotalAmount($tax, false, false)) - $this->serviceLinesTotal('taxed'));
     }
 
     /**
@@ -558,7 +587,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithoutTaxesAfterDiscount(): float
     {
-        return round($this->getUntaxedTotalAmount(false), 2);
+        return MoneyRounding::toTheCent($this->getUntaxedTotalAmount(false));
     }
 
     /**
@@ -566,7 +595,7 @@ class Order extends BaseOrder
      */
     public function getTotalShippingWithoutTaxes(): float
     {
-        return round((float) $this->getUntaxedPostage(), 2);
+        return MoneyRounding::toTheCent((float) $this->getUntaxedPostage());
     }
 
     /**
@@ -576,7 +605,7 @@ class Order extends BaseOrder
      */
     public function getAmountDiscountWithoutTaxes(): float
     {
-        return round($this->getUntaxedDiscount(), 2);
+        return MoneyRounding::toTheCent($this->getUntaxedDiscount());
     }
 
     /**
@@ -588,7 +617,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithTaxesWithShipping(): float
     {
-        return round($this->getTotalAmount(), 2);
+        return MoneyRounding::toTheCent($this->getTotalAmount());
     }
 
     /**
@@ -597,7 +626,7 @@ class Order extends BaseOrder
      */
     public function getAmountDiscountWithTaxes(): float
     {
-        return round((float) $this->getDiscount(), 2);
+        return MoneyRounding::toTheCent((float) $this->getDiscount());
     }
 
     /**
@@ -606,7 +635,7 @@ class Order extends BaseOrder
      */
     public function getTotalShippingWithTaxes(): float
     {
-        return round((float) $this->getPostage(), 2);
+        return MoneyRounding::toTheCent((float) $this->getPostage());
     }
 
     /**
@@ -614,7 +643,7 @@ class Order extends BaseOrder
      */
     public function getTotalShippingTaxAmount(): float
     {
-        return round((float) $this->getPostageTax(), 2);
+        return MoneyRounding::toTheCent((float) $this->getPostageTax());
     }
 
     /**
@@ -626,7 +655,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithoutTaxesWithShipping(): float
     {
-        return round($this->getTotalAmountWithoutTaxesAfterDiscount() + $this->getTotalShippingWithoutTaxes(), 2);
+        return MoneyRounding::toTheCent($this->getTotalAmountWithoutTaxesAfterDiscount() + $this->getTotalShippingWithoutTaxes());
     }
 
     /**
@@ -640,11 +669,10 @@ class Order extends BaseOrder
      */
     public function getTotalTaxAmount(): float
     {
-        return round(
-            round($this->getTotalAmount(), 2)
+        return MoneyRounding::toTheCent(
+            MoneyRounding::toTheCent($this->getTotalAmount())
             - $this->getTotalAmountWithoutTaxesAfterDiscount()
             - $this->getTotalShippingWithoutTaxes(),
-            2,
         );
     }
 

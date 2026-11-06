@@ -29,6 +29,7 @@ use Thelia\Domain\OrderReturn\Service\OrderReturnWriteTransactionInterface;
 use Thelia\Domain\OrderReturn\Service\RefundAmountCalculator;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
 use Thelia\Domain\OrderReturn\Service\StockIncrementer;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -160,13 +161,15 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             }
 
             $refunds = $this->composer->priceRequestedLines($order, $customer, $requested);
-            $total = 0.0;
 
             foreach ($lines as $index => [$line, $orderProduct]) {
                 $line->setProductSaleElementsId($orderProduct->getProductSaleElementsId());
                 $line->setRefundAmount(number_format($refunds[$index], 6, '.', ''));
-                $total += $refunds[$index];
             }
+
+            // Each line is rounded to the cent, the return as a whole is not the sum of
+            // these: the order rounded the sum of its lines, and that is what was paid.
+            $total = $this->refundCalculator->linesRefund($order, $requested);
 
             $reason = $return->getOrderReturnReason();
 
@@ -180,7 +183,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
 
             $return
                 ->setStatusId($initialStatusId)
-                ->setRefundAmount(number_format(round($total, 2), 2, '.', ''))
+                ->setRefundAmount(number_format(MoneyRounding::toTheCent($total), 2, '.', ''))
                 ->save($connection);
         });
 
@@ -253,7 +256,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             $this->restockReceivedLines($return, $connection);
 
             $return
-                ->setRefundAmount(number_format($this->refundCalculator->compute($return, true), 2, '.', ''))
+                ->setRefundAmount(number_format(MoneyRounding::toTheCent($this->refundCalculator->compute($return, true)), 2, '.', ''))
                 ->setStatusId((int) $receivedStatus->getId())
                 ->save($connection);
         });
@@ -292,7 +295,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
 
             if (OrderReturnStatus::CODE_RECEIVED === $toCode) {
                 $this->restockReceivedLines($return, $connection);
-                $return->setRefundAmount(number_format($this->refundCalculator->compute($return, true), 2, '.', ''));
+                $return->setRefundAmount(number_format(MoneyRounding::toTheCent($this->refundCalculator->compute($return, true)), 2, '.', ''));
             }
 
             if (OrderReturnStatus::CODE_REFUSED === $toCode && null !== $event->getRefusalReason()) {

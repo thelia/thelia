@@ -120,6 +120,12 @@ enum CheckoutViolationCode: string
     case CartLineUnavailable = 'cart-line-unavailable';
 
     /**
+     * Lines of the cart no longer met the quantity rules of their combination and were
+     * just brought down or removed: the buyer checks the cart again before ordering.
+     */
+    case CartQuantitiesAdjusted = 'cart-quantities-adjusted';
+
+    /**
      * A refusal of the checkout that names no family of its own — a module's step, or a
      * core exception a later version has not given a code to yet.
      */

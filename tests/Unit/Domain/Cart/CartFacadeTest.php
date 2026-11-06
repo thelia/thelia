@@ -41,7 +41,7 @@ class CartFacadeTest extends TestCase
         $this->assertSame($cart, $array['cart']);
         $this->assertSame(10, $array['productId']);
         $this->assertSame(20, $array['productSaleElementsId']);
-        $this->assertSame(3, $array['quantity']);
+        $this->assertSame(3.0, $array['quantity']);
         $this->assertTrue($array['append']);
         $this->assertFalse($array['newness']);
     }
@@ -56,7 +56,7 @@ class CartFacadeTest extends TestCase
             productSaleElementId: 20,
         );
 
-        $this->assertSame(1, $dto->toArray()['quantity']);
+        $this->assertSame(1.0, $dto->toArray()['quantity']);
         $this->assertTrue($dto->toArray()['append']);
         $this->assertTrue($dto->toArray()['newness']);
     }
@@ -115,7 +115,7 @@ class CartFacadeTest extends TestCase
 
         $this->assertSame($cart, $array['cart']);
         $this->assertSame(42, $array['cart_item_id']);
-        $this->assertSame(5, $array['quantity']);
+        $this->assertSame(5.0, $array['quantity']);
     }
 
     public function testCartItemUpdateQuantityDTOGetCart(): void

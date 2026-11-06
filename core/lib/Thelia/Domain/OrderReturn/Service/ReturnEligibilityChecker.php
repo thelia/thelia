@@ -358,9 +358,10 @@ final class ReturnEligibilityChecker
      * The quantities are read as plain values, never as models: the instance
      * pool hands back a line already loaded in the process as it was then, so
      * a quantity changed since would be counted at its old value. They are
-     * summed here rather than by SUM(): the column is a FLOAT, which SQL adds
-     * in single precision (1000.3 is 1000.2999877929688 there), while PDO hands
-     * out the rounded figure the shop displays.
+     * summed here rather than by SUM(), and the remainder is rounded to the
+     * precision of a quantity: the column is a binary floating point number,
+     * which SQL adds with the error of each value (a single precision FLOAT made
+     * 1000.3 into 1000.2999877929688).
      *
      * $lockingRead is for a write transaction that may have read before it
      * locked its rows, see OrderReturnWriteTransaction: there only a locking

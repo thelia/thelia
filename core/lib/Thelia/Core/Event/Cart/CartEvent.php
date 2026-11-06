@@ -21,7 +21,7 @@ use Thelia\Model\CartItem;
 
 class CartEvent extends ActionEvent
 {
-    protected ?int $quantity = null;
+    protected ?float $quantity = null;
     protected ?bool $append = null;
     protected ?bool $newness = null;
     protected ?int $productSaleElementsId = null;
@@ -30,6 +30,7 @@ class CartEvent extends ActionEvent
     protected ?int $cartItemId = null;
     protected ?BundleComposition $bundleComposition = null;
     protected ?float $bundleAvailability = null;
+    protected bool $offeredByAPromotion = false;
 
     public function __construct(
         protected Cart $cart,
@@ -127,14 +128,18 @@ class CartEvent extends ActionEvent
         return $this->productSaleElementsId;
     }
 
+    /**
+     * A combination sold by measure takes a quantity with decimals (1.25 kg): it is
+     * carried as it is, the rules of the combination deciding whether the cart takes it.
+     */
     public function setQuantity(int|float $quantity): static
     {
-        $this->quantity = (int) $quantity;
+        $this->quantity = (float) $quantity;
 
         return $this;
     }
 
-    public function getQuantity(): ?int
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
@@ -147,6 +152,17 @@ class CartEvent extends ActionEvent
     public function setBundleComposition(?BundleComposition $bundleComposition): static
     {
         $this->bundleComposition = $bundleComposition;
+
+        return $this;
+    }
+
+    /**
+     * The line is a gift a promotion adds (FreeProduct): it is not sold, so the cart
+     * holds it to none of the quantity rules of its combination.
+     */
+    public function setOfferedByAPromotion(bool $offeredByAPromotion): static
+    {
+        $this->offeredByAPromotion = $offeredByAPromotion;
 
         return $this;
     }
@@ -170,6 +186,11 @@ class CartEvent extends ActionEvent
     public function getBundleAvailability(): ?float
     {
         return $this->bundleAvailability;
+    }
+
+    public function isOfferedByAPromotion(): bool
+    {
+        return $this->offeredByAPromotion;
     }
 
     public function getCart(): Cart

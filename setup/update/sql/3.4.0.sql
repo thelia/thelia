@@ -635,4 +635,146 @@ WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
 
 DROP TEMPORARY TABLE `config_title_seed`;
 
+-- ---------------------------------------------------------------------
+-- Quantity rules and unit of measure of a combination
+--
+-- The quantity rules and the unit of measure of a combination. The defaults (a minimum of 1,
+-- a step of 1, no decimals, no unit) are the behaviour every combination had before them, so
+-- nothing changes for an upgraded shop until a combination is given rules. The order line
+-- freezes the unit and the decimals sold, so its documents still write "1,25 kg" once the
+-- combination is changed or deleted.
+-- ---------------------------------------------------------------------
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'min_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `min_quantity` DECIMAL(16,6) DEFAULT 1 NOT NULL COMMENT ''the smallest quantity a cart line of this combination may hold'' AFTER `manufacturer_brand_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'quantity_step');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `quantity_step` DECIMAL(16,6) DEFAULT 1 NOT NULL COMMENT ''the quantity of a cart line is a multiple of this step'' AFTER `min_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'quantity_decimals');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `quantity_decimals` TINYINT DEFAULT 0 NOT NULL COMMENT ''how many decimals a quantity may carry: 0 sells by the piece, more sells by measure'' AFTER `quantity_step`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'unit_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `unit_quantity` DECIMAL(16,6) NULL COMMENT ''what one unit sold contains, in unit_code (0.75 for a 75 cl bottle), NULL when no reference price is shown'' AFTER `quantity_decimals`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'reference_unit_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `reference_unit_quantity` DECIMAL(16,6) NULL COMMENT ''the quantity the reference price is given for, in unit_code (1 for a price per litre)'' AFTER `unit_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'unit_code');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_sale_elements` ADD `unit_code` VARCHAR(16) NULL COMMENT ''the normalized code of the unit of measure (kg, l, m...), NULL when the combination has none'' AFTER `reference_unit_quantity`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'unit_code');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `unit_code` VARCHAR(16) NULL COMMENT ''the unit of measure of the combination, copied when the order is placed so the documents keep the unit sold'' AFTER `mpn`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'quantity_decimals');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_product` ADD `quantity_decimals` TINYINT DEFAULT 0 NOT NULL COMMENT ''the decimals the quantity of the combination carried when the order was placed'' AFTER `unit_code`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- ---------------------------------------------------------------------
+-- Quantities and stocks in double precision
+-- ---------------------------------------------------------------------
+-- A single precision FLOAT gives six significant digits back: 1234.567 kg was read as
+-- 1234.57. The quantity columns become DOUBLE. A FLOAT turned into a DOUBLE keeps its
+-- binary error (0.7 becomes 0.699999988079071), so each converted value is brought back
+-- to the seven significant digits a FLOAT holds, and never past the thousandth, the finest
+-- decimal a quantity is sold with: 0.7 is 0.7 again, 123456.7 stays 123456.7. A column
+-- already in DOUBLE is left alone, so the script can be replayed.
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_sale_elements' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `product_sale_elements` MODIFY `quantity` DOUBLE NOT NULL', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `product_sale_elements` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `cart_item` MODIFY `quantity` DOUBLE DEFAULT 1', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `cart_item` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_product' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_product` MODIFY `quantity` DOUBLE NOT NULL', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_product` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_return_line' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_return_line` MODIFY `quantity` DOUBLE NOT NULL COMMENT ''the quantity the customer asks to return''', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_return_line` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_return_line' AND `COLUMN_NAME` = 'quantity_received' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_return_line` MODIFY `quantity_received` DOUBLE DEFAULT 0 COMMENT ''the quantity actually received by the merchant''', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_return_line` SET `quantity_received` = ROUND(`quantity_received`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity_received`), 0.001)))))) WHERE `quantity_received` <> ROUND(`quantity_received`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity_received`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+SET @quantity_to_double := (SELECT COUNT(*) = 1 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_shipment_item' AND `COLUMN_NAME` = 'quantity' AND `DATA_TYPE` = 'float');
+SET @statement := IF(@quantity_to_double, 'ALTER TABLE `order_shipment_item` MODIFY `quantity` DOUBLE NOT NULL COMMENT ''how much of the order line this shipment carries''', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+SET @statement := IF(@quantity_to_double, 'UPDATE `order_shipment_item` SET `quantity` = ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001)))))) WHERE `quantity` <> ROUND(`quantity`, LEAST(3, GREATEST(0, 6 - FLOOR(LOG10(GREATEST(ABS(`quantity`), 0.001))))))', 'DO 0');
+PREPARE quantity_to_double_statement FROM @statement;
+EXECUTE quantity_to_double_statement;
+DEALLOCATE PREPARE quantity_to_double_statement;
+
+-- ---------------------------------------------------------------------
+-- Line totals rounded as decimals under the rounding of sums
+-- ---------------------------------------------------------------------
+-- The quantity is a binary floating point number, and so is a line total: 3 x 1.005 is
+-- 3.01499…, which ROUND() brought down to 3.01 where the cart charges 3.02. The line totals
+-- are now rounded as decimals. The orders already placed keep the total of their invoice:
+-- the highest order id is stored in last_float_line_rounding_order_id, and the orders up to
+-- it are totalled as they always were. INSERT IGNORE keeps the first value when the script
+-- is run again, so the pivot never moves past the orders placed since. A new shop has 0.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`)
+SELECT 'last_float_line_rounding_order_id', COALESCE(MAX(`id`), 0), 1, 1, NOW(), NOW() FROM `order`;
+
 SET FOREIGN_KEY_CHECKS = 1;

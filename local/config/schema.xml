@@ -347,7 +347,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
-    <column name="quantity" required="true" type="FLOAT" />
+    <column name="quantity" required="true" type="DOUBLE" />
     <column defaultValue="0" name="position" required="true" type="INTEGER" />
     <column defaultValue="true" name="visible" required="true" type="BOOLEAN" />
     <column defaultValue="0" name="promo" type="TINYINT" />
@@ -357,6 +357,12 @@
     <column name="ean_code" size="255" type="VARCHAR" />
     <column description="the manufacturer part number, as the merchant feeds ask for it beside the GTIN" name="mpn" size="255" type="VARCHAR" />
     <column description="the brand of the manufacturer when it is not the brand of the product" name="manufacturer_brand_id" type="INTEGER" />
+    <column defaultValue="1" description="the smallest quantity a cart line of this combination may hold" name="min_quantity" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="1" description="the quantity of a cart line is a multiple of this step" name="quantity_step" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0" description="how many decimals a quantity may carry: 0 sells by the piece, more sells by measure" name="quantity_decimals" required="true" type="TINYINT" />
+    <column description="what one unit sold contains, in unit_code (0.75 for a 75 cl bottle), NULL when no reference price is shown" name="unit_quantity" scale="6" size="16" type="DECIMAL" />
+    <column description="the quantity the reference price is given for, in unit_code (1 for a price per litre)" name="reference_unit_quantity" scale="6" size="16" type="DECIMAL" />
+    <column description="the normalized code of the unit of measure (kg, l, m...), NULL when the combination has none" name="unit_code" size="16" type="VARCHAR" />
     <foreign-key foreignTable="product" name="fk_product_sale_element_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -971,7 +977,7 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="description" type="CLOB" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <column name="quantity" required="true" type="FLOAT" />
+    <column name="quantity" required="true" type="DOUBLE" />
     <column defaultValue="0.000000" name="price" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />
     <column name="was_new" required="true" type="TINYINT" />
@@ -979,6 +985,8 @@
     <column name="weight" size="45" type="VARCHAR" />
     <column name="ean_code" size="255" type="VARCHAR" />
     <column description="the manufacturer part number of the combination, copied when the order is placed so the documents keep the value sold" name="mpn" size="255" type="VARCHAR" />
+    <column description="the unit of measure of the combination, copied when the order is placed so the documents keep the unit sold" name="unit_code" size="16" type="VARCHAR" />
+    <column defaultValue="0" description="the decimals the quantity of the combination carried when the order was placed" name="quantity_decimals" required="true" type="TINYINT" />
     <column name="tax_rule_title" size="255" type="VARCHAR" />
     <column name="tax_rule_description" type="CLOB" />
     <column description="on the line of a bundle component, the id of the bundle line (line_type bundle) that brought it; null on every other line. A component line carries the stock and the weight of one component, never a price" name="parent" type="INTEGER" />
@@ -1100,8 +1108,8 @@
     <column name="order_return_id" required="true" type="INTEGER" />
     <column name="order_product_id" required="true" type="INTEGER" />
     <column description="the sale element to restock, snapshot from the order product" name="product_sale_elements_id" type="INTEGER" />
-    <column description="the quantity the customer asks to return" name="quantity" required="true" type="FLOAT" />
-    <column defaultValue="0" description="the quantity actually received by the merchant" name="quantity_received" type="FLOAT" />
+    <column description="the quantity the customer asks to return" name="quantity" required="true" type="DOUBLE" />
+    <column defaultValue="0" description="the quantity actually received by the merchant" name="quantity_received" type="DOUBLE" />
     <column description="the condition the returned goods were received in" name="received_condition" size="45" type="VARCHAR" />
     <column defaultValue="0" description="whether the received goods can be sold again" name="resellable" type="BOOLEAN" />
     <column defaultValue="0.000000" description="the paid taxed price for the returned quantity of this line" name="refund_amount" scale="6" size="16" type="DECIMAL" />
@@ -1149,7 +1157,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_shipment_id" required="true" type="INTEGER" />
     <column name="order_product_id" required="true" type="INTEGER" />
-    <column description="how much of the order line this shipment carries" name="quantity" required="true" type="FLOAT" />
+    <column description="how much of the order line this shipment carries" name="quantity" required="true" type="DOUBLE" />
     <foreign-key foreignTable="order_shipment" name="fk_order_shipment_item_order_shipment_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_shipment_id" />
     </foreign-key>
@@ -1846,7 +1854,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="cart_id" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
-    <column defaultValue="1" name="quantity" type="FLOAT" />
+    <column defaultValue="1" name="quantity" type="DOUBLE" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column defaultValue="0.000000" name="price" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="0.000000" name="promo_price" scale="6" size="16" type="DECIMAL" />

@@ -611,6 +611,18 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /**
+     * The last order placed before the line totals were rounded as decimals under the
+     * rounding of sums. The quantity column is a binary floating point number, and a line
+     * of 3 x 1.005 was rounded from 3.01499… to 3.01: setup/update/sql/3.4.0.sql writes the
+     * highest order id here, so that the orders already invoiced keep that total. Zero,
+     * the default and the value of a new shop, means the shop has nothing to protect.
+     */
+    public static function isOrderWithFloatLineRounding(int $orderId): bool
+    {
+        return $orderId <= (int) self::read('last_float_line_rounding_order_id', 0);
+    }
+
+    /**
      * Tells how a line total has to be built from a unit price and a quantity.
      *
      * Pass the id of a persisted order to get the mode that order was invoiced

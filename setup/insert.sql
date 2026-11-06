@@ -124,7 +124,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW()),
 (114, 'express_payment_zones', '', 0, 0, NOW(), NOW()),
 (115, 'catalog_has_bundles', '0', 0, 1, NOW(), NOW()),
-(116, 'newsletter_enabled', '1', 0, 0, NOW(), NOW())
+(116, 'newsletter_enabled', '1', 0, 0, NOW(), NOW()),
+(117, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW())
 
 ;
 

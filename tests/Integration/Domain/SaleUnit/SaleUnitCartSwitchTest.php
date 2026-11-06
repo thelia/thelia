@@ -17,10 +17,12 @@ namespace Thelia\Tests\Integration\Domain\SaleUnit;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\Cart\CartItemQuantityAdjustedEvent;
 use Thelia\Core\Event\Cart\CartSaleUnitSwitchedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\Cart;
@@ -128,6 +130,46 @@ final class SaleUnitCartSwitchTest extends ActionIntegrationTestCase
         self::assertSame(2.0, $summary[0]['removed'][0]['previous_quantity']);
         self::assertSame(1.0, $summary[0]['reduced'][0]['quantity']);
         self::assertEqualsWithDelta(7.5, $summary[0]['repriced'][0]['price'], 0.000001);
+    }
+
+    /**
+     * The stock of the unit cuts a line sold by six to seven: the line keeps six, the
+     * valid quantity below, and is told as adjusted. A line the stock leaves below the
+     * smallest quantity sold goes.
+     */
+    public function testAQuantityCutByTheStockOfTheUnitKeepsToTheRules(): void
+    {
+        $bySix = $this->product();
+        $gone = $this->product();
+        foreach ([$bySix, $gone] as $product) {
+            $saleElements = $product->getDefaultSaleElements();
+            (new QuantityRule(minQuantity: 6.0, step: 6.0))->applyTo($saleElements);
+            $saleElements->save($this->getPropelConnection());
+        }
+        $cart = $this->cartOn($this->first);
+        $this->line($cart, $bySix, 12);
+        $this->line($cart, $gone, 6);
+        $this->factory->saleUnitProductSaleElements($this->second, $bySix->getDefaultSaleElements(), 7.0);
+        $this->factory->saleUnitProductSaleElements($this->second, $gone->getDefaultSaleElements(), 5.0);
+        $adjustments = [];
+        $listener = static function (CartItemQuantityAdjustedEvent $event) use (&$adjustments): void {
+            $adjustments[] = $event;
+        };
+        $this->dispatcher->addListener(TheliaEvents::CART_ITEM_QUANTITY_ADJUSTED, $listener);
+
+        try {
+            $this->buyFrom($this->second);
+            $this->follow($cart);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::CART_ITEM_QUANTITY_ADJUSTED, $listener);
+        }
+
+        self::assertSame(6.0, (float) $this->lineOf($cart, $bySix)?->getQuantity(), 'Six, not the seven the unit holds.');
+        self::assertNull($this->lineOf($cart, $gone), 'Five is below the smallest quantity sold: the line goes.');
+        self::assertCount(2, $adjustments);
+        self::assertSame(6.0, $adjustments[0]->getDecision()->quantity);
+        self::assertTrue($adjustments[1]->isRemoved());
+        self::assertSame([$gone->getRef()], array_map(static fn ($change) => $change->productRef, $this->switches[0]->getRemovedLines()));
     }
 
     public function testComingBackToNationalGivesTheNationalPriceBack(): void

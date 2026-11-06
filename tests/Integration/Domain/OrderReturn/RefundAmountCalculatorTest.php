@@ -180,6 +180,77 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
     }
 
     /**
+     * 1.25 kg at 14.82 is a line of 18.525, which the order charges 18.53, half a
+     * cent and above going up. Left at 18.525, the refund is printed 18.52 by a
+     * currency formatter that rounds half to even.
+     */
+    public function testALineSoldByMeasureRefundsWhatTheOrderChargedForIt(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '12.350000', quantity: 1.25, unitTax: '2.470000');
+
+        self::assertSame(18.53, $order->getTotalAmount(), 'The fixture is not the order this test needs.');
+        self::assertSame(18.53, $this->calculator->lineRefundForProduct($orderProduct, 1.25));
+        self::assertSame(18.53, $this->calculator->compute($this->returnOf($order, [[$orderProduct, 1.25]])));
+    }
+
+    /**
+     * 0.7 kg at 0.75 is 0.52499999… as a float. PHP 8.4 no longer rounds it up on its own:
+     * the refund has to come to the 0.53 the order charged, whatever PHP the shop runs.
+     */
+    public function testALineWhoseTotalIsNotExactAsAFloatRefundsTheCentTheOrderCharged(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '0.750000', quantity: 0.7, unitTax: '0.000000');
+
+        self::assertSame(0.53, $order->getTotalAmount(), 'The fixture is not the order this test needs.');
+        self::assertSame(0.53, $this->calculator->lineRefundForProduct($orderProduct, 0.7));
+        self::assertSame(0.53, $this->calculator->compute($this->returnOf($order, [[$orderProduct, 0.7]])));
+    }
+
+    /**
+     * Two lines of 18.525 are charged 37.05, the order rounding their sum: each
+     * line shows 18.53, and returning both refunds the 37.05 paid, not 37.06.
+     */
+    public function testReturningEveryLineSoldByMeasureRefundsTheAmountCharged(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $first = $this->orderProduct($order, price: '12.350000', quantity: 1.25, unitTax: '2.470000');
+        $second = $this->orderProduct($order, price: '12.350000', quantity: 1.25, unitTax: '2.470000');
+
+        self::assertSame(37.05, $order->getTotalAmount(), 'The fixture is not the order this test needs.');
+        self::assertSame(18.53, $this->calculator->lineRefundForProduct($first, 1.25));
+        self::assertSame(18.53, $this->calculator->lineRefundForProduct($second, 1.25));
+        self::assertEqualsWithDelta(37.05, $this->calculator->compute($this->returnOf($order, [[$first, 1.25], [$second, 1.25]])), 1e-9);
+    }
+
+    public function testADiscountedLineSoldByMeasureRefundsWhatTheOrderChargedForIt(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $order->setDiscount('5.000000');
+        $order->save($this->getPropelConnection());
+        $orderProduct = $this->orderProduct($order, price: '12.350000', quantity: 1.25, unitTax: '2.470000');
+
+        self::assertSame(13.53, round($order->getTotalAmount(), 2), 'The fixture is not the order this test needs.');
+        self::assertEqualsWithDelta($order->getTotalAmount(), $this->calculator->lineRefundForProduct($orderProduct, 1.25), 1e-9);
+        self::assertEqualsWithDelta($order->getTotalAmount(), $this->calculator->compute($this->returnOf($order, [[$orderProduct, 1.25]])), 1e-9);
+    }
+
+    /**
+     * An order frozen by the 2.4 upgrade was totalled without any rounding
+     * (Order::getTotalAmountLegacy()), and its refund is left as it was.
+     */
+    public function testALineOfAnOrderFrozenByThe24UpgradeIsNotRoundedToTheCent(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '12.350000', quantity: 1.25, unitTax: '2.470000');
+        ConfigQuery::write('last_legacy_rounding_order_id', (string) $order->getId());
+
+        self::assertEqualsWithDelta(18.525, $this->calculator->lineRefundForProduct($orderProduct, 1.25), 1e-9);
+        self::assertEqualsWithDelta(18.525, $this->calculator->compute($this->returnOf($order, [[$orderProduct, 1.25]])), 1e-9);
+    }
+
+    /**
      * The postage is stored tax included: carried back, it refunds what the
      * customer paid for it, its tax already in it.
      */

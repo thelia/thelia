@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\Shipping\DTO\PostageTaxLine;
 use Thelia\Domain\Shipping\Enum\PostageTaxStrategy;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorFactoryInterface;
@@ -66,7 +67,7 @@ readonly class PostageTaxBreakdownCalculator
         ?State $state = null,
         ?string $locale = null,
     ): void {
-        $untaxedPostage = round((float) $postage->getUntaxedAmount(), 2);
+        $untaxedPostage = MoneyRounding::toTheCent((float) $postage->getUntaxedAmount());
 
         $lines = $this->split($cart, $country, $state, $untaxedPostage, $locale);
 
@@ -74,11 +75,11 @@ readonly class PostageTaxBreakdownCalculator
             return;
         }
 
-        $tax = round(array_sum(array_map(static fn (PostageTaxLine $line): float => $line->amount, $lines)), 2);
+        $tax = MoneyRounding::toTheCent(array_sum(array_map(static fn (PostageTaxLine $line): float => $line->amount, $lines)));
 
         $postage->setUntaxedAmount($untaxedPostage);
         $postage->setAmountTax($tax);
-        $postage->setAmount(round($untaxedPostage + $tax, 2));
+        $postage->setAmount(MoneyRounding::toTheCent($untaxedPostage + $tax));
         $postage->setTaxBreakdown($lines);
     }
 
@@ -102,7 +103,7 @@ readonly class PostageTaxBreakdownCalculator
         float $postageTax,
         ?string $locale = null,
     ): array {
-        $lines = $this->split($cart, $country, $state, round($untaxedPostage, 2), $locale);
+        $lines = $this->split($cart, $country, $state, MoneyRounding::toTheCent($untaxedPostage), $locale);
 
         if ([] === $lines) {
             return [];
@@ -110,7 +111,7 @@ readonly class PostageTaxBreakdownCalculator
 
         $taxTotal = array_sum(array_map(static fn (PostageTaxLine $line): float => $line->amount, $lines));
 
-        return $this->giveRemainderToTheLargestLine($lines, round($postageTax - $taxTotal, 2));
+        return $this->giveRemainderToTheLargestLine($lines, MoneyRounding::toTheCent($postageTax - $taxTotal));
     }
 
     /**
@@ -163,7 +164,7 @@ readonly class PostageTaxBreakdownCalculator
                 '' === $title ? \sprintf('Tax rule #%d', $taxRule->getId()) : $title,
                 $taxRule->getDescription(),
                 $shares[$index],
-                round((float) $calculator->getTaxAmountFromUntaxedPrice($shares[$index]), 2),
+                MoneyRounding::toTheCent((float) $calculator->getTaxAmountFromUntaxedPrice($shares[$index])),
             );
         }
 
@@ -190,7 +191,7 @@ readonly class PostageTaxBreakdownCalculator
                 continue;
             }
 
-            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $cartItem->getTotalRealPrice();
+            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $cartItem->getSummedTotalRealPrice();
         }
 
         $groups = [];
@@ -270,11 +271,11 @@ readonly class PostageTaxBreakdownCalculator
 
             // Shares rounded up can add up to more than the amount before the
             // largest one: each is capped by what is left.
-            $shares[$index] = min(round($amount * $base / $total, 2), round($amount - $distributed, 2));
+            $shares[$index] = min(MoneyRounding::toTheCent($amount * $base / $total), MoneyRounding::toTheCent($amount - $distributed));
             $distributed += $shares[$index];
         }
 
-        $shares[$largest] = round($amount - $distributed, 2);
+        $shares[$largest] = MoneyRounding::toTheCent($amount - $distributed);
 
         ksort($shares);
 
@@ -302,7 +303,7 @@ readonly class PostageTaxBreakdownCalculator
 
         $lines[$largest] = $lines[$largest]->withAmounts(
             $lines[$largest]->untaxedAmount,
-            round($lines[$largest]->amount + $remainder, 2),
+            MoneyRounding::toTheCent($lines[$largest]->amount + $remainder),
         );
 
         return $lines;

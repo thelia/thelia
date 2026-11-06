@@ -35,6 +35,11 @@ use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Product\Identifier\Gtin;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
+use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Log\Tlog;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeCombination;
@@ -132,6 +137,17 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     {
         $salesElement = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId());
 
+        // The stock holds the decimals the combination is sold with, those this very
+        // write gives it if it gives any; judged before anything is written. The back
+        // office posts the stock it shows with every write: a stock left as it is stored
+        // is not judged, or a combination holding 37.75 could never be sold by the piece.
+        if (null === $salesElement || !QuantityScale::isTheSameQuantity($event->getQuantity(), $salesElement->getQuantity() ?? 0.0)) {
+            self::assertTheStockFits(
+                $event->getQuantity(),
+                $event->getQuantityRule() ?? (null === $salesElement ? new QuantityRule() : self::quantityRuleOf($salesElement)),
+            );
+        }
+
         $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -183,6 +199,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             if (null !== $event->getManufacturerBrandId()) {
                 $salesElement->setManufacturerBrandId(0 === $event->getManufacturerBrandId() ? null : $event->getManufacturerBrandId());
             }
+
+            $event->getQuantityRule()?->applyTo($salesElement);
 
             $salesElement->save();
 
@@ -317,6 +335,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             $isDefault = true;
 
+            // The combinations are created sold by the piece: a stock of 2.5 is refused,
+            // where it was cut down to 2.
+            self::assertTheStockFits($event->getQuantity(), new QuantityRule());
+
             // Create all combinations
             foreach ($event->getCombinations() as $combinationAttributesAvIds) {
                 $product = $event->getProduct();
@@ -333,7 +355,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     $isDefault,
                     (bool) $event->getOnsale(),
                     (bool) $event->getIsnew(),
-                    $event->getQuantity() ? (int) $event->getQuantity() : null,
+                    $event->getQuantity(),
                     $event->getEanCode(),
                     $event->getReference() ?? $product->getRef(),
                 );
@@ -522,6 +544,31 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         return null === Gtin::violationOfTypedCode($typedCode) ? Gtin::normalize($typedCode) : '';
     }
 
+    /**
+     * Without rules to read (written around their validation), the stock is not judged.
+     *
+     * @throws QuantityRefusedException when the stock carries more decimals than the combination sells with
+     */
+    private static function assertTheStockFits(float $stock, ?QuantityRule $rule): void
+    {
+        if (null !== $rule) {
+            (new QuantityPolicy())->assertStockFits($stock, $rule);
+        }
+    }
+
+    /**
+     * The rules of a stored combination, or none when they were written around their
+     * validation: the write then leaves them as they are.
+     */
+    private static function quantityRuleOf(ProductSaleElements $productSaleElements): ?QuantityRule
+    {
+        try {
+            return QuantityRule::fromProductSaleElements($productSaleElements);
+        } catch (InvalidQuantityRuleException) {
+            return null;
+        }
+    }
+
     public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, ProductSaleElements $originalProductPSE, $key): void
     {
         $originalProductPSEPrice = ProductPriceQuery::create()
@@ -546,6 +593,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setEanCode($this->cloneableGtin($originalProductPSE->getEanCode()))
             ->setMpn($originalProductPSE->getMpn() ?? '')
             ->setManufacturerBrandId($originalProductPSE->getManufacturerBrandId() ?? 0)
+            // The clone is sold as the original is, and keeps a stock with its decimals.
+            ->setQuantityRule(self::quantityRuleOf($originalProductPSE))
             ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
             ->setPrice((float) $originalProductPSEPrice->getPrice())
             ->setSalePrice((float) $originalProductPSEPrice->getPromoPrice())

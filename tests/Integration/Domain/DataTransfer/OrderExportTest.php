@@ -162,6 +162,78 @@ final class OrderExportTest extends IntegrationTestCase
     }
 
     /**
+     * 1.25 kg at 12.35 plus 2.47 of tax is a line of 18.525: the order is charged 18.53,
+     * of which 3.09 of tax, and the export states the same amounts.
+     */
+    public function testAWeighedOrderIsExportedWithTheAmountsItWasChargedInCents(): void
+    {
+        $order = $this->weighedOrder(1.25, '12.350000', '2.470000');
+
+        self::assertEqualsWithDelta(18.53, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * Under rounding of sums each line total is rounded, and 1.25 x 14.82 is 18.524999…
+     * as a DOUBLE: the export, like the order, rounds it as a decimal, 18.53.
+     */
+    public function testUnderRoundingOfSumsAWeighedOrderIsExportedWithTheAmountItWasChargedInCents(): void
+    {
+        $this->optIn();
+
+        $order = $this->weighedOrder(1.25, '12.350000', '2.470000');
+
+        self::assertEqualsWithDelta(18.53, $this->invoicedTotal($order), 0.0001);
+        self::assertEqualsWithDelta(18.53, (float) $this->exportedRow($order->getRef())['order_total_taxed_price'], 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * The same binary error on a whole quantity: three at 1.005 taxed is 3.015, 3.02.
+     */
+    public function testUnderRoundingOfSumsAWholeQuantityIsExportedWithTheAmountItWasChargedInCents(): void
+    {
+        $this->optIn();
+
+        $order = $this->weighedOrder(3.0, '0.837500', '0.167500');
+
+        self::assertEqualsWithDelta(3.02, $this->invoicedTotal($order), 0.0001);
+        self::assertEqualsWithDelta(3.02, (float) $this->exportedRow($order->getRef())['order_total_taxed_price'], 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
+     * An order placed before the line totals were rounded as decimals is exported with
+     * the 3.01 it was invoiced, the orders after the pivot with 3.02.
+     */
+    public function testUnderRoundingOfSumsAnOrderPlacedBeforeTheDecimalRoundingIsExportedWithItsInvoicedTotal(): void
+    {
+        $this->optIn();
+
+        $invoiced = $this->weighedOrder(3.0, '0.837500', '0.167500');
+        ConfigQuery::write('last_float_line_rounding_order_id', (string) $invoiced->getId());
+        $placedAfter = $this->weighedOrder(3.0, '0.837500', '0.167500');
+
+        self::assertEqualsWithDelta(3.01, $this->invoicedTotal($invoiced), 0.0001);
+        self::assertEqualsWithDelta(3.01, (float) $this->exportedRow($invoiced->getRef())['order_total_taxed_price'], 0.0001);
+        self::assertEqualsWithDelta(3.02, (float) $this->exportedRow($placedAfter->getRef())['order_total_taxed_price'], 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($invoiced);
+        $this->assertExportedTotalsMatchTheInvoice($placedAfter);
+    }
+
+    /**
+     * The quantity column keeps 1234.565 as 1234.5649: 1234.565 kg at 1.00 is charged
+     * 1234.57, and exported so, not 1234.56.
+     */
+    public function testAQuantityTheColumnCannotKeepExactlyIsExportedAsSold(): void
+    {
+        $order = $this->weighedOrder(1234.565, '1.000000', '0.000000');
+
+        self::assertEqualsWithDelta(1234.57, $this->invoicedTotal($order), 0.0001);
+        $this->assertExportedTotalsMatchTheInvoice($order);
+    }
+
+    /**
      * The pivot a shop writes when it opts in: the orders it had already
      * invoiced keep the rule they were charged with, and so does their line in
      * the export.
@@ -356,6 +428,25 @@ final class OrderExportTest extends IntegrationTestCase
         $tax = 0.0;
 
         return $order->getTotalAmount($tax, false, false);
+    }
+
+    private function weighedOrder(float $kilograms, string $pricePerKilogram, string $taxPerKilogram): Order
+    {
+        $order = $this->factory->order();
+        $order->setRef('EXP-'.uniqid());
+        $order->save($this->getPropelConnection());
+
+        $line = $this->factory->orderProduct($order, ['price' => $pricePerKilogram, 'quantity' => $kilograms]);
+        $line->setUnitCode('kg')->setQuantityDecimals(2)->save($this->getPropelConnection());
+
+        (new OrderProductTax())
+            ->setOrderProductId($line->getId())
+            ->setTitle('VAT')
+            ->setDescription('')
+            ->setAmount($taxPerKilogram)
+            ->save($this->getPropelConnection());
+
+        return $order;
     }
 
     private function optIn(): void

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\Service;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Exception\TheliaProcessException;
 
@@ -61,14 +62,16 @@ readonly class StockDecrementer
 
         [$table, $where] = $this->target($saleUnitId, $productSaleElementsId);
 
+        $remaining = self::onTheFinestDecimal('`quantity` - :quantity');
+
         if ($allowNegativeStock) {
-            $sql = "UPDATE `$table` SET `quantity` = `quantity` - :quantity WHERE $where";
+            $sql = "UPDATE `$table` SET `quantity` = $remaining WHERE $where";
         } elseif ($guardAvailability) {
-            $sql = "UPDATE `$table` SET `quantity` = `quantity` - :quantity WHERE $where AND `quantity` >= :quantity";
+            $sql = "UPDATE `$table` SET `quantity` = $remaining WHERE $where AND ".self::onTheFinestDecimal('`quantity`').' >= :quantity';
         } else {
             // Historical behaviour when availability is not checked: never
             // fail, floor the stock at zero.
-            $sql = "UPDATE `$table` SET `quantity` = GREATEST(`quantity` - :quantity, 0) WHERE $where";
+            $sql = "UPDATE `$table` SET `quantity` = GREATEST($remaining, 0) WHERE $where";
         }
 
         $statement = $connection->prepare($sql);
@@ -98,7 +101,7 @@ readonly class StockDecrementer
 
         [$table, $where] = $this->target($saleUnitId, $productSaleElementsId);
 
-        $statement = $connection->prepare("UPDATE `$table` SET `quantity` = `quantity` + :quantity WHERE $where");
+        $statement = $connection->prepare("UPDATE `$table` SET `quantity` = ".self::onTheFinestDecimal('`quantity` + :quantity')." WHERE $where");
         $statement->bindValue(':quantity', $quantity);
         $statement->bindValue(':id', $productSaleElementsId, \PDO::PARAM_INT);
 
@@ -107,6 +110,18 @@ readonly class StockDecrementer
         }
 
         $statement->execute();
+    }
+
+    /**
+     * A stock kept on the finest decimal a quantity is sold with. The counters are binary
+     * floating point numbers (DOUBLE), which hold 0.7 only approximately: every movement
+     * would add its error to the one before, and a stock compared as it is could refuse
+     * the last 0.7 kg to a buyer of 0.7 kg (as a single precision FLOAT did, which left
+     * 9999.902 kg after ten orders of 10 g taken from 10 tonnes).
+     */
+    private static function onTheFinestDecimal(string $expression): string
+    {
+        return 'ROUND('.$expression.', '.QuantityScale::MAXIMUM_DECIMALS.')';
     }
 
     /**

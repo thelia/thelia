@@ -25,6 +25,7 @@ use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
 use Thelia\Model\Base\CartItem as BaseCartItem;
@@ -358,18 +359,53 @@ class CartItem extends BaseCartItem
     }
 
     /**
+     * The line total as the cart and the order add it up, which is not always a
+     * whole number of cents: under the sum of roundings the order rounds the sum
+     * of its lines (Order::getTotalAmount()), not each line, so 1.25 kg at 14.82
+     * counts for 18.525. A total of several lines is made of these.
+     *
+     * @throws PropelException
+     */
+    public function getSummedTotalRealTaxedPrice(Country $country, ?State $state = null, ?TaxCalculatorInterface $cartTaxCalculator = null): float
+    {
+        $unitPrice = 1 === (int) $this->getPromo()
+            ? $this->getTaxedPromoPrice($country, $state, $cartTaxCalculator)
+            : $this->getTaxedPrice($country, $state, $cartTaxCalculator);
+
+        return $this->summedLineTotal($unitPrice);
+    }
+
+    /**
+     * @see getSummedTotalRealTaxedPrice() the same, before taxes
+     */
+    public function getSummedTotalRealPrice(): float
+    {
+        return $this->summedLineTotal($this->getRealPrice());
+    }
+
+    /**
+     * Turns a unit price into the line total shown and charged for the line,
+     * rounded half up to the cent: the order charges 18.53 for a line of 18.525,
+     * where a currency formatter rounding half to even would print 18.52.
+     */
+    private function lineTotal(float $unitPrice): float
+    {
+        return MoneyRounding::toTheCent($this->summedLineTotal($unitPrice));
+    }
+
+    /**
      * Turns a unit price into a line total, rounding where the shop's
      * order_rounding_mode says to round.
      *
      * Order::getTotalAmount() has to reach the same figure from the persisted
      * order lines, so any change here belongs there too.
      */
-    private function lineTotal(float $unitPrice): float
+    private function summedLineTotal(float $unitPrice): float
     {
         if (ConfigQuery::isRoundingModeRoundingOfSums()) {
-            return round($unitPrice * $this->getQuantity(), 2);
+            return MoneyRounding::toTheCent($unitPrice * $this->getQuantity());
         }
 
-        return round($unitPrice, 2) * $this->getQuantity();
+        return MoneyRounding::toTheCent($unitPrice) * $this->getQuantity();
     }
 }

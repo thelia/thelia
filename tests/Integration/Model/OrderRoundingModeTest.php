@@ -159,6 +159,102 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
         self::assertSame([37.02, 44.42], $this->cartTotals($this->createCart([$line])));
     }
 
+    /**
+     * 1.25 kg at 14.82 taxed is a line of 18.525, which the order charges 18.53.
+     * Left at 18.525, the line is printed 18.52 by a currency formatter that
+     * rounds half to even, so the line is rounded half up where it is computed.
+     */
+    public function testALineSoldByMeasureShowsWhatTheOrderChargesForIt(): void
+    {
+        $fixtures = $this->createCart([['price' => '12.35', 'quantity' => 1.25, 'vatPercent' => self::STANDARD_VAT]]);
+        $cartItem = $fixtures['cart']->getCartItems()->getFirst();
+
+        self::assertSame(18.53, $cartItem->getTotalTaxedPrice($fixtures['country']));
+        self::assertSame(18.53, $cartItem->getTotalRealTaxedPrice($fixtures['country']));
+        self::assertSame(15.44, $cartItem->getTotalPrice());
+        self::assertSame(18.53, $fixtures['cart']->getTaxedAmount($fixtures['country']));
+        self::assertSame(18.53, $this->placeOrder($fixtures)->getTotalAmount());
+    }
+
+    /**
+     * The order rounds the sum of its lines under the sum of roundings: two lines
+     * of 18.525 are charged 37.05. Each line shows 18.53, and the cart keeps
+     * totalling what the order charges, not the 37.06 of the rounded lines.
+     */
+    public function testTwoLinesSoldByMeasureTotalWhatTheOrderCharges(): void
+    {
+        $line = ['price' => '12.35', 'quantity' => 1.25, 'vatPercent' => self::STANDARD_VAT];
+        $fixtures = $this->createCart([$line, $line]);
+
+        foreach ($fixtures['cart']->getCartItems() as $cartItem) {
+            self::assertSame(18.53, $cartItem->getTotalTaxedPrice($fixtures['country']));
+        }
+
+        self::assertSame(37.05, $fixtures['cart']->getTaxedAmount($fixtures['country']));
+        self::assertSame(30.88, $fixtures['cart']->getTotalAmount(country: $fixtures['country']));
+        self::assertSame(37.05, $this->placeOrder($fixtures)->getTotalAmount());
+    }
+
+    /**
+     * Under rounding of sums the order rounds each line total, and the quantity is a
+     * DOUBLE: 1.25 x 14.82 is 18.524999… in binary, which the database rounds down to
+     * 18.52 where the cart, rounding in PHP, charges 18.53. The line is brought back to
+     * a decimal before it is rounded.
+     */
+    public function testUnderRoundingOfSumsALineSoldByMeasureIsChargedWhatTheCartShowed(): void
+    {
+        $this->optIn();
+
+        $fixtures = $this->createCart([['price' => '12.35', 'quantity' => 1.25, 'vatPercent' => self::STANDARD_VAT]]);
+
+        self::assertSame(18.53, $fixtures['cart']->getTaxedAmount($fixtures['country']));
+        self::assertSame(18.53, $this->placeOrder($fixtures)->getTotalAmount());
+    }
+
+    /**
+     * The same binary error on a whole quantity: three at 1.005 taxed (0.8375 + 20 %) is
+     * 3.015, which a DOUBLE holds just below the half cent.
+     */
+    public function testUnderRoundingOfSumsALineOfWholeUnitsIsChargedWhatTheCartShowed(): void
+    {
+        $this->optIn();
+
+        $fixtures = $this->createCart([['price' => '0.8375', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT]]);
+        $cartAmount = $fixtures['cart']->getTaxedAmount($fixtures['country']);
+
+        self::assertSame(3.02, $cartAmount);
+        self::assertSame($cartAmount, $this->placeOrder($fixtures)->getTotalAmount());
+    }
+
+    /**
+     * An order placed before the line totals were rounded as decimals was invoiced 3.01:
+     * the pivot the 3.4.0 update writes keeps that total. The orders after it are
+     * charged as the cart showed them.
+     */
+    public function testUnderRoundingOfSumsAnOrderPlacedBeforeTheDecimalRoundingKeepsItsInvoicedTotal(): void
+    {
+        $this->optIn();
+        $line = ['price' => '0.8375', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT];
+
+        $invoiced = $this->placeOrder($this->createCart([$line]));
+        ConfigQuery::write('last_float_line_rounding_order_id', (string) $invoiced->getId());
+        $placedAfter = $this->placeOrder($this->createCart([$line]));
+
+        self::assertSame(3.01, $invoiced->getTotalAmount());
+        self::assertSame(3.02, $placedAfter->getTotalAmount());
+    }
+
+    public function testALineOfWholeUnitsKeepsItsTotal(): void
+    {
+        // 12.34 x 1.20 = 14.808, shown 14.81, and three of them 44.43.
+        $fixtures = $this->createCart([['price' => '12.34', 'quantity' => 3.0, 'vatPercent' => self::STANDARD_VAT]]);
+        $cartItem = $fixtures['cart']->getCartItems()->getFirst();
+
+        self::assertEqualsWithDelta(44.43, $cartItem->getTotalTaxedPrice($fixtures['country']), 1e-9);
+        self::assertEqualsWithDelta(37.02, $cartItem->getTotalPrice(), 1e-9);
+        self::assertSame(44.43, $fixtures['cart']->getTaxedAmount($fixtures['country']));
+    }
+
     public function testAPromoPriceFollowsTheMode(): void
     {
         $fixtures = $this->createCart([$this->bulkLine(promoPrice: '0.004000')]);

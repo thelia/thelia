@@ -22,7 +22,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * cart_item.quantity is a FLOAT (goods sold by weight carry a fractional quantity, see
+ * cart_item.quantity is a DOUBLE (goods sold by weight carry a fractional quantity, see
  * Api\Resource\CartItem::$quantity). A surcharge charged per unit has to follow that
  * quantity, not its integer part.
  */
