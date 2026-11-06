@@ -48,7 +48,7 @@ class CustomerUpdateForm extends BaseForm
                 IntegerType::class,// In a front office context, update the in-memory logged-in user data
             )
             ->add('title', TextType::class, [
-                'label' => Translator::getInstance()->trans('Title'),
+                'label' => Translator::getInstance()->trans('Customer title'),
                 'label_attr' => [
                     'for' => 'title',
                 ],
@@ -85,7 +85,7 @@ class CustomerUpdateForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans('Title'),
+                'label' => Translator::getInstance()->trans('Customer title'),
                 'label_attr' => [
                     'for' => 'title',
                 ],

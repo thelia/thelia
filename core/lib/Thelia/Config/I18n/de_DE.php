@@ -152,6 +152,7 @@ return [
     'Customer' => 'Kunde',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Der Kunde ist %op% <strong>%customer_list%</strong> ',
     'Customer rating' => 'Kundenbewertung',
+    'Customer title' => 'Titel',
     'Customers' => 'Kunden',
     'Dashboard' => 'Dashboard',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Datum \'%date\' ist ungültig, bitte geben Sie eine gültige Datum mit dem %fmt Format',

@@ -185,6 +185,7 @@ return [
     'Customer is %op% <strong>%customer_list%</strong>' => 'Le client est %op% <strong>%customer_list%</strong> ',
     'Customer group is %op% <strong>%customer_group_list%</strong>' => 'Le groupe de clients est %op% <strong>%customer_group_list%</strong>',
     'Customer rating' => 'Note client',
+    'Customer title' => 'Titre',
     'Customers' => 'Clients',
     'Dashboard' => 'Tableau de bord',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => "La date '%date' est incorrecte, merci d'indiquer une date au format %fmt",

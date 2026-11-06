@@ -88,7 +88,7 @@ class AddressCreateForm extends FirewallForm
                     new NotBlank(),
                 ],
                 'choices' => $this->customerTitleService->getTitleAsFormChoices(),
-                'label' => Translator::getInstance()->trans('Title'),
+                'label' => Translator::getInstance()->trans('Customer title'),
                 'expanded' => false,
                 'multiple' => false,
                 'label_attr' => [
