@@ -195,6 +195,20 @@ final class RefundAmountCalculatorTest extends IntegrationTestCase
     }
 
     /**
+     * 0.7 kg at 0.75 is 0.52499999… as a float. PHP 8.4 no longer rounds it up on its own:
+     * the refund has to come to the 0.53 the order charged, whatever PHP the shop runs.
+     */
+    public function testALineWhoseTotalIsNotExactAsAFloatRefundsTheCentTheOrderCharged(): void
+    {
+        $order = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_PAID]);
+        $orderProduct = $this->orderProduct($order, price: '0.750000', quantity: 0.7, unitTax: '0.000000');
+
+        self::assertSame(0.53, $order->getTotalAmount(), 'The fixture is not the order this test needs.');
+        self::assertSame(0.53, $this->calculator->lineRefundForProduct($orderProduct, 0.7));
+        self::assertSame(0.53, $this->calculator->compute($this->returnOf($order, [[$orderProduct, 0.7]])));
+    }
+
+    /**
      * Two lines of 18.525 are charged 37.05, the order rounding their sum: each
      * line shows 18.53, and returning both refunds the 37.05 paid, not 37.06.
      */

@@ -28,6 +28,7 @@ use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\PaymentAmount;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -290,8 +291,8 @@ class Order extends BaseOrder
         // The order is charged in cents, as Cart::getTaxedAmount() and Cart::getTotalAmount()
         // round the cart. A line sold by measure is where it shows: 1.25 kg at 14.82 is a
         // line of 18.525, charged 18.53, and the tax is the gap between the two rounded totals.
-        $total = round((float) self::$totalsCache[$id]->total_taxed_price, 2);
-        $tax = $total - round((float) self::$totalsCache[$id]->total_untaxed_price, 2);
+        $total = MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_taxed_price);
+        $tax = $total - MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_untaxed_price);
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
@@ -549,7 +550,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithTaxesAfterDiscount(): float
     {
-        return round(round($this->getTotalAmount(), 2) - round((float) $this->getPostage(), 2), 2);
+        return MoneyRounding::toTheCent(MoneyRounding::toTheCent($this->getTotalAmount()) - MoneyRounding::toTheCent((float) $this->getPostage()));
     }
 
     /**
@@ -561,7 +562,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithoutTaxes(): float
     {
-        return round($this->getUntaxedTotalAmount(false, false), 2);
+        return MoneyRounding::toTheCent($this->getUntaxedTotalAmount(false, false));
     }
 
     /**
@@ -573,7 +574,7 @@ class Order extends BaseOrder
      */
     public function getTotalGoodsWithoutTaxes(): float
     {
-        return round($this->getTotalAmountWithoutTaxes() - $this->serviceLinesTotal('untaxed'), 2);
+        return MoneyRounding::toTheCent($this->getTotalAmountWithoutTaxes() - $this->serviceLinesTotal('untaxed'));
     }
 
     /**
@@ -586,7 +587,7 @@ class Order extends BaseOrder
     {
         $tax = 0;
 
-        return round(round($this->getTotalAmount($tax, false, false), 2) - $this->serviceLinesTotal('taxed'), 2);
+        return MoneyRounding::toTheCent(MoneyRounding::toTheCent($this->getTotalAmount($tax, false, false)) - $this->serviceLinesTotal('taxed'));
     }
 
     /**
@@ -645,7 +646,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithoutTaxesAfterDiscount(): float
     {
-        return round($this->getUntaxedTotalAmount(false), 2);
+        return MoneyRounding::toTheCent($this->getUntaxedTotalAmount(false));
     }
 
     /**
@@ -653,7 +654,7 @@ class Order extends BaseOrder
      */
     public function getTotalShippingWithoutTaxes(): float
     {
-        return round((float) $this->getUntaxedPostage(), 2);
+        return MoneyRounding::toTheCent((float) $this->getUntaxedPostage());
     }
 
     /**
@@ -663,7 +664,7 @@ class Order extends BaseOrder
      */
     public function getAmountDiscountWithoutTaxes(): float
     {
-        return round($this->getUntaxedDiscount(), 2);
+        return MoneyRounding::toTheCent($this->getUntaxedDiscount());
     }
 
     /**
@@ -675,7 +676,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithTaxesWithShipping(): float
     {
-        return round($this->getTotalAmount(), 2);
+        return MoneyRounding::toTheCent($this->getTotalAmount());
     }
 
     /**
@@ -684,7 +685,7 @@ class Order extends BaseOrder
      */
     public function getAmountDiscountWithTaxes(): float
     {
-        return round((float) $this->getDiscount(), 2);
+        return MoneyRounding::toTheCent((float) $this->getDiscount());
     }
 
     /**
@@ -693,7 +694,7 @@ class Order extends BaseOrder
      */
     public function getTotalShippingWithTaxes(): float
     {
-        return round((float) $this->getPostage(), 2);
+        return MoneyRounding::toTheCent((float) $this->getPostage());
     }
 
     /**
@@ -701,7 +702,7 @@ class Order extends BaseOrder
      */
     public function getTotalShippingTaxAmount(): float
     {
-        return round((float) $this->getPostageTax(), 2);
+        return MoneyRounding::toTheCent((float) $this->getPostageTax());
     }
 
     /**
@@ -713,7 +714,7 @@ class Order extends BaseOrder
      */
     public function getTotalAmountWithoutTaxesWithShipping(): float
     {
-        return round($this->getTotalAmountWithoutTaxesAfterDiscount() + $this->getTotalShippingWithoutTaxes(), 2);
+        return MoneyRounding::toTheCent($this->getTotalAmountWithoutTaxesAfterDiscount() + $this->getTotalShippingWithoutTaxes());
     }
 
     /**
@@ -727,11 +728,10 @@ class Order extends BaseOrder
      */
     public function getTotalTaxAmount(): float
     {
-        return round(
-            round($this->getTotalAmount(), 2)
+        return MoneyRounding::toTheCent(
+            MoneyRounding::toTheCent($this->getTotalAmount())
             - $this->getTotalAmountWithoutTaxesAfterDiscount()
             - $this->getTotalShippingWithoutTaxes(),
-            2,
         );
     }
 

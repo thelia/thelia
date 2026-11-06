@@ -28,6 +28,7 @@ use Thelia\Domain\Catalog\Bundle\BundleLineContents;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
+use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
@@ -346,7 +347,7 @@ class Cart extends BaseCart
             $total += $this->getTaxedGiftWrapping($country, $state);
         }
 
-        return round($total, 2);
+        return MoneyRounding::toTheCent($total);
     }
 
     /**
@@ -383,7 +384,7 @@ class Cart extends BaseCart
             $total += $this->getUntaxedGiftWrapping();
         }
 
-        return round($total, 2);
+        return MoneyRounding::toTheCent($total);
     }
 
     /**
@@ -506,7 +507,7 @@ class Cart extends BaseCart
 
     public function setDiscount(?string $discount = null): static
     {
-        return parent::setDiscount($discount !== null ? (string) round((float) $discount, 2) : null);
+        return parent::setDiscount($discount !== null ? (string) MoneyRounding::toTheCent((float) $discount) : null);
     }
 
     /**
@@ -518,7 +519,7 @@ class Cart extends BaseCart
             return (float) $this->getDiscount();
         }
 
-        return round($this->createCartTaxCalculator($this)->computeUntaxedCartDiscount($this, $country, $state), 2);
+        return MoneyRounding::toTheCent($this->createCartTaxCalculator($this)->computeUntaxedCartDiscount($this, $country, $state));
     }
 
     /**
@@ -583,14 +584,13 @@ class Cart extends BaseCart
         // reads at its bare price. The order is what the tax is finally computed on, and it
         // always has an address.
         if (!$country instanceof Country || !$taxRule instanceof TaxRule) {
-            return round($untaxedPrice, 2);
+            return MoneyRounding::toTheCent($untaxedPrice);
         }
 
-        return round(
+        return MoneyRounding::toTheCent(
             $this->createCartTaxCalculator($this)
                 ->loadTaxRuleWithoutProduct($taxRule, $country, $state)
                 ->getTaxedPrice($untaxedPrice),
-            2,
         );
     }
 
