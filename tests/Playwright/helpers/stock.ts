@@ -2,6 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { request } from '@playwright/test';
 import { ddevMysql } from './db';
+import { expect, type Browser } from '@playwright/test';
+import { loginAdmin } from './admin';
 
 /**
  * Helpers of the stock specs: shop settings and sale element rows read and written straight in
@@ -310,4 +312,60 @@ export async function mailpitMessage(id: string): Promise<MailpitFullMessage> {
 /** Deletes only the messages that match the query: other mail in the box is left alone. */
 export async function mailpitDeleteMatching(query: string): Promise<void> {
   await mailpit('DELETE', `/api/v1/search?query=${encodeURIComponent(query)}`);
+}
+
+// ---------------------------------------------------------------- v2: what the carts hold, orders, clean-up
+
+/** What the carts hold of a sale element right now, as the back-office tooltip should tell it. */
+export async function heldNow(pseId: number): Promise<{ quantity: number; carts: number; nextExpiry: string | null }> {
+  const out = await ddevMysql(
+    `SELECT IFNULL(SUM(quantity), 0), COUNT(DISTINCT cart_id), IFNULL(DATE_FORMAT(MIN(reserved_until), '%Y-%m-%d %H:%i'), 'NULL') FROM cart_item WHERE product_sale_elements_id = ${pseId} AND reserved_until > NOW()`,
+  );
+  const [quantity, carts, expiry] = out.split('\t');
+  return { quantity: Number(quantity), carts: Number(carts), nextExpiry: 'NULL' === expiry ? null : expiry };
+}
+
+/**
+ * What the purge command does to a hold that has run out: the line keeps no date and no held quantity. The next hold of the
+ * cart is then a new one (a line with a date, even a past one, is "told as held" and its next hold is free).
+ */
+export async function expireCartHolds(cartId: number): Promise<void> {
+  await ddevMysql(`UPDATE cart_item SET reserved_until = NULL, reserved_quantity = NULL WHERE cart_id = ${cartId}`);
+}
+
+export async function latestCartIdOf(customerEmail: string): Promise<number> {
+  return Number(await ddevMysql(`SELECT c.id FROM cart c JOIN customer cu ON cu.id = c.customer_id WHERE cu.email = ${sql(customerEmail)} ORDER BY c.id DESC LIMIT 1`));
+}
+
+/** The back-office moves an order to "paid" the way the merchant does when a cheque arrives (the stock of a Cheque order is taken then). */
+export async function payOrderInBackOffice(browser: Browser, orderRef: string): Promise<void> {
+  const context = await browser.newContext({ ignoreHTTPSErrors: true });
+  const admin = await context.newPage();
+  await loginAdmin(admin);
+  const orderId = await orderIdOf(orderRef);
+  await admin.goto(`/admin/order/update/${orderId}`);
+  await admin.getByTestId('order-status-select').selectOption({ label: 'Paid' }).catch(async () => {
+    await admin.getByTestId('order-status-select').selectOption('2');
+  });
+  await Promise.all([admin.waitForLoadState('load'), admin.getByTestId('order-status-submit').click()]);
+  await expect.poll(() => ddevMysql(`SELECT status_id FROM \`order\` WHERE id = ${orderId}`), { timeout: 15_000 }).toBe('2');
+  await context.close();
+}
+
+/** Removes the orders a spec placed (lines, addresses) and the customers it registered, with their Mailpit mail. Nothing else is touched. */
+export async function purgeOrdersAndCustomers(orderRefs: string[], emails: string[]): Promise<void> {
+  if (orderRefs.length > 0) {
+    const refs = orderRefs.map(sql).join(',');
+    await ddevMysql(`
+      CREATE TEMPORARY TABLE tmp_v2_order_address AS
+        SELECT invoice_order_address_id AS id FROM \`order\` WHERE ref IN (${refs})
+        UNION SELECT delivery_order_address_id FROM \`order\` WHERE ref IN (${refs});
+      DELETE FROM \`order\` WHERE ref IN (${refs});
+      DELETE FROM order_address WHERE id IN (SELECT id FROM tmp_v2_order_address);
+    `);
+  }
+  for (const email of emails) {
+    await ddevMysql(`DELETE FROM customer WHERE email = ${sql(email)}`);
+    await mailpitDeleteMatching(`to:${email}`).catch(() => {});
+  }
 }
