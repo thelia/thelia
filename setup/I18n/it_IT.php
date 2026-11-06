@@ -444,4 +444,5 @@ return [
     'Saved payment methods' => 'Metodi di pagamento salvati',
     'Customer groups' => 'Gruppi di clienti',
     'Default customer group' => 'Gruppo di clienti predefinito',
+    'Low stock on {{ config("store_name") }}' => 'Scorte basse su {{ config("store_name") }}',
 ];

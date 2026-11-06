@@ -357,6 +357,10 @@
     <column name="ean_code" size="255" type="VARCHAR" />
     <column description="the manufacturer part number, as the merchant feeds ask for it beside the GTIN" name="mpn" size="255" type="VARCHAR" />
     <column description="the brand of the manufacturer when it is not the brand of the product" name="manufacturer_brand_id" type="INTEGER" />
+    <column defaultValue="0" description="what happens at zero stock: 0 refuse the sale, 1 sell without limit, 2 sell up to preorder_limit units below zero" name="out_of_stock_policy" required="true" type="TINYINT" />
+    <column description="units that can be sold below zero stock when out_of_stock_policy is 2" name="preorder_limit" type="FLOAT" />
+    <column description="date the stock is expected again, shown on preorders" name="restock_date" type="DATE" />
+    <column description="stock level at or under which the shop owner is alerted; null: the shop-wide threshold" name="low_stock_threshold" type="FLOAT" />
     <foreign-key foreignTable="product" name="fk_product_sale_element_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -984,6 +988,8 @@
     <column description="on the line of a bundle component, the id of the bundle line (line_type bundle) that brought it; null on every other line. A component line carries the stock and the weight of one component, never a price" name="parent" type="INTEGER" />
     <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column name="virtual_document" size="255" type="VARCHAR" />
+    <column defaultValue="0" description="the line was sold above the physical stock, on preorder" name="is_preorder" required="true" type="TINYINT" />
+    <column description="restock date of the sale element when the line was ordered, frozen on preorder lines" name="restock_date" type="DATE" />
     <column defaultValue="0" description="the line was offered by a promotion, copied from the cart so the order and its documents still say so once the cart is gone" name="is_offered" required="true" type="TINYINT" />
     <column defaultValue="product" description="what the line stands for: a good taken off the catalogue (product), a service the shop invoices beside them such as a gift wrapping (service), the priced line of a bundle (bundle), or one component of a bundle, with no price (bundle_component). Everything that walks the lines of an order reads this to know whether it is looking at something to pick, to ship or to count as stock." name="line_type" required="true" size="32" type="VARCHAR" />
     <foreign-key foreignTable="order" name="fk_order_product_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -1855,6 +1861,8 @@
     <column defaultValue="0" description="the line was put in the cart by a promotion, not by the customer, and the customer may neither change nor remove it" name="is_offered" required="true" type="TINYINT" />
     <column description="the coupon that offers the line, read to take the line back when the promotion no longer applies" name="offered_by_coupon_id" type="INTEGER" />
     <column description="the components a customer chose for a bundle line, as canonical JSON; null outside a bundle" name="bundle_composition" type="LONGVARCHAR" />
+    <column description="the stock of the line is held for the cart until this moment; null or past: not held" name="reserved_until" type="TIMESTAMP" />
+    <column description="the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told" name="reserved_quantity" type="FLOAT" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
@@ -1872,6 +1880,13 @@
     </index>
     <index name="idx_cart_item_product_sale_elements_id">
       <index-column name="product_sale_elements_id" />
+    </index>
+    <index name="idx_cart_item_pse_reserved_until">
+      <index-column name="product_sale_elements_id" />
+      <index-column name="reserved_until" />
+    </index>
+    <index name="idx_cart_item_reserved_until">
+      <index-column name="reserved_until" />
     </index>
     <index name="idx_cart_item_offered_by_coupon_id">
       <index-column name="offered_by_coupon_id" />

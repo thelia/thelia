@@ -31,6 +31,7 @@ use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 final class ProductSaleElementActionTest extends ActionIntegrationTestCase
 {
@@ -474,6 +475,159 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
         self::assertSame(0, $clonedPse->getNewness());
     }
 
+    public function testUpdateWritesTheStockSettingsItCarries(): void
+    {
+        [$product, $pse, $currency] = $this->productWithASaleElement();
+
+        $event = $this->updateEventOf($product, $pse, $currency)
+            ->setOutOfStockPolicy(2)
+            ->setPreorderLimit(10.0)
+            ->setRestockDate(new \DateTime('2027-03-15'))
+            ->setLowStockThreshold(20.0);
+        $this->dispatch($event, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+
+        $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+        self::assertSame(2, $reloaded->getOutOfStockPolicy());
+        self::assertSame(10.0, $reloaded->getPreorderLimit());
+        self::assertSame('2027-03-15', $reloaded->getRestockDate()->format('Y-m-d'));
+        self::assertSame(20.0, $reloaded->getLowStockThreshold());
+    }
+
+    public function testUpdateRefusesANegativePreorderLimitOrThreshold(): void
+    {
+        [$product, $pse, $currency] = $this->productWithASaleElement();
+        $pse->setPreorderLimit(4.0)->setLowStockThreshold(3.0)->save();
+
+        foreach (['preorder limit' => fn () => $this->updateEventOf($product, $pse, $currency)->setPreorderLimit(-1.0), 'low stock threshold' => fn () => $this->updateEventOf($product, $pse, $currency)->setLowStockThreshold(-1.0)] as $setting => $event) {
+            try {
+                $this->dispatch($event(), TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+                self::fail('A negative '.$setting.' is refused.');
+            } catch (\InvalidArgumentException $refusal) {
+                self::assertStringContainsString($setting, $refusal->getMessage());
+            }
+        }
+
+        $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+        self::assertSame(4.0, $reloaded->getPreorderLimit());
+        self::assertSame(3.0, $reloaded->getLowStockThreshold());
+    }
+
+    public function testUpdateTellsTheListenersWhenTheStockChanges(): void
+    {
+        [$product, $pse, $currency] = $this->productWithASaleElement();
+        $pse->setQuantity(22)->save();
+        $received = [];
+        $listener = static function (\Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent $event) use (&$received): void {
+            $received[] = $event->getChanges();
+        };
+        $this->dispatcher->addListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, $listener);
+        // The transaction this test wraps itself in is not one of a caller: the change is told at once.
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn(Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME));
+
+        try {
+            $this->dispatch($this->updateEventOf($product, $pse, $currency)->setQuantity(19), TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, $listener);
+            $this->getService(TestCallerTransaction::class)->reset();
+        }
+
+        self::assertCount(1, $received);
+        self::assertSame($pse->getId(), $received[0][0]->productSaleElementsId);
+        self::assertSame(22.0, $received[0][0]->previousQuantity);
+        self::assertSame(19.0, $received[0][0]->newQuantity);
+    }
+
+    public function testUpdateTellsNobodyWhenTheStockStaysWhereItWas(): void
+    {
+        [$product, $pse, $currency] = $this->productWithASaleElement();
+        $pse->setQuantity(22)->save();
+        $heard = 0;
+        $listener = static function () use (&$heard): void {
+            ++$heard;
+        };
+        $this->dispatcher->addListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, $listener);
+
+        try {
+            $this->dispatch($this->updateEventOf($product, $pse, $currency)->setQuantity(22), TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, $listener);
+        }
+
+        self::assertSame(0, $heard);
+    }
+
+    public function testUpdateLeavesTheStockSettingsAloneWhenTheEventDoesNotCarryThem(): void
+    {
+        [$product, $pse, $currency] = $this->productWithASaleElement();
+        $pse->setOutOfStockPolicy(1)->setPreorderLimit(4.0)->setRestockDate(new \DateTime('2027-01-02'))->setLowStockThreshold(3.0)->save();
+
+        $this->dispatch($this->updateEventOf($product, $pse, $currency), TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+
+        $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+        self::assertSame(1, $reloaded->getOutOfStockPolicy());
+        self::assertSame(4.0, $reloaded->getPreorderLimit());
+        self::assertSame('2027-01-02', $reloaded->getRestockDate()->format('Y-m-d'));
+        self::assertSame(3.0, $reloaded->getLowStockThreshold());
+    }
+
+    public function testUpdateClearsTheStockSettingsSetToNull(): void
+    {
+        [$product, $pse, $currency] = $this->productWithASaleElement();
+        $pse->setOutOfStockPolicy(2)->setPreorderLimit(4.0)->setRestockDate(new \DateTime('2027-01-02'))->setLowStockThreshold(3.0)->save();
+
+        $event = $this->updateEventOf($product, $pse, $currency)
+            ->setOutOfStockPolicy(null)
+            ->setPreorderLimit(null)
+            ->setRestockDate(null)
+            ->setLowStockThreshold(null);
+        $this->dispatch($event, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+
+        $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+        self::assertSame(0, $reloaded->getOutOfStockPolicy(), 'No policy means the sale is refused at zero.');
+        self::assertNull($reloaded->getPreorderLimit());
+        self::assertNull($reloaded->getRestockDate());
+        self::assertNull($reloaded->getLowStockThreshold());
+    }
+
+    public function testCreateWritesTheStockSettingsItCarries(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $currency);
+
+        $event = (new ProductSaleElementCreateEvent($product, [], $currency->getId()))
+            ->setOutOfStockPolicy(1)
+            ->setLowStockThreshold(8.0);
+        $this->dispatch($event, TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT);
+
+        $created = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElement()->getId());
+        self::assertSame(1, $created->getOutOfStockPolicy());
+        self::assertSame(8.0, $created->getLowStockThreshold());
+        self::assertNull($created->getPreorderLimit());
+    }
+
+    public function testCloneCarriesTheStockSettings(): void
+    {
+        $currency = $this->factory->currency();
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $currency);
+        $product->setLocale('en_US')->setTitle('Cloneable product')->save();
+        $pse = ProductSaleElementsQuery::create()->filterByProductId($product->getId())->findOne();
+        self::assertNotNull($pse);
+        $pse->setOutOfStockPolicy(2)->setPreorderLimit(6.0)->setRestockDate(new \DateTime('2027-05-06'))->setLowStockThreshold(2.0)->save();
+
+        $event = new ProductCloneEvent($product->getRef().'-CLONE', 'en_US', $product);
+        $this->dispatch($event, TheliaEvents::PRODUCT_CLONE);
+
+        $clonedPses = ProductSaleElementsQuery::create()->filterByProductId($event->getClonedProduct()->getId())->find();
+        self::assertNotCount(0, $clonedPses);
+
+        foreach ($clonedPses as $cloned) {
+            self::assertSame(2, $cloned->getOutOfStockPolicy());
+            self::assertSame(6.0, $cloned->getPreorderLimit());
+            self::assertSame('2027-05-06', $cloned->getRestockDate()->format('Y-m-d'));
+            self::assertSame(2.0, $cloned->getLowStockThreshold());
+        }
+    }
+
     public function testCloneCarriesTheVirtualDocumentOfEachSaleElement(): void
     {
         $currency = $this->factory->currency();
@@ -632,5 +786,33 @@ final class ProductSaleElementActionTest extends ActionIntegrationTestCase
     private function documentFiles(): array
     {
         return array_values(glob($this->documentUploadDir.\DIRECTORY_SEPARATOR.'*') ?: []);
+    }
+
+    /**
+     * @return array{0: Product, 1: \Thelia\Model\ProductSaleElements, 2: Currency}
+     */
+    private function productWithASaleElement(): array
+    {
+        $currency = $this->factory->currency();
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $currency);
+
+        return [$product, $this->factory->productSaleElement($product), $currency];
+    }
+
+    private function updateEventOf(Product $product, \Thelia\Model\ProductSaleElements $pse, Currency $currency): ProductSaleElementUpdateEvent
+    {
+        return (new ProductSaleElementUpdateEvent($product, $pse->getId()))
+            ->setReference($pse->getRef())
+            ->setQuantity(5)
+            ->setWeight(1.0)
+            ->setOnsale(0)
+            ->setIsnew(0)
+            ->setIsdefault(true)
+            ->setEanCode(null)
+            ->setTaxRuleId($product->getTaxRuleId())
+            ->setCurrencyId($currency->getId())
+            ->setFromDefaultCurrency(0)
+            ->setPrice(10.0)
+            ->setSalePrice(0.0);
     }
 }

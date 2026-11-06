@@ -18,6 +18,8 @@ use Thelia\Model\Product;
 
 class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 {
+    use StockSettingsFieldsTrait;
+
     protected int $product_sale_element_id;
     protected Product $product;
     protected string $reference;

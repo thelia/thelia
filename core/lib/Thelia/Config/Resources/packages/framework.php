@@ -87,6 +87,24 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 10,
                 'interval' => '1 hour',
             ],
+            // Holds of the stock of a cart. A hold locks the stock rows and writes the lines, so
+            // a script that keeps adding to a cart, or that walks through many carts, could keep
+            // the stock out of every real buyer. The per-cart window is far above what a buyer
+            // does (a line added, the steps of the checkout, a few changes of quantity); the
+            // per-client one, by address, is for a caller who spreads over many carts. Both
+            // figures are operating settings read from the environment (see
+            // parameters/stock_reservation_rate_limit.php): a shop whose buyers share one
+            // address (an office, a mobile carrier) may need the second one higher.
+            'stock_reservation_per_cart' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_STOCK_RESERVATION_RATE_LIMIT_PER_CART)%',
+                'interval' => '1 hour',
+            ],
+            'stock_reservation_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_STOCK_RESERVATION_RATE_LIMIT_PER_CLIENT)%',
+                'interval' => '1 hour',
+            ],
             // Signatures tried on the preview of an unpublished content or folder. A
             // signed-in administrator does not spend it; a reviewer opening a shared
             // link a few times does not notice it; a caller forging signatures does.

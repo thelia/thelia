@@ -14,7 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Promotion;
 
+use Propel\Runtime\Propel;
+use Thelia\Core\Event\ProductSaleElement\StockReleasedEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Cart\Service\CartSelectionService;
+use Thelia\Domain\Catalog\Stock\StockReservationAnnouncer;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
+use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
@@ -24,10 +30,12 @@ use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\DestinationRestriction;
 use Thelia\Model\Map\CartItemTableMap;
 use Thelia\Model\Product;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
  * AC15: a gift offered by a promotion that the destination refuses is not offered, so it
@@ -61,6 +69,42 @@ final class FreeProductGiftRefusesTheDeliveryAddressTest extends ActionIntegrati
         self::assertSame(0, CartItemQuery::create()->filterByCartId($cart->getId())->filterByProductId($gift->getId())->count(), 'The gift the destination refuses is left in the cart, where it blocks the order (AC15).');
     }
 
+    public function testAHeldGiftWithdrawnWithTheDestinationIsToldAsReleased(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        ConfigQuery::write('allow_negative_stock', '0');
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::write(StockSettings::RESERVATION_SCOPE, 'cart');
+        ConfigQuery::write(StockSettings::RESERVATION_DURATION, '15');
+        ConfigQuery::resetCache();
+        $callerTransaction = $this->getService(TestCallerTransaction::class);
+        $callerTransaction->ignoreTheLevelsOpenOn(Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME));
+        [$cart, $gift, $abroad, $coupon] = $this->cartWithTheGiftOfferedOnTheServedDefaultAddress();
+        $giftLine = CartItemQuery::create()->filterByCartId($cart->getId())->filterByProductId($gift->getId())->findOne();
+        $giftLine->getProductSaleElements()->setQuantity(5)->save();
+        $this->getService(StockReservationService::class)->holdAfterCartChange($cart);
+        $held = $this->getService(StockReservationService::class)->heldLinesOf((int) $cart->getId(), (int) $giftLine->getId());
+        self::assertCount(1, $held, 'Precondition: the gift line holds stock.');
+
+        $told = [];
+        $listener = static function (StockReleasedEvent $event) use (&$told): void {
+            $told[] = [$event->getCartId(), $event->getLines()];
+        };
+        $this->dispatcher->addListener(TheliaEvents::STOCK_RELEASED, $listener);
+
+        try {
+            $this->getService(CartSelectionService::class)->setDeliveryAddress(new CheckoutDTO($cart, deliveryAddressId: $abroad->getId()));
+            $coupon->exec();
+            $this->getService(StockReservationAnnouncer::class)->flush();
+        } finally {
+            $this->dispatcher->removeListener(TheliaEvents::STOCK_RELEASED, $listener);
+            $callerTransaction->reset();
+            ConfigQuery::resetCache();
+        }
+
+        self::assertEquals([[(int) $cart->getId(), $held]], $told);
+    }
+
     /**
      * @return array{Cart, Product, Address, FreeProduct}
      */
@@ -88,7 +132,7 @@ final class FreeProductGiftRefusesTheDeliveryAddressTest extends ActionIntegrati
 
         /** @var FacadeInterface $facade */
         $facade = $this->getService('thelia.facade');
-        $coupon = new FreeProduct($facade, $checker);
+        $coupon = new FreeProduct($facade, $checker, $this->getService(StockReservationService::class));
         $coupon->set(
             $facade,
             'FREE-GIFT-ADDRESS',

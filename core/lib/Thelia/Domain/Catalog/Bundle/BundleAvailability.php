@@ -136,7 +136,7 @@ final readonly class BundleAvailability
                 return 0;
             }
 
-            if ($component->virtual) {
+            if ($component->virtual || $component->unlimited) {
                 $available ??= self::UNLIMITED;
 
                 continue;

@@ -19,15 +19,21 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Catalog\Bundle\BundleComponentReader;
 use Thelia\Domain\Catalog\Bundle\BundleDecimal;
+use Thelia\Domain\Catalog\Stock\NoReservedQuantity;
+use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Checkout\Service\ConsentAnswerStoreInterface;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
 use Thelia\Domain\Order\Exception\StockShortageException;
+use Thelia\Domain\Order\Exception\StockTakeRefusedException;
 use Thelia\Domain\Order\Service\BundleOrderComponent;
 use Thelia\Domain\Order\Service\BundleOrderPlanner;
 use Thelia\Domain\Order\Service\GiftWrappingLineFactory;
@@ -36,8 +42,11 @@ use Thelia\Domain\Order\Service\OrderFactory;
 use Thelia\Domain\Order\Service\OrderProductFactory;
 use Thelia\Domain\Order\Service\OrderRefGeneratorInterface;
 use Thelia\Domain\Order\Service\OrderTransactionManager;
+use Thelia\Domain\Order\Service\PackPreorder;
 use Thelia\Domain\Order\Service\StockDecrementer;
+use Thelia\Domain\Order\Service\StockMovement;
 use Thelia\Domain\Order\Service\StockPolicy;
+use Thelia\Domain\Order\Service\StockTake;
 use Thelia\Domain\Order\Service\TaxProvider;
 use Thelia\Domain\Order\Service\TranslationProvider;
 use Thelia\Domain\Order\Service\VirtualProductContext;
@@ -46,6 +55,7 @@ use Thelia\Domain\Payment\Enum\OrderPaymentPartState;
 use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
 use Thelia\Domain\Payment\OrderPaymentComposer;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
+use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliverySlotBooker;
@@ -71,6 +81,8 @@ use Thelia\Model\ProductSaleElements;
 
 readonly class OrderFacade
 {
+    private SellableStock $sellableStock;
+
     public function __construct(
         private OrderTransactionManager $orderTransactionManager,
         private OrderFactory $orderFactory,
@@ -94,7 +106,12 @@ readonly class OrderFacade
         private OrderPaymentComposer $orderPaymentComposer,
         private BundleOrderPlanner $bundleOrderPlanner,
         private BundleComponentReader $bundleComponentReader,
+        ?SellableStock $sellableStock = null,
+        private ?StockReservationService $stockReservation = null,
+        private ?StockLevelAnnouncer $stockLevelAnnouncer = null,
     ) {
+        // A facade built without them sells as a shop that does not reserve its stock.
+        $this->sellableStock = $sellableStock ?? new SellableStock(new NoReservedQuantity(), new SaleUnitAvailableStock($saleUnitContext, $saleUnitStockResolver));
     }
 
     /**
@@ -142,12 +159,33 @@ readonly class OrderFacade
         // pack itself.
         $bundleComponents = $this->bundleOrderPlanner->componentsOf($cart->getCartItems());
 
-        $this->assertCartStockIsAvailable($cart, $bundleComponents);
+        // The sale unit the order is stamped with (OrderFactory): the one stock every check, every
+        // reservation read and every take of this order stands on.
+        $saleUnitId = $this->saleUnitContext->getSaleUnit()?->getId();
+
+        $this->assertCartStockIsAvailable($cart, $bundleComponents, $saleUnitId);
+
+        // When the shop reserves its stock, the rows the order takes from are locked before
+        // anything is read in its transaction: the reservations of the other carts are then read
+        // as they stand, and a cart holding a unit is never sold to this one.
+        $stockRowsToLock = true === $this->stockReservation?->isActive() ? self::stockRowsOf($cart, $bundleComponents) : [];
 
         $connection = $this->orderTransactionManager->begin();
 
+        /** @var list<StockMovement> $stockMovements what the order took from the stock, for the event sent once it is committed */
+        $stockMovements = [];
+
         try {
-            $this->refuseACartThatHasAlreadyBeenOrdered($cart, $connection);
+            $this->refuseACartThatHasAlreadyBeenOrdered($cart, $connection, $stockRowsToLock);
+
+            // What the other carts hold of those rows, read once, now that they are locked: the
+            // guard of every take and the preorder of every line stand on it.
+            $reservedByOtherCarts = null === $this->stockReservation ? [] : $this->stockReservation->reservedByOtherCartsOf(
+                $stockRowsToLock,
+                $saleUnitId,
+                (int) $cart->getId(),
+                $connection,
+            );
 
             $placedOrder = $this->orderFactory->createFromSessionOrder($sessionOrder, $currency, $lang, $cart, $customer);
 
@@ -225,10 +263,10 @@ readonly class OrderFacade
                 $plannedComponents = [];
 
                 if (null === $components) {
-                    $stockTakes[] = [$product, $productSaleElements, (float) $cartItem->getQuantity(), $virtualContext];
+                    $stockTakes[] = [$product, $productSaleElements, (float) $cartItem->getQuantity(), $virtualContext, self::lineKey($cartItem)];
                 }
 
-                foreach ($components ?? [] as $component) {
+                foreach ($components ?? [] as $componentIndex => $component) {
                     $componentContext = $this->virtualProductHandler->resolve(
                         $dispatcher,
                         $placedOrder,
@@ -236,14 +274,22 @@ readonly class OrderFacade
                         (int) $component->productSaleElements->getId(),
                     );
 
-                    $stockTakes[] = [$component->product, $component->productSaleElements, $component->quantity, $componentContext];
-                    $plannedComponents[] = [$component, $componentContext];
+                    $stockTakes[] = [$component->product, $component->productSaleElements, $component->quantity, $componentContext, self::lineKey($cartItem, $componentIndex)];
+                    $plannedComponents[] = [$component, $componentContext, self::lineKey($cartItem, $componentIndex)];
                 }
 
                 $plannedLines[] = [$cartItem, $product, $productSaleElements, $virtualContext, null === $components ? null : $plannedComponents];
             }
 
-            $this->takeEverythingFromStock($placedOrder, $stockTakes, $manageStockOnCreation, $connection);
+            $movementOfLine = $this->takeEverythingFromStock($stockTakes, $manageStockOnCreation, $reservedByOtherCarts, $saleUnitId, $connection);
+            $stockMovements = array_values(array_filter($movementOfLine));
+
+            // What the cart held is now sold: the cart no longer holds it, so its units are not
+            // counted twice. A stock left for the payment stays held by the cart until the order is
+            // paid or cancelled (Action\Order::updateStatus()): nobody else buys it meanwhile.
+            if ($manageStockOnCreation) {
+                $this->stockReservation?->releaseCart((int) $cart->getId(), $connection);
+            }
 
             foreach ($plannedLines as [$cartItem, $product, $productSaleElements, $virtualContext, $components]) {
                 $productI18n = $this->translationProvider->getProductTranslation($lang->getLocale(), $product->getId());
@@ -275,9 +321,22 @@ readonly class OrderFacade
                     'connection' => $connection,
                 ];
 
-                $orderProduct = null === $components
-                    ? $this->orderProductFactory->createOrderProduct(...$lineArguments)
-                    : $this->orderProductFactory->createBundleLine(...$lineArguments);
+                // What was a preorder when the stock was taken is frozen on the line. A pack is
+                // one when one of its components is, and waits for the latest of their dates.
+                if (null === $components) {
+                    $orderProduct = $this->orderProductFactory->createOrderProduct(
+                        ...$lineArguments,
+                        isPreorder: $movementOfLine[self::lineKey($cartItem)]->preorder ?? false,
+                        restockDate: $movementOfLine[self::lineKey($cartItem)]?->restockDate,
+                    );
+                } else {
+                    $packPreorder = PackPreorder::of(array_map(static fn (array $plannedComponent): ?StockMovement => $movementOfLine[$plannedComponent[2]] ?? null, $components));
+                    $orderProduct = $this->orderProductFactory->createBundleLine(
+                        ...$lineArguments,
+                        isPreorder: $packPreorder['isPreorder'],
+                        restockDate: $packPreorder['restockDate'],
+                    );
+                }
 
                 /** @var OrderProductTax $tax */
                 foreach ($taxDetails as $tax) {
@@ -292,8 +351,8 @@ readonly class OrderFacade
                     $connection
                 );
 
-                foreach ($components ?? [] as [$component, $componentContext]) {
-                    $this->persistBundleComponent($placedOrder, $orderProduct, $component, $componentContext, $lang, $connection);
+                foreach ($components ?? [] as [$component, $componentContext, $componentKey]) {
+                    $this->persistBundleComponent($placedOrder, $orderProduct, $component, $componentContext, $lang, $connection, $movementOfLine[$componentKey] ?? null);
                 }
             }
 
@@ -340,8 +399,6 @@ readonly class OrderFacade
                 // rollback would leave the buyer with boxes to tick again and no way to know it.
                 $this->consentAnswers->clear();
             }
-
-            return $placedOrder;
         } catch (\Throwable $throwable) {
             $this->orderTransactionManager->rollback($connection);
 
@@ -354,6 +411,83 @@ readonly class OrderFacade
 
             throw $throwable;
         }
+
+        // Once the order is committed, never inside its transaction: a listener that reads
+        // the stock, writes, or fails must meet the stock as the order left it.
+        $this->announceStockChanges($dispatcher, $stockMovements);
+
+        return $placedOrder;
+    }
+
+    /**
+     * Tells the listeners what the order did to the stock of each sale element it moved (the
+     * shared counter: the own stock of a sale unit is not a level of the sale element). One
+     * change per sale element, from what it was before the first line to what it is after the
+     * last. The order is placed whatever the listeners do: a failure is logged, not thrown.
+     *
+     * @param list<StockMovement> $stockMovements
+     */
+    private function announceStockChanges(EventDispatcherInterface $dispatcher, array $stockMovements): void
+    {
+        /** @var array<int, StockLevelChange> $changes */
+        $changes = [];
+
+        foreach ($stockMovements as $movement) {
+            if ($movement->onSaleUnitStock()) {
+                continue;
+            }
+
+            $changes[$movement->productSaleElementsId] = new StockLevelChange(
+                $movement->productSaleElementsId,
+                isset($changes[$movement->productSaleElementsId]) ? $changes[$movement->productSaleElementsId]->previousQuantity : $movement->previousQuantity,
+                $movement->newQuantity,
+            );
+        }
+
+        // Inside the transaction of a caller, once that one is over, and never when it is rolled back.
+        if (null !== $this->stockLevelAnnouncer) {
+            $this->stockLevelAnnouncer->announceChanges(array_values($changes));
+
+            return;
+        }
+
+        StockLevelAnnouncer::tell($dispatcher, array_values($changes));
+    }
+
+    /**
+     * The sale elements whose stock the order may take from: the lines of products that are not
+     * virtual, and the components of the packs, the sale element of a pack holding none.
+     *
+     * @param array<int, list<BundleOrderComponent>> $bundleComponents the pack lines, by cart line id
+     *
+     * @return list<int>
+     */
+    private static function stockRowsOf(CartModel $cart, array $bundleComponents): array
+    {
+        $ids = [];
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            foreach ($bundleComponents[(int) $cartItem->getId()] ?? [] as $component) {
+                if (1 !== (int) $component->product->getVirtual()) {
+                    $ids[] = (int) $component->productSaleElements->getId();
+                }
+            }
+
+            if (!isset($bundleComponents[(int) $cartItem->getId()]) && 1 !== (int) $cartItem->getProduct()->getVirtual()) {
+                $ids[] = (int) $cartItem->getProductSaleElementsId();
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * The key a line of the order, or one component of a pack line, is known by between the
+     * moment its stock is taken and the moment it is written.
+     */
+    private static function lineKey(\Thelia\Model\CartItem $cartItem, ?int $componentIndex = null): string
+    {
+        return $cartItem->getId().(null === $componentIndex ? '' : ':'.$componentIndex);
     }
 
     /**
@@ -420,21 +554,30 @@ readonly class OrderFacade
      * another session while this transaction holds a locking read is seen by the plain
      * read that comes after it.
      *
+     * The stock rows the order takes from, when the shop reserves its stock, are locked right
+     * after the cart and for the same reason: the reservations of the other carts are read
+     * after them, in a view that cannot predate a reservation committed meanwhile.
+     *
      * A cancelled order is not one: a payment that did not go through takes the order back
      * and leaves the buyer with the cart they still have, and refusing to let them order it
      * again would strand them. That is also why the guard is not a unique index on
      * `cart_id`, which would refuse the second, legitimate order as well.
      *
+     * @param list<int> $stockRowsToLock the sale elements whose stock row is locked after the cart
+     *
      * @throws CartAlreadyOrderedException when this very cart already carries an order that stands
      * @throws PropelException
      */
-    private function refuseACartThatHasAlreadyBeenOrdered(CartModel $cart, ConnectionInterface $connection): void
+    private function refuseACartThatHasAlreadyBeenOrdered(CartModel $cart, ConnectionInterface $connection, array $stockRowsToLock = []): void
     {
         $cartId = (int) $cart->getId();
 
         $lockTheCart = $connection->prepare('SELECT `id` FROM `cart` WHERE `id` = :cartId FOR UPDATE');
         $lockTheCart->bindValue(':cartId', $cartId, \PDO::PARAM_INT);
         $lockTheCart->execute();
+
+        // A locking read too, so still before the view of the transaction is taken.
+        $this->stockReservation?->lockStockRows($stockRowsToLock, $connection);
 
         $existingOrder = $this->liveOrderOf($cartId, $connection);
 
@@ -640,7 +783,7 @@ readonly class OrderFacade
      *
      * @throws StockShortageException
      */
-    private function assertCartStockIsAvailable(CartModel $cart, array $bundleComponents): void
+    private function assertCartStockIsAvailable(CartModel $cart, array $bundleComponents, ?int $saleUnitId): void
     {
         if (!ConfigQuery::checkAvailableStock()) {
             return;
@@ -648,7 +791,7 @@ readonly class OrderFacade
 
         // A cart without a pack is checked as it always was, with the queries it always had.
         if ([] === $bundleComponents) {
-            $this->assertStockOfEachLineIsAvailable($cart);
+            $this->assertStockOfEachLineIsAvailable($cart, $saleUnitId);
 
             return;
         }
@@ -690,8 +833,14 @@ readonly class OrderFacade
 
         // One read for every sale element of the cart, the sale unit's own stock included:
         // the one source the cart itself reads.
-        $available = $this->bundleComponentReader->read([...array_column($singleLines, 0), ...array_keys($askedByStock)]);
-        $availableQuantity = static fn (int $productSaleElementsId): float => isset($available[$productSaleElementsId]) ? $available[$productSaleElementsId]->availableQuantity : 0.0;
+        $available = $this->bundleComponentReader->read(
+            [...array_column($singleLines, 0), ...array_keys($askedByStock)],
+            (int) $cart->getId() > 0 ? (int) $cart->getId() : null,
+            $saleUnitId,
+        );
+        $availableQuantity = static fn (int $productSaleElementsId): float => isset($available[$productSaleElementsId])
+            ? ($available[$productSaleElementsId]->unlimited ? \INF : $available[$productSaleElementsId]->availableQuantity)
+            : 0.0;
 
         foreach ($singleLines as [$productSaleElementsId, $askedMicro, $reference]) {
             if (!isset($askedByStock[$productSaleElementsId])) {
@@ -705,13 +854,18 @@ readonly class OrderFacade
     }
 
     /**
-     * The check of a cart without any pack, line by line against the stock of its sale element.
+     * The check of a cart without any pack, line by line against the stock of its sale element, the
+     * sale elements of the cart read together: one read of the reservations, one of the stock of the
+     * sale unit, whatever the number of lines.
      *
      * @throws StockShortageException
      */
-    private function assertStockOfEachLineIsAvailable(CartModel $cart): void
+    private function assertStockOfEachLineIsAvailable(CartModel $cart, ?int $saleUnitId): void
     {
-        $saleUnitId = $this->saleUnitContext->getSaleUnit()?->getId();
+        /** @var list<\Thelia\Model\CartItem> $lines */
+        $lines = [];
+        /** @var array<int, ProductSaleElements> $saleElements */
+        $saleElements = [];
 
         foreach ($cart->getCartItems() as $cartItem) {
             // Judged before the stock: the sale element of a pack holds none, and a shortage
@@ -723,69 +877,22 @@ readonly class OrderFacade
                 continue;
             }
 
-            $productSaleElements = $cartItem->getProductSaleElements();
+            $lines[] = $cartItem;
+            $saleElements[(int) $cartItem->getProductSaleElementsId()] = $cartItem->getProductSaleElements();
+        }
 
+        if ([] === $lines) {
+            return;
+        }
+
+        $cartId = (int) $cart->getId();
+        $sellable = $this->sellableStock->forMany($saleElements, $saleUnitId, $cartId > 0 ? $cartId : null);
+
+        foreach ($lines as $cartItem) {
             $this->stockPolicy->assertStockIsAvailable(
                 $cartItem->getQuantity(),
-                $this->saleUnitStockResolver->availableQuantity(
-                    $saleUnitId,
-                    $productSaleElements->getId(),
-                    (float) $productSaleElements->getQuantity(),
-                ),
+                $sellable[(int) $cartItem->getProductSaleElementsId()] ?? \INF,
                 $cartItem->getProduct()->getRef(),
-            );
-        }
-    }
-
-    /**
-     * Takes a quantity of a sale element from the stock of the order, in its transaction.
-     *
-     * @throws StockShortageException
-     */
-    private function takeFromStock(
-        ModelOrder $placedOrder,
-        Product $product,
-        ProductSaleElements $productSaleElements,
-        float $quantity,
-        VirtualProductContext $virtualContext,
-        bool $manageStockOnCreation,
-        ConnectionInterface $connection,
-    ): void {
-        $checkStock = $this->stockPolicy->shouldCheckAvailability(ConfigQuery::checkAvailableStock(), $virtualContext->useStock);
-
-        if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
-            try {
-                // Atomic conditional decrement: check and write are a single
-                // statement, so concurrent checkouts cannot oversell.
-                $this->stockDecrementer->decrement(
-                    $productSaleElements->getId(),
-                    $quantity,
-                    guardAvailability: $checkStock,
-                    allowNegativeStock: (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
-                    connection: $connection,
-                    // The unit the order was stamped with: what a cancellation or a
-                    // return gives back to, so the two movements always meet.
-                    saleUnitId: $placedOrder->getSaleUnitId(),
-                );
-            } catch (TheliaProcessException $shortage) {
-                // The decrementer knows a row id and a quantity; only here is
-                // there a product to name, and a caller told "not enough stock"
-                // about a cart of ten lines has nothing to act on. The type is
-                // what a caller maps to an answer: everything else this class
-                // raises is a defect, not a shortage.
-                throw new StockShortageException($product->getRef(), previous: $shortage);
-            }
-        } elseif ($checkStock) {
-            // Stock is managed later (e.g. at payment): keep the
-            // advisory availability check on order creation.
-            $this->stockPolicy->assertStockIsAvailable(
-                $quantity,
-                $this->saleUnitStockResolver->availableQuantity(
-                    $placedOrder->getSaleUnitId(),
-                    $productSaleElements->getId(),
-                    (float) $productSaleElements->getQuantity(),
-                ),
-                $product->getRef(),
             );
         }
     }
@@ -794,19 +901,84 @@ readonly class OrderFacade
      * Takes from the stock what the order asks of it, in the ascending id of the sale
      * element (stable for one sale element asked by several lines): the order every
      * placement locks the stock rows in. Each line keeps its own take and its own guard,
-     * the check a line of a cart without any pack has always had.
+     * the check a line of a cart without any pack has always had; what the takes left is read
+     * once, after the last one.
      *
-     * @param list<array{0: Product, 1: ProductSaleElements, 2: float, 3: VirtualProductContext}> $stockTakes
+     * A stock managed later (at the payment) is not taken: the line keeps the advisory check
+     * of the order creation, on the same stock and the same reservations.
+     *
+     * @param list<array{0: Product, 1: ProductSaleElements, 2: float, 3: VirtualProductContext, 4: string}> $stockTakes           the last entry is the key of the line the take is for
+     * @param array<int, float>                                                                              $reservedByOtherCarts what the other carts hold, by sale element, read after the locks
+     *
+     * @return array<int|string, StockMovement|null> what each take did to the stock, by that key, in the order the stock was taken
      *
      * @throws StockShortageException
      */
-    private function takeEverythingFromStock(ModelOrder $placedOrder, array $stockTakes, bool $manageStockOnCreation, ConnectionInterface $connection): void
-    {
+    private function takeEverythingFromStock(
+        array $stockTakes,
+        bool $manageStockOnCreation,
+        array $reservedByOtherCarts,
+        ?int $saleUnitId,
+        ConnectionInterface $connection,
+    ): array {
         usort($stockTakes, static fn (array $first, array $second): int => (int) $first[1]->getId() <=> (int) $second[1]->getId());
 
-        foreach ($stockTakes as [$product, $productSaleElements, $quantity, $virtualContext]) {
-            $this->takeFromStock($placedOrder, $product, $productSaleElements, $quantity, $virtualContext, $manageStockOnCreation, $connection);
+        $checkAvailableStock = ConfigQuery::checkAvailableStock();
+        $movements = [];
+        /** @var array<int|string, StockTake> $takes */
+        $takes = [];
+        /** @var array<int|string, Product> $productOfTake */
+        $productOfTake = [];
+
+        foreach ($stockTakes as [$product, $productSaleElements, $quantity, $virtualContext, $lineKey]) {
+            $movements[$lineKey] = null;
+            $checkStock = $this->stockPolicy->shouldCheckAvailability($checkAvailableStock, $virtualContext->useStock);
+            $reserved = $checkStock ? ($reservedByOtherCarts[(int) $productSaleElements->getId()] ?? 0.0) : 0.0;
+
+            if ($this->stockPolicy->shouldDecrementStock($manageStockOnCreation, $virtualContext->useStock)) {
+                // Atomic conditional decrement: check and write are a single
+                // statement, so concurrent checkouts cannot oversell.
+                $takes[$lineKey] = new StockTake((int) $productSaleElements->getId(), $quantity, $checkStock, $reserved);
+                $productOfTake[$lineKey] = $product;
+            } elseif ($checkStock) {
+                // Stock is managed later (e.g. at payment): keep the
+                // advisory availability check on order creation.
+                $ceiling = SellableStock::ceilingOfPse(
+                    $productSaleElements,
+                    $this->saleUnitStockResolver->availableQuantity($saleUnitId, (int) $productSaleElements->getId(), (float) $productSaleElements->getQuantity()),
+                );
+
+                $this->stockPolicy->assertStockIsAvailable($quantity, null === $ceiling ? \INF : max(0.0, $ceiling - $reserved), $product->getRef());
+            }
         }
+
+        if ([] === $takes) {
+            return $movements;
+        }
+
+        try {
+            $taken = $this->stockDecrementer->decrementAll(
+                $takes,
+                (bool) (int) ConfigQuery::read('allow_negative_stock', 0),
+                $connection,
+                // The unit the order was stamped with: what a cancellation or a
+                // return gives back to, so the two movements always meet.
+                $saleUnitId,
+            );
+        } catch (StockTakeRefusedException $shortage) {
+            // The decrementer knows a row id and a quantity; only here is
+            // there a product to name, and a caller told "not enough stock"
+            // about a cart of ten lines has nothing to act on. The type is
+            // what a caller maps to an answer: everything else this class
+            // raises is a defect, not a shortage.
+            throw new StockShortageException($productOfTake[$shortage->takeKey]->getRef(), previous: $shortage);
+        }
+
+        foreach ($taken as $lineKey => $movement) {
+            $movements[$lineKey] = $movement;
+        }
+
+        return $movements;
     }
 
     /**
@@ -821,6 +993,7 @@ readonly class OrderFacade
         VirtualProductContext $virtualContext,
         LangModel $lang,
         ConnectionInterface $connection,
+        ?StockMovement $stockMovement = null,
     ): void {
         $componentLine = $this->orderProductFactory->createBundleComponentLine(
             $placedOrder,
@@ -831,6 +1004,8 @@ readonly class OrderFacade
             $component->quantity,
             $virtualContext,
             $connection,
+            $stockMovement->preorder ?? false,
+            $stockMovement?->restockDate,
         );
 
         $this->orderProductFactory->persistAttributeCombinations(

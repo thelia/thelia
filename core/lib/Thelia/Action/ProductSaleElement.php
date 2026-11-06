@@ -26,6 +26,7 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementToggleVisibilityEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
@@ -35,6 +36,8 @@ use Thelia\Domain\Catalog\Bundle\Exception\BundleDefinitionException;
 use Thelia\Domain\Catalog\Product\Identifier\Gtin;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Log\Tlog;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeCombination;
@@ -56,8 +59,10 @@ use Thelia\Model\ProductSaleElementsQuery;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 {
-    public function __construct(protected EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher,
+        protected ?StockLevelAnnouncer $stockLevelAnnouncer = null,
+    ) {
     }
 
     /**
@@ -112,6 +117,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 }
             }
 
+            if ($this->applyStockSettings($salesElement, $event)) {
+                $salesElement->save($con);
+            }
+
             $event->setProductSaleElement($salesElement);
 
             // Store all the stuff !
@@ -120,6 +129,53 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $con->rollback();
 
             throw $exception;
+        }
+    }
+
+    /**
+     * Writes the stock settings the event carries and leaves the others alone.
+     *
+     * @return bool whether a setting was written
+     */
+    private function applyStockSettings(ProductSaleElements $salesElement, ProductSaleElementCreateEvent|ProductSaleElementUpdateEvent $event): bool
+    {
+        $written = false;
+
+        if ($event->hasOutOfStockPolicy()) {
+            $salesElement->setOutOfStockPolicy(OutOfStockPolicy::fromStored($event->getOutOfStockPolicy())->value);
+            $written = true;
+        }
+
+        if ($event->hasPreorderLimit()) {
+            self::refuseANegative('preorder limit', $event->getPreorderLimit());
+            $salesElement->setPreorderLimit($event->getPreorderLimit());
+            $written = true;
+        }
+
+        if ($event->hasRestockDate()) {
+            $salesElement->setRestockDate($event->getRestockDate());
+            $written = true;
+        }
+
+        if ($event->hasLowStockThreshold()) {
+            self::refuseANegative('low stock threshold', $event->getLowStockThreshold());
+            $salesElement->setLowStockThreshold($event->getLowStockThreshold());
+            $written = true;
+        }
+
+        return $written;
+    }
+
+    /**
+     * A count of units below zero, or a level of stock, is never negative: a negative preorder limit
+     * would sell less than the stock itself.
+     *
+     * @throws \InvalidArgumentException
+     */
+    private static function refuseANegative(string $setting, ?float $value): void
+    {
+        if (null !== $value && $value < 0) {
+            throw new \InvalidArgumentException(\sprintf('The %s of a sale element cannot be negative, %s given.', $setting, $value));
         }
     }
 
@@ -135,6 +191,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
+
+        // The stock before the edit, for the event sent once it is committed. A sale element
+        // created by this very call had no level before.
+        $previousQuantity = null === $salesElement ? null : (float) $salesElement->getQuantity();
 
         try {
             // Update the product's tax rule
@@ -183,6 +243,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             if (null !== $event->getManufacturerBrandId()) {
                 $salesElement->setManufacturerBrandId(0 === $event->getManufacturerBrandId() ? null : $event->getManufacturerBrandId());
             }
+
+            $this->applyStockSettings($salesElement, $event);
 
             $salesElement->save();
 
@@ -239,6 +301,19 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             }
 
             throw $exception;
+        }
+
+        // After the commit, never inside it: a listener meets the stock as the edit left it, and
+        // the edit stands whatever the listeners do. Inside the transaction of a caller, once that
+        // one is over, and never when it is rolled back.
+        if (null !== $previousQuantity) {
+            $changes = [new StockLevelChange((int) $salesElement->getId(), $previousQuantity, (float) $salesElement->getQuantity())];
+
+            if (null !== $this->stockLevelAnnouncer) {
+                $this->stockLevelAnnouncer->announceChanges($changes);
+            } else {
+                StockLevelAnnouncer::tell($this->eventDispatcher, $changes);
+            }
         }
     }
 
@@ -546,6 +621,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setEanCode($this->cloneableGtin($originalProductPSE->getEanCode()))
             ->setMpn($originalProductPSE->getMpn() ?? '')
             ->setManufacturerBrandId($originalProductPSE->getManufacturerBrandId() ?? 0)
+            ->setOutOfStockPolicy($originalProductPSE->getOutOfStockPolicy())
+            ->setPreorderLimit($originalProductPSE->getPreorderLimit())
+            ->setRestockDate($originalProductPSE->getRestockDate())
+            ->setLowStockThreshold($originalProductPSE->getLowStockThreshold())
             ->setTaxRuleId((int) $event->getOriginalProduct()->getTaxRuleId())
             ->setPrice((float) $originalProductPSEPrice->getPrice())
             ->setSalePrice((float) $originalProductPSEPrice->getPromoPrice())

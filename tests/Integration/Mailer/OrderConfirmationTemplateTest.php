@@ -86,6 +86,44 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
     }
 
     /**
+     * A line sold below zero stock tells the buyer it is a preorder, with the restock date frozen on
+     * it, in the HTML and in the text of the mail; a line in stock tells nothing of the kind.
+     */
+    public function testAPreorderLineShowsItIsAPreorderWithTheRestockDate(): void
+    {
+        $this->skipUnlessTheInstalledTemplateCarries('IS_PREORDER', 'the preorder mention');
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order($factory->customer($factory->customerTitle()));
+        $factory->orderProduct($order, ['title' => 'A line in stock']);
+        $factory->orderProduct($order, ['title' => 'A line on order'])
+            ->setIsPreorder(1)
+            ->setRestockDate('2030-01-15')
+            ->save($this->getPropelConnection());
+
+        $email = $this->renderConfirmation($this->parametersTheCoreSendsFor($order));
+
+        foreach (['html' => (string) $email->getHtmlBody(), 'text' => (string) $email->getTextBody()] as $part => $body) {
+            self::assertSame(1, substr_count($body, 'restock expected on'), 'One line is a preorder, in the '.$part.' part.');
+            self::assertStringContainsString('2030', $body, 'With its restock date, in the '.$part.' part.');
+        }
+    }
+
+    public function testAnOrderWithoutPreorderSaysNothingOfIt(): void
+    {
+        $this->skipUnlessTheInstalledTemplateCarries('IS_PREORDER', 'the preorder mention');
+
+        $factory = $this->createFixtureFactory();
+        $order = $factory->order($factory->customer($factory->customerTitle()));
+        $factory->orderProduct($order);
+
+        $email = $this->renderConfirmation($this->parametersTheCoreSendsFor($order));
+
+        self::assertStringNotContainsString('Pre-order', (string) $email->getHtmlBody());
+        self::assertStringNotContainsString('Pre-order', (string) $email->getTextBody());
+    }
+
+    /**
      * The confirmation exactly as Thelia\Action\Order sends it, parameters included.
      *
      * @return array<string, mixed>
@@ -137,6 +175,22 @@ final class OrderConfirmationTemplateTest extends IntegrationTestCase
             $parameters,
             'en_US',
         );
+    }
+
+    /**
+     * Skips when the installed template does not carry a mention yet (the preorder one): the CI of
+     * the core installs the template package of its main branch, which may not carry it. Both parts
+     * of the mail are looked at.
+     */
+    private function skipUnlessTheInstalledTemplateCarries(string $witness, string $what): void
+    {
+        $directory = $this->getService(TemplateHelperInterface::class)->getActiveMailTemplate()->getAbsolutePath();
+
+        foreach (['order_confirmation.html.twig', 'order_confirmation.txt.twig'] as $file) {
+            if (!str_contains((string) @file_get_contents($directory.DS.$file), $witness)) {
+                self::markTestSkipped(\sprintf('The installed mail template (%s) does not carry %s yet.', $directory, $what));
+            }
+        }
     }
 
     /**

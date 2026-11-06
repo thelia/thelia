@@ -218,6 +218,18 @@ final class TheliaEvents
 
     public const PRODUCT_PRODUCT_SALE_ELEMENT_TOGGLE_VISIBILITY = 'action.toggleProductSaleElementVisibility';
     public const PRODUCT_PRODUCT_SALE_ELEMENT_UPDATE_POSITION = 'action.updateProductSaleElementPosition';
+
+    /** The physical stock of sale elements changed (dispatched after the commit): StockLevelChangedEvent. */
+    public const PRODUCT_SALE_ELEMENTS_STOCK_CHANGED = 'thelia.pse.stock_changed';
+
+    /** A sale element went from above its low stock threshold to at or under it: LowStockReachedEvent. */
+    public const PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED = 'thelia.pse.low_stock_reached';
+
+    /** A cart started to hold the stock of some of its lines (dispatched after the commit): StockReservedEvent. */
+    public const STOCK_RESERVED = 'thelia.pse.stock_reserved';
+
+    /** A cart stopped holding the stock of some of its lines (dispatched after the commit): StockReleasedEvent. */
+    public const STOCK_RELEASED = 'thelia.pse.stock_released';
     public const PRODUCT_COMBINATION_GENERATION = 'action.productCombinationGeneration';
     public const PRODUCT_SET_TEMPLATE = 'action.productSetTemplate';
     public const PRODUCT_ADD_ACCESSORY = 'action.productAddProductAccessory';

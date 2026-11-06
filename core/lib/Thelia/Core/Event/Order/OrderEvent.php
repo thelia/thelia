@@ -16,6 +16,7 @@ namespace Thelia\Core\Event\Order;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Domain\Order\Service\StatusStockPlan;
 use Thelia\Model\Order;
 
 /**
@@ -36,6 +37,7 @@ class OrderEvent extends ActionEvent
     protected ?int $status = null;
     protected ?int $previousStatusId = null;
     protected bool $statusTransitionForced = false;
+    protected ?StatusStockPlan $stockPlan = null;
     protected ?string $deliveryRef = null;
     protected ?int $cartItemId = null;
     protected ?string $transactionRef = null;
@@ -269,6 +271,24 @@ class OrderEvent extends ActionEvent
     public function getStatus(): ?int
     {
         return $this->status;
+    }
+
+    /**
+     * What the change of status does to the stock, when the dispatcher worked it out already, before
+     * its own transaction (the admin API): the listener then neither locks nor asks again.
+     *
+     * @return $this
+     */
+    public function setStockPlan(?StatusStockPlan $stockPlan): self
+    {
+        $this->stockPlan = $stockPlan;
+
+        return $this;
+    }
+
+    public function getStockPlan(): ?StatusStockPlan
+    {
+        return $this->stockPlan;
     }
 
     /**

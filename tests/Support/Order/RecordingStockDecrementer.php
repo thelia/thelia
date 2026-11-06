@@ -16,6 +16,7 @@ namespace Thelia\Tests\Support\Order;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Domain\Order\Service\StockDecrementer;
+use Thelia\Domain\Order\Service\StockTake;
 
 /**
  * The stock decrementer of the core, which also records the sale elements it is asked to
@@ -42,21 +43,15 @@ final readonly class RecordingStockDecrementer extends StockDecrementer
         $this->incrementCalls = new \ArrayObject();
     }
 
-    public function decrement(
-        int $productSaleElementsId,
-        float $quantity,
-        bool $guardAvailability,
-        bool $allowNegativeStock,
-        ConnectionInterface $connection,
-        ?int $saleUnitId = null,
-    ): void {
-        $this->calls->append($productSaleElementsId);
+    protected function applyTake(StockTake $take, bool $onSaleUnitStock, bool $allowNegativeStock, ConnectionInterface $connection, ?int $saleUnitId): bool
+    {
+        $this->calls->append($take->productSaleElementsId);
 
         if (null !== $this->failure && \count($this->calls) === $this->failOnCall) {
             throw $this->failure;
         }
 
-        parent::decrement($productSaleElementsId, $quantity, $guardAvailability, $allowNegativeStock, $connection, $saleUnitId);
+        return parent::applyTake($take, $onSaleUnitStock, $allowNegativeStock, $connection, $saleUnitId);
     }
 
     public function increment(int $productSaleElementsId, float $quantity, ConnectionInterface $connection, ?int $saleUnitId = null): void

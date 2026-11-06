@@ -16,12 +16,17 @@ namespace Thelia\Tests\Integration\Action;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Mailer\MailerInterface;
 use Thelia\Action\OrderReturn as OrderReturnAction;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
+use Thelia\Core\Event\ProductSaleElement\LowStockReachedEvent;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Domain\OrderReturn\EventListener\SendOrderReturnStatusEmailListener;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
@@ -43,6 +48,7 @@ use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\RecordingMailerFactory;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
  * Drives a return through the state machine and checks the side effects the
@@ -53,8 +59,43 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
 {
     private ?RecordingMailerFactory $mailer = null;
 
+    /** @var list<StockLevelChange> */
+    private array $stockChanges = [];
+
+    /** @var list<LowStockReachedEvent> */
+    private array $lowStockSignals = [];
+
+    /** @var array<string, \Closure> */
+    private array $stockListeners = [];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->stockListeners = [
+            TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED => function (StockLevelChangedEvent $event): void {
+                $this->stockChanges = [...$this->stockChanges, ...$event->getChanges()];
+            },
+            TheliaEvents::PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED => function (LowStockReachedEvent $event): void {
+                $this->lowStockSignals[] = $event;
+                // Stops the signal before the default e-mail listener.
+                $event->stopPropagation();
+            },
+        ];
+
+        foreach ($this->stockListeners as $eventName => $listener) {
+            $this->dispatcher->addListener($eventName, $listener, 1000);
+        }
+    }
+
     protected function tearDown(): void
     {
+        foreach ($this->stockListeners as $eventName => $listener) {
+            $this->dispatcher->removeListener($eventName, $listener);
+        }
+
+        $this->getService(TestCallerTransaction::class)->reset();
+        $this->getService(StockLevelAnnouncer::class)->reset();
         ConfigQuery::resetCache();
         OrderReturnStatusQuery::resetCache();
 
@@ -78,6 +119,89 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
         // Two units received at 10.00, no tax and no discount on this order:
         // any other number means the refund was computed on something else.
         self::assertSame(20.0, (float) $return->getRefundAmount());
+    }
+
+    /**
+     * The stock goes up: the listeners of the stock levels hear of the change, and no low stock
+     * signal follows a stock that rises.
+     */
+    public function testReceivingTellsWhatWentBackToTheStock(): void
+    {
+        $this->theTestIsNoCaller();
+        ConfigQuery::write('order_return_restock_mode', OrderReturnAction::RESTOCK_MODE_RESELLABLE);
+        [$return, $pse] = $this->acceptedReturn(receivedQuantity: 0.0, resellable: true);
+        $pse->setLowStockThreshold(11.0)->save();
+        $line = $return->getOrderReturnLines()->getFirst();
+
+        $this->dispatch((new OrderReturnEvent($return))->setReceivedLines([
+            (int) $line->getId() => ['quantity' => 2.0, 'condition' => 'as new', 'resellable' => true],
+        ]), TheliaEvents::ORDER_RETURN_RECEIVE);
+
+        self::assertEquals([new StockLevelChange((int) $pse->getId(), 10.0, 12.0)], $this->stockChanges);
+        self::assertSame([], $this->lowStockSignals);
+    }
+
+    public function testMovingAReturnToReceivedTellsWhatWentBackToTheStock(): void
+    {
+        $this->theTestIsNoCaller();
+        ConfigQuery::write('order_return_restock_mode', OrderReturnAction::RESTOCK_MODE_RESELLABLE);
+        [$return, $pse] = $this->acceptedReturn(receivedQuantity: 2.0, resellable: true);
+
+        $this->transition($return, OrderReturnStatus::CODE_RECEIVED);
+
+        self::assertEquals([new StockLevelChange((int) $pse->getId(), 10.0, 12.0)], $this->stockChanges);
+    }
+
+    public function testAReturnThatRestocksNothingTellsNothing(): void
+    {
+        $this->theTestIsNoCaller();
+        ConfigQuery::write('order_return_restock_mode', OrderReturnAction::RESTOCK_MODE_NEVER);
+        [$return] = $this->acceptedReturn(receivedQuantity: 2.0, resellable: true);
+
+        $this->transition($return, OrderReturnStatus::CODE_RECEIVED);
+
+        self::assertSame([], $this->stockChanges);
+    }
+
+    /**
+     * Inside the transaction of a caller nothing says the restocking will be kept: it is told when
+     * that transaction is over.
+     */
+    public function testInsideTheTransactionOfACallerTheChangeWaitsForItsEnd(): void
+    {
+        ConfigQuery::write('order_return_restock_mode', OrderReturnAction::RESTOCK_MODE_RESELLABLE);
+        [$return, $pse] = $this->acceptedReturn(receivedQuantity: 2.0, resellable: true);
+
+        $this->transition($return, OrderReturnStatus::CODE_RECEIVED);
+
+        self::assertSame([], $this->stockChanges);
+
+        $this->theTestIsNoCaller();
+        $this->getService(StockLevelAnnouncer::class)->flush();
+
+        self::assertEquals([new StockLevelChange((int) $pse->getId(), 10.0, 12.0)], $this->stockChanges);
+    }
+
+    /**
+     * Built without the shared announcer (a subclass, a module), the action still waits for the
+     * transaction of its caller: nothing is told inside it, and the announcer it made is subscribed
+     * to the end of the request, where it flushes.
+     */
+    public function testAnActionBuiltWithoutTheSharedAnnouncerWaitsForTheTransactionOfItsCaller(): void
+    {
+        ConfigQuery::write('order_return_restock_mode', OrderReturnAction::RESTOCK_MODE_RESELLABLE);
+        [$return] = $this->acceptedReturn(receivedQuantity: 2.0, resellable: true);
+        $told = [];
+        $dispatcher = $this->recordingDispatcher();
+        $dispatcher->addListener(TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, static function (StockLevelChangedEvent $event) use (&$told): void {
+            $told = [...$told, ...$event->getChanges()];
+        });
+        $target = OrderReturnStatusQuery::create()->findOneByCode(OrderReturnStatus::CODE_RECEIVED);
+
+        $dispatcher->dispatch((new OrderReturnEvent($return))->setTargetStatusId((int) $target?->getId()), TheliaEvents::ORDER_RETURN_UPDATE_STATUS);
+
+        self::assertSame([], $told, 'The test transaction stands for the one of a caller: nothing is told inside it.');
+        self::assertTrue($dispatcher->hasListeners(KernelEvents::TERMINATE), 'The announcer made by the action flushes at the end of the request.');
     }
 
     public function testANonResellableLineIsNotRestockedInResellableMode(): void
@@ -308,6 +432,12 @@ final class OrderReturnActionTest extends ActionIntegrationTestCase
         }
 
         return $dispatcher;
+    }
+
+    /** The transaction this test wraps itself in is not one of a caller. */
+    private function theTestIsNoCaller(): void
+    {
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn($this->getPropelConnection());
     }
 
     private function transition(OrderReturn $return, string $toCode): void

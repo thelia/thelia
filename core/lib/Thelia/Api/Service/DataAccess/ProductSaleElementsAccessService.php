@@ -24,6 +24,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\Product\ProductTaxedPriceResolver;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Catalog\Stock\VisitorSellableStock;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
@@ -47,6 +48,7 @@ class ProductSaleElementsAccessService
         private readonly VisitorPriceReader $visitorPriceReader,
         private readonly ProductTaxedPriceResolver $productTaxedPriceResolver,
         private readonly BundleDisplayedStock $bundleDisplayedStock,
+        private readonly VisitorSellableStock $visitorSellableStock,
     ) {
         $this->request = $requestStack->getMainRequest();
     }
@@ -87,6 +89,10 @@ class ProductSaleElementsAccessService
         // zero, is never the answer (the default composition is the one a page shows).
         $bundleQuantity = $this->bundleDisplayedStock->forProducts([(int) $productId])[(int) $productId] ?? null;
 
+        // What the visitor may buy of every sale element of the product, read together: the reservations
+        // are one query whatever the number of combinations.
+        $sellable = null === $bundleQuantity ? $this->visitorSellableStock->forMany($pses, false) : [];
+
         foreach ($pses as $pse) {
             $resolvedPrice = $resolvedPrices[(int) $pse->getId()] ?? null;
 
@@ -110,6 +116,12 @@ class ProductSaleElementsAccessService
 
             $this->eventDispatcher->dispatch(new PseByProductEvent($pse));
 
+            // What the visitor may buy, the number the API serves as `availableQuantity`: a bundle
+            // is supplied by its components, any other sale element by its stock and its sale mode.
+            $availableQuantity = null !== $bundleQuantity
+                ? (ConfigQuery::checkAvailableStock() ? (float) $bundleQuantity : null)
+                : ($sellable[(int) $pse->getId()]['available'] ?? null);
+
             $result[] = [
                 'id' => $pse->getId(),
                 'isDefault' => $pse->isDefault(),
@@ -120,6 +132,10 @@ class ProductSaleElementsAccessService
                 'ean' => $pse->getEanCode(),
                 'mpn' => $pse->getMpn(),
                 'quantity' => $bundleQuantity ?? $pse->getQuantity(),
+                'availableQuantity' => $availableQuantity,
+                'outOfStockPolicy' => (int) $pse->getOutOfStockPolicy(),
+                'restockDate' => $pse->getRestockDate('Y-m-d'),
+                'isPreorder' => $sellable[(int) $pse->getId()]['preorder'] ?? false,
                 'weight' => $pse->getWeight(),
                 // Taxed by the service the product cards of the API are, so that a card and
                 // the page it opens print the same figure.

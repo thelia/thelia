@@ -25,15 +25,19 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\GtinConstraint;
+use Thelia\Api\State\Processor\ProductSaleElementsStockProcessor;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
+use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 #[ApiResource(
@@ -50,9 +54,11 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
         ),
         new Put(
             uriTemplate: '/admin/product_sale_elements/{id}',
+            processor: ProductSaleElementsStockProcessor::class,
         ),
         new Patch(
             uriTemplate: '/admin/product_sale_elements/{id}',
+            processor: ProductSaleElementsStockProcessor::class,
         ),
         new Delete(
             uriTemplate: '/admin/product_sale_elements/{id}',
@@ -277,6 +283,73 @@ class ProductSaleElements implements PropelResourceInterface
     #[Length(max: InvalidMpnException::MAXIMUM_LENGTH, groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
     public ?string $mpn = null;
 
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'Units the visitor may still buy: the stock plus what the sale mode allows below zero, less what other carts reserve. Null: no limit.')]
+    public ?float $availableQuantity = null;
+
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'Whether the next unit the visitor buys is sold below zero stock (a preorder): nothing physical is left once other carts have taken theirs, and the sale mode still sells.')]
+    public ?bool $isPreorder = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'What happens when the combination is asked above its stock: 0 refuse the sale (default), 1 sell without limit, 2 sell up to preorderLimit units below zero.')]
+    #[Choice(choices: [0, 1, 2], groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    #[NotNull(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?int $outOfStockPolicy = OutOfStockPolicy::Refuse->value;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+    ])]
+    #[ApiProperty(description: 'Units that can be sold below zero stock when outOfStockPolicy is 2.')]
+    #[PositiveOrZero(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?float $preorderLimit = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_FRONT_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+        Product::GROUP_FRONT_READ_SINGLE,
+        Product::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'Date the stock is expected again, shown on preorders.')]
+    public ?\DateTime $restockDate = null;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_WRITE,
+        Product::GROUP_ADMIN_READ_SINGLE,
+    ])]
+    #[ApiProperty(description: 'Stock level at or under which the shop owner is alerted. Null: the shop-wide threshold applies. Never exposed to the front.')]
+    #[PositiveOrZero(groups: [self::GROUP_ADMIN_WRITE, Product::GROUP_ADMIN_WRITE])]
+    public ?float $lowStockThreshold = null;
+
     #[Relation(targetResource: Brand::class, relationAlias: 'ManufacturerBrand')]
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -483,6 +556,54 @@ class ProductSaleElements implements PropelResourceInterface
     public function setMpn(?string $mpn): self
     {
         $this->mpn = $mpn;
+
+        return $this;
+    }
+
+    public function getOutOfStockPolicy(): ?int
+    {
+        return $this->outOfStockPolicy;
+    }
+
+    public function setOutOfStockPolicy(?int $outOfStockPolicy): self
+    {
+        $this->outOfStockPolicy = $outOfStockPolicy;
+
+        return $this;
+    }
+
+    public function getPreorderLimit(): ?float
+    {
+        return $this->preorderLimit;
+    }
+
+    public function setPreorderLimit(?float $preorderLimit): self
+    {
+        $this->preorderLimit = $preorderLimit;
+
+        return $this;
+    }
+
+    public function getRestockDate(): ?\DateTime
+    {
+        return $this->restockDate;
+    }
+
+    public function setRestockDate(?\DateTime $restockDate): self
+    {
+        $this->restockDate = $restockDate;
+
+        return $this;
+    }
+
+    public function getLowStockThreshold(): ?float
+    {
+        return $this->lowStockThreshold;
+    }
+
+    public function setLowStockThreshold(?float $lowStockThreshold): self
+    {
+        $this->lowStockThreshold = $lowStockThreshold;
 
         return $this;
     }

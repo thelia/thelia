@@ -338,6 +338,24 @@ class OrderProduct implements PropelResourceInterface
     ])]
     public ?string $mpn = null;
 
+    /** Whether the line was sold above the physical stock. Read only: frozen when the order is placed. */
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public bool $isPreorder = false;
+
+    /** The date the stock of the combination was expected again when the line was ordered. Read only, frozen on preorder lines. */
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        Order::GROUP_ADMIN_READ_SINGLE,
+        Order::GROUP_FRONT_READ_SINGLE,
+        self::GROUP_FRONT_READ_SINGLE,
+    ])]
+    public ?\DateTime $restockDate = null;
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_ADMIN_WRITE,
@@ -657,6 +675,30 @@ class OrderProduct implements PropelResourceInterface
     public function setEanCode(?string $eanCode): self
     {
         $this->eanCode = $eanCode;
+
+        return $this;
+    }
+
+    public function getIsPreorder(): bool
+    {
+        return $this->isPreorder;
+    }
+
+    public function setIsPreorder(bool $isPreorder): self
+    {
+        $this->isPreorder = $isPreorder;
+
+        return $this;
+    }
+
+    public function getRestockDate(): ?\DateTime
+    {
+        return $this->restockDate;
+    }
+
+    public function setRestockDate(?\DateTime $restockDate): self
+    {
+        $this->restockDate = $restockDate;
 
         return $this;
     }

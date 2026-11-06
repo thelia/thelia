@@ -16,7 +16,10 @@ namespace Thelia\Domain\Cart\Bundle;
 
 use Thelia\Domain\Catalog\Bundle\BundleAvailability;
 use Thelia\Domain\Catalog\Bundle\BundleComposition;
+use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
+use Thelia\Model\Cart;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductSaleElements;
 
 /**
@@ -29,8 +32,8 @@ use Thelia\Model\ProductSaleElements;
  * visitor buys from when it keeps one, the national counter otherwise; a virtual product
  * has no stock to run out of.
  *
- * Whether the shop refuses beyond it is the setting of the shop (ConfigQuery::checkAvailableStock()),
- * which the caller reads. What a list shows of a bundle before any composition is chosen is
+ * A shop that does not check its stock (ConfigQuery::checkAvailableStock()) supplies every line
+ * without limit, the line of a bundle as any other: nothing is read. What a list shows of a bundle before any composition is chosen is
  * BundleDisplayedStock's.
  */
 final readonly class CartLineAvailability
@@ -41,14 +44,24 @@ final readonly class CartLineAvailability
     public function __construct(
         private BundleAvailability $bundleAvailability,
         private ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
+        private ?SellableStock $sellableStock = null,
     ) {
     }
 
     /**
+     * What the shop can supply of a line: for a sale element, what it may still sell (SellableStock:
+     * the stock, what its sale mode allows below zero, less what other carts reserve), unlimited when
+     * its sale mode sells without limit.
+     *
      * @param BundleComposition|null $composition the composition of the line, null for a line that is not a bundle
+     * @param Cart|null              $cart        the cart asking, whose own reservation is not held against it
      */
-    public function forLine(ProductSaleElements $productSaleElements, ?BundleComposition $composition = null): float
+    public function forLine(ProductSaleElements $productSaleElements, ?BundleComposition $composition = null, ?Cart $cart = null): float
     {
+        if (!ConfigQuery::checkAvailableStock()) {
+            return (float) self::UNLIMITED;
+        }
+
         if (null !== $composition) {
             return (float) $this->bundleAvailability->forComposition((int) $productSaleElements->getProductId(), $composition);
         }
@@ -57,7 +70,29 @@ final readonly class CartLineAvailability
             return (float) self::UNLIMITED;
         }
 
-        return $this->saleUnitAvailableStock?->availableQuantity($productSaleElements) ?? (float) $productSaleElements->getQuantity();
+        $cartId = (int) $cart?->getId();
+
+        return ($this->sellableStock ?? SellableStock::withoutReservations())->forPse(
+            $productSaleElements,
+            $this->saleUnitAvailableStock?->availableQuantity($productSaleElements),
+            $cart?->getSaleUnitId(),
+            $cartId > 0 ? $cartId : null,
+        ) ?? (float) self::UNLIMITED;
+    }
+
+    /**
+     * What the carts other than this one hold of the stock of a sale element, on the stock the cart
+     * sells from; 0.0 when the shop does not reserve.
+     */
+    public function reservedByOtherCarts(ProductSaleElements $productSaleElements, Cart $cart): float
+    {
+        $cartId = (int) $cart->getId();
+
+        return ($this->sellableStock ?? SellableStock::withoutReservations())->reservedByOtherCarts(
+            (int) $productSaleElements->getId(),
+            null === $cart->getSaleUnitId() ? null : (int) $cart->getSaleUnitId(),
+            $cartId > 0 ? $cartId : null,
+        );
     }
 
     /**
@@ -70,6 +105,10 @@ final readonly class CartLineAvailability
      */
     public function forBundleLines(array $lines): array
     {
+        if (!ConfigQuery::checkAvailableStock()) {
+            return array_map(static fn (): float => (float) self::UNLIMITED, $lines);
+        }
+
         $requests = [];
         $answerOf = [];
 

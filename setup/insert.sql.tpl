@@ -124,7 +124,11 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (113, 'ai_tool_token_max_days', '365', 0, 0, NOW(), NOW()),
 (114, 'express_payment_zones', '', 0, 0, NOW(), NOW()),
 (115, 'catalog_has_bundles', '0', 0, 1, NOW(), NOW()),
-(116, 'newsletter_enabled', '1', 0, 0, NOW(), NOW())
+(116, 'newsletter_enabled', '1', 0, 0, NOW(), NOW()),
+(117, 'stock_reservation_enabled', '0', 0, 0, NOW(), NOW()),
+(118, 'stock_reservation_scope', 'checkout', 0, 0, NOW(), NOW()),
+(119, 'stock_reservation_duration', '15', 0, 0, NOW(), NOW()),
+(120, 'low_stock_threshold', '5', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2273,7 +2277,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
 (9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
 (10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
-(11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW())
+(11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW()),
+(12, 'low_stock_alert', NULL, NULL, 'low_stock_alert.txt', NULL, 'low_stock_alert.html', NOW(), NOW())
 ;
 
 /**
@@ -2374,7 +2379,11 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (112, '{{ locale }}', {{ intl('Hours a write proposal of an AI tool waits for the approval of an administrator before it expires (24 when invalid)', locale) }}, NULL, NULL, NULL),
     (113, '{{ locale }}', {{ intl('Longest life, in days, of a token given to an external assistant for the MCP server (365 when invalid)', locale) }}, NULL, NULL, NULL),
     (114, '{{ locale }}', {{ intl('Where the express payment buttons of the payment modules show, comma separated among checkout (empty: nowhere)', locale) }}, NULL, NULL, NULL),
-    (116, '{{ locale }}', {{ intl('Offer newsletter sign-up to visitors (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (116, '{{ locale }}', {{ intl('Offer newsletter sign-up to visitors (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL),
+    (117, '{{ locale }}', {{ intl('Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL),
+    (118, '{{ locale }}', {{ intl('When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)', locale) }}, NULL, NULL, NULL),
+    (119, '{{ locale }}', {{ intl('Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)', locale) }}, NULL, NULL, NULL),
+    (120, '{{ locale }}', {{ intl('Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4128,7 +4137,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
     (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
     (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL),
-    (11, '{{ locale }}', {{ intl('Shipping notice sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} has been shipped', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (11, '{{ locale }}', {{ intl('Shipping notice sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} has been shipped', locale) }}, NULL, NULL),
+    (12, '{{ locale }}', {{ intl('Message sent to the shop owner when the stock of a sale element runs low', locale) }}, {{ intl('Low stock on {{ config("store_name") }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

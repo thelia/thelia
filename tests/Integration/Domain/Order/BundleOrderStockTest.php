@@ -14,17 +14,21 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Propel\Runtime\Propel;
 use Thelia\Action\OrderReturn as OrderReturnAction;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
+use Thelia\Domain\Catalog\Stock\StockSettings;
+use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Order\Service\StockDecrementer;
 use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\Order\StatusAction\OrderStatusActionContext;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\Service\StockIncrementer;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -85,6 +89,55 @@ final class BundleOrderStockTest extends ActionIntegrationTestCase
         OrderReturnStatusQuery::resetCache();
 
         parent::tearDown();
+    }
+
+    /**
+     * The sale unit the order is stamped with is the one stock the whole placement stands on, the
+     * check before the transaction as the take: a cart still stamped with another unit is refused
+     * by the check, before anything is written, when the other carts of the unit hold its stock.
+     *
+     * The helmets of the order unit: 2 of its own, both held by another cart of the unit.
+     */
+    public function testThePackCheckReadsTheReservationsOfTheSaleUnitTheOrderIsStampedWith(): void
+    {
+        $this->manageTheStockWhenTheOrderIsPlaced();
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::resetCache();
+        $service = $this->getService(BundleCompositionService::class);
+        $example = $this->exampleBundle($this->factory, $service);
+        $helmet = $example['helmetProduct']->getDefaultSaleElements();
+        $orderUnit = $this->factory->saleUnit();
+        $cartUnit = $this->factory->saleUnit();
+        $this->factory->saleUnitProductSaleElements($orderUnit, $helmet, 2.0);
+
+        $otherCart = $this->factory->cart(null, ['currency' => $this->factory->currency()]);
+        $otherCart->setSaleUnitId($orderUnit->getId())->save();
+        $held = $this->factory->cartItem($otherCart, $example['helmetProduct'], $helmet, ['quantity' => 2.0]);
+        Propel::getConnection()->exec('UPDATE cart_item SET reserved_until = NOW() + INTERVAL 10 MINUTE WHERE id = '.(int) $held->getId());
+
+        [$customer, $currency, $lang] = $this->aBuyer();
+        $cart = $this->aCart($customer, $currency);
+        $cart->setSaleUnitId($cartUnit->getId())->save();
+        $this->addBundleLine($cart, $example['bundle'], [(int) $example['bike']->getId() => '1', (int) $example['helmet']->getId() => '2', (int) $example['lock']->getId() => '2']);
+
+        $context = $this->getService(SaleUnitContext::class);
+        $context->setSaleUnit($orderUnit);
+        $refused = null;
+
+        try {
+            $statements = $this->statementsDuring(function () use ($cart, $customer, $currency, $lang, &$refused): void {
+                try {
+                    $this->placeOrder($cart, $customer, $currency, $lang);
+                } catch (StockShortageException $shortage) {
+                    $refused = $shortage;
+                }
+            });
+        } finally {
+            $context->setSaleUnit(null);
+        }
+
+        self::assertInstanceOf(StockShortageException::class, $refused, 'The helmets of the unit are held by another cart.');
+        self::assertSame([], array_values(array_filter($statements, static fn (string $statement): bool => str_starts_with($statement, 'INSERT INTO `order`'))), 'Refused by the check, before the order is written.');
     }
 
     public function testCancellingAnOrderTakenAtItsPlacementGivesTheComponentsBack(): void

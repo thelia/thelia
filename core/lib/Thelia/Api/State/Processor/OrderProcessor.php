@@ -26,7 +26,10 @@ use Thelia\Api\Resource\Order as OrderResource;
 use Thelia\Api\Resource\OrderStatus as OrderStatusResource;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Order\Exception\OrderStatusChangeConflictException;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
+use Thelia\Domain\Order\Service\PaymentStockLock;
+use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderQuery;
 
@@ -42,6 +45,7 @@ final readonly class OrderProcessor implements ProcessorInterface
         private PropelPersistProcessor $persistProcessor,
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
+        private ?PaymentStockLock $paymentStockLock = null,
     ) {
     }
 
@@ -62,6 +66,16 @@ final readonly class OrderProcessor implements ProcessorInterface
         // the row, and the persistence writes it back. One transaction around the write and
         // the event: a refused transition must not leave the other fields of the request
         // written while the client is told the write failed.
+        $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
+
+        // Read before the transaction, the way the status event reads it on its own: the stock rows
+        // a payment takes from, when the shop reserves its stock and left it for the payment. The
+        // event locks them again, which then waits on nothing. Limit: a status another request
+        // moves between this read and the lock below is judged on the status read here.
+        $stockPlan = null === $requestedStatusId || null === $this->paymentStockLock
+            ? null
+            : $this->paymentStockLock->planFor($order, $requestedStatusId, $this->eventDispatcher);
+
         $connection = Propel::getWriteConnection(OrderTableMap::DATABASE_NAME);
         $connection->beginTransaction();
         $event = null;
@@ -71,7 +85,11 @@ final readonly class OrderProcessor implements ProcessorInterface
             // release of the payment parts asks the modules to give back what they hold) then
             // read what another request committed before the lock was granted.
             $lockedStatusId = OrderQuery::create()->lockStatusIdForUpdate((int) $uriVariables['id'], $connection) ?? throw new NotFoundHttpException('No such order.');
-            $requestedStatusId = $this->requestedStatusId($data, $context['previous_data'] ?? null, $order->getStatusId());
+
+            // Then, before any plain read freezes the view of the transaction (the persistence
+            // reads the order): the stock rows, so that the payment reads the reservations of the
+            // other carts as they stand and never takes the unit another cart holds.
+            $this->paymentStockLock?->lock($stockPlan->rows ?? [], $connection);
 
             // The status written back is always the one read under the lock: the column itself is
             // moved through the event only, and a status another request committed since the
@@ -81,7 +99,7 @@ final readonly class OrderProcessor implements ProcessorInterface
 
             if (null !== $requestedStatusId && $requestedStatusId !== $lockedStatusId) {
                 $order->reload();
-                $event = (new OrderEvent($order))->setStatus($requestedStatusId);
+                $event = (new OrderEvent($order))->setStatus($requestedStatusId)->setStockPlan($stockPlan);
                 $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
             }
 
@@ -92,6 +110,12 @@ final readonly class OrderProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         } catch (\Throwable $throwable) {
             $connection->rollBack();
+
+            // Another request took a lock this one needed and the database broke the tie:
+            // nothing of this change stands, and asked again it is judged on what the other left.
+            if (!$throwable instanceof OrderStatusChangeConflictException && LockConflictDetector::isLockConflict($throwable)) {
+                throw new OrderStatusChangeConflictException($throwable);
+            }
 
             throw $throwable;
         }

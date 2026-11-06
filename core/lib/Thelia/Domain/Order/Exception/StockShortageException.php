@@ -32,14 +32,21 @@ use Thelia\Exception\TheliaProcessException;
  * The product is named because a refusal has to say which line to change: "not enough
  * stock" about a cart of ten lines is not something a buyer can act on. The reference is
  * the one printed on the catalogue page they came from, so it is theirs to read.
+ *
+ * Open to the refusals of the reservation of the stock, which are shortages to every caller
+ * that already answers this one: a line another cart holds, a tie the database broke.
  */
-final class StockShortageException extends TheliaProcessException
+class StockShortageException extends TheliaProcessException
 {
+    /**
+     * @param string|null $message the sentence of a more precise refusal of the family, the shortage one by default
+     */
     public function __construct(
         public readonly ?string $productReference = null,
         ?\Throwable $previous = null,
+        ?string $message = null,
     ) {
-        parent::__construct(self::messageFor($productReference), previous: $previous);
+        parent::__construct($message ?? self::messageFor($productReference), previous: $previous);
     }
 
     public static function messageFor(?string $productReference): string

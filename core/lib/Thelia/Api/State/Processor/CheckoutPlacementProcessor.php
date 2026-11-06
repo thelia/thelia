@@ -23,12 +23,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Resource\CheckoutPlacementInput;
 use Thelia\Api\Resource\CheckoutPlacementOutput;
 use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
 use Thelia\Domain\Cart\Exception\CartPricesChangedException;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
@@ -121,6 +123,11 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
             // conflict with the state of the cart rather than a malformed request, like the
             // stock below; the message is the core's own, with no amount in it.
             throw new ConflictHttpException($pricesChanged->getMessage(), $pricesChanged);
+        } catch (StockReservationRateLimitedException $tooOften) {
+            // Defence: the placement itself holds nothing (the steps before it do, and answer 429),
+            // but a module that holds stock while it places an order answers the same way.
+            // Not a shortage: the delay to wait is told.
+            throw new TooManyRequestsHttpException($tooOften->retryAfterSeconds, $tooOften->getMessage(), $tooOften);
         } catch (StockShortageException $shortage) {
             // The shop cannot sell what it no longer holds. It is a conflict with the
             // state of the stock rather than a bad request: the same request posted a

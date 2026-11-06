@@ -21,6 +21,10 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\Product\ProductFacade;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
+use Thelia\Domain\Catalog\Stock\StockReservationLimiter;
+use Thelia\Domain\Catalog\Stock\StockSettings;
+use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionFacade;
@@ -31,6 +35,7 @@ use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
 use Thelia\Model\Country;
@@ -48,6 +53,7 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\ApiTestCase;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
  * The order tunnel of an account, driven over the front API.
@@ -428,6 +434,93 @@ final class CheckoutApiTest extends ApiTestCase
             'A shortage must name the line the buyer has to change.',
         );
         self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+    }
+
+    /**
+     * A shop that reserves its stock holds it at every step: a step taken while another cart
+     * holds the last unit is a conflict naming the product, as a placement the shop can no
+     * longer serve is.
+     */
+    public function testAStepTakenWhileAnotherCartHoldsTheLastUnitIsAConflictNamingTheProduct(): void
+    {
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::resetCache();
+        // The transaction this test wraps itself in is not one of a caller: a hold runs in it.
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn($this->getPropelConnection());
+
+        try {
+            $checkout = $this->readyCheckout();
+            $token = $this->authenticateAsCustomer($checkout['customer']);
+            $cartId = $checkout['cart']->getId();
+
+            foreach (ProductSaleElementsQuery::create()->filterByProductId($checkout['product']->getId())->find($this->getPropelConnection()) as $productSaleElements) {
+                $productSaleElements->setQuantity(1)->save($this->getPropelConnection());
+            }
+
+            $factory = $this->createFixtureFactory();
+            $otherCart = $factory->cart(null);
+            $factory->cartItem($otherCart, $checkout['product']);
+            $this->getService(CheckoutFacade::class)->holdStock($otherCart);
+
+            $response = $this->jsonRequest('POST', $this->url($cartId, 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+
+            self::assertSame(409, $response->getStatusCode());
+            self::assertStringContainsString((string) $checkout['product']->getRef(), (string) $response->getContent());
+        } finally {
+            $this->getService(TestCallerTransaction::class)->reset();
+            ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
+            ConfigQuery::resetCache();
+        }
+    }
+
+    /**
+     * A step of the checkout holds the stock: asked more often than a buyer does, it is refused
+     * with the delay to wait. Not a conflict with the stock, which would tell the caller to try
+     * again at once.
+     */
+    public function testAStepOverTheBudgetOfHoldsOfTheCartIsRefusedWithTheDelayToWait(): void
+    {
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::resetCache();
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn($this->getPropelConnection());
+
+        try {
+            $checkout = $this->readyCheckout();
+            $token = $this->authenticateAsCustomer($checkout['customer']);
+            $cartId = (int) $checkout['cart']->getId();
+            $limiter = $this->getService(StockReservationLimiter::class);
+
+            for ($hold = 1; $hold <= 60; ++$hold) {
+                self::assertNull($limiter->spend($cartId), 'Hold '.$hold.' of the cart is within its budget.');
+            }
+
+            $response = $this->jsonRequest('POST', $this->url($cartId, 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+
+            self::assertSame(429, $response->getStatusCode(), (string) $response->getContent());
+            self::assertGreaterThan(0, (int) $response->headers->get('Retry-After'));
+            self::assertLessThanOrEqual(3601, (int) $response->headers->get('Retry-After'), 'The window is an hour, its end rounded up to the second.');
+        } finally {
+            $this->getService(TestCallerTransaction::class)->reset();
+            ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
+            ConfigQuery::resetCache();
+        }
+    }
+
+    public function testAPlacementWhoseHoldIsOverTheBudgetIsRefusedWithTheDelayToWait(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        $this->listen(TheliaEvents::ORDER_PAY, static function (): void {
+            throw new StockReservationRateLimitedException(120);
+        }, priority: 1024);
+
+        $response = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(429, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('120', $response->headers->get('Retry-After'));
     }
 
     /**

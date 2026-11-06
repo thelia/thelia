@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\QuickOrder;
 
+use Propel\Runtime\Propel;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Domain\CustomerList\Exception\PurchaseListNotFoundException;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
@@ -24,11 +26,14 @@ use Thelia\Domain\QuickOrder\Exception\QuickOrderRateLimitedException;
 use Thelia\Domain\QuickOrder\QuickOrderFacade;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 final class QuickOrderFacadeTest extends IntegrationTestCase
 {
@@ -160,6 +165,29 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
         self::assertSame([[(int) $saleElements->getId(), 4.0]], $this->cartLines($cart));
     }
 
+    /** Physical 5, another cart holds 2, this cart has 2: 1 more is left to it, the answer of SellableStock. */
+    public function testARefusedLineTellsWhatTheOtherCartsLeave(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::resetCache();
+
+        try {
+            $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+            $saleElements = $this->saleElements(5);
+            $this->factory->cartItem($cart, $saleElements->getProduct(), $saleElements, ['quantity' => 2.0]);
+            $otherCart = $this->factory->cart(null, ['currency' => $this->currency]);
+            $held = $this->factory->cartItem($otherCart, $saleElements->getProduct(), $saleElements, ['quantity' => 2.0]);
+            Propel::getWriteConnection(CartTableMap::DATABASE_NAME)->exec('UPDATE cart_item SET reserved_until = NOW() + INTERVAL 10 MINUTE WHERE id = '.(int) $held->getId());
+
+            $line = $this->facade->addToCart($this->customer, $cart, self::lines([(string) $saleElements->getRef() => 3]))->lines[0];
+
+            self::assertSame(['quantity_refused', 1.0], [$line->status->value, $line->availableQuantity]);
+        } finally {
+            ConfigQuery::resetCache();
+        }
+    }
+
     public function testTwoLinesOfOneSaleElementShareItsStock(): void
     {
         $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
@@ -176,6 +204,35 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
             array_map(static fn (QuickOrderLine $line): array => [$line->status->value, $line->added, $line->availableQuantity], $table->lines),
         );
         self::assertSame([[(int) $saleElements->getId(), 3.0]], $this->cartLines($cart));
+    }
+
+    /**
+     * A shop that reserves from the cart on holds the lines the quick order added, once they are
+     * committed: never inside the transaction that writes them (StockReservationService).
+     */
+    public function testAShopThatReservesFromTheCartOnHoldsTheLinesOnceWritten(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::write(StockSettings::RESERVATION_SCOPE, 'cart');
+        ConfigQuery::write(StockSettings::RESERVATION_DURATION, '15');
+        ConfigQuery::resetCache();
+        $connection = Propel::getWriteConnection(CartTableMap::DATABASE_NAME);
+        $callerTransaction = $this->getService(TestCallerTransaction::class);
+        // The transaction this test wraps itself in is not one of a caller.
+        $callerTransaction->ignoreTheLevelsOpenOn($connection);
+
+        try {
+            $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+            $saleElements = $this->saleElements(5);
+
+            $this->facade->addToCart($this->customer, $cart, self::lines([(string) $saleElements->getRef() => 2]));
+
+            self::assertSame(['1'], array_map('strval', $connection->query('SELECT COALESCE(reserved_until > NOW(), 0) FROM cart_item WHERE cart_id = '.(int) $cart->getId())->fetchAll(\PDO::FETCH_COLUMN)));
+        } finally {
+            $callerTransaction->reset();
+            ConfigQuery::resetCache();
+        }
     }
 
     private function spendOnAForeignList(): void

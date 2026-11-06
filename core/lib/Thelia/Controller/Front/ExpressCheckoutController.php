@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementResult;
 use Thelia\Domain\Checkout\Enum\PaymentActionType;
 use Thelia\Domain\Checkout\Exception\CheckoutException;
@@ -80,6 +81,14 @@ final readonly class ExpressCheckoutController
             $result = $this->confirmationService->confirm($request, $moduleCode, $this->tokenOf($request));
         } catch (ExpressCheckoutConfirmationDeniedException $denied) {
             return new JsonResponse(['error' => $denied->getMessage()], Response::HTTP_FORBIDDEN);
+        } catch (StockReservationRateLimitedException $tooOften) {
+            // Defence: the confirmation holds nothing itself, a module that holds stock while it
+            // places the order may raise this. Not a shortage: the sheet is told how long to wait.
+            return new JsonResponse(
+                ['error' => $tooOften->getMessage()],
+                Response::HTTP_TOO_MANY_REQUESTS,
+                ['Retry-After' => (string) $tooOften->retryAfterSeconds],
+            );
         } catch (CheckoutPlacementInProgressException|StockShortageException|OrderPlacementConflictException $conflict) {
             // As the checkout API answers them: a state of the shop rather than a bad
             // request — the same confirmation a moment earlier or later may go through.
