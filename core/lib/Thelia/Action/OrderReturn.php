@@ -19,7 +19,10 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Stock\CallerTransaction;
+use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Domain\OrderReturn\EventListener\SendOrderReturnStatusEmailListener;
 use Thelia\Domain\OrderReturn\Exception\ReturnNotAllowedException;
 use Thelia\Domain\OrderReturn\OrderReturnStateMachine;
@@ -80,6 +83,9 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         // keeps working; the container always injects the shared instance,
         // which the eligibility checker reads too.
         protected OrderReturnWriteTransactionInterface $transaction = new OrderReturnWriteTransaction(),
+        // Optional for the same reason: without it, the restocked quantities go through an announcer
+        // of this instance (see announce()), which waits for the transaction of a caller as well.
+        protected ?StockLevelAnnouncer $stockLevelAnnouncer = null,
     ) {
     }
 
@@ -213,7 +219,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             throw new ReturnNotAllowedException('The received return status does not exist.');
         }
 
-        $this->inReturnTransaction($return, function (ConnectionInterface $connection) use ($return, $declaredLines, $receivedStatus): void {
+        $changes = $this->inReturnTransaction($return, function (ConnectionInterface $connection) use ($return, $declaredLines, $receivedStatus): array {
             $fromCode = $return->getStatusCode();
 
             if (null === $fromCode || !$this->stateMachine->canTransition($fromCode, OrderReturnStatus::CODE_RECEIVED)) {
@@ -250,13 +256,17 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
                 $line->save($connection);
             }
 
-            $this->restockReceivedLines($return, $connection);
+            $changes = $this->restockReceivedLines($return, $connection);
 
             $return
                 ->setRefundAmount(number_format($this->refundCalculator->compute($return, true), 2, '.', ''))
                 ->setStatusId((int) $receivedStatus->getId())
                 ->save($connection);
+
+            return $changes;
         });
+
+        $this->announce($changes, $dispatcher);
 
         $event->setOrderReturn($return);
     }
@@ -283,15 +293,17 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
 
         $toCode = $targetStatus->getEffectiveCode();
 
-        $this->inReturnTransaction($return, function (ConnectionInterface $connection) use ($return, $event, $targetStatusId, $toCode): void {
+        $changes = $this->inReturnTransaction($return, function (ConnectionInterface $connection) use ($return, $event, $targetStatusId, $toCode): array {
             $fromCode = $return->getStatusCode();
 
             if (null === $fromCode || !$this->stateMachine->canTransition($fromCode, $toCode)) {
                 throw new ReturnNotAllowedException(\sprintf('The return cannot move from "%s" to "%s".', $fromCode ?? 'none', $toCode));
             }
 
+            $changes = [];
+
             if (OrderReturnStatus::CODE_RECEIVED === $toCode) {
-                $this->restockReceivedLines($return, $connection);
+                $changes = $this->restockReceivedLines($return, $connection);
                 $return->setRefundAmount(number_format($this->refundCalculator->compute($return, true), 2, '.', ''));
             }
 
@@ -300,7 +312,11 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             }
 
             $return->setStatusId($targetStatusId)->save($connection);
+
+            return $changes;
         });
+
+        $this->announce($changes, $dispatcher);
 
         $event->setOrderReturn($return);
     }
@@ -349,9 +365,11 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
      * The order product lines are read before the transaction, for the ids of
      * the rows to lock only.
      *
-     * @param callable(ConnectionInterface): void $work
+     * @param callable(ConnectionInterface): list<StockLevelChange> $work the changes of stock it wrote
+     *
+     * @return list<StockLevelChange>
      */
-    private function inReturnTransaction(OrderReturnModel $return, callable $work): void
+    private function inReturnTransaction(OrderReturnModel $return, callable $work): array
     {
         /** @var list<int> $orderProductIds */
         $orderProductIds = array_map('intval', OrderReturnLineQuery::create()
@@ -360,10 +378,34 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             ->find()
             ->getData());
 
-        $this->transaction->run((int) $return->getOrderId(), $orderProductIds, function (ConnectionInterface $connection) use ($return, $work): void {
+        /** @var list<StockLevelChange> $changes */
+        $changes = $this->transaction->run((int) $return->getOrderId(), $orderProductIds, function (ConnectionInterface $connection) use ($return, $work): array {
             $this->lockReturn($return, $connection);
-            $work($connection);
+
+            return $work($connection);
         });
+
+        return $changes;
+    }
+
+    /**
+     * Tells the listeners of the stock levels what the restocking changed, now that the stock is
+     * written for good: at once when the transaction of the return was the outermost, when the
+     * transaction of a caller is over otherwise, never when it is rolled back.
+     *
+     * @param list<StockLevelChange> $changes
+     */
+    private function announce(array $changes, EventDispatcherInterface $dispatcher): void
+    {
+        if (!$this->stockLevelAnnouncer instanceof StockLevelAnnouncer) {
+            // Built without the shared announcer (a subclass, a module written against the previous
+            // constructor): one of its own, that waits for the transaction of a caller like the
+            // shared one and is flushed at the same moments, once it is subscribed to the dispatcher.
+            $this->stockLevelAnnouncer = new StockLevelAnnouncer($dispatcher, new CallerTransaction());
+            $dispatcher->addSubscriber($this->stockLevelAnnouncer);
+        }
+
+        $this->stockLevelAnnouncer->announceChanges($changes);
     }
 
     /**
@@ -443,12 +485,15 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
         $return->resetPartialOrderReturnLines(false);
     }
 
-    private function restockReceivedLines(OrderReturnModel $return, ConnectionInterface $connection): void
+    /**
+     * @return list<StockLevelChange> what went back to the shared counter of each sale element
+     */
+    private function restockReceivedLines(OrderReturnModel $return, ConnectionInterface $connection): array
     {
         $mode = ConfigQuery::read(self::RESTOCK_MODE_CONFIG_KEY, self::RESTOCK_MODE_RESELLABLE);
 
         if (self::RESTOCK_MODE_NEVER === $mode) {
-            return;
+            return [];
         }
 
         $saleUnitId = $return->getOrder()?->getSaleUnitId();
@@ -482,7 +527,7 @@ class OrderReturn extends BaseAction implements EventSubscriberInterface
             }
         }
 
-        $this->stockIncrementer->incrementInAscendingId($quantities, $connection, $saleUnitId);
+        return $this->stockIncrementer->incrementInAscendingId($quantities, $connection, $saleUnitId);
     }
 
     public static function getSubscribedEvents(): array
