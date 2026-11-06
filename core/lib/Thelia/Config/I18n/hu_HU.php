@@ -102,6 +102,7 @@ return [
     'Current Password' => 'Jelenlegi jelszó',
     'Customer' => 'Ügyfél',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Az ügyfél <strong>%op%</strong> a következő listában: <strong>%customer_list%</strong>',
+    'Customer title' => 'Név',
     'Customers' => 'Ügyfelek',
     'Dashboard' => 'Vezérlőpult',
     'Decimal places' => 'Tizedesjegyek száma',

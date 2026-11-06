@@ -141,6 +141,7 @@ return [
     'Current Password' => 'Geçerli Şifre',
     'Customer' => 'Customer',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Müşteri %op% <strong>%customer_list%</strong> olduğunu',
+    'Customer title' => 'Başlık',
     'Customers' => 'müşteriler',
     'Dashboard' => 'Kontrol paneli',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Tarihi \'%date\' geçersiz, lütfen %fmt biçimini kullanarak geçerli bir tarih girin',

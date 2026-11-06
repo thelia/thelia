@@ -182,6 +182,7 @@ return [
     'Customer is %op% <strong>%customer_list%</strong>' => 'Customer is %op% <strong>%customer_list%</strong>',
     'Customer group is %op% <strong>%customer_group_list%</strong>' => 'Customer group is %op% <strong>%customer_group_list%</strong>',
     'Customer rating' => 'Customer rating',
+    'Customer title' => 'Title',
     'Customers' => 'Customers',
     'Dashboard' => 'Dashboard',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => "Date '%date' is invalid, please enter a valid date using %fmt format",

@@ -159,6 +159,7 @@ return [
     'Customer' => 'Клиент',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Клиент %op% <strong>%customer_list%</strong>',
     'Customer rating' => 'Оценка покупателей',
+    'Customer title' => 'Заголовок',
     'Customers' => 'Клиенты',
     'Dashboard' => 'Приборная панель',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Недопустимая дата \'%date\', пожалуйста, введите корректную дату с использованием формата %fmt',
