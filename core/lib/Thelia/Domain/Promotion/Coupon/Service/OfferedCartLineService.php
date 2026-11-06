@@ -22,6 +22,7 @@ use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Catalog\Bundle\BundleAvailability;
 use Thelia\Domain\Catalog\Stock\ReservedQuantityProvider;
 use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineProviderInterface;
 use Thelia\Domain\Promotion\Coupon\OfferedLine\OfferedLineRequest;
@@ -78,6 +79,7 @@ class OfferedCartLineService implements ResetInterface
         private readonly ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
         private readonly ?BundleAvailability $bundleAvailability = null,
         private readonly ?ReservedQuantityProvider $reservedQuantityProvider = null,
+        private readonly ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -187,7 +189,7 @@ class OfferedCartLineService implements ResetInterface
             $line = array_shift($lines);
 
             foreach ($lines as $supernumerary) {
-                $supernumerary->delete();
+                $this->deleteLine($supernumerary);
                 $changed = true;
             }
 
@@ -199,7 +201,7 @@ class OfferedCartLineService implements ResetInterface
         // Lines no kept promotion asks for any more.
         foreach ($offeredLines as $orphans) {
             foreach ($orphans as $orphan) {
-                $orphan->delete();
+                $this->deleteLine($orphan);
                 $changed = true;
             }
         }
@@ -248,7 +250,7 @@ class OfferedCartLineService implements ResetInterface
 
         if (0 === $grantable) {
             $this->unavailablePromotions[$request->couponId] = $label;
-            $line->delete();
+            $this->deleteLine($line);
 
             return true;
         }
@@ -274,6 +276,19 @@ class OfferedCartLineService implements ResetInterface
         }
 
         return $modified;
+    }
+
+    /**
+     * A gift line that held stock goes with a release told to the listeners of the reservations.
+     */
+    private function deleteLine(CartItem $line): void
+    {
+        $cartId = (int) $line->getCartId();
+        $held = $this->stockReservation?->heldLinesOf($cartId, (int) $line->getId()) ?? [];
+
+        $line->delete();
+
+        $this->stockReservation?->announceReleased($cartId, $held);
     }
 
     private function addOfferedLine(Cart $cart, OfferedLineRequest $request, string $label): bool

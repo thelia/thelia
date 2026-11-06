@@ -613,7 +613,7 @@ final class StockReservationTest extends ActionIntegrationTestCase
     /**
      * What reserving adds to a placement of a cart of one line: the lock of its stock row, the
      * reservations read by the check before the transaction and by the guard of the decrement,
-     * and the lines the cart held, released.
+     * and the lines of the cart (their ids, then their lock), the held ones released.
      */
     public function testWhatAShopThatReservesAddsToAPlacement(): void
     {
@@ -636,7 +636,7 @@ final class StockReservationTest extends ActionIntegrationTestCase
         $this->checkout()->holdStock($cartOn);
         $on = $this->statementsDuring(fn () => $this->placeOrder($cartOn, $customer, $currency, $lang));
 
-        self::assertSame(\count($off) + 5, \count($on), 'Lock, two reads of the reservations, the held lines found and released.');
+        self::assertSame(\count($off) + 6, \count($on), 'Lock, two reads of the reservations, the lines of the cart found, locked and read, and the held ones released.');
     }
 
     /**

@@ -21,6 +21,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Cart\Exception\ProductNotAvailableException;
 use Thelia\Domain\Cart\Exception\ProductWithoutPriceException;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Promotion\Coupon\FacadeInterface;
 use Thelia\Domain\Shipping\DestinationRestriction\CartDestinations;
 use Thelia\Domain\Shipping\DestinationRestriction\DestinationRestrictionChecker;
@@ -58,6 +59,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     public function __construct(
         FacadeInterface $facade,
         protected ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
+        protected ?StockReservationService $stockReservation = null,
     ) {
         parent::__construct($facade);
     }
@@ -283,7 +285,10 @@ class FreeProduct extends AbstractRemoveOnProducts
             if ($freeProductCartItem instanceof CartItem && $this->theDestinationRefuses($freeProductCartItem)) {
                 // The cart now goes where the gift cannot travel (the buyer chose another
                 // delivery address): the gift is withdrawn rather than blocking the order.
+                $cartId = (int) $freeProductCartItem->getCartId();
+                $held = $this->stockReservation?->heldLinesOf($cartId, (int) $freeProductCartItem->getId()) ?? [];
                 $freeProductCartItem->delete();
+                $this->stockReservation?->announceReleased($cartId, $held);
                 $this->clearFreeProductsCartItemIds();
                 $this->facade->getCart()?->clearCartItems();
 

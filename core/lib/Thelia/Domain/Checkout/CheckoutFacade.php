@@ -18,6 +18,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Domain\Cart\Service\CartSelectionService;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationConflictException;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationRefusedException;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
@@ -52,8 +53,9 @@ final readonly class CheckoutFacade
      * enters the checkout, on a page that selects nothing yet. Nothing is done when the shop does
      * not reserve its stock.
      *
-     * @throws StockReservationRefusedException  a line asks more than what the other carts leave; nothing is held
-     * @throws StockReservationConflictException another cart took the same stock at the same moment; nothing is held
+     * @throws StockReservationRefusedException     a line asks more than what the other carts leave; nothing is held
+     * @throws StockReservationConflictException    another cart took the same stock at the same moment; nothing is held
+     * @throws StockReservationRateLimitedException the cart, or its address, takes new holds more often than a buyer does; nothing is held, the delay to wait is on the exception
      */
     public function holdStock(Cart $cart): void
     {
@@ -65,6 +67,8 @@ final readonly class CheckoutFacade
      * once more (holdStock()).
      *
      * @throws StockReservationRefusedException
+     * @throws StockReservationConflictException
+     * @throws StockReservationRateLimitedException
      */
     public function selectDeliveryAddress(CheckoutDTO $dto): void
     {
@@ -77,6 +81,8 @@ final readonly class CheckoutFacade
      * once more (holdStock()).
      *
      * @throws StockReservationRefusedException
+     * @throws StockReservationConflictException
+     * @throws StockReservationRateLimitedException
      */
     public function selectInvoiceAddress(CheckoutDTO $dto): void
     {
@@ -89,6 +95,8 @@ final readonly class CheckoutFacade
      * once more (holdStock()).
      *
      * @throws StockReservationRefusedException
+     * @throws StockReservationConflictException
+     * @throws StockReservationRateLimitedException
      */
     public function selectDeliveryModule(CheckoutDTO $dto): void
     {
@@ -104,6 +112,7 @@ final readonly class CheckoutFacade
      * @throws StoredMethodNotSelectableException
      * @throws StockReservationRefusedException
      * @throws StockReservationConflictException
+     * @throws StockReservationRateLimitedException
      */
     public function selectPaymentModule(CheckoutDTO $dto): void
     {
@@ -118,7 +127,9 @@ final readonly class CheckoutFacade
      * is then held once more (holdStock()).
      *
      * @throws StockReservationRefusedException
-     * @throws \Exception                       If underlying services raise domain exceptions
+     * @throws StockReservationConflictException
+     * @throws StockReservationRateLimitedException
+     * @throws \Exception                           If underlying services raise domain exceptions
      */
     public function validateForOrder(Cart $cart): void
     {

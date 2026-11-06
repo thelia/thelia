@@ -20,6 +20,10 @@ declare(strict_types=1);
  * the product a refusal names and its message.
  *
  * Usage: php reserve-or-place-in-another-process.php hold <cart id>
+ *        php reserve-or-place-in-another-process.php purge <cart id>   (the scheduled purge, whole table; the cart id is not used)
+ *        php reserve-or-place-in-another-process.php purge-while-holding <cart id> <cart id whose release the purge tells first>
+ *            (the scheduled purge; while it tells the release of the second cart, it holds the first, as a buyer does between
+ *             the commit of the purge and the end of its announcements)
  *        php reserve-or-place-in-another-process.php place <cart id> <customer id> <delivery order address id> <invoice order address id>
  */
 
@@ -28,9 +32,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
+use Thelia\Core\Event\ProductSaleElement\StockReservationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationConflictException;
+use Thelia\Domain\Catalog\Stock\StockReservationPurger;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
 use Thelia\Domain\Order\Exception\StockShortageException;
@@ -68,7 +74,18 @@ $dispatcher->addListener(
     512,
 );
 
-$cart = CartQuery::create()->findPk($cartId) ?? throw new RuntimeException('No cart '.$cartId);
+// What the listeners of the reservations are told here: direction and quantity of each line.
+$told = [];
+
+foreach ([TheliaEvents::STOCK_RESERVED => 'reserved', TheliaEvents::STOCK_RELEASED => 'released'] as $eventName => $direction) {
+    $dispatcher->addListener($eventName, static function (StockReservationEvent $event) use (&$told, $direction): void {
+        foreach ($event->getLines() as $line) {
+            $told[] = [$direction, $line->cartItemId, $line->quantity];
+        }
+    });
+}
+
+$cart = 'purge' === $mode ? null : (CartQuery::create()->findPk($cartId) ?? throw new RuntimeException('No cart '.$cartId));
 
 try {
     if ('hold' === $mode) {
@@ -96,6 +113,19 @@ try {
             recordConsentAnswers: false,
         );
         $outcome = ['outcome' => 'placed', 'reference' => null, 'message' => null];
+    } elseif ('purge' === $mode) {
+        $cleared = $container->get(StockReservationPurger::class)->purgeExpired();
+        $outcome = ['outcome' => 'purged', 'reference' => null, 'message' => (string) $cleared];
+    } elseif ('purge-while-holding' === $mode) {
+        $heldWhilePurging = false;
+        $dispatcher->addListener(TheliaEvents::STOCK_RELEASED, static function (StockReservationEvent $event) use ($container, $cart, $customerId, &$heldWhilePurging): void {
+            if (!$heldWhilePurging && $event->getCartId() === $customerId) {
+                $heldWhilePurging = true;
+                $container->get(CheckoutFacade::class)->holdStock($cart);
+            }
+        }, 100);
+        $cleared = $container->get(StockReservationPurger::class)->purgeExpired();
+        $outcome = ['outcome' => 'purged', 'reference' => null, 'message' => (string) $cleared];
     } else {
         throw new InvalidArgumentException('Unknown mode '.$mode);
     }
@@ -105,6 +135,6 @@ try {
     $outcome = ['outcome' => 'refused', 'reference' => $shortage->productReference, 'message' => $shortage->getMessage()];
 }
 
-echo json_encode($outcome, \JSON_THROW_ON_ERROR);
+echo json_encode($outcome + ['told' => $told], \JSON_THROW_ON_ERROR);
 
 $kernel->shutdown();

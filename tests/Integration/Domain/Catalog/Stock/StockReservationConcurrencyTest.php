@@ -28,6 +28,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Map\CartItemTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\Product;
@@ -280,6 +281,160 @@ final class StockReservationConcurrencyTest extends ActionIntegrationTestCase
         self::assertSame([19.0], $readByTheListener, 'Heard once, after the commit.');
     }
 
+    /**
+     * The scheduled purge clears a line whose hold ran out while a hold of the same cart is
+     * already at work on it: the hold locks the line by primary key before it reads what it told,
+     * so it waits for the purge, then reads the line as released and tells the new hold. This
+     * process plays the purge, in a transaction that has cleared the line and not yet committed.
+     */
+    public function testAHoldOfALineThePurgeIsClearingWaitsForItAndTellsTheNewHold(): void
+    {
+        [$cart, $line] = $this->expiredAnnouncedLine();
+        $connection = Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME);
+
+        $connection->beginTransaction();
+        $connection->query('SELECT `id` FROM `cart_item` WHERE `id` = '.(int) $line->getId().' FOR UPDATE')->fetchAll();
+        $process = $this->inAnotherProcess('hold', (int) $cart->getId());
+
+        try {
+            $this->waitUntilTheOtherProcessWaitsOnTheStock($process, table: 'cart_item');
+            $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL WHERE `id` = '.(int) $line->getId());
+        } finally {
+            $connection->commit();
+        }
+
+        $outcome = $this->waitFor($process);
+
+        self::assertSame('held', $outcome['outcome']);
+        self::assertEquals([['reserved', (int) $line->getId(), 2.0]], $outcome['told'], 'Cleared by the purge, then held again: one new hold, no release.');
+        self::assertTrue($this->isHeld($line));
+    }
+
+    /**
+     * A hold takes a line back while the purge is about to clear it: the purge locks the line,
+     * reads it again, finds it held again, and clears and tells nothing.
+     */
+    public function testThePurgeOfALineAHoldTakesBackClearsAndTellsNothing(): void
+    {
+        [, $line] = $this->expiredAnnouncedLine();
+        $connection = Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME);
+
+        $connection->beginTransaction();
+        $connection->query('SELECT `id` FROM `cart_item` WHERE `id` = '.(int) $line->getId().' FOR UPDATE')->fetchAll();
+        $process = $this->inAnotherProcess('purge', 0);
+
+        try {
+            $this->waitUntilTheOtherProcessWaitsOnTheStock($process, table: 'cart_item');
+            $connection->exec('UPDATE `cart_item` SET `reserved_until` = NOW() + INTERVAL 15 MINUTE, `reserved_quantity` = 2 WHERE `id` = '.(int) $line->getId());
+        } finally {
+            $connection->commit();
+        }
+
+        $outcome = $this->waitFor($process);
+
+        self::assertSame('purged', $outcome['outcome']);
+        self::assertSame([], array_values(array_filter($outcome['told'], static fn (array $told): bool => $told[1] === (int) $line->getId())), 'Held again before the purge got the line: nothing is told for it.');
+        self::assertTrue($this->isHeld($line), 'And its new date is kept.');
+    }
+
+    /**
+     * The purge cleared the lines of two carts and tells them one after the other; between the
+     * commit and the announcement of the second, a buyer holds the second cart again. The purge
+     * tells what it wrote: the release of that line is not lost because a read back would see the
+     * new hold, and the new hold is told too: one reservation, one release, then.
+     */
+    public function testAHoldBetweenTheCommitOfThePurgeAndItsAnnouncementDoesNotEraseTheRelease(): void
+    {
+        [$cartA, $lineA] = $this->expiredAnnouncedLine();
+        [$cartB, $lineB] = $this->expiredAnnouncedLine();
+
+        $outcome = $this->waitFor($this->inAnotherProcess('purge-while-holding', (int) $cartB->getId(), (int) $cartA->getId()));
+
+        self::assertSame('purged', $outcome['outcome']);
+        self::assertEquals(
+            [['reserved', (int) $lineB->getId(), 2.0], ['released', (int) $lineA->getId(), 2.0], ['released', (int) $lineB->getId(), 2.0]],
+            $outcome['told'],
+            'The hold of the second cart tells its reservation while the purge tells the first cart; the purge then tells the release of the second.',
+        );
+        self::assertTrue($this->isHeld($lineB));
+    }
+
+    /**
+     * A hold reads the quantity of a line under the lock of the line: a module changed it (with no
+     * hold) while the hold waited for the lock, and the hold tells and writes the new quantity.
+     */
+    public function testAHoldReadsTheQuantityOfTheLinesItLocked(): void
+    {
+        [$cart, $line] = $this->committedCart($this->committedProduct(10), 2);
+        $connection = Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME);
+        $connection->exec('UPDATE `cart_item` SET `reserved_until` = NOW() + INTERVAL 15 MINUTE, `reserved_quantity` = 2 WHERE `id` = '.(int) $line->getId());
+
+        $connection->beginTransaction();
+        $connection->query('SELECT `id` FROM `cart_item` WHERE `id` = '.(int) $line->getId().' FOR UPDATE')->fetchAll();
+        $process = $this->inAnotherProcess('hold', (int) $cart->getId());
+
+        try {
+            $this->waitUntilTheOtherProcessWaitsOnTheStock($process, table: 'cart_item');
+            $connection->exec('UPDATE `cart_item` SET `quantity` = 5 WHERE `id` = '.(int) $line->getId());
+        } finally {
+            $connection->commit();
+        }
+
+        $outcome = $this->waitFor($process);
+
+        self::assertSame('held', $outcome['outcome']);
+        self::assertEquals([['released', (int) $line->getId(), 2.0], ['reserved', (int) $line->getId(), 5.0]], $outcome['told'], 'Told with the quantity read under the lock.');
+        self::assertSame(5.0, (float) $this->otherSession()->query('SELECT reserved_quantity FROM cart_item WHERE id = '.(int) $line->getId())->fetchColumn());
+    }
+
+    /**
+     * A cart of more lines than one batch of locks (500): the lines of the last batch are read under
+     * their own locks, not through the view the first batch froze. The purge (this process) clears
+     * the last line while the hold waits for it: the hold tells it as a new reservation.
+     */
+    public function testAHoldOfMoreLinesThanOneBatchReadsTheLastBatchUnderItsLocks(): void
+    {
+        [$cart] = $this->committedCart($this->committedProduct(3000), 2);
+        $connection = Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME);
+        $copy = 'INSERT INTO `cart_item` (`cart_id`, `product_id`, `quantity`, `product_sale_elements_id`, `price`, `promo_price`, `is_offered`) '
+            .'SELECT `cart_id`, `product_id`, `quantity`, `product_sale_elements_id`, `price`, `promo_price`, `is_offered` FROM `cart_item` WHERE `cart_id` = '.(int) $cart->getId();
+
+        foreach (range(1, 9) as $doubling) {
+            $connection->exec($copy);
+        }
+
+        $connection->exec('UPDATE `cart_item` SET `reserved_until` = NOW() + INTERVAL 15 MINUTE, `reserved_quantity` = 2 WHERE `cart_id` = '.(int) $cart->getId());
+        $last = (int) $connection->query('SELECT MAX(`id`) FROM `cart_item` WHERE `cart_id` = '.(int) $cart->getId())->fetchColumn();
+        self::assertSame(512, (int) $connection->query('SELECT COUNT(*) FROM `cart_item` WHERE `cart_id` = '.(int) $cart->getId())->fetchColumn());
+
+        $connection->beginTransaction();
+        $connection->query('SELECT `id` FROM `cart_item` WHERE `id` = '.$last.' FOR UPDATE')->fetchAll();
+        $process = $this->inAnotherProcess('hold', (int) $cart->getId());
+
+        try {
+            $this->waitUntilTheOtherProcessWaitsOnTheStock($process, table: 'cart_item');
+            $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL WHERE `id` = '.$last);
+        } finally {
+            $connection->commit();
+        }
+
+        $outcome = $this->waitFor($process);
+
+        self::assertSame('held', $outcome['outcome']);
+        self::assertEquals([['reserved', $last, 2.0]], $outcome['told'], 'The 511 other lines are held as told; the last one, cleared while the hold waited, is a new reservation.');
+    }
+
+    /**
+     * @return array{0: Cart, 1: CartItem} a cart of a line of 2, told as held and whose date ran out
+     */
+    private function expiredAnnouncedLine(): array
+    {
+        [$cart, $line] = $this->committedCart($this->committedProduct(5), 2);
+        Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME)->exec('UPDATE `cart_item` SET `reserved_until` = NOW() - INTERVAL 1 MINUTE, `reserved_quantity` = 2 WHERE `id` = '.(int) $line->getId());
+
+        return [$cart, $line];
+    }
+
     private function duringThePlacement(callable $then): void
     {
         // Once this order took its stock, and before it commits.
@@ -311,15 +466,16 @@ final class StockReservationConcurrencyTest extends ActionIntegrationTestCase
      * a process that ends without waiting (refused before its transaction) is no failure.
      *
      * @param resource $process
+     * @param string   $table   the table whose lock the other process waits on
      */
-    private function waitUntilTheOtherProcessWaitsOnTheStock($process, bool $mayEnd = false): void
+    private function waitUntilTheOtherProcessWaitsOnTheStock($process, bool $mayEnd = false, string $table = 'product_sale_elements'): void
     {
         $ownThreads = [
             (int) Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME)->query('SELECT CONNECTION_ID()')->fetchColumn(),
             (int) $this->otherSession()->query('SELECT CONNECTION_ID()')->fetchColumn(),
         ];
         $waiting = $this->otherSession()->prepare(
-            "SELECT CONCAT(ID, ':', INFO) FROM information_schema.PROCESSLIST WHERE DB = DATABASE() AND COMMAND IN ('Query', 'Execute') AND INFO LIKE '%product_sale_elements%' AND (INFO LIKE '%FOR UPDATE%' OR INFO LIKE 'UPDATE%') AND ID NOT IN (".implode(',', $ownThreads).')',
+            "SELECT CONCAT(ID, ':', INFO) FROM information_schema.PROCESSLIST WHERE DB = DATABASE() AND COMMAND IN ('Query', 'Execute') AND INFO LIKE '%".$table."%' AND (INFO LIKE '%FOR UPDATE%' OR INFO LIKE 'UPDATE%') AND ID NOT IN (".implode(',', $ownThreads).')',
         );
         $deadline = microtime(true) + self::PROCESS_TIMEOUT;
         $seen = [];
@@ -351,7 +507,7 @@ final class StockReservationConcurrencyTest extends ActionIntegrationTestCase
     /**
      * @param resource $process
      *
-     * @return array{outcome: string, reference: string|null, message: string|null}
+     * @return array{outcome: string, reference: string|null, message: string|null, told: list<array{0: string, 1: int, 2: float}>}
      */
     private function waitFor($process): array
     {
