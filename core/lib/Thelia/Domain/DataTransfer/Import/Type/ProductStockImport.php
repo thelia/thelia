@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\DataTransfer\Import\Type;
 
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidGtinException;
 use Thelia\Domain\Catalog\Product\Identifier\InvalidMpnException;
@@ -37,6 +38,29 @@ class ProductStockImport extends AbstractImport
         'mpn',
     ];
 
+    /** @var array<int, float> by sale element id, the stock before the first row that wrote it */
+    private array $stockBefore = [];
+
+    /** @var array<int, float> by sale element id, the stock after the last row that wrote it */
+    private array $stockAfter = [];
+
+    /**
+     * What the rows written so far did to the stock, one change per sale element whatever the number
+     * of rows that wrote it. A refused row is never part of it.
+     *
+     * @return list<StockLevelChange>
+     */
+    public function stockChanges(): array
+    {
+        $changes = [];
+
+        foreach ($this->stockBefore as $productSaleElementsId => $before) {
+            $changes[] = new StockLevelChange($productSaleElementsId, $before, $this->stockAfter[$productSaleElementsId]);
+        }
+
+        return $changes;
+    }
+
     public function importData(array $data): ?string
     {
         $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
@@ -58,6 +82,9 @@ class ProductStockImport extends AbstractImport
                 ['%value' => self::cellText($data['stock']), '%column' => 'stock', '%id' => self::cellText($data['id'])],
             );
         }
+
+        // Read from the table, not from the instance: a pooled one may be older than the row.
+        $stockBefore = $this->stockBefore[(int) $pse->getId()] ?? $this->storedStockOf((int) $pse->getId());
 
         $pse->setQuantity((float) $data['stock']);
 
@@ -85,8 +112,22 @@ class ProductStockImport extends AbstractImport
 
         $pse->save();
 
+        $this->stockBefore[(int) $pse->getId()] = $stockBefore;
+        $this->stockAfter[(int) $pse->getId()] = (float) $pse->getQuantity();
+
         ++$this->importedRows;
 
         return null;
+    }
+
+    private function storedStockOf(int $productSaleElementsId): float
+    {
+        /** @var int|string|float|null $stock */
+        $stock = ProductSaleElementsQuery::create()
+            ->filterById($productSaleElementsId)
+            ->select('Quantity')
+            ->findOne();
+
+        return (float) $stock;
     }
 }
