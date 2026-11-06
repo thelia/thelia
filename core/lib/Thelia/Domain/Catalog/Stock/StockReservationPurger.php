@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Stock;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Thelia\Core\Event\ProductSaleElement\StockReservationLine;
+use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Model\Map\CartItemTableMap;
 
 /**
@@ -27,12 +30,18 @@ use Thelia\Model\Map\CartItemTableMap;
  *
  * By batches of lines found without lock, then cleared by primary key: a single UPDATE over
  * the dates would lock every line it scans, the carts being filled at that moment included.
+ *
+ * A reservation that ran out was never told as released: the purge tells it (STOCK_RELEASED, one
+ * event per cart, with the quantity the line was told with), for the lines it really cleared. A line held again since it was found keeps its
+ * date and is told to nobody. Each batch is one transaction (lines locked by primary key, read again
+ * under the lock, cleared), told after its commit as it was written, never read back: a hold of the
+ * same line waits for the commit, or has finished before it. No transaction of the caller is open here: the announcer tells at once.
  */
 final readonly class StockReservationPurger
 {
     public const DEFAULT_BATCH_SIZE = 500;
 
-    public function __construct(private StockSettings $stockSettings)
+    public function __construct(private StockSettings $stockSettings, private ?StockReservationAnnouncer $announcer = null)
     {
     }
 
@@ -60,10 +69,73 @@ final readonly class StockReservationPurger
                 break;
             }
 
-            // A line held again since it was found keeps its new date.
-            $cleared += (int) $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL WHERE `id` IN ('.implode(',', $ids).') AND `reserved_until` <= NOW()');
+            try {
+                $released = $this->clear($ids, $connection);
+            } catch (\Throwable $throwable) {
+                if (LockConflictDetector::isLockConflict($throwable)) {
+                    // Housekeeping: a line another request holds is left to the next run.
+                    break;
+                }
+
+                throw $throwable;
+            }
+
+            // After the commit: a listener cannot hold the locks, nor fail the clearing. Told as it
+            // was written, with no read back: a hold that took the line again since the commit has
+            // told its own reservation, which a read back would mistake for "not released".
+            foreach ($released as $cartId => $lines) {
+                $cleared += \count($lines);
+                $this->announcer?->releasedNow($cartId, $lines);
+            }
         } while (\count($ids) === $batchSize);
 
         return $cleared;
+    }
+
+    /**
+     * One transaction: the lines are locked by primary key in ascending id and read again under the
+     * lock, so that what is cleared is what is told (the quantity the line was told with, and only
+     * a line still expired: one held again since keeps its date), then cleared.
+     *
+     * @param list<int> $ids
+     *
+     * @return array<int, list<StockReservationLine>> the lines cleared, by cart id
+     */
+    private function clear(array $ids, ConnectionInterface $connection): array
+    {
+        sort($ids);
+        $connection->beginTransaction();
+
+        try {
+            $statement = $connection->prepare(
+                'SELECT `id`, `cart_id`, `product_sale_elements_id`, COALESCE(`reserved_quantity`, `quantity`) FROM `cart_item` WHERE `id` IN ('.implode(',', $ids).') ORDER BY `id` FOR UPDATE',
+            );
+            $statement->execute();
+            $locked = $statement->fetchAll(\PDO::FETCH_NUM);
+            CartItemTableMap::clearInstancePool();
+
+            $statement = $connection->prepare('SELECT `id` FROM `cart_item` WHERE `id` IN ('.implode(',', $ids).') AND `reserved_until` <= NOW()');
+            $statement->execute();
+            $expired = array_flip(array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN)));
+            $byCart = [];
+
+            if ([] !== $expired) {
+                $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL WHERE `id` IN ('.implode(',', array_keys($expired)).')');
+            }
+
+            foreach ($locked as [$id, $cartId, $productSaleElementsId, $quantity]) {
+                if (isset($expired[(int) $id])) {
+                    $byCart[(int) $cartId][] = new StockReservationLine((int) $id, (int) $productSaleElementsId, round((float) $quantity, 6));
+                }
+            }
+
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
+
+        return $byCart;
     }
 }

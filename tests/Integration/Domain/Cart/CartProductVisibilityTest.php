@@ -14,11 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Cart;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
+use Thelia\Core\Event\ProductSaleElement\StockReservationEvent;
+use Thelia\Core\Event\ProductSaleElement\StockReservationLine;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Cart\CartFacade;
@@ -29,6 +32,9 @@ use Thelia\Domain\Cart\Exception\ProductNotAvailableException;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Cart\Service\CartLineVisibility;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Stock\StockReservationAnnouncer;
+use Thelia\Domain\Catalog\Stock\StockSettings;
+use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
@@ -52,6 +58,7 @@ use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
  * The cart holds what the catalog shows its visitor, whichever way a line gets in: an addition
@@ -201,6 +208,40 @@ final class CartProductVisibilityTest extends ActionIntegrationTestCase
         self::assertCount(1, $notices);
         self::assertStringContainsString($this->titleOf($this->table), $notices[0]);
         self::assertStringNotContainsString($this->titleOf($this->sofa), $notices[0]);
+    }
+
+    public function testALineTakenOutOfTheCartThatHeldStockIsToldReleasedAndTheOthersAreNot(): void
+    {
+        ConfigQuery::write('check-available-stock', '1');
+        ConfigQuery::write('allow_negative_stock', '0');
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::write(StockSettings::RESERVATION_SCOPE, 'checkout');
+        ConfigQuery::write(StockSettings::RESERVATION_DURATION, '15');
+        ConfigQuery::resetCache();
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn(Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME));
+        $released = [];
+        $listener = static function (StockReservationEvent $event) use (&$released): void {
+            $released[] = [$event->getCartId(), $event->getLines()];
+        };
+        $this->getService('event_dispatcher')->addListener(TheliaEvents::STOCK_RELEASED, $listener);
+
+        try {
+            $cart = $this->factory->cart();
+            $tableLine = $this->factory->cartItem($cart, $this->table, null, ['quantity' => 2.0]);
+            $this->factory->cartItem($cart, $this->sofa, null, ['quantity' => 1.0]);
+            $this->getService(CheckoutFacade::class)->holdStock($cart);
+            // Written by something else with no hold after it: the release tells the 2 it was reserved with.
+            Propel::getWriteConnection(CartItemTableMap::DATABASE_NAME)->exec('UPDATE cart_item SET quantity = 6 WHERE id = '.(int) $tableLine->getId());
+            $this->signInAs($this->professional());
+
+            $this->getService(CartLineVisibility::class)->removeHiddenLines($cart);
+            $this->getService(StockReservationAnnouncer::class)->flush();
+
+            self::assertEquals([[(int) $cart->getId(), [new StockReservationLine((int) $tableLine->getId(), (int) $tableLine->getProductSaleElementsId(), 2.0)]]], $released);
+        } finally {
+            $this->getService('event_dispatcher')->removeListener(TheliaEvents::STOCK_RELEASED, $listener);
+            $this->getService(TestCallerTransaction::class)->reset();
+        }
     }
 
     public function testSigningInAsAConsumerKeepsTheWholeCartAndSaysNothing(): void

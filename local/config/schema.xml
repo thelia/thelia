@@ -1862,6 +1862,7 @@
     <column description="the coupon that offers the line, read to take the line back when the promotion no longer applies" name="offered_by_coupon_id" type="INTEGER" />
     <column description="the components a customer chose for a bundle line, as canonical JSON; null outside a bundle" name="bundle_composition" type="LONGVARCHAR" />
     <column description="the stock of the line is held for the cart until this moment; null or past: not held" name="reserved_until" type="TIMESTAMP" />
+    <column description="the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told" name="reserved_quantity" type="FLOAT" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>

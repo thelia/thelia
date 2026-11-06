@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Model\AddressQuery;
@@ -70,12 +71,14 @@ final readonly class CustomerAnonymizer
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
      * @param CustomerGroupAssignment|null                    $customerGroupAssignment what announces the move to the default group; without it, the move is written and not announced
+     * @param StockReservationService|null                    $stockReservation        what tells the listeners of the reservations the lines the carts held; without it, the carts go without a word
      */
     public function __construct(
         private CustomerPaymentMethodService $customerPaymentMethodService,
         #[AutowireIterator('thelia.customer.personal_data_provider')]
         private iterable $personalDataProviders = [],
         private ?CustomerGroupAssignment $customerGroupAssignment = null,
+        private ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -288,7 +291,10 @@ final readonly class CustomerAnonymizer
         foreach ($carts as $cart) {
             $cartAddressIds[] = $cart->getAddressDeliveryId();
             $cartAddressIds[] = $cart->getAddressInvoiceId();
+            // The lines the cart held are told as released once the transaction is over.
+            $held = $this->stockReservation?->heldLinesOf((int) $cart->getId()) ?? [];
             $cart->delete($connection);
+            $this->stockReservation?->announceReleased((int) $cart->getId(), $held);
         }
 
         $cartAddressIds = array_values(array_unique(array_filter($cartAddressIds)));

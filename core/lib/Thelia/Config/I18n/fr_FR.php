@@ -994,6 +994,7 @@ return [
     'You must choose a delivery method before using this coupon.' => 'Vous devez choisir un mode de livraison avant d\'utiliser ce coupon.',
     'Another change of the same products was made at the same moment. Please try again.' => 'Une autre modification des mêmes produits a eu lieu au même moment. Merci de réessayer.',
     'Another cart took the same products at the same moment. Please try again.' => 'Un autre panier a pris les mêmes produits au même moment. Merci de réessayer.',
+    'Too many attempts to hold these products. Please try again later.' => 'Trop de tentatives de réservation de ces produits. Merci de réessayer plus tard.',
     'Another change of this order was made at the same moment. Please try again.' => 'Une autre modification de cette commande a été faite au même moment. Merci de réessayer.',
     'Another order took the same products at the same moment. Please try again.' => 'Une autre commande a pris les mêmes produits au même moment. Merci de réessayer.',
     'Cart is empty or contains no items' => 'Le panier est vide ou ne contient aucun article',

@@ -2438,6 +2438,7 @@ CREATE TABLE `cart_item`
     `offered_by_coupon_id` INTEGER COMMENT 'the coupon that offers the line, read to take the line back when the promotion no longer applies',
     `bundle_composition` TEXT COMMENT 'the components a customer chose for a bundle line, as canonical JSON; null outside a bundle',
     `reserved_until` DATETIME COMMENT 'the stock of the line is held for the cart until this moment; null or past: not held',
+    `reserved_quantity` FLOAT COMMENT 'the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

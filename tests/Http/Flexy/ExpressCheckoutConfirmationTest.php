@@ -19,6 +19,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\Event\Checkout\ExpressPaymentNotPlacedEvent;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
 use Thelia\Domain\Checkout\DTO\ExpressWalletAnswer;
 use Thelia\Domain\Checkout\Enum\CheckoutDisplayMode;
 use Thelia\Domain\Checkout\Enum\GuestCheckoutMode;
@@ -384,6 +385,27 @@ final class ExpressCheckoutConfirmationTest extends GuestCheckoutTestCase
         $this->confirm($this->tokenFor($cart));
 
         $this->jsonAnswer(409);
+    }
+
+    /**
+     * The hold of the stock the wallet confirmation makes is over the budget of the cart, or of its
+     * address: not a shortage, so not a conflict. The wallet is told how long to wait.
+     */
+    public function testAHoldOverItsBudgetIsAskedToWaitNotToRetryAtOnce(): void
+    {
+        $cart = $this->aGuestReadyToPay();
+        ExpressPaymentTestModule::$answer = $this->answerFor($cart);
+        $this->getService('event_dispatcher')->addListener(
+            OrderProductEvent::PRE_INSERT,
+            static function (): never {
+                throw new StockReservationRateLimitedException(120);
+            },
+        );
+
+        $this->confirm($this->tokenFor($cart));
+
+        $this->jsonAnswer(429);
+        self::assertSame('120', $this->client->getResponse()->headers->get('Retry-After'));
     }
 
     /**

@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\Cart as CartResource;
@@ -34,6 +35,7 @@ use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\Service\CartGuard;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
@@ -128,6 +130,10 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             // A stored method of another customer reads like a missing one, and none of
             // these messages carries the provider reference.
             throw new UnprocessableEntityHttpException($refusal->getMessage(), $refusal);
+        } catch (StockReservationRateLimitedException $tooOften) {
+            // Not a shortage, nothing is missing: the cart, or the address it comes from, holds
+            // the stock more often than a buyer does. Answered with the delay to wait.
+            throw new TooManyRequestsHttpException($tooOften->retryAfterSeconds, $tooOften->getMessage(), $tooOften);
         } catch (StockShortageException $shortage) {
             // A line the stock left by the other carts no longer covers, or a tie with another
             // cart: a conflict with the state of the stock, as when the order is placed. The
@@ -152,7 +158,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
     /**
      * A step of the checkout like the others: the stock of the lines is held again once the day is chosen.
      *
-     * @throws StockShortageException the stock of a line is no longer there for this cart
+     * @throws StockShortageException               the stock of a line is no longer there for this cart
+     * @throws StockReservationRateLimitedException the cart, or its address, takes new holds more often than a buyer does
      */
     private function chooseDeliveryDate(Cart $cart, CheckoutDeliveryDateInput $input): void
     {
@@ -162,7 +169,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
 
     /**
      * @throws PropelException
-     * @throws StockShortageException the stock of a line is no longer there for this cart
+     * @throws StockShortageException               the stock of a line is no longer there for this cart
+     * @throws StockReservationRateLimitedException the cart, or its address, takes new holds more often than a buyer does
      */
     private function selectDeliveryAddress(Cart $cart, CheckoutDeliveryAddressInput $input): void
     {
@@ -180,7 +188,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
 
     /**
      * @throws PropelException
-     * @throws StockShortageException the stock of a line is no longer there for this cart
+     * @throws StockShortageException               the stock of a line is no longer there for this cart
+     * @throws StockReservationRateLimitedException the cart, or its address, takes new holds more often than a buyer does
      */
     private function selectInvoiceAddress(Cart $cart, CheckoutInvoiceAddressInput $input): void
     {
@@ -197,7 +206,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
 
     /**
      * @throws PropelException
-     * @throws StockShortageException the stock of a line is no longer there for this cart
+     * @throws StockShortageException               the stock of a line is no longer there for this cart
+     * @throws StockReservationRateLimitedException the cart, or its address, takes new holds more often than a buyer does
      */
     private function selectDeliveryModule(Cart $cart, CheckoutDeliveryModuleInput $input): void
     {
@@ -218,8 +228,9 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
     /**
      * @throws PropelException
      * @throws CustomerPaymentMethodException
-     * @throws InvalidPaymentException        when the group of the buyer does not list the module
-     * @throws StockShortageException         the stock of a line is no longer there for this cart
+     * @throws InvalidPaymentException              when the group of the buyer does not list the module
+     * @throws StockShortageException               the stock of a line is no longer there for this cart
+     * @throws StockReservationRateLimitedException the cart, or its address, takes new holds more often than a buyer does
      */
     private function selectPaymentModule(Cart $cart, CheckoutPaymentModuleInput $input): void
     {

@@ -989,6 +989,7 @@ return [
     'You must choose a delivery method before using this coupon.' => 'You must choose a delivery method before using this coupon.',
     'Another change of the same products was made at the same moment. Please try again.' => 'Another change of the same products was made at the same moment. Please try again.',
     'Another cart took the same products at the same moment. Please try again.' => 'Another cart took the same products at the same moment. Please try again.',
+    'Too many attempts to hold these products. Please try again later.' => 'Too many attempts to hold these products. Please try again later.',
     'Another change of this order was made at the same moment. Please try again.' => 'Another change of this order was made at the same moment. Please try again.',
     'Another order took the same products at the same moment. Please try again.' => 'Another order took the same products at the same moment. Please try again.',
     'Cart is empty or contains no items' => 'Cart is empty or contains no items',
