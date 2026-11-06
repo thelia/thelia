@@ -31,6 +31,15 @@ use Thelia\Model\Map\CartItemTableMap;
  */
 final readonly class DatabaseReservedQuantity implements ReservedQuantityProvider
 {
+    /** A line counts while its reservation is still ahead; an expired one is never counted, whatever the purge did. */
+    public const ACTIVE_RESERVATION = '`cart_item`.`reserved_until` > NOW()';
+
+    /** Joins the own stock row of the sale unit of the cart, when that unit keeps one for the sale element. */
+    public const OWN_STOCK_JOIN = 'LEFT JOIN `sale_unit_product_sale_elements` `own` ON `own`.`sale_unit_id` = `cart`.`sale_unit_id` AND `own`.`product_sale_elements_id` = `cart_item`.`product_sale_elements_id` ';
+
+    /** Needs OWN_STOCK_JOIN: the carts that sell from the national counter. */
+    public const NATIONAL_STOCK = '`own`.`id` IS NULL';
+
     public function __construct(private StockSettings $stockSettings)
     {
     }
@@ -59,7 +68,7 @@ final readonly class DatabaseReservedQuantity implements ReservedQuantityProvide
         // The own row of the unit of the cart asking decides the stock it sells from: that row,
         // or the national counter.
         $sameStock = null === $saleUnitId
-            ? '`own`.`id` IS NULL'
+            ? self::NATIONAL_STOCK
             : '((`asker`.`id` IS NOT NULL AND `cart`.`sale_unit_id` = :saleUnitId) OR (`asker`.`id` IS NULL AND `own`.`id` IS NULL))';
         $askerJoin = null === $saleUnitId
             ? ''
@@ -68,10 +77,10 @@ final readonly class DatabaseReservedQuantity implements ReservedQuantityProvide
         $statement = ($connection ?? Propel::getConnection(CartItemTableMap::DATABASE_NAME))->prepare(
             'SELECT `cart_item`.`product_sale_elements_id`, SUM(`cart_item`.`quantity`) FROM `cart_item` '
             .'INNER JOIN `cart` ON `cart`.`id` = `cart_item`.`cart_id` '
-            .'LEFT JOIN `sale_unit_product_sale_elements` `own` ON `own`.`sale_unit_id` = `cart`.`sale_unit_id` AND `own`.`product_sale_elements_id` = `cart_item`.`product_sale_elements_id` '
+            .self::OWN_STOCK_JOIN
             .$askerJoin
             .'WHERE `cart_item`.`product_sale_elements_id` IN ('.implode(',', $productSaleElementsIds).') '
-            .'AND `cart_item`.`reserved_until` > NOW() '
+            .'AND '.self::ACTIVE_RESERVATION.' '
             .(null === $excludedCartId ? '' : 'AND `cart_item`.`cart_id` <> :excludedCartId ')
             .'AND '.$sameStock.' '
             .'GROUP BY `cart_item`.`product_sale_elements_id`',
