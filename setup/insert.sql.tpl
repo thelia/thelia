@@ -2273,7 +2273,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (8, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW()),
 (9, 'customer_send_code', NULL, NULL, 'customer_send_code.txt', NULL, 'customer_send_code.html', NOW(), NOW()),
 (10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
-(11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW())
+(11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW()),
+(12, 'report_mail', NULL, NULL, 'report_mail.txt', NULL, 'report_mail.html', NOW(), NOW())
 ;
 
 /**
@@ -4128,7 +4129,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (8, '{{ locale }}', {{ intl('Mail sent to the customer to confirm its account', locale) }}, {{ intl('Confirm your %store account', locale) }}, NULL, NULL),
     (9, '{{ locale }}', {{ intl('Mail sent to the customer with the code that activates the account', locale) }}, {{ intl('Your %store activation code', locale) }}, NULL, NULL),
     (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL),
-    (11, '{{ locale }}', {{ intl('Shipping notice sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} has been shipped', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (11, '{{ locale }}', {{ intl('Shipping notice sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} has been shipped', locale) }}, NULL, NULL),
+    (12, '{{ locale }}', {{ intl('Report sent by e-mail', locale) }}, {{ intl('{{ report_title }}: {{ period_start }} to {{ period_end }}', locale) }}, {{ intl('Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', locale) }}, {{ intl('<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}', locale) }}){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

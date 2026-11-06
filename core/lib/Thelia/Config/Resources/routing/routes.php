@@ -18,7 +18,10 @@ use Thelia\Controller\Front\ContactController;
 use Thelia\Controller\Front\DefaultController;
 use Thelia\Controller\Front\ExpressCheckoutController;
 use Thelia\Controller\Front\PublicationPreviewController;
+use Thelia\Controller\Front\ReportDownloadController;
 use Thelia\Domain\CMS\Publication\Preview\PublicationPreview;
+use Thelia\Domain\Reporting\Mailing\ReportDownloadLinkGenerator;
+use Thelia\Domain\Reporting\Mailing\ReportMailStorage;
 
 return static function (RoutingConfigurator $routes): void {
     $routes->add('api_front_login_check', '/api/front/login');
@@ -58,6 +61,13 @@ return static function (RoutingConfigurator $routes): void {
     $routes->add(PublicationPreview::ROUTE, '/preview/{type}/{id}')
         ->controller(PublicationPreviewController::class)
         ->requirements(['type' => 'content|folder', 'id' => '\d+'])
+        ->methods(['GET']);
+
+    // The file of a report e-mailed as a link, for whoever holds the signed link of the
+    // e-mail. Declared before the theme routes, like the preview above.
+    $routes->add(ReportDownloadLinkGenerator::ROUTE, '/report-download/{file}')
+        ->controller(ReportDownloadController::class)
+        ->requirements(['file' => ReportMailStorage::FILE_PATTERN])
         ->methods(['GET']);
 
     // Owned by the core rather than by each wallet module: this is where the buyer is put

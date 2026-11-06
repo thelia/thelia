@@ -49,6 +49,7 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
             'maintenance:purge' => '30 3 * * *',
             'thelia:messenger:purge-failed' => '0 4 * * *',
             'content:publish-scheduled' => '* * * * *',
+            'report:send-due' => '*/15 * * * *',
         ];
         // An active module may add its own tasks to this schedule: only the tasks of the core are compared.
         $commands = self::commands($schedule->getRecurringMessages());
@@ -100,7 +101,7 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
         $container->register('messenger.transport_factory')->setSynthetic(true);
         $container->register('messenger.default_serializer')->setSynthetic(true);
         $container->register(TheliaSchedule::class, TheliaSchedule::class)
-            ->setArguments([new Definition(ArrayAdapter::class), new Definition(LockFactory::class, [new Definition(InMemoryStore::class)]), '* * * * *', '30 3 * * *', '0 4 * * *', '', '* * * * *'])
+            ->setArguments([new Definition(ArrayAdapter::class), new Definition(LockFactory::class, [new Definition(InMemoryStore::class)]), '* * * * *', '30 3 * * *', '0 4 * * *', '', '* * * * *', '*/15 * * * *'])
             ->addTag('scheduler.schedule_provider', ['name' => TheliaSchedule::NAME])
             ->setPublic(true);
         $container->register('stock_sync.nightly_check', \stdClass::class)

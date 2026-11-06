@@ -47,5 +47,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('env(THELIA_SCHEDULE_MAINTENANCE_PURGE)', '30 3 * * *')
         ->set('env(THELIA_SCHEDULE_FAILED_JOBS_PURGE)', '0 4 * * *')
         ->set('env(THELIA_SCHEDULE_CURRENCY_RATES)', '')
-        ->set('env(THELIA_SCHEDULE_CONTENT_PUBLICATION)', '* * * * *');
+        ->set('env(THELIA_SCHEDULE_CONTENT_PUBLICATION)', '* * * * *')
+        ->set('env(THELIA_SCHEDULE_REPORT_MAILS)', '*/15 * * * *');
 };

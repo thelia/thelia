@@ -21,6 +21,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
@@ -612,7 +613,7 @@ class MailerFactory
      * body stored in the database. The back office previews a message with it, so that
      * what it shows is what would be sent. Its template definition is the caller's to set.
      *
-     * @throws \Exception when no parser claims the template file
+     * @throws \Exception when no parser claims the template file and the message has no body of its own
      */
     public function parserFor(Message $message): ParserInterface
     {
@@ -627,9 +628,20 @@ class MailerFactory
             return $this->parserResolver->getDefaultParser();
         }
 
-        return $this->parserResolver->getParser(
-            $this->templateHelper->getActiveMailTemplate()->getAbsolutePath(),
-            pathinfo($templateFileName, \PATHINFO_FILENAME),
-        );
+        try {
+            return $this->parserResolver->getParser(
+                $this->templateHelper->getActiveMailTemplate()->getAbsolutePath(),
+                pathinfo($templateFileName, \PATHINFO_FILENAME),
+            );
+        } catch (ResourceNotFoundException $noParserClaimsTheFile) {
+            // The mail theme in use may be older than the message (a shop updated before its
+            // theme): a message that carries a body of its own is then rendered from it, as
+            // Message::buildMessage() does for a template file it cannot load.
+            if ('' !== trim((string) $message->getHtmlMessage()) || '' !== trim((string) $message->getTextMessage())) {
+                return $this->parserResolver->getDefaultParser();
+            }
+
+            throw $noParserClaimsTheFile;
+        }
     }
 }
