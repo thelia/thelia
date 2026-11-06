@@ -16,6 +16,7 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\SharedCache\SharedCacheKeyCollector;
 use Thelia\Core\SharedCache\SharedCacheMode;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Domain\Catalog\Bundle\BundleDiscountType;
@@ -60,6 +61,7 @@ final class ProductBundleSharedCacheTest extends WebIntegrationTestCase
         ConfigQuery::write(SharedCacheMode::CONFIG_KEY, SharedCacheMode::ENABLED->value);
 
         $plain = $this->anonymousVisit(self::PLAIN_URL);
+        $this->skipIfTheThemeReadsWhatTheListDoesNotAllow($plain['cacheControl']);
         $bundle = $this->anonymousVisit(self::BUNDLE_URL);
 
         self::assertSame([], $plain['cookies'], 'the reference sheet starts no session');
@@ -107,6 +109,17 @@ final class ProductBundleSharedCacheTest extends WebIntegrationTestCase
             'cacheControl' => (string) $response->headers->get('Cache-Control'),
             'keys' => explode(' ', (string) $response->headers->get('xkey')),
         ];
+    }
+
+    /**
+     * A theme or a module that reads a resource the list of visitor independent ones does not name keeps every
+     * page personal, the reference sheet included: there is then no shared sheet to compare the bundle with.
+     */
+    private function skipIfTheThemeReadsWhatTheListDoesNotAllow(string $cacheControl): void
+    {
+        if (!\in_array('public', $this->directives($cacheControl), true) && !$this->getService(SharedCacheKeyCollector::class)->isComplete()) {
+            self::markTestSkipped('The installed theme or a module reads a resource that is not on the shared cache list.');
+        }
     }
 
     /**
