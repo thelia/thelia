@@ -44,6 +44,7 @@ use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\BundleSettingsConstraint;
 use Thelia\Api\Bridge\Propel\Validator\I18nConstraint;
+use Thelia\Api\State\Processor\ProductStockProcessor;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductQuery;
@@ -64,10 +65,12 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         new Put(
             uriTemplate: '/admin/products/{id}',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            processor: ProductStockProcessor::class,
         ),
         new Patch(
             uriTemplate: '/admin/products/{id}',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_WRITE, self::GROUP_ADMIN_WRITE_UPDATE]],
+            processor: ProductStockProcessor::class,
         ),
         new Delete(
             uriTemplate: '/admin/products/{id}',
