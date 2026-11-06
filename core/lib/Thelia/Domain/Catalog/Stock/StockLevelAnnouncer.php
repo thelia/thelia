@@ -38,8 +38,9 @@ use Thelia\Model\ProductSaleElementsQuery;
  * will be committed, and is not dropped either: it waits, and goes out when the transaction is over
  * (the end of the request, of the command, of the message, handled or failed), from the stock
  * before the change to the stock read back then. A stock that reads back what it read before was
- * rolled back, or moved back since, and is never told. A failing listener is logged; the stock
- * stays changed.
+ * rolled back, or moved back since, and is never told. A change of the same sale element told
+ * after that transaction, before the end, takes the waiting one over: one change, from the stock
+ * before the first. A failing listener is logged; the stock stays changed.
  */
 final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterface
 {
@@ -77,6 +78,15 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
             }
 
             return;
+        }
+
+        // A sale element whose change still waits for a committed transaction: told once, from the
+        // stock before the change that waited, never the two apart.
+        foreach ($changes as $index => $change) {
+            if (isset($this->waiting[$change->productSaleElementsId])) {
+                $changes[$index] = new StockLevelChange($change->productSaleElementsId, $this->waiting[$change->productSaleElementsId], $change->newQuantity);
+                unset($this->waiting[$change->productSaleElementsId]);
+            }
         }
 
         self::tell($this->dispatcher, $changes);
