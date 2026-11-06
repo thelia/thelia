@@ -300,6 +300,13 @@ final class TheliaEvents
      */
     public const CART_LINES_REMOVED = 'cart.lines.removed';
 
+    /**
+     * Sent (CartEvent) by a module whose discount lines changed while the cart did not (the buyer
+     * chose to spend a balance): the discount of the session cart is priced again with the lines
+     * of the modules and the promotions ({@see \Thelia\Domain\Cart\Discount\CartDiscountLineProviderInterface}).
+     */
+    public const CART_DISCOUNT_LINES_CHANGED = 'cart.discount_lines.changed';
+
     /** sent when a new item is added to current cart. */
     public const AFTER_CARTADDITEM = 'cart.after.addItem';
 
@@ -361,6 +368,14 @@ final class TheliaEvents
      */
     public const ORDER_PAYMENT_PART_SETTLE = 'action.order.paymentPart.settle';
     public const ORDER_PAYMENT_PART_RELEASE = 'action.order.paymentPart.release';
+
+    /**
+     * Sent (OrderDiscountLineEvent) for each discount line of a module written on an order
+     * being placed, inside the transaction of the order and before its commit. The module whose
+     * key the line carries charges the amount with the connection of the event; throwing rolls
+     * the whole order back. The order has no ref yet.
+     */
+    public const ORDER_DISCOUNT_LINE_RECORD = 'action.order.discountLine.record';
 
     /**
      * Shipments: a parcel, or a set of parcels leaving together, carrying part or all

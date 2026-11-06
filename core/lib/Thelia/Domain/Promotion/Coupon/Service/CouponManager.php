@@ -76,15 +76,24 @@ class CouponManager implements ResetInterface
      *
      * @return float checkout discount
      */
-    public function getDiscount(): float
+    /**
+     * The discount of the cart: what the kept promotions take off, plus what the modules take off
+     * under their own name, never more than what the cart holds.
+     *
+     * @param float $discountLinesTotal what the discount lines of the modules take off, tax included
+     *                                  ({@see \Thelia\Domain\Cart\Discount\CartDiscountLines})
+     */
+    public function getDiscount(float $discountLinesTotal = 0.0): float
     {
-        $discount = 0.00;
+        $discount = max(0.0, $discountLinesTotal);
 
         $coupons = $this->getCurrentCoupons();
 
         if ([] !== $coupons) {
-            $discount = $this->getEffect($this->getSelection()->kept);
+            $discount += $this->getEffect($this->getSelection()->kept);
+        }
 
+        if ($discount > 0.0) {
             // Just In Case test. The facade total leaves the offered lines out (they
             // must not feed the conditions), but they ARE payable lines the discount
             // offsets: the cap is the taxed total of everything the cart holds.
@@ -131,13 +140,13 @@ class CouponManager implements ResetInterface
      * that keep their gifts in it (free product). They count for nothing here, so the caller
      * only uses this for a cart no session stands behind.
      */
-    public function discountOfCartWithoutSession(Cart $cart, ?Customer $buyer): float
+    public function discountOfCartWithoutSession(Cart $cart, ?Customer $buyer, float $discountLinesTotal = 0.0): float
     {
-        return CartDiscountScope::within($cart, $buyer, function (): float {
+        return CartDiscountScope::within($cart, $buyer, function () use ($discountLinesTotal): float {
             $this->invalidateCurrentCoupons();
 
             try {
-                return $this->getDiscount();
+                return $this->getDiscount($discountLinesTotal);
             } finally {
                 // Built for this cart: not for the next one this request asks about.
                 $this->invalidateCurrentCoupons();

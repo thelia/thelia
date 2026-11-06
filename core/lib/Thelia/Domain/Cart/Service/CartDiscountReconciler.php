@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Domain\Cart\Discount\CartDiscountLines;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
@@ -49,6 +50,7 @@ final readonly class CartDiscountReconciler
         private PostageHandler $postageHandler,
         private RequestStack $requestStack,
         private EventDispatcherInterface $dispatcher,
+        private CartDiscountLines $cartDiscountLines,
     ) {
     }
 
@@ -63,7 +65,7 @@ final readonly class CartDiscountReconciler
             return true;
         }
 
-        return abs((float) $cart->getDiscount() - $this->couponManager->discountOfCartWithoutSession($cart, $buyer)) < 0.005;
+        return abs((float) $cart->getDiscount() - $this->discountOfCartWithoutSession($cart, $buyer)) < 0.005;
     }
 
     /**
@@ -78,7 +80,7 @@ final readonly class CartDiscountReconciler
             $this->dispatcher->dispatch(new CartEvent($cart), TheliaEvents::CART_LINES_REPRICED);
         } elseif ($discountIsThePromotionsOwn && $this->aPromotionAppliesOnItsOwn()) {
             $cart
-                ->setDiscount((string) $this->couponManager->discountOfCartWithoutSession($cart, $buyer))
+                ->setDiscount((string) $this->discountOfCartWithoutSession($cart, $buyer))
                 ->save();
         }
 
@@ -109,8 +111,22 @@ final readonly class CartDiscountReconciler
         return (int) $request->getSession()->get(Session::SESSION_CART_ID_NAME) === (int) $cart->getId();
     }
 
+    /**
+     * The discount lines of the modules are read from the cart: they apply with no session, as the
+     * automatic promotions do.
+     */
     private function aPromotionAppliesOnItsOwn(): bool
     {
-        return CouponQuery::create()->filterByTriggerMode(Coupon::TRIGGER_MODE_AUTOMATIC)->count() > 0;
+        return $this->cartDiscountLines->haveProviders()
+            || CouponQuery::create()->filterByTriggerMode(Coupon::TRIGGER_MODE_AUTOMATIC)->count() > 0;
+    }
+
+    private function discountOfCartWithoutSession(Cart $cart, ?Customer $buyer): float
+    {
+        return $this->couponManager->discountOfCartWithoutSession(
+            $cart,
+            $buyer,
+            CartDiscountLines::total($this->cartDiscountLines->of($cart)),
+        );
     }
 }

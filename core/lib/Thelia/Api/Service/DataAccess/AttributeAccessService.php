@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Cart\Discount\CartDiscountLines;
 use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleLineContents;
 use Thelia\Domain\Order\Service\BundleOrderPlanner;
@@ -83,6 +84,7 @@ class AttributeAccessService
         private readonly VatExemptionResolver $vatExemptionResolver,
         private readonly BundleOrderPlanner $bundleOrderPlanner,
         private readonly BundleCatalogState $bundleCatalogState,
+        private readonly CartDiscountLines $cartDiscountLines,
     ) {
     }
 
@@ -388,20 +390,22 @@ class AttributeAccessService
     }
 
     /**
-     * What each kept promotion takes off the cart, so the front can name the
-     * promotions instead of showing one anonymous total.
+     * What each kept promotion and each discount line of a module takes off the cart, so the
+     * front can name them instead of showing one anonymous total.
      *
      * The stored `cart.discount` is the authoritative figure — it was capped and
-     * rounded when the evaluation wrote it — so what the promotions price now is
-     * prorated onto it: the listed taxed_amount add up EXACTLY to
-     * attr('cart', 'taxed_discount'), the rounding remainder on the last line,
-     * and the amounts to attr('cart', 'discount') the same way. A stored
-     * discount of zero has nothing to distribute: the list is empty.
+     * rounded when the evaluation wrote it. The lines of the modules are served
+     * first, each up to its amount, the way the order freezes them; what the
+     * promotions price now is prorated onto what is left. The listed taxed_amount
+     * add up EXACTLY to attr('cart', 'taxed_discount'), the rounding remainder on
+     * the last line, and the amounts to attr('cart', 'discount') the same way. A
+     * stored discount of zero has nothing to distribute: the list is empty.
      *
      * The amounts come from the coupons the evaluation retained, which
      * CouponManager memoises for the request: reading this attribute never
      * rebuilds them. A promotion discounting nothing — free shipping, an offer
-     * whose gift is out of stock — is left out: it has no line to show.
+     * whose gift is out of stock — is left out: it has no line to show. The
+     * promotions are listed first, then the lines of the modules.
      *
      * @return list<array{label: string, amount: float, taxed_amount: float}>
      */
@@ -413,40 +417,56 @@ class AttributeAccessService
             return [];
         }
 
-        $couponsKept = $this->couponManager->getCouponsKept();
-
-        if ([] === $couponsKept) {
-            return [];
-        }
-
-        $titles = $this->couponTitles($couponsKept);
+        $moduleLines = $this->cartDiscountLines->of($cart);
+        $moduleTaxedAmounts = CartDiscountLines::serve($moduleLines, $storedTaxedDiscount);
+        $leftForPromotions = round($storedTaxedDiscount - array_sum($moduleTaxedAmounts), 2);
 
         $labels = [];
         $rawAmounts = [];
+        $couponsKept = $this->couponManager->getCouponsKept();
 
-        /** @var CouponInterface $coupon */
-        foreach ($couponsKept as $coupon) {
-            $rawAmount = round($coupon->exec(), 2);
+        if ([] !== $couponsKept) {
+            $titles = $this->couponTitles($couponsKept);
 
-            if ($rawAmount <= 0.0) {
+            /** @var CouponInterface $coupon */
+            foreach ($couponsKept as $coupon) {
+                $rawAmount = round($coupon->exec(), 2);
+
+                if ($rawAmount <= 0.0) {
+                    continue;
+                }
+
+                $labels[] = $this->couponLabel($coupon, $titles);
+                $rawAmounts[] = $rawAmount;
+            }
+        }
+
+        $taxedAmounts = DiscountProration::prorate($rawAmounts, $leftForPromotions);
+
+        foreach ($moduleLines as $index => $moduleLine) {
+            if ($moduleTaxedAmounts[$index] <= 0.0) {
                 continue;
             }
 
-            $labels[] = $this->couponLabel($coupon, $titles);
-            $rawAmounts[] = $rawAmount;
+            $labels[] = $moduleLine->label;
+            $taxedAmounts[] = $moduleTaxedAmounts[$index];
         }
-
-        $taxedAmounts = DiscountProration::prorate($rawAmounts, $storedTaxedDiscount);
 
         if ([] === $taxedAmounts) {
             return [];
         }
+
+        // The listed amounts add up to the stored discount but for a share nothing can
+        // name (a discount the modules and the promotions no longer explain): the untaxed
+        // amounts follow the listed ones only.
+        $listedTaxed = round(array_sum($taxedAmounts), 2);
 
         // The pair the cart exposes gives the factor to untax a share of the
         // discount; the last line takes the untaxed rounding remainder too, and
         // as with the taxed shares no line takes more than what is left.
         $untaxedDiscount = round($cart->getCalculatedDiscount(false, $taxCountry, $taxState), 2);
         $untaxFactor = $untaxedDiscount / $storedTaxedDiscount;
+        $listedUntaxed = abs($listedTaxed - $storedTaxedDiscount) < 0.005 ? $untaxedDiscount : round($listedTaxed * $untaxFactor, 2);
 
         $discounts = [];
         $allocatedUntaxed = 0.0;
@@ -454,8 +474,8 @@ class AttributeAccessService
 
         foreach ($taxedAmounts as $index => $taxedAmount) {
             $amount = $index === $lastIndex
-                ? round($untaxedDiscount - $allocatedUntaxed, 2)
-                : min(round($taxedAmount * $untaxFactor, 2), round($untaxedDiscount - $allocatedUntaxed, 2));
+                ? round($listedUntaxed - $allocatedUntaxed, 2)
+                : min(round($taxedAmount * $untaxFactor, 2), round($listedUntaxed - $allocatedUntaxed, 2));
 
             $allocatedUntaxed = round($allocatedUntaxed + $amount, 2);
 
