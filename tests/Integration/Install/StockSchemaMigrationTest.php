@@ -39,7 +39,7 @@ final class StockSchemaMigrationTest extends IntegrationTestCase
 
     private const NEW_COLUMNS = [
         'product_sale_elements' => ['out_of_stock_policy', 'preorder_limit', 'restock_date', 'low_stock_threshold'],
-        'cart_item' => ['reserved_until'],
+        'cart_item' => ['reserved_until', 'reserved_quantity'],
         'order_product' => ['is_preorder', 'restock_date'],
     ];
 
@@ -107,6 +107,25 @@ final class StockSchemaMigrationTest extends IntegrationTestCase
             // Whatever happened, the composition of the bundle lines is back.
             $this->runBlock(self::BUNDLE_BLOCK_TITLE);
         }
+    }
+
+    /**
+     * A development database that already has the date of the reservation but not the quantity the
+     * listeners were told: the block adds the quantity right after the date, as a fresh install has it.
+     */
+    public function testAShopThatHasTheReservationDateButNotTheQuantityGetsItRightAfterTheDate(): void
+    {
+        $this->runBlock(self::SCHEMA_BLOCK_TITLE);
+        $this->connection()->exec('ALTER TABLE `cart_item` DROP COLUMN `reserved_quantity`');
+        self::assertSame([], $this->column("SHOW COLUMNS FROM `cart_item` LIKE 'reserved_quantity'"));
+
+        $this->runBlock(self::SCHEMA_BLOCK_TITLE);
+
+        self::assertSame($this->freshInstallShape, $this->shape());
+        self::assertSame(
+            ['reserved_until', 'reserved_quantity'],
+            \array_slice($this->column("SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' ORDER BY `ORDINAL_POSITION`"), -4, 2),
+        );
     }
 
     public function testTheSeedBlockSeedsEachSettingAndMessageOnceWhateverTheReplays(): void

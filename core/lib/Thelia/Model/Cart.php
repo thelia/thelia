@@ -27,6 +27,7 @@ use Thelia\Domain\Catalog\Bundle\BundleCatalogState;
 use Thelia\Domain\Catalog\Bundle\BundleLineContents;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
 use Thelia\Domain\Taxation\TaxEngine\ExemptTaxCalculator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorInterface;
@@ -100,12 +101,15 @@ class Cart extends BaseCart
         ?SaleUnitStockResolver $saleUnitStockResolver = null,
         ?CartLineAvailability $cartLineAvailability = null,
         ?CartLinePricer $linePricer = null,
+        ?StockReservationService $stockReservation = null,
     ): self|bool {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             return false;
         }
 
         $cartItems = $this->getCartItems();
+        // The lines this cart holds are told as released once it is deleted, the copy holding its own.
+        $heldLines = $stockReservation?->heldLinesOf((int) $this->getId()) ?? [];
 
         $cart = new self();
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
@@ -187,6 +191,8 @@ class Cart extends BaseCart
         } catch (\Exception) {
             // just fail silently in some cases
         }
+
+        $stockReservation?->announceReleased((int) $this->getId(), $heldLines);
 
         return $cart;
     }

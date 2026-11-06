@@ -16,7 +16,9 @@ namespace Thelia\Domain\Catalog\Stock;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Thelia\Core\Event\ProductSaleElement\StockReservationLine;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationConflictException;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationRefusedException;
 use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Log\Tlog;
@@ -40,6 +42,24 @@ use Thelia\Model\Map\CartItemTableMap;
  * buyers into a deadlock. A caller that writes the cart in a transaction holds after its commit.
  *
  * A shop that does not reserve, or does not check its stock, holds nothing and reads nothing.
+ *
+ * A hold that takes a line not told as held yet spends one of the budgets of the cart and of the
+ * address it comes from (StockReservationLimiter), before it writes anything; a hold that only
+ * pushes back the date of lines already told as held, or changes their quantity, spends nothing.
+ * Over the budgets, the lines already held still go on with their date and their quantity, the new
+ * ones are left out: the checkout is then refused with the delay to wait, and a change of the cart
+ * leaves its new line unheld, in silence, as a line the stock does not cover.
+ *
+ * What a hold or a release changes is told to the listeners once committed
+ * (StockReservationAnnouncer): the lines that were not held and are (reserved), the lines that
+ * were held and are not (released), a line whose quantity changed while held (released with the
+ * quantity it was told with, then reserved with the new one). A line is told as held from its
+ * first hold until it is released, whether or not its date ran out meanwhile: the date only says
+ * when the stock goes back on sale, and the purge, a removal or an order is what releases the
+ * line. A hold that takes back a line whose date ran out only pushes the date. The quantity a
+ * line was told with is kept on the line (`reserved_quantity`, written with `reserved_until`,
+ * emptied with it): whoever changed the quantity of the line since, with or without a hold, the
+ * release tells the quantity of the reservation.
  */
 final readonly class StockReservationService
 {
@@ -48,6 +68,9 @@ final readonly class StockReservationService
         private DatabaseReservedQuantity $reservedQuantity,
         private StockRowLocker $stockRowLocker,
         private CallerTransactionInterface $callerTransaction,
+        private StockReservationLimiter $limiter,
+        private StockReservationAnnouncer $announcer,
+        private HeldCartLineReader $heldLines,
     ) {
     }
 
@@ -60,9 +83,10 @@ final readonly class StockReservationService
     /**
      * At a step of the checkout: every line is held, or none is and the step is refused.
      *
-     * @throws StockReservationRefusedException  a line asks more than what the other carts leave
-     * @throws StockReservationConflictException the database broke a tie with another cart
-     * @throws \LogicException                   called inside a transaction of the caller
+     * @throws StockReservationRefusedException     a line asks more than what the other carts leave
+     * @throws StockReservationConflictException    the database broke a tie with another cart
+     * @throws StockReservationRateLimitedException the cart, or its address, holds more often than a buyer does
+     * @throws \LogicException                      called inside a transaction of the caller
      */
     public function holdForCheckout(Cart $cart): void
     {
@@ -138,16 +162,61 @@ final readonly class StockReservationService
             return;
         }
 
-        $statement = $connection->prepare('SELECT `id` FROM `cart_item` WHERE `cart_id` = :cartId AND `reserved_until` IS NOT NULL');
-        $statement->bindValue(':cartId', $cartId, \PDO::PARAM_INT);
-        $statement->execute();
+        // Locked by primary key, after the stock rows of the caller, and read under the lock: a
+        // purge that cleared a line since the view of the caller was frozen has told it already.
+        $held = $this->heldLines->lockedOfCart($cartId, $connection);
 
-        $this->writeReservedUntil(array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN)), null, $connection);
+        $this->writeReleased(array_map(static fn (StockReservationLine $line): int => $line->cartItemId, $held), $connection);
+
+        // Told once the transaction of the caller is over, if the lines read back unheld then.
+        $this->announcer->released($cartId, $held);
+    }
+
+    /**
+     * The lines of a cart that hold stock now, read before a write that removes them (a line
+     * deleted, a cart emptied or purged), to be told with announceReleased() once it is written.
+     * Nothing when the shop does not reserve.
+     *
+     * @return list<StockReservationLine>
+     */
+    public function heldLinesOf(int $cartId, ?int $cartItemId = null): array
+    {
+        if (!$this->isActive() || $cartId <= 0) {
+            return [];
+        }
+
+        return $this->heldLines->ofCart($cartId, $cartItemId);
+    }
+
+    /**
+     * @param list<int> $cartIds
+     *
+     * @return array<int, list<StockReservationLine>> by cart id; a cart that holds nothing is absent
+     */
+    public function heldLinesOfCarts(array $cartIds): array
+    {
+        if (!$this->isActive() || [] === $cartIds) {
+            return [];
+        }
+
+        return $this->heldLines->ofCarts($cartIds);
+    }
+
+    /**
+     * Lines read by heldLinesOf() before they were removed: told as released, or once the
+     * transaction the removal is part of is over, when they read back unheld.
+     *
+     * @param list<StockReservationLine> $lines
+     */
+    public function announceReleased(int $cartId, array $lines): void
+    {
+        $this->announcer->released($cartId, $lines);
     }
 
     /**
      * @throws StockReservationRefusedException
      * @throws StockReservationConflictException
+     * @throws StockReservationRateLimitedException
      */
     private function hold(Cart $cart, bool $strict): void
     {
@@ -168,7 +237,9 @@ final readonly class StockReservationService
         }
 
         // Read before the transaction, with no lock: what to lock follows from it, and a plain
-        // read inside the transaction before the locks would freeze its view too early.
+        // read inside the transaction before the locks would freeze its view too early. It only
+        // chooses what to lock and whether to spend a token; the transaction decides on the lines
+        // it has locked (their quantity, whether they are told as held).
         $lines = $this->linesOf($cartId, $connection);
 
         if (!$strict && StockReservationScope::Checkout === $this->stockSettings->reservationScope() && !\in_array(true, array_column($lines, 'held'), true)) {
@@ -181,6 +252,111 @@ final readonly class StockReservationService
             return;
         }
 
+        // Only a line not told as held yet costs a hold: pushing back the date of the others, or
+        // changing their quantity, is free. The budget is spent here, before anything is written,
+        // not once the hold is over: requests in parallel would all find it unspent.
+        $secondsToWait = null;
+
+        if (\in_array(false, array_column($lines, 'told'), true)) {
+            if ($strict) {
+                // A line that cannot be held costs no token: the checkout refuses it, by name,
+                // whatever the budget says (the transaction below judges it again, under the locks).
+                $this->refuseTheFirstUncoveredLine($cart, $lines, $connection);
+            }
+
+            $secondsToWait = $this->limiter->spend($cartId);
+
+            if (null !== $secondsToWait) {
+                // The lines already held go on; the new ones stay in the cart, unheld.
+                $lines = array_values(array_filter($lines, static fn (array $line): bool => $line['told']));
+            }
+        }
+
+        // A line a purge cleared between the read above and the locks is told as new by the
+        // transaction without a token (a window of a few milliseconds, accepted); over the budget,
+        // it is left out instead.
+        if ([] !== $lines) {
+            $this->holdInTransaction($cart, $lines, $strict, null === $secondsToWait, $connection);
+        }
+
+        if (null === $secondsToWait) {
+            return;
+        }
+
+        if ($strict) {
+            throw new StockReservationRateLimitedException($secondsToWait);
+        }
+
+        // The line stays in the cart, unheld: the checkout holds it, or refuses it, later.
+        Tlog::getInstance()->warning('The stock of cart '.$cartId.' was not held: the cart, or its address, held too often.');
+    }
+
+    /**
+     * Judges every line against the stock, with no lock: the same coverage as the transaction (a
+     * strict hold refuses any line the stock does not cover, a line told as held whose date ran out
+     * included), read once before the budget is spent.
+     *
+     * @param list<array{id: int, productSaleElementsId: int, quantity: float, bundle: bool, virtual: bool, reference: string, held: bool, told: bool}> $lines
+     *
+     * @throws StockReservationRefusedException
+     */
+    private function refuseTheFirstUncoveredLine(Cart $cart, array $lines, ConnectionInterface $connection): void
+    {
+        $cartId = (int) $cart->getId();
+        $productSaleElementsIds = array_values(array_unique(array_column($lines, 'productSaleElementsId')));
+        $saleUnitId = null === $cart->getSaleUnitId() ? null : (int) $cart->getSaleUnitId();
+        $stock = $this->stockOf($productSaleElementsIds, $saleUnitId, $connection);
+        $reserved = $this->reservedQuantity->reservedByOtherCartsOf($productSaleElementsIds, $saleUnitId, $cartId, $connection);
+        $asked = $this->askedBySaleElement($lines);
+
+        foreach ($lines as $line) {
+            if (!self::isCovered($line['productSaleElementsId'], $asked, $stock, $reserved)) {
+                throw new StockReservationRefusedException($line['reference']);
+            }
+        }
+    }
+
+    /**
+     * @param list<array{id: int, productSaleElementsId: int, quantity: float, bundle: bool, virtual: bool, reference: string, held: bool, told: bool}> $lines
+     *
+     * @return array<int, float> the quantity asked by all the lines, by sale element id
+     */
+    private function askedBySaleElement(array $lines): array
+    {
+        $asked = [];
+
+        foreach ($lines as $line) {
+            $asked[$line['productSaleElementsId']] = ($asked[$line['productSaleElementsId']] ?? 0.0) + $line['quantity'];
+        }
+
+        return $asked;
+    }
+
+    /**
+     * @param array<int, float>                                           $asked
+     * @param array<int, array{0: float, 1: OutOfStockPolicy, 2: ?float}> $stock
+     * @param array<int, float>                                           $reserved
+     */
+    private static function isCovered(int $productSaleElementsId, array $asked, array $stock, array $reserved): bool
+    {
+        $ceiling = isset($stock[$productSaleElementsId])
+            ? SellableStock::ceilingOf(...$stock[$productSaleElementsId])
+            : 0.0;
+
+        return null === $ceiling
+            || round($asked[$productSaleElementsId], 6) <= round($ceiling - ($reserved[$productSaleElementsId] ?? 0.0), 6);
+    }
+
+    /**
+     * @param list<array{id: int, productSaleElementsId: int, quantity: float, bundle: bool, virtual: bool, reference: string, held: bool, told: bool}> $lines
+     * @param bool                                                                                                                                      $mayStartLines false when the budget is spent: a line found not told as held under the locks is left out
+     *
+     * @throws StockReservationRefusedException
+     * @throws StockReservationConflictException
+     */
+    private function holdInTransaction(Cart $cart, array $lines, bool $strict, bool $mayStartLines, ConnectionInterface $connection): void
+    {
+        $cartId = (int) $cart->getId();
         $productSaleElementsIds = array_values(array_unique(array_column($lines, 'productSaleElementsId')));
         $saleUnitId = null === $cart->getSaleUnitId() ? null : (int) $cart->getSaleUnitId();
 
@@ -189,29 +365,53 @@ final readonly class StockReservationService
         try {
             $this->stockRowLocker->lock($productSaleElementsIds, $connection);
 
+            // Every lock first (the stock rows, then all the lines by ascending id), then the reads:
+            // two holds of the same cart follow one another, and the second sees what the first
+            // wrote; a purge of the same lines waits for this commit or has finished before it.
+            // The quantity and what each line was told with are those of the locked rows.
+            $locked = $this->heldLines->lockedLines(array_column($lines, 'id'), $connection);
+            $announcedBefore = [];
+            $current = [];
+
+            foreach ($lines as $line) {
+                $row = $locked[$line['id']] ?? null;
+
+                // Deleted since the read, emptied, or not told as held with the budget spent: not held now.
+                if (null === $row || $row['quantity'] <= 0 || (!$mayStartLines && null === $row['announced'])) {
+                    continue;
+                }
+
+                $announcedBefore[$line['id']] = $row['announced'];
+                $current[] = [...$line, 'quantity' => $row['quantity']];
+            }
+
+            $lines = $current;
             $stock = $this->stockOf($productSaleElementsIds, $saleUnitId, $connection);
             $reserved = $this->reservedQuantity->reservedByOtherCartsOf($productSaleElementsIds, $saleUnitId, $cartId, $connection);
 
-            /** @var array<int, float> $asked */
-            $asked = [];
+            $asked = $this->askedBySaleElement($lines);
 
-            foreach ($lines as $line) {
-                $asked[$line['productSaleElementsId']] = ($asked[$line['productSaleElementsId']] ?? 0.0) + $line['quantity'];
-            }
-
+            /** @var array<int, float> $held the quantity of each line the hold covers, by line id */
             $held = [];
             $released = [];
+            $started = [];
+            $stopped = [];
 
             foreach ($lines as $line) {
                 $productSaleElementsId = $line['productSaleElementsId'];
-                $ceiling = isset($stock[$productSaleElementsId])
-                    ? SellableStock::ceilingOf(...$stock[$productSaleElementsId])
-                    : 0.0;
-                $covered = null === $ceiling
-                    || round($asked[$productSaleElementsId], 6) <= round($ceiling - ($reserved[$productSaleElementsId] ?? 0.0), 6);
+                $covered = self::isCovered($productSaleElementsId, $asked, $stock, $reserved);
+                $toldQuantity = $announcedBefore[$line['id']];
 
                 if ($covered) {
-                    $held[] = $line['id'];
+                    $held[$line['id']] = $line['quantity'];
+
+                    if (null === $toldQuantity) {
+                        $started[] = new StockReservationLine($line['id'], $productSaleElementsId, $line['quantity']);
+                    } elseif ($toldQuantity !== $line['quantity']) {
+                        // Held already, with another quantity than the one it was told with.
+                        $stopped[] = new StockReservationLine($line['id'], $productSaleElementsId, $toldQuantity);
+                        $started[] = new StockReservationLine($line['id'], $productSaleElementsId, $line['quantity']);
+                    }
 
                     continue;
                 }
@@ -221,10 +421,14 @@ final readonly class StockReservationService
                 }
 
                 $released[] = $line['id'];
+
+                if (null !== $toldQuantity) {
+                    $stopped[] = new StockReservationLine($line['id'], $productSaleElementsId, $toldQuantity);
+                }
             }
 
-            $this->writeReservedUntil($held, $this->stockSettings->reservationDurationMinutes(), $connection);
-            $this->writeReservedUntil($released, null, $connection);
+            $this->writeReservation($held, $this->stockSettings->reservationDurationMinutes(), $connection);
+            $this->writeReleased($released, $connection);
 
             $connection->commit();
         } catch (\Throwable $throwable) {
@@ -236,18 +440,23 @@ final readonly class StockReservationService
 
             throw $throwable;
         }
+
+        // After the commit, outside the try: a listener cannot turn a hold into a conflict.
+        $this->announcer->releasedNow($cartId, $stopped);
+        $this->announcer->reserved($cartId, $started);
     }
 
     /**
-     * The lines of the cart, as stored.
+     * The lines of the cart, as stored: `held` when their date is still ahead (they hold stock now),
+     * `told` when they have a date at all (they were told as held and not released since).
      *
-     * @return list<array{id: int, productSaleElementsId: int, quantity: float, bundle: bool, virtual: bool, reference: string, held: bool}>
+     * @return list<array{id: int, productSaleElementsId: int, quantity: float, bundle: bool, virtual: bool, reference: string, held: bool, told: bool}>
      */
     private function linesOf(int $cartId, ConnectionInterface $connection): array
     {
         $statement = $connection->prepare(
             'SELECT `cart_item`.`id`, `cart_item`.`product_sale_elements_id`, `cart_item`.`quantity`, `cart_item`.`bundle_composition` IS NOT NULL, '
-            .'`product`.`virtual`, `product`.`ref`, COALESCE(`cart_item`.`reserved_until` > NOW(), 0) '
+            .'`product`.`virtual`, `product`.`ref`, COALESCE(`cart_item`.`reserved_until` > NOW(), 0), `cart_item`.`reserved_until` IS NOT NULL '
             .'FROM `cart_item` INNER JOIN `product` ON `product`.`id` = `cart_item`.`product_id` '
             .'WHERE `cart_item`.`cart_id` = :cartId ORDER BY `cart_item`.`id`',
         );
@@ -256,7 +465,7 @@ final readonly class StockReservationService
 
         $lines = [];
 
-        foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $productSaleElementsId, $quantity, $bundle, $virtual, $reference, $held]) {
+        foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $productSaleElementsId, $quantity, $bundle, $virtual, $reference, $held, $told]) {
             $lines[] = [
                 'id' => (int) $id,
                 'productSaleElementsId' => (int) $productSaleElementsId,
@@ -265,6 +474,7 @@ final readonly class StockReservationService
                 'virtual' => 1 === (int) $virtual,
                 'reference' => (string) $reference,
                 'held' => 1 === (int) $held,
+                'told' => 1 === (int) $told,
             ];
         }
 
@@ -304,25 +514,36 @@ final readonly class StockReservationService
     }
 
     /**
-     * @param list<int> $cartItemIds
-     * @param int|null  $minutes     from now on, or null to hold nothing any more
+     * The lines the hold covers: their date pushed back and the quantity they are told with.
+     *
+     * @param array<int, float> $quantityByCartItemId
+     * @param int               $minutes              from now on
      */
-    private function writeReservedUntil(array $cartItemIds, ?int $minutes, ConnectionInterface $connection): void
+    private function writeReservation(array $quantityByCartItemId, int $minutes, ConnectionInterface $connection): void
+    {
+        $idsByQuantity = [];
+
+        foreach ($quantityByCartItemId as $cartItemId => $quantity) {
+            $idsByQuantity[(string) $quantity][] = $cartItemId;
+        }
+
+        foreach ($idsByQuantity as $quantity => $cartItemIds) {
+            $statement = $connection->prepare('UPDATE `cart_item` SET `reserved_until` = NOW() + INTERVAL :minutes MINUTE, `reserved_quantity` = :quantity WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')');
+            $statement->bindValue(':minutes', $minutes, \PDO::PARAM_INT);
+            $statement->bindValue(':quantity', (string) $quantity);
+            $statement->execute();
+        }
+    }
+
+    /**
+     * @param list<int> $cartItemIds
+     */
+    private function writeReleased(array $cartItemIds, ConnectionInterface $connection): void
     {
         if ([] === $cartItemIds) {
             return;
         }
 
-        $ids = implode(',', array_map('intval', $cartItemIds));
-
-        if (null === $minutes) {
-            $connection->exec("UPDATE `cart_item` SET `reserved_until` = NULL WHERE `id` IN ($ids)");
-
-            return;
-        }
-
-        $statement = $connection->prepare("UPDATE `cart_item` SET `reserved_until` = NOW() + INTERVAL :minutes MINUTE WHERE `id` IN ($ids)");
-        $statement->bindValue(':minutes', $minutes, \PDO::PARAM_INT);
-        $statement->execute();
+        $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')');
     }
 }

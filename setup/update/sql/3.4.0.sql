@@ -9,6 +9,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- existing shop behaving as before; no row is rewritten.
 -- `cart_item.reserved_until` holds the stock of a line for its cart until that
 -- moment; a past or empty value holds nothing.
+-- `cart_item.reserved_quantity` is the quantity the listeners of the reservations
+-- were told the line holds, written with `reserved_until` and emptied when the
+-- line is released; an empty value on a line that has a date reads as its quantity.
 -- `order_product.is_preorder` and `restock_date` freeze, when the order is
 -- placed, whether the line was sold above the physical stock.
 --
@@ -49,6 +52,13 @@ DEALLOCATE PREPARE add_column_statement;
 SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'reserved_until');
 SET @after_column := IF((SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'bundle_composition') > 0, 'bundle_composition', 'offered_by_coupon_id');
 SET @statement := IF(@add_column, CONCAT('ALTER TABLE `cart_item` ADD `reserved_until` DATETIME COMMENT \'the stock of the line is held for the cart until this moment; null or past: not held\' AFTER `', @after_column, '`'), 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- `reserved_until` is added just above, so it is always there to be followed.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'reserved_quantity');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `reserved_quantity` FLOAT COMMENT \'the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told\' AFTER `reserved_until`', 'DO 0');
 PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;

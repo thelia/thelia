@@ -21,6 +21,8 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\Product\ProductFacade;
+use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
+use Thelia\Domain\Catalog\Stock\StockReservationLimiter;
 use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
@@ -469,6 +471,56 @@ final class CheckoutApiTest extends ApiTestCase
             ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
             ConfigQuery::resetCache();
         }
+    }
+
+    /**
+     * A step of the checkout holds the stock: asked more often than a buyer does, it is refused
+     * with the delay to wait. Not a conflict with the stock, which would tell the caller to try
+     * again at once.
+     */
+    public function testAStepOverTheBudgetOfHoldsOfTheCartIsRefusedWithTheDelayToWait(): void
+    {
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::resetCache();
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn($this->getPropelConnection());
+
+        try {
+            $checkout = $this->readyCheckout();
+            $token = $this->authenticateAsCustomer($checkout['customer']);
+            $cartId = (int) $checkout['cart']->getId();
+            $limiter = $this->getService(StockReservationLimiter::class);
+
+            for ($hold = 1; $hold <= 60; ++$hold) {
+                self::assertNull($limiter->spend($cartId), 'Hold '.$hold.' of the cart is within its budget.');
+            }
+
+            $response = $this->jsonRequest('POST', $this->url($cartId, 'delivery_address'), ['addressId' => $checkout['address']->getId()], token: $token);
+
+            self::assertSame(429, $response->getStatusCode(), (string) $response->getContent());
+            self::assertGreaterThan(0, (int) $response->headers->get('Retry-After'));
+            self::assertLessThanOrEqual(3601, (int) $response->headers->get('Retry-After'), 'The window is an hour, its end rounded up to the second.');
+        } finally {
+            $this->getService(TestCallerTransaction::class)->reset();
+            ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
+            ConfigQuery::resetCache();
+        }
+    }
+
+    public function testAPlacementWhoseHoldIsOverTheBudgetIsRefusedWithTheDelayToWait(): void
+    {
+        $checkout = $this->readyCheckout();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+
+        $this->listen(TheliaEvents::ORDER_PAY, static function (): void {
+            throw new StockReservationRateLimitedException(120);
+        }, priority: 1024);
+
+        $response = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(429, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame('120', $response->headers->get('Retry-After'));
     }
 
     /**

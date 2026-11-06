@@ -45,6 +45,7 @@ use Thelia\Domain\Catalog\Bundle\BundleComposition;
 use Thelia\Domain\Catalog\Bundle\BundlePriceMode;
 use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\SaleUnit\Cart\CartLineChange;
@@ -103,6 +104,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?CartLineAvailability $cartLineAvailability = null,
         protected ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
         protected ?SellableStock $sellableStock = null,
+        protected ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -378,7 +380,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 return;
             }
 
+            $held = $this->stockReservation?->heldLinesOf((int) $cart->getId(), (int) $cartItem->getId()) ?? [];
+
             $cartItem->delete();
+
+            $this->stockReservation?->announceReleased((int) $cart->getId(), $held);
 
             // Force an update of the Cart object to provide
             // to other listeners an updated CartItem collection.
@@ -392,7 +398,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function clear(CartEvent $event): void
     {
         $cart = $event->getCart();
+        $cartId = (int) $cart->getId();
+        $held = $this->stockReservation?->heldLinesOf($cartId) ?? [];
+
         $cart->delete();
+
+        $this->stockReservation?->announceReleased($cartId, $held);
     }
 
     /**
@@ -909,7 +920,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
                 if ($available <= 0) {
                     $changes[] = $this->lineChange($cartItem, $quantity, 0.0, $price, $price);
+                    $held = $this->stockReservation?->heldLinesOf((int) $cart->getId(), (int) $cartItem->getId()) ?? [];
                     $cartItem->delete();
+                    $this->stockReservation?->announceReleased((int) $cart->getId(), $held);
 
                     continue;
                 }
@@ -1258,6 +1271,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             $this->saleUnitStockResolver,
             $this->cartLineAvailability,
             $this->cartLinePricer,
+            $this->stockReservation,
         );
 
         $cartEvent = new CartDuplicationEvent($newCart, $cart);

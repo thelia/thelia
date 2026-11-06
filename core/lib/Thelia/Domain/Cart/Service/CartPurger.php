@@ -16,17 +16,27 @@ namespace Thelia\Domain\Cart\Service;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Model\CartQuery;
 use Thelia\Model\OrderQuery;
 
 class CartPurger
 {
+    private const LOT = 500;
+
+    /**
+     * The lines of the purged carts that held stock are told as released (STOCK_RELEASED), by cart.
+     */
+    public function __construct(private readonly ?StockReservationService $stockReservation = null)
+    {
+    }
+
     /**
      * @throws PropelException
      */
     public function purgeCartsWithoutOrder(int $days): int
     {
-        return $this->cartsWithoutOrder($days)->delete();
+        return $this->deleteAnnouncingTheReleases($this->cartsWithoutOrder($days));
     }
 
     /**
@@ -42,7 +52,7 @@ class CartPurger
      */
     public function purgeAnonymousCarts(int $days): int
     {
-        return $this->anonymousCarts($days)->delete();
+        return $this->deleteAnnouncingTheReleases($this->anonymousCarts($days));
     }
 
     /**
@@ -51,6 +61,56 @@ class CartPurger
     public function countAnonymousCarts(int $days): int
     {
         return $this->anonymousCarts($days)->count();
+    }
+
+    /**
+     * The carts that have a line told as held are deleted first, by lots, each lot read before the
+     * delete takes its lines away and told once it is done (a line that reads back held was kept:
+     * the cart was not deleted after all); the carts that held nothing follow in one delete.
+     *
+     * @throws PropelException
+     */
+    private function deleteAnnouncingTheReleases(CartQuery $query): int
+    {
+        if (null === $this->stockReservation || !$this->stockReservation->isActive()) {
+            return $query->delete();
+        }
+
+        $deleted = 0;
+
+        while (true) {
+            // The carts of the purge with at least one line told as held: few, since only a hold
+            // that nothing released (a tunnel left open) leaves a date behind.
+            $cartIds = array_map('intval', (clone $query)
+                ->useCartItemQuery()
+                    ->filterByReservedUntil(null, Criteria::ISNOTNULL)
+                ->endUse()
+                ->select('Id')
+                ->distinct()
+                ->limit(self::LOT)
+                ->find()
+                ->toArray());
+
+            if ([] === $cartIds) {
+                break;
+            }
+
+            $held = $this->stockReservation->heldLinesOfCarts($cartIds);
+            $lot = CartQuery::create()->filterById($cartIds, Criteria::IN)->delete();
+
+            foreach ($held as $cartId => $lines) {
+                $this->stockReservation->announceReleased($cartId, $lines);
+            }
+
+            $deleted += $lot;
+
+            if (0 === $lot) {
+                // Nothing went: the same carts would come back for ever.
+                break;
+            }
+        }
+
+        return $deleted + $query->delete();
     }
 
     private function cartsWithoutOrder(int $days): CartQuery

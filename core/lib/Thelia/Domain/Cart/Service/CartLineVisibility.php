@@ -16,8 +16,10 @@ namespace Thelia\Domain\Cart\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Thelia\Core\Event\ProductSaleElement\StockReservationLine;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -53,6 +55,7 @@ final readonly class CartLineVisibility
         private ProductVisibility $productVisibility,
         private RequestStack $requestStack,
         private CartShippingRules $cartShippingRules,
+        private ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -132,11 +135,21 @@ final readonly class CartLineVisibility
         }
 
         $productIds = [];
+        $cartId = (int) $cart->getId();
+        // A line that held stock goes without a word of its own: the ones taken out are told as released.
+        $held = $this->stockReservation?->heldLinesOf($cartId) ?? [];
+        $removedIds = [];
 
         foreach ($hiddenLines as $line) {
             $productIds[(int) $line->getProductId()] = (int) $line->getProductId();
+            $removedIds[(int) $line->getId()] = true;
             $line->delete();
         }
+
+        $this->stockReservation?->announceReleased(
+            $cartId,
+            array_values(array_filter($held, static fn (StockReservationLine $heldLine): bool => isset($removedIds[$heldLine->cartItemId]))),
+        );
 
         // The collection of the cart, if it was loaded, still holds the lines: the next
         // reader gets the cart as it now stands.
