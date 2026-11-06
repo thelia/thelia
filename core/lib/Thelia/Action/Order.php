@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Action;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -46,7 +45,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang as LangModel;
-use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order as ModelOrder;
@@ -382,7 +380,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-            $this->lockOrderAndLoadItsLinesAgain($order, $con);
+            $order->lockForUpdate($con);
+            $order->clearOrderProducts();
 
             $this->updateQuantity($order, $newStatus, $dispatcher);
 
@@ -396,20 +395,6 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             throw $exception;
         }
-    }
-
-    /**
-     * An edit of the order lines holds the same row lock until it commits: the stock is then moved for the lines
-     * the order has once the edit is over, not for those this object read before.
-     */
-    private function lockOrderAndLoadItsLinesAgain(ModelOrder $order, ConnectionInterface $connection): void
-    {
-        $statement = $connection->prepare('SELECT `id` FROM `order` WHERE `id` = :id FOR UPDATE');
-        $statement->bindValue(':id', $order->getId(), \PDO::PARAM_INT);
-        $statement->execute();
-
-        OrderProductTableMap::clearInstancePool();
-        $order->clearOrderProducts();
     }
 
     /**
