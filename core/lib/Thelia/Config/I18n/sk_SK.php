@@ -146,6 +146,7 @@ return [
     'Current Password' => 'Súčasné heslo',
     'Customer' => 'Zákazník',
     'Customer is %op% <strong>%customer_list%</strong>' => 'Zákazník je %op% <strong>%customer_list%</strong>',
+    'Customer title' => 'Oslovenie',
     'Customers' => 'Zákazníci',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => 'Dátum "%date" je neplatný, prosím zadajte platný dátum vo formáte %fmt',
     'Debug' => 'Debug',

@@ -141,6 +141,7 @@ return [
     'Current Password' => 'رمزعبور فعلی',
     'Customer' => 'مشتری',
     'Customer is %op% <strong>%customer_list%</strong>' => 'مشتری %op% <strong>%customer_list%</strong>',
+    'Customer title' => 'عنوان',
     'Customers' => 'مشتریان',
     'Dashboard' => 'پیشخوان',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => 'تاریخ \'%date\' نامعتبر است لطفا یک تاریخ معتبر با قالب %fmt وارد کنید',

@@ -126,6 +126,7 @@ return [
     'Currency name' => 'اسم العملة',
     'Current Password' => 'كلمة السر الحالية',
     'Customer' => 'العميل',
+    'Customer title' => 'العنوان',
     'Customers' => 'العملاء',
     'Dashboard' => 'لوحة المعلومات',
     "Date '%date' is invalid, please enter a valid date using %fmt format" => 'التاريخ \'%date\' غير صالح ، الرجاء إدخال تاريخ صحيح باستخدام المنسق %fmt',

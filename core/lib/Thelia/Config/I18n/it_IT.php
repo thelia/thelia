@@ -96,6 +96,7 @@ return [
     'Current Password' => 'Password attuale',
     'Customer' => 'Cliente',
     'Customer rating' => 'Valutazione dei clienti',
+    'Customer title' => 'Titolo',
     'Customers' => 'Clienti',
     'Dashboard' => 'Dashboard',
     'Debug' => 'Eseguire il debug',
