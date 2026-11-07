@@ -22,7 +22,7 @@ use Thelia\Model\Map\ConfigTableMap;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * The chart of accounts of the accounting exports is five settings, seeded empty and labelled
+ * The chart of accounts of the accounting exports is six settings, seeded empty and labelled
  * on a fresh install and on an updated shop alike: the exports refuse to run until the
  * merchant fills the accounts, and nothing a merchant already set is overwritten.
  */
@@ -35,6 +35,7 @@ final class AccountingSettingsSeedTest extends IntegrationTestCase
         'accounting_customer_account',
         'accounting_shipping_account',
         'accounting_rate_accounts',
+        'accounting_commercial_credit_account',
     ];
 
     public function testAFreshInstallSeedsTheSettingsEmptyAndLabelled(): void
