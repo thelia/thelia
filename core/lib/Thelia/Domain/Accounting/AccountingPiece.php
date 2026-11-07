@@ -15,17 +15,23 @@ declare(strict_types=1);
 namespace Thelia\Domain\Accounting;
 
 /**
- * The entries of one invoice: the piece of the sales journal, under the reference and the
- * date of the invoice.
+ * The entries of one invoice or one credit note: the piece of the sales journal, under its
+ * reference and its date of invoice.
  */
 final readonly class AccountingPiece
 {
+    public const INVOICE = 'invoice';
+    public const CREDIT_NOTE = 'credit_note';
+
     /**
-     * @param list<AccountingEntry> $entries the customer first, then the products, the shipping and the taxes
-     * @param list<string>          $notes   what the accountant should check on this invoice, for the report
+     * @param self::INVOICE|self::CREDIT_NOTE $kind
+     * @param int                             $sourceId the order of an invoice, the credit note of the CreditNote module
+     * @param list<AccountingEntry>           $entries  the customer first, then the products, the shipping and the taxes
+     * @param list<string>                    $notes    what the accountant should check on this invoice, for the report
      */
     public function __construct(
-        public int $orderId,
+        public string $kind,
+        public int $sourceId,
         public string $invoiceRef,
         public \DateTimeInterface $invoiceDate,
         public string $customerRef,
@@ -34,5 +40,10 @@ final readonly class AccountingPiece
         public array $entries,
         public array $notes = [],
     ) {
+    }
+
+    public function isCreditNote(): bool
+    {
+        return self::CREDIT_NOTE === $this->kind;
     }
 }

@@ -55,8 +55,8 @@ final class SalesPieceBuilder
         [$productAmounts, $productTaxes, $productLines] = $this->productAmountsByRate($order, $chart);
 
         $tax = 0.0;
-        $totalCents = self::cents($order->getTotalAmount($tax));
-        $taxCents = self::cents((float) $tax);
+        $totalCents = PieceAmounts::cents($order->getTotalAmount($tax));
+        $taxCents = PieceAmounts::cents((float) $tax);
 
         if ($totalCents <= 0) {
             throw new OrderNotExportableException($this->trans('Order %ref: its invoice amounts to nothing.', ['%ref' => $orderRef]));
@@ -64,8 +64,8 @@ final class SalesPieceBuilder
 
         $postage = (float) $order->getPostage();
         $postageTax = (float) $order->getPostageTax();
-        $postageCents = self::cents($postage - $postageTax);
-        $postageTaxCents = self::cents($postageTax);
+        $postageCents = PieceAmounts::cents($postage - $postageTax);
+        $postageTaxCents = PieceAmounts::cents($postageTax);
         [$postageWeights, $postageTaxWeights] = $this->postageWeightsByRate($order, $postage - $postageTax, $postageTax, $chart);
 
         $productCents = $totalCents - $taxCents - $postageCents;
@@ -88,16 +88,16 @@ final class SalesPieceBuilder
 
         $entries = [new AccountingEntry(AccountingEntry::ROLE_CUSTOMER, $chart->customerAccount, null, $totalCents, 0)];
 
-        foreach (self::byRate($products) as $rate => $cents) {
+        foreach (PieceAmounts::byRate($products) as $rate => $cents) {
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_PRODUCT, $this->accountsOf($chart, $rate, $orderRef)['product'], $rate, 0, $cents);
         }
 
         // The shipping has an account of its own: only its tax needs the accounts of its rate.
-        foreach (self::byRate($shipping) as $rate => $cents) {
+        foreach (PieceAmounts::byRate($shipping) as $rate => $cents) {
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_SHIPPING, $chart->shippingAccount, $rate, 0, $cents);
         }
 
-        foreach (self::byRate($taxes) as $rate => $cents) {
+        foreach (PieceAmounts::byRate($taxes) as $rate => $cents) {
             $taxAccount = $this->accountsOf($chart, $rate, $orderRef)['tax'] ?? throw new OrderNotExportableException($this->trans('Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
             $entries[] = new AccountingEntry(AccountingEntry::ROLE_TAX, $taxAccount, $rate, 0, $cents);
         }
@@ -112,7 +112,7 @@ final class SalesPieceBuilder
             }
 
             $foreignCurrencyCode = (string) $order->getCurrency()?->getCode();
-            $entries = self::inShopCurrency($entries, $rate);
+            $entries = PieceAmounts::inShopCurrency($entries, $rate);
         }
 
         $invoiceAddress = $order->getOrderAddressRelatedByInvoiceOrderAddressId();
@@ -120,6 +120,7 @@ final class SalesPieceBuilder
         $customerName = trim((string) $invoiceAddress?->getCompany()) ?: trim($invoiceAddress?->getFirstname().' '.$invoiceAddress?->getLastname());
 
         return new AccountingPiece(
+            AccountingPiece::INVOICE,
             (int) $order->getId(),
             (string) $order->getInvoiceRef(),
             $order->getInvoiceDate() ?? throw new OrderNotExportableException($this->trans('Order %ref has no invoice date.', ['%ref' => $orderRef])),
@@ -163,7 +164,7 @@ final class SalesPieceBuilder
                 continue;
             }
 
-            $rate = $this->rateOf($chart, $unitPrice, $unitTax);
+            $rate = PieceAmounts::rateOf($chart, $unitPrice, $unitTax);
             [$lineAmount, $lineTax] = self::lineAsInvoiced($order, (float) $line->getQuantity(), $unitPrice, $unitTaxAmounts);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $lineAmount;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + $lineTax;
@@ -191,7 +192,7 @@ final class SalesPieceBuilder
     {
         $notes = [];
 
-        foreach (self::byRate($taxes + array_fill_keys(array_keys($products + $shipping), 0)) as $rate => $taxCents) {
+        foreach (PieceAmounts::byRate($taxes + array_fill_keys(array_keys($products + $shipping), 0)) as $rate => $taxCents) {
             $baseCents = ($products[$rate] ?? 0) + ($shipping[$rate] ?? 0);
             $expectedCents = (int) round($baseCents * (float) $rate / 100);
             $tolerance = max(1, ($productLines[$rate] ?? 0) + (isset($shipping[$rate]) ? max(1, $postageShares) : 0));
@@ -240,15 +241,6 @@ final class SalesPieceBuilder
     }
 
     /**
-     * The rate the chart files an amount and its tax under (AccountingChart::rateFor()); the
-     * rate the two amounts make when the chart has none that fits, for the refusal to name it.
-     */
-    private function rateOf(AccountingChart $chart, float $amount, float $tax): string
-    {
-        return $chart->rateFor($amount, $tax) ?? AccountingChart::rateKey($amount > 0 ? $tax / $amount * 100 : 0.0);
-    }
-
-    /**
      * @return array{array<string, float>, array<string, float>}
      */
     private function postageWeightsByRate(Order $order, float $untaxedPostage, float $postageTax, AccountingChart $chart): array
@@ -258,13 +250,13 @@ final class SalesPieceBuilder
 
         foreach (OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->find() as $share) {
             $untaxed = (float) $share->getUntaxedAmount();
-            $rate = $this->rateOf($chart, $untaxed, (float) $share->getAmount());
+            $rate = PieceAmounts::rateOf($chart, $untaxed, (float) $share->getAmount());
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $untaxed;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $share->getAmount();
         }
 
         if ([] === $amounts) {
-            $rate = $this->rateOf($chart, $untaxedPostage, $postageTax);
+            $rate = PieceAmounts::rateOf($chart, $untaxedPostage, $postageTax);
             $amounts[$rate] = $untaxedPostage;
             $taxes[$rate] = $postageTax;
         }
@@ -294,10 +286,10 @@ final class SalesPieceBuilder
     private static function fromFrozen(int $total, array $frozen, bool $discounted, array $weights): array
     {
         if ([] === $frozen) {
-            return self::allocate($total, $weights);
+            return PieceAmounts::allocate($total, $weights);
         }
 
-        $shares = array_map(self::cents(...), $frozen);
+        $shares = array_map(PieceAmounts::cents(...), $frozen);
         $difference = $total - array_sum($shares);
 
         if (0 === $difference) {
@@ -307,7 +299,7 @@ final class SalesPieceBuilder
         if ($discounted) {
             $sign = $difference < 0 ? -1 : 1;
 
-            foreach (self::allocate(abs($difference), $weights) as $rate => $cents) {
+            foreach (PieceAmounts::allocate(abs($difference), $weights) as $rate => $cents) {
                 $shares[$rate] = ($shares[$rate] ?? 0) + $sign * $cents;
             }
         } else {
@@ -323,117 +315,6 @@ final class SalesPieceBuilder
         }
 
         return array_filter($shares, static fn (int $share): bool => 0 !== $share);
-    }
-
-    /**
-     * Splits whole cents in proportion of the weights; the cents the rounding leaves go to
-     * the largest remainders, so the shares add up to the total exactly. Nothing to weigh
-     * puts everything on the first key.
-     *
-     * @param array<string, float> $weights
-     *
-     * @return array<string, int>
-     */
-    private static function allocate(int $cents, array $weights): array
-    {
-        if (0 === $cents) {
-            return [];
-        }
-
-        $sum = array_sum(array_map('abs', $weights));
-
-        if ([] === $weights || $sum <= 0.0) {
-            return [array_key_first($weights) ?? AccountingChart::rateKey(0.0) => $cents];
-        }
-
-        $shares = [];
-        $remainders = [];
-
-        foreach ($weights as $key => $weight) {
-            $exact = $cents * abs($weight) / $sum;
-            $shares[$key] = (int) floor($exact);
-            $remainders[$key] = $exact - $shares[$key];
-        }
-
-        arsort($remainders);
-
-        foreach (array_keys($remainders) as $key) {
-            if (array_sum($shares) >= $cents) {
-                break;
-            }
-
-            ++$shares[$key];
-        }
-
-        return array_filter($shares, static fn (int $share): bool => 0 !== $share);
-    }
-
-    /**
-     * @param array<string, int> $amounts
-     *
-     * @return array<string, int> the highest rate first
-     */
-    private static function byRate(array $amounts): array
-    {
-        uksort($amounts, static fn (string $left, string $right): int => (float) $right <=> (float) $left);
-
-        return $amounts;
-    }
-
-    /**
-     * Each line converted at the rate of the order, the cent the conversion leaves on the
-     * largest credit so that the piece still balances.
-     *
-     * @param list<AccountingEntry> $entries
-     *
-     * @return list<AccountingEntry>
-     */
-    private static function inShopCurrency(array $entries, float $rate): array
-    {
-        $rate = $rate > 0 ? $rate : 1.0;
-        $converted = [];
-
-        foreach ($entries as $entry) {
-            $converted[] = new AccountingEntry(
-                $entry->role,
-                $entry->account,
-                $entry->rateKey,
-                (int) round($entry->debitCents / $rate),
-                (int) round($entry->creditCents / $rate),
-                $entry->debitCents + $entry->creditCents,
-            );
-        }
-
-        $difference = array_sum(array_map(static fn (AccountingEntry $entry): int => $entry->debitCents - $entry->creditCents, $converted));
-
-        if (0 !== $difference) {
-            // On the largest sale rather than on a tax: the tax stays the converted tax.
-            $largest = null;
-
-            foreach ([AccountingEntry::ROLE_PRODUCT, AccountingEntry::ROLE_SHIPPING, AccountingEntry::ROLE_TAX] as $role) {
-                foreach ($converted as $index => $entry) {
-                    if ($role === $entry->role && $entry->creditCents > 0 && (null === $largest || $entry->creditCents > $converted[$largest]->creditCents)) {
-                        $largest = $index;
-                    }
-                }
-
-                if (null !== $largest) {
-                    break;
-                }
-            }
-
-            if (null !== $largest) {
-                $entry = $converted[$largest];
-                $converted[$largest] = new AccountingEntry($entry->role, $entry->account, $entry->rateKey, 0, $entry->creditCents + $difference, $entry->foreignCents);
-            }
-        }
-
-        return array_values(array_filter($converted, static fn (AccountingEntry $entry): bool => 0 !== $entry->debitCents || 0 !== $entry->creditCents));
-    }
-
-    private static function cents(float $amount): int
-    {
-        return (int) round($amount * 100);
     }
 
     /**
