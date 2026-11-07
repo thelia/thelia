@@ -128,7 +128,12 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (117, 'stock_reservation_enabled', '0', 0, 0, NOW(), NOW()),
 (118, 'stock_reservation_scope', 'checkout', 0, 0, NOW(), NOW()),
 (119, 'stock_reservation_duration', '15', 0, 0, NOW(), NOW()),
-(120, 'low_stock_threshold', '5', 0, 0, NOW(), NOW())
+(120, 'low_stock_threshold', '5', 0, 0, NOW(), NOW()),
+(121, 'accounting_journal_code', '', 0, 0, NOW(), NOW()),
+(122, 'accounting_journal_label', '', 0, 0, NOW(), NOW()),
+(123, 'accounting_customer_account', '', 0, 0, NOW(), NOW()),
+(124, 'accounting_shipping_account', '', 0, 0, NOW(), NOW()),
+(125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2385,7 +2390,12 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (117, '{{ locale }}', {{ intl('Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)', locale) }}, NULL, NULL, NULL),
     (118, '{{ locale }}', {{ intl('When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)', locale) }}, NULL, NULL, NULL),
     (119, '{{ locale }}', {{ intl('Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)', locale) }}, NULL, NULL, NULL),
-    (120, '{{ locale }}', {{ intl('Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (120, '{{ locale }}', {{ intl('Stock level at or under which the shop owner is alerted that a sale element runs low (5 when invalid), a sale element can set its own', locale) }}, NULL, NULL, NULL),
+    (121, '{{ locale }}', {{ intl('Code of the sales journal in the accounting exports (VE when empty)', locale) }}, NULL, NULL, NULL),
+    (122, '{{ locale }}', {{ intl('Label of the sales journal in the accounting exports (Ventes when empty)', locale) }}, NULL, NULL, NULL),
+    (123, '{{ locale }}', {{ intl('Customer account the sales journal debits, e.g. 411000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
+    (124, '{{ locale }}', {{ intl('Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
+    (125, '{{ locale }}', {{ intl('Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
