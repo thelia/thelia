@@ -28,12 +28,13 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class AccountingSettingsSeedTest extends IntegrationTestCase
 {
+    // Written out rather than read from AccountingChart: the seed is checked on its own.
     private const SETTINGS = [
-        AccountingChart::JOURNAL_CODE_KEY,
-        AccountingChart::JOURNAL_LABEL_KEY,
-        AccountingChart::CUSTOMER_ACCOUNT_KEY,
-        AccountingChart::SHIPPING_ACCOUNT_KEY,
-        AccountingChart::RATE_ACCOUNTS_KEY,
+        'accounting_journal_code',
+        'accounting_journal_label',
+        'accounting_customer_account',
+        'accounting_shipping_account',
+        'accounting_rate_accounts',
     ];
 
     public function testAFreshInstallSeedsTheSettingsEmptyAndLabelled(): void
