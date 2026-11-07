@@ -186,6 +186,54 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertSame(0, $pooledOrders);
     }
 
+    public function testAnOrderCostsTheJournalOneQueryWhateverItsLinesAddressAndCustomer(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720,5.5:706055:445705');
+        $invoice = fn (): Order => $this->invoicedOrder('2031-05-10', [[100.0, 1, 20.0], [10.0, 3, 0.55]], postage: 12.0, postageTax: 2.0);
+
+        for ($i = 0; $i < 10; ++$i) {
+            $invoice();
+        }
+
+        $tenOrders = $this->queriesOf(fn () => $this->rows(new SalesJournalExport(), '2031-05'));
+
+        for ($i = 0; $i < 10; ++$i) {
+            $invoice();
+        }
+
+        $twentyOrders = $this->queriesOf(fn () => $this->rows(new SalesJournalExport(), '2031-05'));
+
+        // Order::getTotalAmount() reads the totals of the invoice, once per order, and keeps them.
+        self::assertLessThanOrEqual(10, $twentyOrders - $tenOrders, 'Lines, taxes, postage, address and customer are read by batch.');
+    }
+
+    public function testAnInvoiceIssuedDuringTheExportNeitherRepeatsNorPushesOutTheOthers(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $orders = [];
+
+        for ($i = 0; $i < 201; ++$i) {
+            $orders[] = $this->invoicedOrder('2031-06-10', [[10.0, 1, 2.0]]);
+        }
+
+        $export = new SalesJournalExport();
+        $export->setLang(Lang::getDefaultLanguage());
+        $export->setRangeDate(['start' => new \DateTime('2031-06-01 00:00:00'), 'end' => new \DateTime('2031-06-30 23:59:59')]);
+        $rows = [];
+
+        foreach ($export as $row) {
+            if ([] === $rows) {
+                $this->invoicedOrder('2031-06-01', [[10.0, 1, 2.0]]);
+            }
+
+            $rows[] = $row;
+        }
+
+        $rowsByPiece = array_count_values(array_column($this->mine($rows, $orders), 'PieceRef'));
+        self::assertCount(201, $rowsByPiece);
+        self::assertSame([3], array_values(array_unique($rowsByPiece)), 'Each invoice is booked once.');
+    }
+
     public function testTheReportSpeaksTheLanguageOfTheExport(): void
     {
         $this->chart('411000', '708500', '20:706200:445720');
@@ -328,6 +376,18 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         }
 
         return $rows;
+    }
+
+    /**
+     * The statements the database received while the callable ran.
+     */
+    private function queriesOf(callable $run): int
+    {
+        $questions = static fn (): int => (int) Propel::getConnection('TheliaMain')->query("SHOW SESSION STATUS LIKE 'Questions'")->fetchColumn(1);
+        $before = $questions();
+        $run();
+
+        return $questions() - $before;
     }
 
     /**
