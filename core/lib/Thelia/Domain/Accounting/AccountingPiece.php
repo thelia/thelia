@@ -22,6 +22,7 @@ final readonly class AccountingPiece
 {
     /**
      * @param list<AccountingEntry> $entries the customer first, then the products, the shipping and the taxes
+     * @param list<string>          $notes   what the accountant should check on this invoice, for the report
      */
     public function __construct(
         public int $orderId,
@@ -31,6 +32,7 @@ final readonly class AccountingPiece
         public string $customerName,
         public ?string $foreignCurrencyCode,
         public array $entries,
+        public array $notes = [],
     ) {
     }
 }
