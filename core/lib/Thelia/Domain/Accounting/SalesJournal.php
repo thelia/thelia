@@ -79,6 +79,10 @@ final class SalesJournal
 
                 ++$count;
 
+                foreach ($piece->notes as $note) {
+                    $report->addWarning($note);
+                }
+
                 foreach ($piece->entries as $entry) {
                     $debit += $entry->debitCents;
                     $credit += $entry->creditCents;

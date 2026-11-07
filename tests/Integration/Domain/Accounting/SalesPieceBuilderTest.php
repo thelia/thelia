@@ -153,6 +153,39 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
         }
     }
 
+    public function testADiscountedInvoiceIsBookedAsIssuedAndItsTaxOffTheRatesIsNamed(): void
+    {
+        // Thelia untaxes the 15.00 discount at the unweighted average of the rates of the
+        // lines, (1.20 + 1.055) / 2: 13.30 excluding tax and 1.70 of tax, so the invoice
+        // collects 19.95 of tax where the bases at their rates give 19.43.
+        $order = $this->invoicedOrder(discount: 15.0);
+        $this->line($order, 100.0, 1, [20.0]);
+        $this->line($order, 10.0, 3, [0.55]);
+
+        $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+        self::assertSame([
+            ['411000', 13665, 0],
+            ['706200', 0, 8977],
+            ['706055', 0, 2693],
+            ['445720', 0, 1843],
+            ['445705', 0, 152],
+        ], $this->summary($piece));
+        self::assertCount(2, $piece->notes);
+        self::assertStringContainsString('20.00%', $piece->notes[0]);
+        self::assertStringContainsString('18.43', $piece->notes[0]);
+        self::assertStringContainsString('17.95', $piece->notes[0]);
+    }
+
+    public function testAnUndiscountedInvoiceNamesNothing(): void
+    {
+        $order = $this->invoicedOrder(postage: 12.0, postageTax: 2.0);
+        $this->line($order, 100.0, 1, [20.0]);
+        $this->line($order, 3.333333, 7, [0.183333]);
+
+        self::assertSame([], $this->builder->build($order, $this->chart, $this->defaultCurrency())->notes);
+    }
+
     public function testAnOrderPricedBeforeTheRoundingRulesStillBalances(): void
     {
         $order = $this->invoicedOrder();

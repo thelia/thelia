@@ -52,7 +52,7 @@ final class SalesPieceBuilder
     {
         $this->locale = $locale;
         $orderRef = (string) $order->getRef();
-        [$productAmounts, $productTaxes] = $this->productAmountsByRate($order, $chart);
+        [$productAmounts, $productTaxes, $productLines] = $this->productAmountsByRate($order, $chart);
 
         $tax = 0.0;
         $totalCents = self::cents($order->getTotalAmount($tax));
@@ -83,6 +83,8 @@ final class SalesPieceBuilder
         foreach (self::fromFrozen($postageTaxCents, $postageTaxWeights, false, $postageTaxWeights) as $rate => $cents) {
             $taxes[$rate] = ($taxes[$rate] ?? 0) + $cents;
         }
+
+        $notes = $discounted ? $this->taxesOffTheirRates($orderRef, $products, $shipping, $taxes, $productLines, \count($postageWeights)) : [];
 
         $entries = [new AccountingEntry(AccountingEntry::ROLE_CUSTOMER, $chart->customerAccount, null, $totalCents, 0)];
 
@@ -125,6 +127,7 @@ final class SalesPieceBuilder
             $customerName,
             $foreignCurrencyCode,
             $entries,
+            $notes,
         );
     }
 
@@ -133,12 +136,13 @@ final class SalesPieceBuilder
      * Only the proportions are used: the amounts booked are the totals of the invoice,
      * which Order::getTotalAmount() computes under the rounding rule of the order.
      *
-     * @return array{array<string, float>, array<string, float>}
+     * @return array{array<string, float>, array<string, float>, array<string, int>}
      */
     private function productAmountsByRate(Order $order, AccountingChart $chart): array
     {
         $amounts = [];
         $taxes = [];
+        $counts = [];
         $lines = OrderProductQuery::create()->filterByOrderId($order->getId())->find();
         $unitTaxes = [];
 
@@ -163,9 +167,47 @@ final class SalesPieceBuilder
             [$lineAmount, $lineTax] = self::lineAsInvoiced($order, (float) $line->getQuantity(), $unitPrice, $unitTaxAmounts);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $lineAmount;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + $lineTax;
+            $counts[$rate] = ($counts[$rate] ?? 0) + 1;
         }
 
-        return [$amounts, $taxes];
+        return [$amounts, $taxes, $counts];
+    }
+
+    /**
+     * The rates whose tax is not the rate of their base, a cent per line aside. Thelia takes
+     * the tax out of a discount at the average of the rates of the lines, not weighted by
+     * their amounts: on an order mixing rates, the invoice then collects more tax at one rate
+     * and less at another than its bases say. The journal books the invoice as it was issued
+     * and names the order for the tax return.
+     *
+     * @param array<string, int> $products
+     * @param array<string, int> $shipping
+     * @param array<string, int> $taxes
+     * @param array<string, int> $productLines
+     *
+     * @return list<string>
+     */
+    private function taxesOffTheirRates(string $orderRef, array $products, array $shipping, array $taxes, array $productLines, int $postageShares): array
+    {
+        $notes = [];
+
+        foreach (self::byRate($taxes + array_fill_keys(array_keys($products + $shipping), 0)) as $rate => $taxCents) {
+            $baseCents = ($products[$rate] ?? 0) + ($shipping[$rate] ?? 0);
+            $expectedCents = (int) round($baseCents * (float) $rate / 100);
+            $tolerance = max(1, ($productLines[$rate] ?? 0) + (isset($shipping[$rate]) ? max(1, $postageShares) : 0));
+
+            if (abs($taxCents - $expectedCents) > $tolerance) {
+                $notes[] = $this->trans('Order %ref: at %rate, the invoice collected %tax of tax on a base of %base, where the rate gives %expected. Its discount was untaxed at the average rate of its lines: check it before the tax return.', [
+                    '%ref' => $orderRef,
+                    '%rate' => $rate.'%',
+                    '%tax' => SalesJournal::amount($taxCents),
+                    '%base' => SalesJournal::amount($baseCents),
+                    '%expected' => SalesJournal::amount($expectedCents),
+                ]);
+            }
+        }
+
+        return $notes;
     }
 
     /**

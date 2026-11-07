@@ -98,6 +98,18 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertStringContainsString('credit note', $report);
     }
 
+    public function testADiscountedOrderWhoseTaxIsOffItsRatesIsNamedInTheReport(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720,5.5:706055:445705');
+        $order = $this->invoicedOrder('2026-02-13', [[100.0, 1, 20.0], [10.0, 3, 0.55]], discount: 15.0);
+
+        $export = new SalesJournalExport();
+        $rows = $this->rows($export, '2026-02');
+
+        self::assertNotSame([], $this->mine($rows, [$order]), 'The order is booked as its invoice was issued.');
+        self::assertStringContainsString((string) $order->getRef().': at 20.00%', implode("\n", $export->report()->warnings()));
+    }
+
     public function testTheTaxSummaryAddsUpTheTaxesOfTheJournal(): void
     {
         $this->chart('411000', '708500', '20:706200:445720,5.5:706055:445705');
