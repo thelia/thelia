@@ -15,10 +15,12 @@ declare(strict_types=1);
 namespace Thelia\Tests\Http\BackOffice;
 
 use BackOfficeDefaultTwigBundle\Controller\Configuration\AccountingController;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Domain\Accounting\AccountingChart;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\OrderProduct;
@@ -102,7 +104,7 @@ final class AccountingExportsBackOfficeTest extends WebIntegrationTestCase
         self::assertSame('20:706200:445720', ConfigQuery::read(AccountingChart::RATE_ACCOUNTS_KEY));
     }
 
-    public function testTheJournalIsDownloadedAndItsReportShownAfterwards(): void
+    public function testTheJournalIsDownloadedAndItsReportShownOnItsJob(): void
     {
         ConfigQuery::write(AccountingChart::CUSTOMER_ACCOUNT_KEY, '411000');
         ConfigQuery::write(AccountingChart::SHIPPING_ACCOUNT_KEY, '708500');
@@ -123,8 +125,10 @@ final class AccountingExportsBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
         self::assertStringStartsWith('text/plain', (string) $this->client->getResponse()->headers->get('Content-Type'));
 
-        $this->client->request('GET', '/admin/export/'.$exportId);
-        self::assertMatchesRegularExpression('/[1-9]\d* pi(e|è)ces?/', (string) $this->client->getResponse()->getContent());
+        $job = ExportJobQuery::create()->filterByExportId($exportId)->orderById(Criteria::DESC)->findOne() ?? self::fail('The export left no job.');
+        $this->client->request('GET', '/admin/export/job/'.$job->getId());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertMatchesRegularExpression('/[1-9]\d* pi(e|è)ces?/', $this->client->getCrawler()->filter('[data-testid="export-job-report"]')->text(''));
     }
 
     public function testWithoutAChartTheExportSaysWhatToSet(): void
