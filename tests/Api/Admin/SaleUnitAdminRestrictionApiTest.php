@@ -18,14 +18,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
+use Thelia\Domain\Payment\Enum\OrderPaymentPartState;
 use Thelia\Domain\Shipping\DTO\ShipmentLine;
 use Thelia\Domain\Shipping\Service\OrderShipmentManager;
 use Thelia\Model\Admin;
+use Thelia\Model\CartAddress;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Map\OrderReturnLineTableMap;
 use Thelia\Model\Map\SaleUnitTableMap;
 use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentPart;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderReturn;
@@ -313,6 +316,11 @@ final class SaleUnitAdminRestrictionApiTest extends ApiTestCase
         $children['mine']['cart_items'] = $this->cartItemOf($mineCart)->getId();
         $children['theirs']['cart_items'] = $this->cartItemOf($theirCart)->getId();
 
+        foreach (['mine' => $this->mine, 'theirs' => $this->theirs] as $key => $saleUnit) {
+            $children[$key]['cart_addresses'] = $this->cartAddressOn($saleUnit, 'address_delivery')->getId();
+            $children[$key]['order_payment_parts'] = $this->paymentPartOf($key === 'mine' ? $mine : $theirs)->getId();
+        }
+
         $token = $this->authenticateAsAdmin($this->restrictedTo($this->mine));
 
         foreach ($children['theirs'] as $resource => $id) {
@@ -350,6 +358,66 @@ final class SaleUnitAdminRestrictionApiTest extends ApiTestCase
         $return->clearOrderReturnLines();
 
         return $return;
+    }
+
+    public function testThePaymentPartsOfAnOrderOfAnotherUnitAreOutOfReach(): void
+    {
+        $mine = $this->paymentPartOf($this->orderOn($this->mine));
+        $theirs = $this->paymentPartOf($this->orderOn($this->theirs));
+        $national = $this->paymentPartOf($this->orderOn(null));
+        $token = $this->authenticateAsAdmin($this->restrictedTo($this->mine));
+
+        $ids = $this->ids($this->jsonRequest('GET', '/api/admin/order_payment_parts?itemsPerPage=1000', token: $token));
+
+        self::assertContains($mine->getId(), $ids);
+        self::assertNotContains($theirs->getId(), $ids);
+        self::assertNotContains($national->getId(), $ids);
+        self::assertSame(404, $this->jsonRequest('GET', '/api/admin/order_payment_parts/'.$theirs->getId(), token: $token)->getStatusCode());
+    }
+
+    public function testTheInvoiceAddressOfACartOfAnotherUnitIsOutOfReach(): void
+    {
+        $mine = $this->cartAddressOn($this->mine, 'address_invoice');
+        $theirs = $this->cartAddressOn($this->theirs, 'address_invoice');
+        $token = $this->authenticateAsAdmin($this->restrictedTo($this->mine));
+
+        $ids = $this->ids($this->jsonRequest('GET', '/api/admin/cart_addresses?itemsPerPage=1000', token: $token));
+
+        self::assertContains($mine->getId(), $ids);
+        self::assertNotContains($theirs->getId(), $ids);
+        self::assertSame(404, $this->jsonRequest('GET', '/api/admin/cart_addresses/'.$theirs->getId(), token: $token)->getStatusCode());
+    }
+
+    public function testAnAddressOfNoCartIsOutOfReachOfARestrictedAdministrator(): void
+    {
+        $orphan = $this->factory->cartAddress();
+        $token = $this->authenticateAsAdmin($this->restrictedTo($this->mine));
+
+        self::assertNotContains($orphan->getId(), $this->ids($this->jsonRequest('GET', '/api/admin/cart_addresses?itemsPerPage=1000', token: $token)));
+        self::assertSame(404, $this->jsonRequest('GET', '/api/admin/cart_addresses/'.$orphan->getId(), token: $token)->getStatusCode());
+    }
+
+    private function cartAddressOn(SaleUnit $saleUnit, string $role): CartAddress
+    {
+        $address = $this->factory->cartAddress();
+        $cart = $this->cartOn($saleUnit);
+        'address_delivery' === $role ? $cart->setAddressDeliveryId($address->getId()) : $cart->setAddressInvoiceId($address->getId());
+        $cart->save($this->getPropelConnection());
+
+        return $address;
+    }
+
+    private function paymentPartOf(Order $order): OrderPaymentPart
+    {
+        $part = (new OrderPaymentPart())
+            ->setOrderId($order->getId())
+            ->setAmount('1.00')
+            ->setState(OrderPaymentPartState::PENDING->value)
+            ->setIsPrimary(true)
+            ->setPosition(1);
+        $part->save($this->getPropelConnection());
+
+        return $part;
     }
 
     private function cartOn(SaleUnit $saleUnit): \Thelia\Model\Cart
