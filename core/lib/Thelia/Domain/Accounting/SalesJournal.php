@@ -17,6 +17,7 @@ namespace Thelia\Domain\Accounting;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\ExportReport;
+use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
@@ -24,7 +25,6 @@ use Thelia\Model\Map\OrderPostageTaxTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -59,43 +59,42 @@ final class SalesJournal
         }
 
         $shopCurrency = CurrencyQuery::create()->findOneByByDefault(1) ?? throw new \RuntimeException('The shop has no default currency.');
-        $builder = new SalesPieceBuilder();
-        $offset = 0;
+        $creditNotes = new CreditNoteReader();
+        $withCreditNotes = $creditNotes->isModuleActive() && $creditNotes->hasItsTables();
         $count = 0;
+        $creditNoteCount = 0;
         $debit = 0;
         $credit = 0;
 
-        do {
-            $orders = $this->invoiced($from, $to)->offset($offset)->limit(self::BATCH_SIZE)->find();
+        $pieces = self::inDateOrder(
+            $this->invoicePieces($chart, $from, $to, $report, $shopCurrency, $locale),
+            $withCreditNotes ? $this->creditNotePieces($creditNotes, $chart, $from, $to, $report, $shopCurrency, $locale) : new \EmptyIterator(),
+        );
 
-            foreach ($orders as $order) {
-                try {
-                    $piece = $builder->build($order, $chart, $shopCurrency, $locale);
-                } catch (OrderNotExportableException $exception) {
-                    $report->addWarning($exception->getMessage());
+        foreach ($pieces as $piece) {
+            ++$count;
 
-                    continue;
-                }
-
-                ++$count;
-
-                foreach ($piece->notes as $note) {
-                    $report->addWarning($note);
-                }
-
-                foreach ($piece->entries as $entry) {
-                    $debit += $entry->debitCents;
-                    $credit += $entry->creditCents;
-                }
-
-                yield $piece;
+            if ($piece->isCreditNote()) {
+                ++$creditNoteCount;
             }
 
-            $offset += self::BATCH_SIZE;
-            self::forgetTheBatch();
-        } while (self::BATCH_SIZE === \count($orders));
+            foreach ($piece->notes as $note) {
+                $report->addWarning($note);
+            }
+
+            foreach ($piece->entries as $entry) {
+                $debit += $entry->debitCents;
+                $credit += $entry->creditCents;
+            }
+
+            yield $piece;
+        }
 
         $report->addLine($translator->trans('%count pieces, debit %debit, credit %credit.', ['%count' => $count, '%debit' => self::amount($debit), '%credit' => self::amount($credit)], null, $locale));
+
+        if ($withCreditNotes) {
+            $report->addLine($translator->trans('%count credit notes among them.', ['%count' => $creditNoteCount], null, $locale));
+        }
 
         $withoutReference = $this->period(OrderQuery::create(), $from, $to)
             ->where('(Order.InvoiceRef IS NULL OR Order.InvoiceRef = \'\')')
@@ -105,9 +104,84 @@ final class SalesJournal
             $report->addWarning($translator->trans('%count orders of the period have an invoice date but no invoice reference: they are not in the journal.', ['%count' => $withoutReference], null, $locale));
         }
 
-        $report->addWarning(null !== ModuleQuery::create()->filterByCode('CreditNote')->filterByActivate(1)->findOne()
-            ? $translator->trans('The credit notes of the CreditNote module are not in this journal: book them separately.', [], null, $locale)
-            : $translator->trans('No credit note module is installed: refunds made without credit note are not in this journal.', [], null, $locale));
+        if (!$withCreditNotes) {
+            $report->addWarning($creditNotes->isModuleActive()
+                ? $translator->trans('The CreditNote module is active but its tables cannot be read: its credit notes are not in this journal, book them separately.', [], null, $locale)
+                : $translator->trans('No credit note module is installed: refunds made without credit note are not in this journal.', [], null, $locale));
+        }
+    }
+
+    /**
+     * @return \Generator<int, AccountingPiece> by invoice date, then id
+     */
+    private function invoicePieces(AccountingChart $chart, ?\DateTimeInterface $from, ?\DateTimeInterface $to, ExportReport $report, Currency $shopCurrency, string $locale): \Generator
+    {
+        $builder = new SalesPieceBuilder();
+        $offset = 0;
+
+        do {
+            $orders = $this->invoiced($from, $to)->offset($offset)->limit(self::BATCH_SIZE)->find();
+
+            foreach ($orders as $order) {
+                try {
+                    yield $builder->build($order, $chart, $shopCurrency, $locale);
+                } catch (OrderNotExportableException $exception) {
+                    $report->addWarning($exception->getMessage());
+                }
+            }
+
+            $offset += self::BATCH_SIZE;
+            self::forgetTheBatch();
+        } while (self::BATCH_SIZE === \count($orders));
+    }
+
+    /**
+     * @return \Generator<int, AccountingPiece> by invoice date, then id
+     */
+    private function creditNotePieces(CreditNoteReader $reader, AccountingChart $chart, ?\DateTimeInterface $from, ?\DateTimeInterface $to, ExportReport $report, Currency $shopCurrency, string $locale): \Generator
+    {
+        $builder = new CreditPieceBuilder();
+
+        foreach ($reader->invoiced($from, $to) as $creditNote) {
+            try {
+                yield $builder->build($creditNote, $chart, $shopCurrency, $locale);
+            } catch (OrderNotExportableException $exception) {
+                $report->addWarning($exception->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Two streams of pieces, each in date order, merged so that the journal stays in date
+     * order: on the same second, the invoice before the credit note.
+     *
+     * @param \Iterator<int, AccountingPiece> $invoices
+     * @param \Iterator<int, AccountingPiece> $creditNotes
+     *
+     * @return \Generator<int, AccountingPiece>
+     */
+    private static function inDateOrder(\Iterator $invoices, \Iterator $creditNotes): \Generator
+    {
+        $invoices->rewind();
+        $creditNotes->rewind();
+
+        while ($invoices->valid() || $creditNotes->valid()) {
+            if (!$creditNotes->valid() || ($invoices->valid() && self::sortKey($invoices->current()) <= self::sortKey($creditNotes->current()))) {
+                yield $invoices->current();
+                $invoices->next();
+            } else {
+                yield $creditNotes->current();
+                $creditNotes->next();
+            }
+        }
+    }
+
+    /**
+     * @return array{string, int, int}
+     */
+    private static function sortKey(AccountingPiece $piece): array
+    {
+        return [$piece->invoiceDate->format('Y-m-d H:i:s'), $piece->isCreditNote() ? 1 : 0, $piece->sourceId];
     }
 
     /**

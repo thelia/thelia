@@ -101,6 +101,17 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertStringContainsString('credit note', $report);
     }
 
+    public function testAnActiveCreditNoteModuleWhoseTablesCannotBeReadIsNamedInTheReport(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        Propel::getConnection('TheliaMain')->exec("INSERT INTO `module` (`code`, `version`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES ('CreditNote', '4.4.0', 1, 1, 999, 'CreditNote\\\\CreditNote', NOW(), NOW())");
+
+        $export = new SalesJournalExport();
+        $this->rows($export, '2026-02');
+
+        self::assertStringContainsString('The CreditNote module is active but its tables cannot be read', implode("\n", $export->report()->warnings()));
+    }
+
     public function testADiscountedOrderWhoseTaxIsOffItsRatesIsNamedInTheReport(): void
     {
         $this->chart('411000', '708500', '20:706200:445720,5.5:706055:445705');

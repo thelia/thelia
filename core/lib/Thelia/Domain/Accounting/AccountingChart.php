@@ -26,6 +26,10 @@ use Thelia\Model\ConfigQuery;
  * The rate accounts are one setting, "20:706200:445720,5.5:706055:445705,0:706000": the
  * rate in percent, the product account, and the tax account, which a rate of 0 does not
  * need.
+ *
+ * The account of commercial credit notes is optional: a rebate, a discount or a refund of a
+ * difference granted after the invoice is debited to it (709 in the French chart) when it is
+ * set, to the sales account of its rate otherwise.
  */
 final readonly class AccountingChart
 {
@@ -34,6 +38,7 @@ final readonly class AccountingChart
     public const CUSTOMER_ACCOUNT_KEY = 'accounting_customer_account';
     public const SHIPPING_ACCOUNT_KEY = 'accounting_shipping_account';
     public const RATE_ACCOUNTS_KEY = 'accounting_rate_accounts';
+    public const COMMERCIAL_CREDIT_ACCOUNT_KEY = 'accounting_commercial_credit_account';
 
     public const DEFAULT_JOURNAL_CODE = 'VE';
     public const DEFAULT_JOURNAL_LABEL = 'Ventes';
@@ -57,6 +62,7 @@ final readonly class AccountingChart
         public string $customerAccount,
         public string $shippingAccount,
         private array $rates,
+        public ?string $commercialCreditAccount = null,
     ) {
     }
 
@@ -71,15 +77,17 @@ final readonly class AccountingChart
             (string) ConfigQuery::read(self::CUSTOMER_ACCOUNT_KEY, ''),
             (string) ConfigQuery::read(self::SHIPPING_ACCOUNT_KEY, ''),
             (string) ConfigQuery::read(self::RATE_ACCOUNTS_KEY, ''),
+            (string) ConfigQuery::read(self::COMMERCIAL_CREDIT_ACCOUNT_KEY, ''),
         );
     }
 
     /**
      * @throws InvalidAccountingChartException
      */
-    public static function fromValues(string $journalCode, string $journalLabel, string $customerAccount, string $shippingAccount, string $rateAccounts): self
+    public static function fromValues(string $journalCode, string $journalLabel, string $customerAccount, string $shippingAccount, string $rateAccounts, string $commercialCreditAccount = ''): self
     {
         $customerAccount = trim($customerAccount);
+        $commercialCreditAccount = trim($commercialCreditAccount);
         $shippingAccount = trim($shippingAccount);
         $journalCode = trim($journalCode);
         $journalLabel = trim($journalLabel);
@@ -98,6 +106,10 @@ final readonly class AccountingChart
 
         if ('' !== $shippingAccount && 1 !== preg_match(self::ACCOUNT_PATTERN, $shippingAccount)) {
             throw new InvalidAccountingChartException(self::trans('The shipping account "%account" is not an account number: letters and digits only, 20 at most.', ['%account' => $shippingAccount]));
+        }
+
+        if ('' !== $commercialCreditAccount && 1 !== preg_match(self::ACCOUNT_PATTERN, $commercialCreditAccount)) {
+            throw new InvalidAccountingChartException(self::trans('The account of commercial credit notes "%account" is not an account number: letters and digits only, 20 at most.', ['%account' => $commercialCreditAccount]));
         }
 
         $rates = [];
@@ -139,6 +151,7 @@ final readonly class AccountingChart
             $customerAccount,
             $shippingAccount,
             $rates,
+            '' !== $commercialCreditAccount ? $commercialCreditAccount : null,
         );
     }
 
