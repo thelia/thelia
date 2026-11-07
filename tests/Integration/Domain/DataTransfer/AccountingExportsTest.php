@@ -234,6 +234,24 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertSame([3], array_values(array_unique($rowsByPiece)), 'Each invoice is booked once.');
     }
 
+    public function testOrdersPlacedInThePeriodWithoutInvoiceAreCountedWithTheirReason(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $undated = $this->invoicedOrder('2031-07-10', [[100.0, 1, 20.0]]);
+        $notInvoiced = [$this->invoicedOrder('2031-07-11', [[100.0, 1, 20.0]]), $this->invoicedOrder('2031-07-12', [[100.0, 1, 20.0]])];
+        // A paid order is given its invoice date when it is saved: only an import or an older
+        // version leaves an invoice reference without date.
+        $connection = Propel::getConnection('TheliaMain');
+        $connection->exec("UPDATE `order` SET invoice_date = NULL, created_at = '2031-07-05 10:00:00' WHERE id = ".(int) $undated->getId());
+        $connection->exec("UPDATE `order` SET invoice_ref = NULL, invoice_date = NULL, created_at = '2031-07-06 10:00:00' WHERE id IN (".implode(',', array_map(static fn (Order $order): int => (int) $order->getId(), $notInvoiced)).')');
+
+        $export = new SalesJournalExport();
+        $this->rows($export, '2031-07');
+
+        self::assertContains('1 orders placed in the period have an invoice reference but no invoice date: they belong to no period, book them by hand.', $export->report()->warnings());
+        self::assertContains('2 orders placed in the period are not invoiced: they have no piece.', $export->report()->lines());
+    }
+
     public function testTheReportSpeaksTheLanguageOfTheExport(): void
     {
         $this->chart('411000', '708500', '20:706200:445720');
