@@ -19,10 +19,12 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\Cart;
+use Thelia\Api\Resource\CartAddress;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Api\Resource\Order;
 use Thelia\Api\Resource\OrderAddress;
 use Thelia\Api\Resource\OrderCoupon;
+use Thelia\Api\Resource\OrderPaymentPart;
 use Thelia\Api\Resource\OrderProduct;
 use Thelia\Api\Resource\OrderProductTax;
 use Thelia\Api\Resource\OrderReturn;
@@ -33,10 +35,12 @@ use Thelia\Api\Resource\SaleUnit;
 use Thelia\Api\Resource\SaleUnitProductPrice;
 use Thelia\Api\Resource\SaleUnitProductSaleElements;
 use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
+use Thelia\Model\Map\CartAddressTableMap;
 use Thelia\Model\Map\CartItemTableMap;
 use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Map\OrderCouponTableMap;
+use Thelia\Model\Map\OrderPaymentPartTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderReturnLineTableMap;
@@ -52,8 +56,8 @@ use Thelia\Model\Map\SaleUnitTableMap;
  * Narrows the admin API of a restricted administrator to its sale units: the
  * orders placed on them and everything that belongs to those orders (lines and
  * their taxes, addresses, coupons, shipments and their lines, returns and their
- * lines), the carts of those units and their lines, their prices, their stocks,
- * the units themselves. Collections lose the other rows, items answer 404, and
+ * lines, payment parts), the carts of those units and their lines and addresses,
+ * their prices, their stocks, the units themselves. Collections lose the other rows, items answer 404, and
  * since a write loads its item first, an item out of reach cannot be changed or
  * deleted either.
  *
@@ -81,6 +85,8 @@ final readonly class AdminSaleUnitScopeExtension implements QueryCollectionExten
         OrderCoupon::class => [OrderCouponTableMap::COL_ORDER_ID, self::ORDERS],
         OrderShipment::class => [OrderShipmentTableMap::COL_ORDER_ID, self::ORDERS],
         OrderReturn::class => [OrderReturnTableMap::COL_ORDER_ID, self::ORDERS],
+        OrderPaymentPart::class => [OrderPaymentPartTableMap::COL_ORDER_ID, self::ORDERS],
+        CartAddress::class => [CartAddressTableMap::COL_ID, 'SELECT `cart`.`address_delivery_id` FROM `cart` WHERE `cart`.`sale_unit_id` IN (%1$s) UNION SELECT `cart`.`address_invoice_id` FROM `cart` WHERE `cart`.`sale_unit_id` IN (%1$s)'],
         OrderAddress::class => [OrderAddressTableMap::COL_ID, 'SELECT `order`.`invoice_order_address_id` FROM `order` WHERE `order`.`sale_unit_id` IN (%1$s) UNION SELECT `order`.`delivery_order_address_id` FROM `order` WHERE `order`.`sale_unit_id` IN (%1$s)'],
         OrderProductTax::class => [OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID, 'SELECT `order_product`.`id` FROM `order_product` INNER JOIN `order` ON `order`.`id` = `order_product`.`order_id` WHERE `order`.`sale_unit_id` IN (%1$s)'],
         OrderShipmentItem::class => [OrderShipmentItemTableMap::COL_ORDER_SHIPMENT_ID, 'SELECT `order_shipment`.`id` FROM `order_shipment` INNER JOIN `order` ON `order`.`id` = `order_shipment`.`order_id` WHERE `order`.`sale_unit_id` IN (%1$s)'],
