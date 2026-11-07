@@ -14,14 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Order;
-use Thelia\Model\OrderPostageTaxQuery;
-use Thelia\Model\OrderProductQuery;
-use Thelia\Model\OrderProductTaxQuery;
 
 /**
  * The entries of an invoiced order, balanced to the cent.
@@ -40,6 +36,9 @@ use Thelia\Model\OrderProductTaxQuery;
  *
  * An order in another currency than the shop's is booked in the shop currency at the rate
  * frozen on the order, each line carrying its own amount.
+ *
+ * The journal hands the frozen amounts of a whole batch of orders, read at once; an order
+ * built alone reads its own the same way, as a batch of one.
  */
 final class SalesPieceBuilder
 {
@@ -48,11 +47,12 @@ final class SalesPieceBuilder
     /**
      * @throws OrderNotExportableException
      */
-    public function build(Order $order, AccountingChart $chart, Currency $shopCurrency, ?string $locale = null): AccountingPiece
+    public function build(Order $order, AccountingChart $chart, Currency $shopCurrency, ?string $locale = null, ?FrozenOrderAmounts $frozen = null): AccountingPiece
     {
         $this->locale = $locale;
         $orderRef = (string) $order->getRef();
-        [$productAmounts, $productTaxes, $productLines] = $this->productAmountsByRate($order, $chart);
+        $frozen ??= FrozenOrderAmounts::ofOrders([(int) $order->getId()])[(int) $order->getId()];
+        [$productAmounts, $productTaxes, $productLines] = $this->productAmountsByRate($order, $frozen, $chart);
 
         $tax = 0.0;
         $totalCents = PieceAmounts::cents($order->getTotalAmount($tax));
@@ -66,7 +66,7 @@ final class SalesPieceBuilder
         $postageTax = (float) $order->getPostageTax();
         $postageCents = PieceAmounts::cents($postage - $postageTax);
         $postageTaxCents = PieceAmounts::cents($postageTax);
-        [$postageWeights, $postageTaxWeights] = $this->postageWeightsByRate($order, $postage - $postageTax, $postageTax, $chart);
+        [$postageWeights, $postageTaxWeights] = $this->postageWeightsByRate($frozen, $postage - $postageTax, $postageTax, $chart);
 
         $productCents = $totalCents - $taxCents - $postageCents;
         $productTaxCents = $taxCents - $postageTaxCents;
@@ -139,25 +139,13 @@ final class SalesPieceBuilder
      *
      * @return array{array<string, float>, array<string, float>, array<string, int>}
      */
-    private function productAmountsByRate(Order $order, AccountingChart $chart): array
+    private function productAmountsByRate(Order $order, FrozenOrderAmounts $frozen, AccountingChart $chart): array
     {
         $amounts = [];
         $taxes = [];
         $counts = [];
-        $lines = OrderProductQuery::create()->filterByOrderId($order->getId())->find();
-        $unitTaxes = [];
 
-        foreach (OrderProductTaxQuery::create()->filterByOrderProductId(array_map(static fn ($line): int => (int) $line->getId(), iterator_to_array($lines, false)), Criteria::IN)->find() as $tax) {
-            $unitTaxes[(int) $tax->getOrderProductId()][] = $tax;
-        }
-
-        foreach ($lines as $line) {
-            $promo = 1 === (int) $line->getWasInPromo();
-            $unitPrice = (float) ($promo ? $line->getPromoPrice() : $line->getPrice());
-            $unitTaxAmounts = array_map(
-                static fn ($tax): float => (float) ($promo ? $tax->getPromoAmount() : $tax->getAmount()),
-                $unitTaxes[(int) $line->getId()] ?? [],
-            );
+        foreach ($frozen->lines as ['quantity' => $quantity, 'unitPrice' => $unitPrice, 'unitTaxes' => $unitTaxAmounts]) {
             $unitTax = array_sum($unitTaxAmounts);
 
             if ($unitPrice <= 0.0 && $unitTax <= 0.0) {
@@ -165,7 +153,7 @@ final class SalesPieceBuilder
             }
 
             $rate = PieceAmounts::rateOf($chart, $unitPrice, $unitTax);
-            [$lineAmount, $lineTax] = self::lineAsInvoiced($order, (float) $line->getQuantity(), $unitPrice, $unitTaxAmounts);
+            [$lineAmount, $lineTax] = self::lineAsInvoiced($order, $quantity, $unitPrice, $unitTaxAmounts);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $lineAmount;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + $lineTax;
             $counts[$rate] = ($counts[$rate] ?? 0) + 1;
@@ -243,16 +231,15 @@ final class SalesPieceBuilder
     /**
      * @return array{array<string, float>, array<string, float>}
      */
-    private function postageWeightsByRate(Order $order, float $untaxedPostage, float $postageTax, AccountingChart $chart): array
+    private function postageWeightsByRate(FrozenOrderAmounts $frozen, float $untaxedPostage, float $postageTax, AccountingChart $chart): array
     {
         $amounts = [];
         $taxes = [];
 
-        foreach (OrderPostageTaxQuery::create()->filterByOrderId($order->getId())->find() as $share) {
-            $untaxed = (float) $share->getUntaxedAmount();
-            $rate = PieceAmounts::rateOf($chart, $untaxed, (float) $share->getAmount());
+        foreach ($frozen->postageShares as ['untaxed' => $untaxed, 'tax' => $tax]) {
+            $rate = PieceAmounts::rateOf($chart, $untaxed, $tax);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $untaxed;
-            $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $share->getAmount();
+            $taxes[$rate] = ($taxes[$rate] ?? 0.0) + $tax;
         }
 
         if ([] === $amounts) {

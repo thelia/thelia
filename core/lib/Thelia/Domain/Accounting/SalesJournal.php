@@ -25,6 +25,7 @@ use Thelia\Model\Map\OrderPostageTaxTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 
 /**
@@ -112,25 +113,32 @@ final class SalesJournal
     }
 
     /**
+     * Each batch starts after the last order of the previous one, by invoice date then id: an
+     * order invoiced while the export runs cannot shift the batches, and none is read twice.
+     * The customer, the invoice address and the currency come with the order; the lines,
+     * their taxes and the postage shares, with the batch.
+     *
      * @return \Generator<int, AccountingPiece> by invoice date, then id
      */
     private function invoicePieces(AccountingChart $chart, ?\DateTimeInterface $from, ?\DateTimeInterface $to, ExportReport $report, Currency $shopCurrency, string $locale): \Generator
     {
         $builder = new SalesPieceBuilder();
-        $offset = 0;
+        $after = null;
 
         do {
-            $orders = $this->invoiced($from, $to)->offset($offset)->limit(self::BATCH_SIZE)->find();
+            $orders = iterator_to_array($this->invoicedBatch($from, $to, $after), false);
+            $frozen = FrozenOrderAmounts::ofOrders(array_map(static fn (Order $order): int => (int) $order->getId(), $orders));
 
             foreach ($orders as $order) {
                 try {
-                    yield $builder->build($order, $chart, $shopCurrency, $locale);
+                    yield $builder->build($order, $chart, $shopCurrency, $locale, $frozen[(int) $order->getId()]);
                 } catch (OrderNotExportableException $exception) {
                     $report->addWarning($exception->getMessage());
                 }
             }
 
-            $offset += self::BATCH_SIZE;
+            $last = end($orders);
+            $after = false === $last ? null : [$last->getInvoiceDate()?->format('Y-m-d H:i:s'), (int) $last->getId()];
             self::forgetTheBatch();
         } while (self::BATCH_SIZE === \count($orders));
     }
@@ -198,13 +206,34 @@ final class SalesJournal
         CustomerTableMap::clearInstancePool();
     }
 
-    private function invoiced(?\DateTimeInterface $from, ?\DateTimeInterface $to): OrderQuery
+    /**
+     * @param array{?string, int}|null $after the invoice date and id of the last order read
+     *
+     * @return iterable<Order>
+     */
+    private function invoicedBatch(?\DateTimeInterface $from, ?\DateTimeInterface $to, ?array $after): iterable
     {
-        return $this->period(OrderQuery::create(), $from, $to)
+        $query = $this->period(OrderQuery::create(), $from, $to)
             ->where('Order.InvoiceRef IS NOT NULL')
-            ->where('Order.InvoiceRef <> \'\'')
+            ->where('Order.InvoiceRef <> \'\'');
+
+        if (null !== $after) {
+            $query
+                ->condition('later', 'Order.InvoiceDate > ?', $after[0])
+                ->condition('same_date', 'Order.InvoiceDate = ?', $after[0])
+                ->condition('next_id', 'Order.Id > ?', $after[1])
+                ->combine(['same_date', 'next_id'], Criteria::LOGICAL_AND, 'same_date_next_id')
+                ->where(['later', 'same_date_next_id'], Criteria::LOGICAL_OR);
+        }
+
+        return $query
+            ->leftJoinWithCustomer()
+            ->leftJoinWithOrderAddressRelatedByInvoiceOrderAddressId()
+            ->leftJoinWithCurrency()
             ->orderByInvoiceDate()
-            ->orderById();
+            ->orderById()
+            ->limit(self::BATCH_SIZE)
+            ->find();
     }
 
     private function period(OrderQuery $query, ?\DateTimeInterface $from, ?\DateTimeInterface $to): OrderQuery
