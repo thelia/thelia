@@ -132,6 +132,50 @@ final class OrderStatusTransitionScreensTest extends WebIntegrationTestCase
         self::assertStringContainsString('no_such_message', $crawler->filter('[data-testid="bo-flash-danger"]')->text());
     }
 
+    public function testTheActionsTabAddsAnEmailForTheEditOfAnOrderAndNamesItsTrigger(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $paid = $this->orderStatus(OrderStatus::CODE_PAID);
+
+        $crawler = $this->client->request('GET', '/admin/configuration/order-status/update/'.$paid->getId().'?tab=actions');
+        if (0 === $crawler->filter('#action-trigger-edit')->count()) {
+            self::markTestSkipped('The installed back-office theme does not offer the edit trigger yet.');
+        }
+
+        $form = $crawler->filter('[data-testid="order-status-action-create-submit"]')->form();
+        $form['trigger'] = 'edit';
+        $form['action_type'] = 'send_customer_email';
+        $form['payload[send_customer_email][message_code]'] = 'order_confirmation';
+        $this->client->submit($form);
+
+        $action = OrderStatusActionQuery::create()->filterByToStatusId($paid->getId())->filterByTriggerType('edit')->findOne();
+        self::assertNotNull($action, 'The edit trigger must be persisted.');
+        self::assertNull($action->getFromStatusId());
+
+        $crawler = $this->client->followRedirect();
+        self::assertStringContainsString('edited', $crawler->filter('[data-testid="order-status-actions-pane"]')->text());
+    }
+
+    public function testAnActionThatIsNotAnEmailIsRefusedOnTheEditOfAnOrder(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $paid = $this->orderStatus(OrderStatus::CODE_PAID);
+
+        $crawler = $this->client->request('GET', '/admin/configuration/order-status/update/'.$paid->getId().'?tab=actions');
+        if (0 === $crawler->filter('#action-trigger-edit')->count()) {
+            self::markTestSkipped('The installed back-office theme does not offer the edit trigger yet.');
+        }
+
+        $form = $crawler->filter('[data-testid="order-status-action-create-submit"]')->form();
+        $form['trigger'] = 'edit';
+        $form['action_type'] = 'allocate_invoice_ref';
+        $this->client->submit($form);
+        $crawler = $this->client->followRedirect();
+
+        self::assertSame(0, OrderStatusActionQuery::create()->filterByToStatusId($paid->getId())->filterByTriggerType('edit')->count());
+        self::assertCount(1, $crawler->filter('[data-testid="bo-flash-danger"]'));
+    }
+
     public function testTheOrderSheetOnlyOffersTheStatusesTheGraphAllows(): void
     {
         $this->loginAs($this->factory->admin());

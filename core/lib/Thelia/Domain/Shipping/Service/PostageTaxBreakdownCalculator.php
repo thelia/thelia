@@ -23,7 +23,10 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\Country;
 use Thelia\Model\Lang;
+use Thelia\Model\Order;
 use Thelia\Model\OrderPostage;
+use Thelia\Model\OrderProductQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
@@ -68,7 +71,7 @@ readonly class PostageTaxBreakdownCalculator
     ): void {
         $untaxedPostage = round((float) $postage->getUntaxedAmount(), 2);
 
-        $lines = $this->split($cart, $country, $state, $untaxedPostage, $locale);
+        $lines = $this->split($this->basesOfCart($cart), $country, $state, $untaxedPostage, $locale);
 
         if ([] === $lines) {
             return;
@@ -102,7 +105,7 @@ readonly class PostageTaxBreakdownCalculator
         float $postageTax,
         ?string $locale = null,
     ): array {
-        $lines = $this->split($cart, $country, $state, round($untaxedPostage, 2), $locale);
+        $lines = $this->split($this->basesOfCart($cart), $country, $state, round($untaxedPostage, 2), $locale);
 
         if ([] === $lines) {
             return [];
@@ -114,12 +117,81 @@ readonly class PostageTaxBreakdownCalculator
     }
 
     /**
+     * The breakdown of the postage of an order whose lines were edited: the
+     * goods are the lines the order carries now, not the cart it came from, and
+     * the tax is the sum of the lines, as when the order was placed.
+     *
+     * Empty on `single_rule`, on a free postage, and when no line carries a
+     * usable tax rule.
+     *
+     * @return list<PostageTaxLine>
+     *
+     * @throws PropelException
+     */
+    public function splitForEditedOrder(
+        Order $order,
+        Country $country,
+        ?State $state,
+        float $untaxedPostage,
+        ?string $locale = null,
+    ): array {
+        return $this->split($this->basesOfOrder($order), $country, $state, round($untaxedPostage, 2), $locale);
+    }
+
+    /**
+     * @return array<int, float> untaxed value by tax rule id
+     */
+    private function basesOfOrder(Order $order): array
+    {
+        $bases = [];
+
+        foreach (OrderProductQuery::create()->filterByOrderId($order->getId())->find() as $line) {
+            if (!$line->isProductLine()) {
+                continue;
+            }
+
+            $taxRuleId = (int) ProductQuery::create()->findOneByRef($line->getProductRef())?->getTaxRuleId();
+
+            if (0 === $taxRuleId) {
+                continue;
+            }
+
+            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + (float) $line->getQuantity() * (float) ($line->getWasInPromo() ? $line->getPromoPrice() : $line->getPrice());
+        }
+
+        return $bases;
+    }
+
+    /**
+     * @return array<int, float> untaxed value by tax rule id
+     */
+    private function basesOfCart(Cart $cart): array
+    {
+        $bases = [];
+
+        /** @var CartItem $cartItem */
+        foreach ($cart->getCartItems() as $cartItem) {
+            $taxRuleId = (int) $cartItem->getProduct()->getTaxRuleId();
+
+            if (0 === $taxRuleId) {
+                continue;
+            }
+
+            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $cartItem->getTotalRealPrice();
+        }
+
+        return $bases;
+    }
+
+    /**
+     * @param array<int, float> $bases untaxed value by tax rule id
+     *
      * @return list<PostageTaxLine>
      *
      * @throws PropelException
      */
     private function split(
-        Cart $cart,
+        array $bases,
         Country $country,
         ?State $state,
         float $untaxedPostage,
@@ -135,7 +207,7 @@ readonly class PostageTaxBreakdownCalculator
             return [];
         }
 
-        $groups = $this->groupCartByTaxRule($cart, $country, $state);
+        $groups = $this->groupByTaxRule($bases, $country, $state);
 
         if ([] === $groups) {
             return [];
@@ -174,25 +246,14 @@ readonly class PostageTaxBreakdownCalculator
      * The untaxed value each tax rule of the cart accounts for, with the tax
      * calculator already loaded for the destination.
      *
+     * @param array<int, float> $bases untaxed value by tax rule id
+     *
      * @return list<array{base: float, rate: float, taxRule: TaxRule, calculator: TaxCalculatorInterface}>
      *
      * @throws PropelException
      */
-    private function groupCartByTaxRule(Cart $cart, Country $country, ?State $state): array
+    private function groupByTaxRule(array $bases, Country $country, ?State $state): array
     {
-        $bases = [];
-
-        /** @var CartItem $cartItem */
-        foreach ($cart->getCartItems() as $cartItem) {
-            $taxRuleId = (int) $cartItem->getProduct()->getTaxRuleId();
-
-            if (0 === $taxRuleId) {
-                continue;
-            }
-
-            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $cartItem->getTotalRealPrice();
-        }
-
         $groups = [];
 
         foreach ($bases as $taxRuleId => $base) {

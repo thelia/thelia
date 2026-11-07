@@ -635,4 +635,19 @@ WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
 
 DROP TEMPORARY TABLE `config_title_seed`;
 
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.order.edit', NOW(), NOW());
+
+SET @order_edit_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.order.edit');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@order_edit_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'de_DE', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'en_US', 'Editing the lines of an order', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'es_ES', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'fr_FR', 'Modification des lignes d\'une commande', NULL, NULL, NULL),
+    (@order_edit_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'nl_NL', NULL, NULL, NULL, NULL),
+    (@order_edit_resource_id, 'ru_RU', NULL, NULL, NULL, NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -390,18 +390,19 @@ final readonly class OrderHistoryRecorder
     /**
      * Whether entries of this kind are checked against the journal before being written.
      *
-     * A note and an address correction are not. A human writing the same sentence twice
-     * meant to write it twice. An administrator correcting an address is a gesture, not
-     * a notification that can be delivered twice, and its payload (the address and its
-     * type, never what was typed) is the same from one correction to the next, so a
-     * comparison would take the second correction, and its author, for a replay.
-     * Neither waits on the lock.
+     * A note, an address correction and an order edit are not. A human writing the same
+     * sentence twice meant to write it twice. An administrator correcting an address or
+     * editing the lines is a gesture, not a notification that can be delivered twice, and
+     * its payload (the address and its type, or the lines named by their reference) can be
+     * the same from one gesture to the next, so a comparison would take the second one,
+     * and its author, for a replay. None waits on the lock.
      */
     private function isDeduplicated(string $eventType): bool
     {
         return !\in_array($eventType, [
             OrderHistoryEventType::NOTE->value,
             OrderHistoryEventType::ADDRESS_UPDATED->value,
+            OrderHistoryEventType::ORDER_EDITED->value,
         ], true);
     }
 

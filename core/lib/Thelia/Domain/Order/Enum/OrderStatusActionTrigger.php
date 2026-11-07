@@ -16,10 +16,12 @@ namespace Thelia\Domain\Order\Enum;
 
 /**
  * What fires an automatic order status action: entering a status, whatever the
- * order came from, or one precise transition between two statuses.
+ * order came from, one precise transition between two statuses, or the edit of an order that
+ * stands in a status.
  */
 enum OrderStatusActionTrigger: string
 {
     case ENTER = 'enter';
     case TRANSITION = 'transition';
+    case EDIT = 'edit';
 }

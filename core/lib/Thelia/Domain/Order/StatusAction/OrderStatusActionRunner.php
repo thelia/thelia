@@ -15,11 +15,13 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\StatusAction;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Thelia\Core\Event\Order\OrderEditEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\Exception\InvalidOrderStatusActionPayloadException;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
+use Thelia\Domain\Order\StatusAction\Effect\AbstractEmailAction;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\Exception\EmailNotSentException;
@@ -83,6 +85,55 @@ final class OrderStatusActionRunner
         foreach ($this->actionsFor($previousStatusId, $newStatusId) as $action) {
             $this->run($action, $order, static fn (array $payload): OrderStatusActionContext => $context($payload, $order, $previousStatus, $newStatus));
         }
+    }
+
+    /**
+     * Runs the actions an order edit fires, once the edit is committed: those of the EDIT trigger
+     * declared on the status the order stands in. Only the e-mail actions make sense after an
+     * edit (stock, invoice numbering and coupons have already followed the edited lines), so
+     * any other type is left alone.
+     */
+    #[AsEventListener(event: TheliaEvents::ORDER_AFTER_EDIT, priority: 5)]
+    public function onOrderEdited(OrderEditEvent $event): void
+    {
+        $order = $event->getOrder();
+        $statusId = $order->getStatusId();
+        $status = null === $statusId ? null : $this->catalog->get($statusId);
+
+        if (null === $status) {
+            return;
+        }
+
+        foreach ($this->editActionsFor($statusId) as $action) {
+            if (!$this->registry->get($action->getActionType()) instanceof AbstractEmailAction) {
+                continue;
+            }
+
+            $this->run($action, $order, static fn (array $payload): OrderStatusActionContext => new OrderStatusActionContext($order, null, $status, $payload, $event->getSummary()));
+        }
+    }
+
+    /**
+     * @return list<OrderStatusAction>
+     */
+    public function editActionsFor(int $statusId): array
+    {
+        $key = 'edit>'.$statusId;
+
+        if (isset($this->actionsByTransition[$key])) {
+            return $this->actionsByTransition[$key];
+        }
+
+        $actions = OrderStatusActionQuery::create()
+            ->filterByActive(true)
+            ->filterByTriggerType(OrderStatusActionTrigger::EDIT->value)
+            ->filterByToStatusId($this->catalog->equivalentIds($statusId), \Propel\Runtime\ActiveQuery\Criteria::IN)
+            ->orderByPosition()
+            ->orderById()
+            ->find()
+            ->getData();
+
+        return $this->actionsByTransition[$key] = array_values($actions);
     }
 
     /**

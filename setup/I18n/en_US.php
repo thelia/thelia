@@ -60,6 +60,7 @@ return [
     'Customer - tab content' => 'Customer - tab content',
     'Customer edit - actions' => 'Customer edit - actions',
     'Customer title - delete form' => 'Customer title - delete form',
+    'Editing the lines of an order' => 'Editing the lines of an order',
     'Feature - update form' => 'Feature - update form',
     'Folder - SEO update form' => 'Folder - SEO update form',
     'Folder - update form' => 'Folder - update form',
