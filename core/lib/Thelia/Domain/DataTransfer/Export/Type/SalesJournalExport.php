@@ -29,7 +29,8 @@ use Thelia\Model\Lang;
  * accounting entries file in their order: written with the FEC serializer it is that file,
  * with the CSV one a sheet to read.
  *
- * The piece is the invoice: its reference numbers the entries and its date dates them.
+ * The piece is the invoice or the credit note: its reference numbers the entries and its date
+ * dates them.
  * The rows are written as the pieces are read: a year of invoices is never held at once.
  */
 class SalesJournalExport extends AbstractExport implements ReportingExportInterface
@@ -103,7 +104,7 @@ class SalesJournalExport extends AbstractExport implements ReportingExportInterf
 
         foreach ($pieces as $piece) {
             $date = $piece->invoiceDate->format('Y-m-d');
-            $label = $translator->trans('Invoice %ref %customer', ['%ref' => $piece->invoiceRef, '%customer' => $piece->customerName], null, $locale);
+            $label = $translator->trans($piece->isCreditNote() ? 'Credit note %ref %customer' : 'Invoice %ref %customer', ['%ref' => $piece->invoiceRef, '%customer' => $piece->customerName], null, $locale);
 
             foreach ($piece->entries as $entry) {
                 $isCustomer = AccountingEntry::ROLE_CUSTOMER === $entry->role;

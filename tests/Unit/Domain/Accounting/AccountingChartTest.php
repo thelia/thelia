@@ -33,6 +33,16 @@ final class AccountingChartTest extends TestCase
         self::assertSame('20:706200:445720,5.5:706055:445705,0:706000', $chart->rateAccountsSetting());
     }
 
+    public function testTheAccountOfCommercialCreditNotesIsOptional(): void
+    {
+        self::assertNull(AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720')->commercialCreditAccount);
+        self::assertSame('709000', AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720', ' 709000 ')->commercialCreditAccount);
+
+        $this->expectException(InvalidAccountingChartException::class);
+
+        AccountingChart::fromValues('VE', 'Ventes', '411000', '708500', '20:706200:445720', '709 000');
+    }
+
     public function testAnEmptyChartSaysWhatIsMissing(): void
     {
         $chart = AccountingChart::fromValues('', '', '', '', '');

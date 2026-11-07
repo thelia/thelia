@@ -24,8 +24,8 @@ use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Model\Lang;
 
 /**
- * The taxes of the invoices of a period, one row per month of invoice and per rate: the
- * amount taxed, the tax and the number of pieces. Read from the pieces of the sales
+ * The taxes of the invoices of a period, less those of its credit notes, one row per month of
+ * invoice and per rate: the amount taxed, the tax and the number of pieces. Read from the pieces of the sales
  * journal, so that both say the same thing to the cent.
  */
 class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInterface
@@ -74,13 +74,16 @@ class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInt
                 $key = $period.'|'.$entry->rateKey;
                 $totals[$key] ??= ['period' => $period, 'rate' => $entry->rateKey, 'taxable' => 0, 'tax' => 0, 'pieces' => []];
 
+                // A credit note debits what an invoice credits: it takes its amounts off the month.
+                $amount = $entry->creditCents - $entry->debitCents;
+
                 if (AccountingEntry::ROLE_TAX === $entry->role) {
-                    $totals[$key]['tax'] += $entry->creditCents;
+                    $totals[$key]['tax'] += $amount;
                 } else {
-                    $totals[$key]['taxable'] += $entry->creditCents;
+                    $totals[$key]['taxable'] += $amount;
                 }
 
-                $totals[$key]['pieces'][$piece->invoiceRef] = true;
+                $totals[$key]['pieces'][$piece->kind.'|'.$piece->invoiceRef] = true;
             }
         }
 
