@@ -121,6 +121,38 @@ final class SalesPieceBuilderTest extends ActionIntegrationTestCase
         }
     }
 
+    public function testEachRateIsBookedAsTheInvoiceRoundedItsLines(): void
+    {
+        $expected = [
+            ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS => [
+                ['411000', 14457, 0],
+                ['706200', 0, 10000],
+                ['706055', 0, 2331],
+                ['445720', 0, 2000],
+                ['445705', 0, 126],
+            ],
+            ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS => [
+                ['411000', 14462, 0],
+                ['706200', 0, 10000],
+                ['706055', 0, 2333],
+                ['445720', 0, 2000],
+                ['445705', 0, 129],
+            ],
+        ];
+
+        foreach ($expected as $mode => $entries) {
+            ConfigQuery::write('order_rounding_mode', (string) $mode);
+            $order = $this->invoicedOrder();
+            $this->line($order, 100.0, 1, [20.0]);
+            $this->line($order, 3.333333, 7, [0.183333]);
+
+            $piece = $this->builder->build($order, $this->chart, $this->defaultCurrency());
+
+            self::assertSame($entries, $this->summary($piece), 'Rounding mode '.$mode);
+            $this->assertBalanced($piece);
+        }
+    }
+
     public function testAnOrderPricedBeforeTheRoundingRulesStillBalances(): void
     {
         $order = $this->invoicedOrder();

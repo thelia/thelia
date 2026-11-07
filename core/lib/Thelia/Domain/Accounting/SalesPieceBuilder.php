@@ -16,6 +16,7 @@ namespace Thelia\Domain\Accounting;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPostageTaxQuery;
@@ -33,8 +34,9 @@ use Thelia\Model\OrderProductTaxQuery;
  *   spread over the rates in proportion of their amount excluding tax;
  * - the shipping, by the rules order_postage_tax froze when the postage was split, or at
  *   the one rate its frozen tax makes otherwise.
- * Every split is made in whole cents, the cents left over going to the largest shares, so
- * that the lines add up to the totals exactly.
+ * Each rate starts from its frozen amounts, rounded line by line as the invoice rounds them,
+ * and is brought to the totals of the invoice in whole cents: what a discount took off is
+ * spread over the rates, a cent of rounding left over goes to the largest line.
  *
  * An order in another currency than the shop's is booked in the shop currency at the rate
  * frozen on the order, each line carrying its own amount.
@@ -73,11 +75,12 @@ final class SalesPieceBuilder
             throw new OrderNotExportableException($this->trans('Order %ref: its discount is larger than its products, the invoice cannot be split by rate.', ['%ref' => $orderRef]));
         }
 
-        $products = self::allocate($productCents, $productAmounts);
-        $shipping = self::allocate($postageCents, $postageWeights);
-        $taxes = self::allocate($productTaxCents, [] !== array_filter($productTaxes) ? $productTaxes : $productAmounts);
+        $discounted = (float) $order->getDiscount() > 0.0;
+        $products = self::fromFrozen($productCents, $productAmounts, $discounted, $productAmounts);
+        $shipping = self::fromFrozen($postageCents, $postageWeights, false, $postageWeights);
+        $taxes = self::fromFrozen($productTaxCents, $productTaxes, $discounted, [] !== array_filter($productTaxes) ? $productTaxes : $productAmounts);
 
-        foreach (self::allocate($postageTaxCents, $postageTaxWeights) as $rate => $cents) {
+        foreach (self::fromFrozen($postageTaxCents, $postageTaxWeights, false, $postageTaxWeights) as $rate => $cents) {
             $taxes[$rate] = ($taxes[$rate] ?? 0) + $cents;
         }
 
@@ -146,22 +149,52 @@ final class SalesPieceBuilder
         foreach ($lines as $line) {
             $promo = 1 === (int) $line->getWasInPromo();
             $unitPrice = (float) ($promo ? $line->getPromoPrice() : $line->getPrice());
-            $unitTax = 0.0;
-
-            foreach ($unitTaxes[(int) $line->getId()] ?? [] as $tax) {
-                $unitTax += (float) ($promo ? $tax->getPromoAmount() : $tax->getAmount());
-            }
+            $unitTaxAmounts = array_map(
+                static fn ($tax): float => (float) ($promo ? $tax->getPromoAmount() : $tax->getAmount()),
+                $unitTaxes[(int) $line->getId()] ?? [],
+            );
+            $unitTax = array_sum($unitTaxAmounts);
 
             if ($unitPrice <= 0.0 && $unitTax <= 0.0) {
                 continue;
             }
 
             $rate = $this->rateOf($chart, $unitPrice, $unitTax);
-            $amounts[$rate] = ($amounts[$rate] ?? 0.0) + (float) $line->getQuantity() * $unitPrice;
-            $taxes[$rate] = ($taxes[$rate] ?? 0.0) + (float) $line->getQuantity() * $unitTax;
+            [$lineAmount, $lineTax] = self::lineAsInvoiced($order, (float) $line->getQuantity(), $unitPrice, $unitTaxAmounts);
+            $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $lineAmount;
+            $taxes[$rate] = ($taxes[$rate] ?? 0.0) + $lineTax;
         }
 
         return [$amounts, $taxes];
+    }
+
+    /**
+     * A line excluding tax and its tax, rounded as Order::getTotalAmount() rounds them for the
+     * invoice: each unit amount to the cent before the quantity under the sum of roundings,
+     * the line total under the rounding of sums, nothing for an order older than both.
+     *
+     * @param list<float> $unitTaxes
+     *
+     * @return array{float, float}
+     */
+    private static function lineAsInvoiced(Order $order, float $quantity, float $unitPrice, array $unitTaxes): array
+    {
+        $orderId = (int) $order->getId();
+
+        if (ConfigQuery::isOrderWithLegacyRounding($orderId)) {
+            return [$quantity * $unitPrice, $quantity * array_sum($unitTaxes)];
+        }
+
+        if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === ConfigQuery::getOrderRoundingMode($orderId)) {
+            $amount = round($quantity * $unitPrice, 2);
+
+            return [$amount, round($quantity * ($unitPrice + array_sum($unitTaxes)), 2) - $amount];
+        }
+
+        return [
+            $quantity * round($unitPrice, 2),
+            $quantity * array_sum(array_map(static fn (float $tax): float => round($tax, 2), $unitTaxes)),
+        ];
     }
 
     /**
@@ -203,6 +236,51 @@ final class SalesPieceBuilder
     private function accountsOf(AccountingChart $chart, string $rate, string $orderRef): array
     {
         return $chart->accountsOf($rate) ?? throw new OrderNotExportableException($this->trans('Order %ref: it was taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
+    }
+
+    /**
+     * The amounts of each rate as the order froze them, rounded to the cent, brought to the
+     * total of the invoice. What the discount took off is spread over the rates in proportion
+     * of the weights; without discount, the difference is the rounding of the invoice and goes
+     * to the largest line.
+     *
+     * @param array<string, float> $frozen
+     * @param array<string, float> $weights
+     *
+     * @return array<string, int>
+     */
+    private static function fromFrozen(int $total, array $frozen, bool $discounted, array $weights): array
+    {
+        if ([] === $frozen) {
+            return self::allocate($total, $weights);
+        }
+
+        $shares = array_map(self::cents(...), $frozen);
+        $difference = $total - array_sum($shares);
+
+        if (0 === $difference) {
+            return array_filter($shares, static fn (int $share): bool => 0 !== $share);
+        }
+
+        if ($discounted) {
+            $sign = $difference < 0 ? -1 : 1;
+
+            foreach (self::allocate(abs($difference), $weights) as $rate => $cents) {
+                $shares[$rate] = ($shares[$rate] ?? 0) + $sign * $cents;
+            }
+        } else {
+            $largest = array_key_first($shares);
+
+            foreach ($shares as $rate => $share) {
+                if (abs($share) > abs($shares[$largest])) {
+                    $largest = $rate;
+                }
+            }
+
+            $shares[$largest] += $difference;
+        }
+
+        return array_filter($shares, static fn (int $share): bool => 0 !== $share);
     }
 
     /**
