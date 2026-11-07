@@ -133,7 +133,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (122, 'accounting_journal_label', '', 0, 0, NOW(), NOW()),
 (123, 'accounting_customer_account', '', 0, 0, NOW(), NOW()),
 (124, 'accounting_shipping_account', '', 0, 0, NOW(), NOW()),
-(125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW())
+(125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
+(126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2395,7 +2396,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (122, '{{ locale }}', {{ intl('Label of the sales journal in the accounting exports (Ventes when empty)', locale) }}, NULL, NULL, NULL),
     (123, '{{ locale }}', {{ intl('Customer account the sales journal debits, e.g. 411000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
     (124, '{{ locale }}', {{ intl('Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
-    (125, '{{ locale }}', {{ intl('Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (125, '{{ locale }}', {{ intl('Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
+    (126, '{{ locale }}', {{ intl('Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

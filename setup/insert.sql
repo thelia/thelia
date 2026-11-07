@@ -133,7 +133,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (122, 'accounting_journal_label', '', 0, 0, NOW(), NOW()),
 (123, 'accounting_customer_account', '', 0, 0, NOW(), NOW()),
 (124, 'accounting_shipping_account', '', 0, 0, NOW(), NOW()),
-(125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW())
+(125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
+(126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2395,6 +2396,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'cs_CZ', NULL, NULL, NULL, NULL),
     (124, 'cs_CZ', NULL, NULL, NULL, NULL),
     (125, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (126, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2497,6 +2499,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'de_DE', 'Kundenkonto, das das Verkaufsjournal belastet, z. B. 411000 (für die Buchhaltungsexporte erforderlich)', NULL, NULL, NULL),
     (124, 'de_DE', 'Konto, dem das Verkaufsjournal die Versandkosten gutschreibt, z. B. 708500 (für die Buchhaltungsexporte erforderlich)', NULL, NULL, NULL),
     (125, 'de_DE', 'Erlöskonto und Konto der vereinnahmten Steuer je Steuersatz, z. B. 20:706200:445720,5.5:706055:445705,0:706000 (für die Buchhaltungsexporte erforderlich)', NULL, NULL, NULL),
+    (126, 'de_DE', 'Konto, das mit kaufmännischen Gutschriften (Rabatt, Nachlass, Erstattung einer Differenz) belastet wird, z. B. 709000 (Erlöskonto ihres Steuersatzes wenn leer)', NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2599,6 +2602,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'en_US', 'Customer account the sales journal debits, e.g. 411000 (required by the accounting exports)', NULL, NULL, NULL),
     (124, 'en_US', 'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)', NULL, NULL, NULL),
     (125, 'en_US', 'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', NULL, NULL, NULL),
+    (126, 'en_US', 'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2701,6 +2705,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'es_ES', 'Cuenta de cliente que carga el diario de ventas, p. ej. 411000 (obligatoria para las exportaciones contables)', NULL, NULL, NULL),
     (124, 'es_ES', 'Cuenta que abona el diario de ventas con el envío, p. ej. 708500 (obligatoria para las exportaciones contables)', NULL, NULL, NULL),
     (125, 'es_ES', 'Cuenta de ventas y cuenta del impuesto repercutido por tipo, p. ej. 20:706200:445720,5.5:706055:445705,0:706000 (obligatoria para las exportaciones contables)', NULL, NULL, NULL),
+    (126, 'es_ES', 'Cuenta que carga los abonos comerciales (rebaja, descuento, reembolso de una diferencia), p. ej. 709000 (cuenta de ventas de su tipo si está vacía)', NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2803,6 +2808,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'fr_FR', 'Compte client débité par le journal des ventes, par exemple 411000 (obligatoire pour les exports comptables)', NULL, NULL, NULL),
     (124, 'fr_FR', 'Compte crédité du port par le journal des ventes, par exemple 708500 (obligatoire pour les exports comptables)', NULL, NULL, NULL),
     (125, 'fr_FR', 'Compte de ventes et compte de TVA collectée par taux, par exemple 20:706200:445720,5.5:706055:445705,0:706000 (obligatoire pour les exports comptables)', NULL, NULL, NULL),
+    (126, 'fr_FR', 'Compte débité des avoirs commerciaux (rabais, remise, remboursement de différence), par exemple 709000 (compte de ventes de leur taux si vide)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2905,6 +2911,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'it_IT', 'Conto cliente addebitato dal giornale delle vendite, ad es. 411000 (obbligatorio per le esportazioni contabili)', NULL, NULL, NULL),
     (124, 'it_IT', 'Conto accreditato delle spese di spedizione dal giornale delle vendite, ad es. 708500 (obbligatorio per le esportazioni contabili)', NULL, NULL, NULL),
     (125, 'it_IT', 'Conto vendite e conto IVA a debito per aliquota, ad es. 20:706200:445720,5.5:706055:445705,0:706000 (obbligatorio per le esportazioni contabili)', NULL, NULL, NULL),
+    (126, 'it_IT', 'Conto addebitato delle note di credito commerciali (ribasso, sconto, rimborso di una differenza), ad es. 709000 (conto vendite della loro aliquota se vuoto)', NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -3007,6 +3014,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'nl_NL', 'Klantrekening die het verkoopdagboek debiteert, bijv. 411000 (verplicht voor de boekhoudexports)', NULL, NULL, NULL),
     (124, 'nl_NL', 'Rekening die het verkoopdagboek crediteert met de verzendkosten, bijv. 708500 (verplicht voor de boekhoudexports)', NULL, NULL, NULL),
     (125, 'nl_NL', 'Omzetrekening en rekening van de geïnde belasting per tarief, bijv. 20:706200:445720,5.5:706055:445705,0:706000 (verplicht voor de boekhoudexports)', NULL, NULL, NULL),
+    (126, 'nl_NL', 'Rekening die met commerciële creditnota\'s (korting, rabat, terugbetaling van een verschil) wordt gedebiteerd, bijv. 709000 (omzetrekening van hun tarief indien leeg)', NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -3108,7 +3116,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (122, 'ru_RU', 'Название журнала продаж в бухгалтерских выгрузках (Ventes, если пусто)', NULL, NULL, NULL),
     (123, 'ru_RU', 'Счёт клиента, который дебетует журнал продаж, например 411000 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
     (124, 'ru_RU', 'Счёт, который журнал продаж кредитует на сумму доставки, например 708500 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
-    (125, 'ru_RU', 'Счёт продаж и счёт начисленного налога по каждой ставке, например 20:706200:445720,5.5:706055:445705,0:706000 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL)
+    (125, 'ru_RU', 'Счёт продаж и счёт начисленного налога по каждой ставке, например 20:706200:445720,5.5:706055:445705,0:706000 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
+    (126, 'ru_RU', 'Счёт, который дебетуется коммерческими кредит-нотами (скидка, уступка, возврат разницы), например 709000 (счёт продаж их ставки, если пусто)', NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks
