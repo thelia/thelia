@@ -18,9 +18,12 @@ use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Thelia\Domain\Accounting\AccountingChart;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Domain\DataTransfer\Export\Type\SalesJournalExport;
 use Thelia\Domain\DataTransfer\Export\Type\TaxSummaryExport;
+use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
+use Thelia\Domain\DataTransfer\Job\JobStatus;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ExportQuery;
@@ -222,6 +225,41 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertMatchesRegularExpression('/[1-9]\d* pieces?/', $tester->getDisplay());
         self::assertSame(1, preg_match('/(\S+\.txt)/', $tester->getDisplay(), $file));
         self::assertStringStartsWith(implode("\t", self::FEC_FIELDS)."\r\n", (string) file_get_contents($file[1]));
+    }
+
+    public function testTheJobOfTheJournalKeepsItsReportForTheScreenOfTheJob(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $this->invoicedOrder('2026-02-10', [[100.0, 1, 20.0]]);
+        $export = ExportQuery::create()->findOneByRef('thelia.export.sales_journal') ?? self::fail('The sales journal is not in the catalogue.');
+
+        $job = $this->getService(ExportJobLauncher::class)->launch(
+            $export,
+            'thelia.fec',
+            language: Lang::getDefaultLanguage(),
+            rangeDate: ['start' => new \DateTime('2026-02-01 00:00:00'), 'end' => new \DateTime('2026-02-28 23:59:59')],
+        );
+        $job->reload();
+        ExportStorage::discard((string) $job->getFilePath());
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
+        $report = $job->getExportReport() ?? self::fail('The job kept no report.');
+        self::assertMatchesRegularExpression('/[1-9]\d* pieces?, debit /', implode("\n", $report->lines()));
+        self::assertStringContainsString('credit note', implode("\n", $report->warnings()));
+    }
+
+    public function testTheJobOfAnExportThatReportsNothingKeepsNoReport(): void
+    {
+        $this->invoicedOrder('2026-02-10', [[100.0, 1, 20.0]]);
+        $export = ExportQuery::create()->findOneByRef('thelia.export.orders') ?? self::fail('The order export is not in the catalogue.');
+
+        $job = $this->getService(ExportJobLauncher::class)->launch($export, 'thelia.csv', language: Lang::getDefaultLanguage());
+        $job->reload();
+        ExportStorage::discard((string) $job->getFilePath());
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
+        self::assertNull($job->getReport());
+        self::assertNull($job->getExportReport());
     }
 
     private function chart(string $customerAccount, string $shippingAccount, string $rateAccounts): void

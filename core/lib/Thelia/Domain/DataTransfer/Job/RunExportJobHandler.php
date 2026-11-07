@@ -21,6 +21,7 @@ use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\ExportStorage;
+use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
@@ -55,7 +56,8 @@ final readonly class RunExportJobHandler
         }
 
         try {
-            $job->setProcessedRows(0)->save();
+            // A replayed job starts over: the report of the run before it is not this one's.
+            $job->setProcessedRows(0)->setReport(null)->save();
             $this->run($job);
         } catch (\Throwable $exception) {
             $this->lifecycle->fail($message, $job, $exception);
@@ -110,6 +112,12 @@ final readonly class RunExportJobHandler
     private function record(ExportJob $job, ExportEvent $event, string $extension): void
     {
         try {
+            $export = $event->getExport();
+
+            if ($export instanceof ReportingExportInterface) {
+                $job->recordReport($export->report());
+            }
+
             $job->setStatus(JobStatus::DONE->value)
                 ->setFilePath($event->getFilePath())
                 ->setFileName($event->getExport()->getFileName().'.'.$extension)
