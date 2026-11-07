@@ -30,8 +30,9 @@ use Thelia\Model\OrderQuery;
 
 /**
  * The pieces of the invoices of a period, by their invoice date: the order is booked when
- * it is invoiced, not when it was placed. An order without invoice reference has no piece;
- * an order the chart of accounts cannot book is left out; both are said in the report.
+ * it is invoiced, not when it was placed. An order without invoice reference or without
+ * invoice date has no piece; an order the chart of accounts cannot book is left out; the
+ * report says how many and why.
  */
 final class SalesJournal
 {
@@ -103,6 +104,24 @@ final class SalesJournal
 
         if ($withoutReference > 0) {
             $report->addWarning($translator->trans('%count orders of the period have an invoice date but no invoice reference: they are not in the journal.', ['%count' => $withoutReference], null, $locale));
+        }
+
+        // An order without invoice date belongs to no period: it is counted in the period it was placed in.
+        $undated = $this->placedIn($from, $to)
+            ->where('Order.InvoiceRef IS NOT NULL')
+            ->where('Order.InvoiceRef <> \'\'')
+            ->count();
+
+        if ($undated > 0) {
+            $report->addWarning($translator->trans('%count orders placed in the period have an invoice reference but no invoice date: they belong to no period, book them by hand.', ['%count' => $undated], null, $locale));
+        }
+
+        $notInvoiced = $this->placedIn($from, $to)
+            ->where('(Order.InvoiceRef IS NULL OR Order.InvoiceRef = \'\')')
+            ->count();
+
+        if ($notInvoiced > 0) {
+            $report->addLine($translator->trans('%count orders placed in the period are not invoiced: they have no piece.', ['%count' => $notInvoiced], null, $locale));
         }
 
         if (!$withCreditNotes) {
@@ -234,6 +253,14 @@ final class SalesJournal
             ->orderById()
             ->limit(self::BATCH_SIZE)
             ->find();
+    }
+
+    private function placedIn(?\DateTimeInterface $from, ?\DateTimeInterface $to): OrderQuery
+    {
+        $query = OrderQuery::create()->filterByInvoiceDate(null, Criteria::ISNULL);
+        $range = array_filter(['min' => $from, 'max' => $to]);
+
+        return [] === $range ? $query : $query->filterByCreatedAt($range);
     }
 
     private function period(OrderQuery $query, ?\DateTimeInterface $from, ?\DateTimeInterface $to): OrderQuery
