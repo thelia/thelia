@@ -87,6 +87,7 @@
 ## Exports and imports
 
 - A sales journal and a tax summary for the accountant, in the Orders category of the exports. The sales journal books the invoices of a period, by invoice date and invoice reference: the customer debited of the total of the invoice, the products, the shipping and the tax collected credited by tax rate, the discount spread over the rates, each invoice balanced to the cent, whatever the rounding rule of the order. Its columns are the 18 fields of the French accounting entries file; the new FEC serializer (`thelia.fec`) writes that file (tab separated, decimal comma, YYYYMMDD dates). The tax summary gives, per month and per rate, the amount taxed, the tax and the number of invoices, from the same pieces. Both need the chart of accounts of the new `accounting_*` settings, seeded empty and labelled by the install and by `3.4.0.sql`, and refuse to run until the accounts are filled. An export may now report what it produced and left out (`ReportingExportInterface`), which the export command prints. See `docs/accounting-exports.md`.
+- An export job keeps what its export reported, the counts of the sales journal and the orders it left out among them, once the worker is done: `export_job.report`, added by `3.4.0.sql`, read with `ExportJob::getExportReport()`. A replayed job starts with an empty report.
 
 ## Newsletter
 

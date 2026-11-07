@@ -6034,6 +6034,7 @@ CREATE TABLE `export_job`
     `file_path` VARCHAR(255) COMMENT 'where the finished file is, on the server',
     `file_name` VARCHAR(255) COMMENT 'the name the file is downloaded under',
     `error` TEXT COMMENT 'why the export failed, as shown to the administrator',
+    `report` TEXT COMMENT 'what the export reported: its lines and warnings, as JSON, NULL for an export that reports nothing',
     `started_at` DATETIME,
     `finished_at` DATETIME,
     `created_at` DATETIME,

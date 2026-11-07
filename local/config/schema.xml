@@ -2929,6 +2929,7 @@
     <column description="where the finished file is, on the server" name="file_path" size="255" type="VARCHAR" />
     <column description="the name the file is downloaded under" name="file_name" size="255" type="VARCHAR" />
     <column description="why the export failed, as shown to the administrator" name="error" type="LONGVARCHAR" />
+    <column description="what the export reported: its lines and warnings, as JSON, NULL for an export that reports nothing" name="report" type="LONGVARCHAR" />
     <column name="started_at" type="TIMESTAMP" />
     <column name="finished_at" type="TIMESTAMP" />
     <foreign-key foreignTable="export" name="fk_export_job_export_id" onDelete="CASCADE" onUpdate="RESTRICT">
