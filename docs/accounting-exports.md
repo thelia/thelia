@@ -97,11 +97,17 @@ sale given back: it is not in the sales journal.
 ## The journal
 
 `SalesJournal` selects the orders whose invoice date falls in the period and that
-have an invoice reference, by invoice date, by batches of 200, and gives their
-pieces one by one, letting go of the models of each batch: a year of invoices is
-never held at once. The order is booked
+have an invoice reference, by invoice date then id, by batches of 200, and gives
+their pieces one by one, letting go of the models of each batch: a year of invoices
+is never held at once. Each batch starts after the last order of the previous one,
+not at an offset, so an order invoiced while the export runs neither shifts the
+batches nor makes an invoice appear twice. The customer, the invoice address and
+the currency come with the orders of the batch; their lines, the frozen taxes of
+the lines and the shares of the postage are read for the whole batch
+(`FrozenOrderAmounts`). An order then costs one query, the one
+`Order::getTotalAmount()` makes for the totals of its invoice. The order is booked
 when it is invoiced, so an order placed in January and invoiced in February is in
-February. The index `idx_order_invoice_date` (3.3.0) serves the selection. The
+February. The index `idx_order_invoice_date` (3.4.0) serves the selection. The
 credit notes are read the same way, by batches after the last one read, and
 merged with the invoices in date order.
 
@@ -138,7 +144,9 @@ it has run: the export command prints it after the path of the file. The sales
 journal reports the number of pieces and the totals of debit and credit, the
 number of credit notes among them, the orders and credit notes it left out with
 the reason, how many orders of the period have an invoice date but no invoice
-reference, and, when the credit notes cannot be read (no module, or the
+reference, how many orders placed in the period have no invoice date (with an
+invoice reference, a warning: such an order belongs to no period and is booked by
+hand; without, they are simply not invoiced), and, when the credit notes cannot be read (no module, or the
 `CreditNote` module active without its tables), that they are not in the journal.
 
 ## Not covered
@@ -151,4 +159,4 @@ reference, and, when the credit notes cannot be read (no module, or the
 - `tests/Integration/Domain/Accounting/SalesPieceBuilderTest.php`: one rate, two rates, shipping split, discount, the rounding rules, an order older than them, a rate without account, another currency.
 - `tests/Unit/Core/Serializer/FECSerializerTest.php`
 - `tests/Integration/Domain/Accounting/CreditNoteJournalTest.php`: creates the tables of the module for the class; full and partial credit notes, discount, commercial account, statuses left out, module inactive, date order, tax summary, another currency.
-- `tests/Integration/Domain/DataTransfer/AccountingExportsTest.php`: refusal, a month by invoice date, the report, the tax summary against the journal, the catalogue, the command.
+- `tests/Integration/Domain/DataTransfer/AccountingExportsTest.php`: refusal, a month by invoice date, the report, the orders without invoice, the queries of an order, an invoice issued during the export, the tax summary against the journal, the catalogue, the command.
