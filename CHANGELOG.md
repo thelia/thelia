@@ -144,6 +144,41 @@
 
 - `Thelia\Domain\Shipping\ZipCode\ZipCodePattern::normalize()` is deprecated and keeps its 3.3 behaviour (spaces and dashes removed, ASCII letters in upper case, always a string). Use `ZipCodePattern::normalForm()`, which folds compatibility characters and returns `null` for a code that has no normal form: empty once its spaces and dashes are removed, keeping a character outside `A` to `Z` and `0` to `9` once folded, or not valid UTF-8. A caller that uses it checks for `null`, or calls `matches()`, which judges such a code itself. See `UPGRADE-3.4.md`.
 
+# 3.3.2
+
+Patch release of the 3.3 line. It narrows two more resources of the admin API to the sale units of a restricted administrator and stops the tax calculator from reading the same tax titles again and again. It ships `setup/update/sql/3.3.2.sql`, which only records the version.
+
+## Security
+
+- An administrator restricted to some sale units no longer reads the cart addresses and the order payment parts of the other units. `GET /api/admin/cart_addresses` listed the delivery and invoice addresses of every cart, carts of other units and carts with no unit included, and `GET /api/admin/order_payment_parts` the payment parts of every order. Both are now bounded like the other resources of the restriction: a collection leaves the other rows out and an item answers 404. An administrator attached to no unit and a superadministrator see everything, as before.
+
+## Performance
+
+- Listing the taxes of a line reads the title and description of each tax by primary key, which Propel answers from its instance pool after the first read of a request. Each call used to query `tax_i18n` again: a cart of 5 lines on a shop with a custom cart total read it about 160 times. The title falls back on the default language, then on the `DEFAULT TITLE` placeholder, as before.
+
+# 3.3.1
+
+Security release of the 3.3 line. It closes a way around the guard of the MCP endpoint, tightens the AI layer (limits of anonymous visitors, keys read from the environment, MCP tokens, media in generated HTML, private network, JSON Schema patterns) and stops an empty file field from answering a 500. It ships `setup/update/sql/3.3.1.sql`, which only records the version.
+
+## Security
+
+- [GHSA-g445-rq89-gwjx](https://github.com/thelia/thelia/security/advisories/GHSA-g445-rq89-gwjx) — the guard of the MCP endpoint compared the path as the client wrote it with `/api/mcp`, while the router matches it once decoded. A request to `/api/%6Dcp` reached the endpoint without the guard, so the holder of an MCP token could send a JSON-RPC batch, run every call of it for one request counted by the rate limiter of the token, and send a body over 256 KiB. The guard now reads the decoded path through `Thelia\Core\HttpFoundation\RequestPath`, and a test of the core fails on any new decision taken on `Request::getPathInfo()`. The shared cache reads the decoded path too, so a never shared address stays personal whatever letter is encoded.
+- An anonymous visitor of a `public` AI usage is counted by their IP address as well as by their session. A session starts with each request that comes without its cookie, so a visitor who never sent the cookie back started a new count at each request, past the limits of the usage (10 requests a minute and 100 a day by default) and up to its monthly budget. The address is the one `Request::getClientIp()` gives, behind the trusted proxies, kept as an HMAC like the session, and both counts take the figures of the usage: visitors behind one shared address (an office, a mobile network) share its count. `AiActor::visitor()` takes the HMAC of the address as an optional second argument (`AiActor::$addressHash`); an actor a module sets in `AiRequest::$actor`, a command and a worker are counted as before.
+- A `pattern` of the JSON Schema of an AI answer or of the arguments of an AI tool no longer accepts a line break after the value it ends on: `$` matched before a final `\n`, which JSON Schema does not allow, so `"14.90\n"` passed the pattern of the price `thelia_update_product_price` takes.
+- An AI connection allowed to reach the private network no longer reaches the metadata service of the cloud through another address than the link-local one: an IPv4 address written as IPv6, mapped (`[::ffff:169.254.169.254]`) or compatible (`[::169.254.169.254]`), the address AWS serves it at over IPv6 (`fd00:ec2::254`) and the one of Alibaba Cloud (`100.100.100.200`) are refused like `169.254.169.254`. A connection to the LAN, to `localhost` or to `[::1]` works as before; an IPv4 address of the LAN written as a mapped IPv6 address is refused, write it as IPv4. Webhooks and the connections that stay on the public network already refused all of these.
+- An MCP token stops working as soon as its administrator loses the right to create one (CREATE on `admin.configuration.ai-mcp`): the right was only checked when the token was created, so the tokens made before kept their access until they expired. The endpoint answers 401, as for a revoked token, and gives the access back if the right is given back before the token expires.
+- The HTML an AI model writes keeps an image, a video or a sound only when it comes from a relative address or from a host of the shop: the host of `url_site`, of each sale unit, and of each language when every language has its own domain (`one_domain_foreach_lang`), their subdomains included. The browser loads a media as soon as the page shows and sends its address to the host that serves it, so a model that wrote data into the address of an image on another host handed it over without anyone clicking. `srcset`, which the sanitizer does not check, is dropped. An image the merchant wants from a CDN of another domain goes through the media library of the shop, or is added by hand after the generation. A project whose images are served by a CDN on another domain lists its host in the parameter `thelia.ai.media_hosts`.
+- An API key an AI connection reads from a `THELIA_AI_*_KEY` or `THELIA_AI_*_TOKEN` environment variable is only sent to the address of the provider, or to the base URL the server sets next to it: `THELIA_AI_X_BASE_URL` for `THELIA_AI_X_KEY` and `THELIA_AI_X_TOKEN`, compared without its final slash. An administrator who held the AI right could name such a variable on a connection to an address of their choice, or move an existing connection there, and test it: the key the server holds left for that address, where a key saved in the settings has to be typed again when the address changes. The settings, the admin API, the connection test and the calls refuse any other address and say which variable to set.
+
+## Fixed
+
+- A form whose file field sits at the top level of the request (`<input type="file" name="archive">`) and is left empty no longer answers a 500: the request taken over from Symfony leaves the empty field out instead of refusing it.
+
+## Upgrading from 3.3.0
+
+- An AI connection that reads its key from a `THELIA_AI_*_KEY` or `THELIA_AI_*_TOKEN` variable and calls a base URL of its own (an OpenAI-compatible server, a self-hosted Ollama, a proxy) stops at its next call, its next test and its next save, with a message that names the variable to set. Set `THELIA_AI_X_BASE_URL` to the base URL of the connection, next to `THELIA_AI_X_KEY` (or `THELIA_AI_X_TOKEN`), where the server sets its variables. A connection that calls the usual address of its provider, or whose key is saved in the settings, has nothing to do.
+- The HTML an AI model writes no longer loads an image, a video or a sound from a host that is not the shop's. A shop whose media live on a CDN under another domain lists that host in `thelia.ai.media_hosts`.
+
 # 3.3.0
 
 Third minor of the 3.x line. 746 commits since 3.2.0. The version number follows the update script this release ships, `setup/update/sql/3.3.0.sql`, which creates the tables of the sale units, the order shipments, the delivery dates and slots, the shipping rules of the products, the payment parts of an order, the background jobs, the webhooks and the AI layer with its tools.
