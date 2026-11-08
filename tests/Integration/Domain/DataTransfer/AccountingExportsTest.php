@@ -29,6 +29,7 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\Order;
@@ -172,18 +173,32 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         Propel::enableInstancePooling();
 
         try {
-            $rows = $this->mine($this->rows(new SalesJournalExport(), '2026-02'), $orders);
+            $export = new SalesJournalExport();
+            $export->setLang(Lang::getDefaultLanguage());
+            $export->setRangeDate(['start' => new \DateTime('2026-02-01 00:00:00'), 'end' => new \DateTime('2026-02-28 23:59:59')]);
+            $rows = [];
+            $firstRead = null;
+
+            foreach ($export as $row) {
+                $firstRead ??= \WeakReference::create(reset(OrderTableMap::$instances));
+                $rows[] = $row;
+            }
+
+            unset($export);
+            gc_collect_cycles();
             $pooledLines = \count(OrderProductTableMap::$instances);
             $pooledOrders = \count(OrderTableMap::$instances);
         } finally {
             Propel::disableInstancePooling();
             OrderTableMap::clearInstancePool();
             OrderProductTableMap::clearInstancePool();
+            CurrencyTableMap::clearInstancePool();
         }
 
-        self::assertCount(205, array_unique(array_column($rows, 'PieceRef')));
+        self::assertCount(205, array_unique(array_column($this->mine($rows, $orders), 'PieceRef')));
         self::assertSame(0, $pooledLines, 'The models of each batch are let go.');
         self::assertSame(0, $pooledOrders);
+        self::assertNull($firstRead->get(), 'Nothing keeps an invoice once its batch is booked, not even the currency it was read with.');
     }
 
     public function testAnOrderCostsTheJournalOneQueryWhateverItsLinesAddressAndCustomer(): void
