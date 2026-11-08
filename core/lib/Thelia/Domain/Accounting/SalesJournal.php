@@ -19,6 +19,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\ExportReport;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Map\OrderPostageTaxTableMap;
@@ -213,10 +214,12 @@ final class SalesJournal
 
     /**
      * The models a batch read are let go: held by Propel's pools, a year of invoices would
-     * be kept in memory to the end of the run.
+     * be kept in memory to the end of the run. The currency goes too: read with the orders,
+     * it collects each of them, with its customer and address, in its own list of orders.
      */
     private static function forgetTheBatch(): void
     {
+        CurrencyTableMap::clearInstancePool();
         OrderTableMap::clearInstancePool();
         OrderProductTableMap::clearInstancePool();
         OrderProductTaxTableMap::clearInstancePool();
