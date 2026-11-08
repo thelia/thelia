@@ -20,6 +20,7 @@ use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\Country;
+use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
@@ -28,6 +29,7 @@ use Thelia\Model\ProductQuery;
 use Thelia\Model\State;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxI18n;
+use Thelia\Model\TaxI18nQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\I18n;
@@ -405,8 +407,7 @@ class Calculator implements TaxCalculatorInterface
             $currentTax += $taxAmount;
 
             if ($taxCollection instanceof OrderProductTaxCollection) {
-                /** @var TaxI18n $taxI18n */
-                $taxI18n = I18n::forceI18nRetrieving($askedLocale, 'Tax', $taxRule->getId());
+                $taxI18n = $this->taxTranslation($askedLocale, (int) $taxRule->getId());
 
                 $orderProductTax = (new OrderProductTax())
                     ->setTitle($taxI18n->getTitle())
@@ -418,6 +419,29 @@ class Calculator implements TaxCalculatorInterface
         }
 
         return $taxedPrice + $currentTax;
+    }
+
+    /**
+     * The title and description of a tax, in the asked language or else the default one.
+     *
+     * Read by primary key, so that Propel's instance pool answers every call after the first of a
+     * request: a cart of several lines prices each of them once or twice, each pricing lists the
+     * same few taxes, and a lookup by criteria went to the database every time.
+     */
+    private function taxTranslation(?string $askedLocale, int $taxId): TaxI18n
+    {
+        if (null !== $askedLocale && $translation = TaxI18nQuery::create()->findPk([$taxId, $askedLocale])) {
+            return $translation;
+        }
+
+        if ($translation = TaxI18nQuery::create()->findPk([$taxId, Lang::getDefaultLanguage()->getLocale()])) {
+            return $translation;
+        }
+
+        /** @var TaxI18n $placeholder */
+        $placeholder = I18n::forceI18nRetrieving($askedLocale, 'Tax', $taxId);
+
+        return $placeholder;
     }
 
     /**
