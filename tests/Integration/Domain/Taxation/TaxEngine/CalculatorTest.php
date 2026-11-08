@@ -29,9 +29,14 @@ use Thelia\Model\Tax;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountry;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Test\Trait\ForgetsPooledModels;
+use Thelia\Test\Trait\RecordsSqlQueries;
 
 final class CalculatorTest extends IntegrationTestCase
 {
+    use ForgetsPooledModels;
+    use RecordsSqlQueries;
+
     public function testTaxesOfTheSamePositionAreAllComputedOnTheUntaxedPrice(): void
     {
         $country = $this->country();
@@ -62,6 +67,26 @@ final class CalculatorTest extends IntegrationTestCase
         }
         sort($listed);
         self::assertSame([['VAT 10', 10.0], ['VAT 5', 5.0]], $listed);
+    }
+
+    public function testTheTitlesOfTheTaxesAreReadOnceHoweverManyLinesAreListed(): void
+    {
+        $country = $this->country();
+        $calculator = (new Calculator())->load(
+            $this->productTaxedBy($country, [1 => [$this->percentTax('10'), $this->percentTax('5')]]),
+            $country,
+        );
+
+        $statements = $this->recordSqlQueriesWithoutPooledModels(static function () use ($calculator): void {
+            for ($line = 0; $line < 10; ++$line) {
+                $taxes = new OrderProductTaxCollection();
+                $calculator->getTaxedPrice(100.0, $taxes, 'en_US');
+            }
+        });
+
+        $titleReads = array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'tax_i18n'));
+
+        self::assertCount(2, $titleReads, 'One read per tax, not one per tax and per line.');
     }
 
     public function testNoTaxCollectionIsBuiltForACallerThatAskedForNone(): void
