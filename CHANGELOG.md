@@ -1,3 +1,15 @@
+# 3.3.2
+
+Patch release of the 3.3 line. It narrows two more resources of the admin API to the sale units of a restricted administrator and stops the tax calculator from reading the same tax titles again and again. It ships `setup/update/sql/3.3.2.sql`, which only records the version.
+
+## Security
+
+- An administrator restricted to some sale units no longer reads the cart addresses and the order payment parts of the other units. `GET /api/admin/cart_addresses` listed the delivery and invoice addresses of every cart, carts of other units and carts with no unit included, and `GET /api/admin/order_payment_parts` the payment parts of every order. Both are now bounded like the other resources of the restriction: a collection leaves the other rows out and an item answers 404. An administrator attached to no unit and a superadministrator see everything, as before.
+
+## Performance
+
+- Listing the taxes of a line reads the title and description of each tax by primary key, which Propel answers from its instance pool after the first read of a request. Each call used to query `tax_i18n` again: a cart of 5 lines on a shop with a custom cart total read it about 160 times. The title falls back on the default language, then on the `DEFAULT TITLE` placeholder, as before.
+
 # 3.3.1
 
 Security release of the 3.3 line. It closes a way around the guard of the MCP endpoint, tightens the AI layer (limits of anonymous visitors, keys read from the environment, MCP tokens, media in generated HTML, private network, JSON Schema patterns) and stops an empty file field from answering a 500. It ships `setup/update/sql/3.3.1.sql`, which only records the version.
