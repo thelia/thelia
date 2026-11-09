@@ -39,7 +39,7 @@ final class StockSchemaMigrationTest extends IntegrationTestCase
 
     private const NEW_COLUMNS = [
         'product_sale_elements' => ['out_of_stock_policy', 'preorder_limit', 'restock_date', 'low_stock_threshold'],
-        'cart_item' => ['reserved_until', 'reserved_quantity'],
+        'cart_item' => ['reserved_until', 'reserved_quantity', 'reserved_since'],
         'order_product' => ['is_preorder', 'restock_date'],
     ];
 
@@ -123,8 +123,8 @@ final class StockSchemaMigrationTest extends IntegrationTestCase
 
         self::assertSame($this->freshInstallShape, $this->shape());
         self::assertSame(
-            ['reserved_until', 'reserved_quantity'],
-            \array_slice($this->column("SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' ORDER BY `ORDINAL_POSITION`"), -4, 2),
+            ['reserved_until', 'reserved_quantity', 'reserved_since'],
+            \array_slice($this->column("SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' ORDER BY `ORDINAL_POSITION`"), -5, 3),
         );
     }
 

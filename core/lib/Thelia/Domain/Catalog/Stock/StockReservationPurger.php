@@ -120,7 +120,7 @@ final readonly class StockReservationPurger
             $byCart = [];
 
             if ([] !== $expired) {
-                $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL WHERE `id` IN ('.implode(',', array_keys($expired)).')');
+                $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL, `reserved_since` = NULL WHERE `id` IN ('.implode(',', array_keys($expired)).')');
             }
 
             foreach ($locked as [$id, $cartId, $productSaleElementsId, $quantity]) {

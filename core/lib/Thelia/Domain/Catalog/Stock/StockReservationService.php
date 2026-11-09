@@ -31,7 +31,11 @@ use Thelia\Model\Map\CartItemTableMap;
  *
  * A line is held by its `reserved_until`: until then, what it asks is taken from what every
  * other cart may buy (DatabaseReservedQuantity, through SellableStock). Holding again pushes
- * the moment back by the duration of the shop. The lines of a virtual product and the lines of
+ * the moment back by the duration of the shop, never past the longest hold counted from the first
+ * hold of the line (`reserved_since`, StockSettings::longestHoldMinutes()): a cart that comes back
+ * to the checkout again and again cannot keep the stock off sale for ever. Past that bound the line
+ * is still told as held until the purge, a removal or an order releases it; only then may a new
+ * hold, which spends the budget, start it again. The lines of a virtual product and the lines of
  * a pack are never held: the first take no stock, the second take the stock of their components.
  *
  * Every hold runs in a transaction of its own that locks the stock rows first, in ascending id,
@@ -427,7 +431,7 @@ final readonly class StockReservationService
                 }
             }
 
-            $this->writeReservation($held, $this->stockSettings->reservationDurationMinutes(), $connection);
+            $this->writeReservation($held, $this->stockSettings->reservationDurationMinutes(), $this->stockSettings->longestHoldMinutes(), $connection);
             $this->writeReleased($released, $connection);
 
             $connection->commit();
@@ -514,13 +518,21 @@ final readonly class StockReservationService
     }
 
     /**
-     * The lines the hold covers: their date pushed back and the quantity they are told with.
+     * The lines the hold covers: their date pushed back and the quantity they are told with. The
+     * date is pushed back by the duration, but never past the longest hold counted from the first
+     * hold of the line, which a line held for the first time (no date, or no start) takes now.
+     *
+     * The start is written first and read again by the date: the same expression gives the same
+     * moment whether the database assigns the columns one after the other or all at once.
      *
      * @param array<int, float> $quantityByCartItemId
      * @param int               $minutes              from now on
+     * @param int               $longestMinutes       from the first hold of the line
      */
-    private function writeReservation(array $quantityByCartItemId, int $minutes, ConnectionInterface $connection): void
+    private function writeReservation(array $quantityByCartItemId, int $minutes, int $longestMinutes, ConnectionInterface $connection): void
     {
+        $since = 'IF(`reserved_until` IS NULL OR `reserved_since` IS NULL, NOW(), `reserved_since`)';
+
         $idsByQuantity = [];
 
         foreach ($quantityByCartItemId as $cartItemId => $quantity) {
@@ -528,8 +540,13 @@ final readonly class StockReservationService
         }
 
         foreach ($idsByQuantity as $quantity => $cartItemIds) {
-            $statement = $connection->prepare('UPDATE `cart_item` SET `reserved_until` = NOW() + INTERVAL :minutes MINUTE, `reserved_quantity` = :quantity WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')');
+            $statement = $connection->prepare(
+                'UPDATE `cart_item` SET `reserved_since` = '.$since.', '
+                .'`reserved_until` = LEAST(NOW() + INTERVAL :minutes MINUTE, '.$since.' + INTERVAL :longestMinutes MINUTE), '
+                .'`reserved_quantity` = :quantity WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')',
+            );
             $statement->bindValue(':minutes', $minutes, \PDO::PARAM_INT);
+            $statement->bindValue(':longestMinutes', $longestMinutes, \PDO::PARAM_INT);
             $statement->bindValue(':quantity', (string) $quantity);
             $statement->execute();
         }
@@ -544,6 +561,6 @@ final readonly class StockReservationService
             return;
         }
 
-        $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')');
+        $connection->exec('UPDATE `cart_item` SET `reserved_until` = NULL, `reserved_quantity` = NULL, `reserved_since` = NULL WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')');
     }
 }
