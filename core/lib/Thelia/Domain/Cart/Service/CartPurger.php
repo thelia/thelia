@@ -72,7 +72,7 @@ class CartPurger
      */
     private function deleteAnnouncingTheReleases(CartQuery $query): int
     {
-        if (null === $this->stockReservation || !$this->stockReservation->isActive()) {
+        if (null === $this->stockReservation || !$this->stockReservation->mayHaveHeldLines()) {
             return $query->delete();
         }
 

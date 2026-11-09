@@ -66,7 +66,7 @@ final class CartItemConcurrentHoldApiTest extends ApiTestCase
     {
         parent::setUp();
 
-        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_DURATION] as $name) {
+        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_DURATION, StockSettings::RESERVATION_HAS_HELD] as $name) {
             $this->settingsBefore[$name] = ConfigQuery::create()->findOneByName($name)?->getValue();
         }
 
@@ -75,6 +75,9 @@ final class CartItemConcurrentHoldApiTest extends ApiTestCase
         ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
         ConfigQuery::write(StockSettings::RESERVATION_SCOPE, 'cart');
         ConfigQuery::write(StockSettings::RESERVATION_DURATION, '15');
+        // Written here, not by the other processes at their first hold: the tear down puts back
+        // what this process wrote, and would miss a variable only the others did.
+        ConfigQuery::write(StockSettings::RESERVATION_HAS_HELD, '1');
         ConfigQuery::resetCache();
     }
 

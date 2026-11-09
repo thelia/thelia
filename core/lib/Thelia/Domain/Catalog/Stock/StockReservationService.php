@@ -23,6 +23,7 @@ use Thelia\Domain\Catalog\Stock\Exception\StockReservationRefusedException;
 use Thelia\Domain\Shared\Database\LockConflictDetector;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\CartItemTableMap;
 
@@ -35,8 +36,12 @@ use Thelia\Model\Map\CartItemTableMap;
  * hold of the line (`reserved_since`, StockSettings::longestHoldMinutes()): a cart that comes back
  * to the checkout again and again cannot keep the stock off sale for ever. Past that bound the line
  * is still told as held until the purge, a removal or an order releases it; only then may a new
- * hold, which spends the budget, start it again. A date that ran out before the bound (the cart
- * left and came back later) is not a refresh: the next hold counts the longest hold from itself. The lines of a virtual product and the lines of
+ * hold, which spends the budget, start it again. A line whose date ran out keeps its first hold
+ * when it is held again, and a hold of a line past the bound dates it now, so that the stock stays
+ * on sale: holding again at every expiry never starts the bound over. Only a line left untouched
+ * for longer (StockSettings::lapsedHoldMinutes(), a window in which other carts could buy the unit)
+ * is held as a new one: its first hold is now, it spends the budget, and its old hold is told as
+ * released before the new one is told as reserved. The lines of a virtual product and the lines of
  * a pack are never held: the first take no stock, the second take the stock of their components.
  *
  * Every hold runs in a transaction of its own that locks the stock rows first, in ascending id,
@@ -46,7 +51,9 @@ use Thelia\Model\Map\CartItemTableMap;
  * cart, and the row a write of the cart line already shares (its foreign key) would turn two
  * buyers into a deadlock. A caller that writes the cart in a transaction holds after its commit.
  *
- * A shop that does not reserve, or does not check its stock, holds nothing and reads nothing.
+ * A shop that does not reserve, or does not check its stock, holds nothing and reads nothing. The
+ * lines it held before the reservation, or the check of the stock, was turned off are still read
+ * when they go (a removal, an order, a purge), so that each of them is told as released.
  *
  * A hold that takes a line not told as held yet spends one of the budgets of the cart and of the
  * address it comes from (StockReservationLimiter), before it writes anything; a hold that only
@@ -61,7 +68,8 @@ use Thelia\Model\Map\CartItemTableMap;
  * quantity it was told with, then reserved with the new one). A line is told as held from its
  * first hold until it is released, whether or not its date ran out meanwhile: the date only says
  * when the stock goes back on sale, and the purge, a removal or an order is what releases the
- * line. A hold that takes back a line whose date ran out only pushes the date. The quantity a
+ * line. A hold that takes back a line whose date ran out only pushes the date, unless the line
+ * lapsed (released, then reserved, as a new hold). The quantity a
  * line was told with is kept on the line (`reserved_quantity`, written with `reserved_until`,
  * emptied with it): whoever changed the quantity of the line since, with or without a hold, the
  * release tells the quantity of the reservation.
@@ -83,6 +91,15 @@ final readonly class StockReservationService
     public function isActive(): bool
     {
         return $this->stockSettings->reservationEnabled() && ConfigQuery::checkAvailableStock();
+    }
+
+    /**
+     * Whether a line may be told as held: the shop reserves, or it held a line before the
+     * reservation was turned off. No query: a shop that never reserved reads nothing.
+     */
+    public function mayHaveHeldLines(): bool
+    {
+        return $this->isActive() || $this->stockSettings->linesMayBeHeld();
     }
 
     /**
@@ -163,7 +180,7 @@ final readonly class StockReservationService
      */
     public function releaseCart(int $cartId, ConnectionInterface $connection): void
     {
-        if (!$this->isActive() || $cartId <= 0) {
+        if ($cartId <= 0 || !$this->mayHaveHeldLines()) {
             return;
         }
 
@@ -180,13 +197,13 @@ final readonly class StockReservationService
     /**
      * The lines of a cart that hold stock now, read before a write that removes them (a line
      * deleted, a cart emptied or purged), to be told with announceReleased() once it is written.
-     * Nothing when the shop does not reserve.
+     * Nothing when the shop never reserved.
      *
      * @return list<StockReservationLine>
      */
     public function heldLinesOf(int $cartId, ?int $cartItemId = null): array
     {
-        if (!$this->isActive() || $cartId <= 0) {
+        if ($cartId <= 0 || !$this->mayHaveHeldLines()) {
             return [];
         }
 
@@ -200,7 +217,7 @@ final readonly class StockReservationService
      */
     public function heldLinesOfCarts(array $cartIds): array
     {
-        if (!$this->isActive() || [] === $cartIds) {
+        if ([] === $cartIds || !$this->mayHaveHeldLines()) {
             return [];
         }
 
@@ -216,6 +233,23 @@ final readonly class StockReservationService
     public function announceReleased(int $cartId, array $lines): void
     {
         $this->announcer->released($cartId, $lines);
+    }
+
+    /**
+     * The lines a write is about to delete with something else (a product, a sale element, a
+     * customer, a product becoming a pack), read now and told as released once the transaction of
+     * the write is over, those that are gone. To be called inside that transaction, before the
+     * delete: the lines removed by a foreign key leave no trace to read afterwards.
+     */
+    public function announceTheReleaseOfLinesAmong(CartItemQuery $lines): void
+    {
+        if (!$this->mayHaveHeldLines()) {
+            return;
+        }
+
+        foreach ($this->heldLines->among($lines) as $cartId => $held) {
+            $this->announcer->released($cartId, $held);
+        }
     }
 
     /**
@@ -281,6 +315,9 @@ final readonly class StockReservationService
         // transaction without a token (a window of a few milliseconds, accepted); over the budget,
         // it is left out instead.
         if ([] !== $lines) {
+            // Before the first date is written: the lines read later when they go, whatever the
+            // settings are then (StockSettings::linesMayBeHeld()).
+            $this->stockSettings->rememberThatLinesAreHeld();
             $this->holdInTransaction($cart, $lines, $strict, null === $secondsToWait, $connection);
         }
 
@@ -375,18 +412,27 @@ final readonly class StockReservationService
             // wrote; a purge of the same lines waits for this commit or has finished before it.
             // The quantity and what each line was told with are those of the locked rows.
             $locked = $this->heldLines->lockedLines(array_column($lines, 'id'), $connection);
+            $lapsedAfterSeconds = 60 * $this->stockSettings->lapsedHoldMinutes();
             $announcedBefore = [];
+            $lapsed = [];
             $current = [];
 
             foreach ($lines as $line) {
                 $row = $locked[$line['id']] ?? null;
+                // Told as held, but untouched long enough for another cart to have bought the unit.
+                $isLapsed = null !== $row && null !== $row['announced'] && $row['expiredForSeconds'] >= $lapsedAfterSeconds;
 
-                // Deleted since the read, emptied, or not told as held with the budget spent: not held now.
-                if (null === $row || $row['quantity'] <= 0 || (!$mayStartLines && null === $row['announced'])) {
+                // Deleted since the read, emptied, or a new hold with the budget spent: not held now.
+                if (null === $row || $row['quantity'] <= 0 || (!$mayStartLines && (null === $row['announced'] || $isLapsed))) {
                     continue;
                 }
 
                 $announcedBefore[$line['id']] = $row['announced'];
+
+                if ($isLapsed) {
+                    $lapsed[$line['id']] = true;
+                }
+
                 $current[] = [...$line, 'quantity' => $row['quantity']];
             }
 
@@ -412,6 +458,10 @@ final readonly class StockReservationService
 
                     if (null === $toldQuantity) {
                         $started[] = new StockReservationLine($line['id'], $productSaleElementsId, $line['quantity']);
+                    } elseif (isset($lapsed[$line['id']])) {
+                        // A new hold of a line whose old one was never released: both are told.
+                        $stopped[] = new StockReservationLine($line['id'], $productSaleElementsId, $toldQuantity);
+                        $started[] = new StockReservationLine($line['id'], $productSaleElementsId, $line['quantity']);
                     } elseif ($toldQuantity !== $line['quantity']) {
                         // Held already, with another quantity than the one it was told with.
                         $stopped[] = new StockReservationLine($line['id'], $productSaleElementsId, $toldQuantity);
@@ -432,7 +482,7 @@ final readonly class StockReservationService
                 }
             }
 
-            $this->writeReservation($held, $this->stockSettings->reservationDurationMinutes(), $this->stockSettings->longestHoldMinutes(), $connection);
+            $this->writeReservation($held, array_keys($lapsed), $this->stockSettings->reservationDurationMinutes(), $this->stockSettings->longestHoldMinutes(), $connection);
             $this->writeReleased($released, $connection);
 
             $connection->commit();
@@ -453,7 +503,9 @@ final readonly class StockReservationService
 
     /**
      * The lines of the cart, as stored: `held` when their date is still ahead (they hold stock now),
-     * `told` when they have a date at all (they were told as held and not released since).
+     * `told` when they have a date (they were told as held and not released since) that did not
+     * run out long ago: a line untouched since longer than StockSettings::lapsedHoldMinutes() is
+     * held again as a new one, which spends the budget.
      *
      * @return list<array{id: int, productSaleElementsId: int, quantity: float, bundle: bool, virtual: bool, reference: string, held: bool, told: bool}>
      */
@@ -461,11 +513,13 @@ final readonly class StockReservationService
     {
         $statement = $connection->prepare(
             'SELECT `cart_item`.`id`, `cart_item`.`product_sale_elements_id`, `cart_item`.`quantity`, `cart_item`.`bundle_composition` IS NOT NULL, '
-            .'`product`.`virtual`, `product`.`ref`, COALESCE(`cart_item`.`reserved_until` > NOW(), 0), `cart_item`.`reserved_until` IS NOT NULL '
+            .'`product`.`virtual`, `product`.`ref`, COALESCE(`cart_item`.`reserved_until` > NOW(), 0), '
+            .'COALESCE(`cart_item`.`reserved_until` > NOW() - INTERVAL :lapsedMinutes MINUTE, 0) '
             .'FROM `cart_item` INNER JOIN `product` ON `product`.`id` = `cart_item`.`product_id` '
             .'WHERE `cart_item`.`cart_id` = :cartId ORDER BY `cart_item`.`id`',
         );
         $statement->bindValue(':cartId', $cartId, \PDO::PARAM_INT);
+        $statement->bindValue(':lapsedMinutes', $this->stockSettings->lapsedHoldMinutes(), \PDO::PARAM_INT);
         $statement->execute();
 
         $lines = [];
@@ -521,25 +575,24 @@ final readonly class StockReservationService
     /**
      * The lines the hold covers: their date pushed back and the quantity they are told with. The
      * date is pushed back by the duration, but never past the longest hold counted from the first
-     * hold of the line, which a line held for the first time (no date, or no start) takes now. So
-     * does a line whose date ran out before the longest hold: nothing refreshed it in time, and
-     * keeping its old start would write a date already past. A line that reached the bound keeps
-     * its start until it is released.
+     * hold of the line, which a line held for the first time (no date, or no start) takes now, and
+     * so does a lapsed line (held again as a new one). Any other line keeps its start, its date run
+     * out or not, until it is released. A line past the bound is dated now, never in the past: the
+     * window it must stay untouched before a new hold starts again at each attempt.
      *
      * The start is written first and read again by the date: the same expression gives the same
      * moment whether the database assigns the columns one after the other or all at once.
      *
      * @param array<int, float> $quantityByCartItemId
+     * @param list<int>         $lapsedCartItemIds    held again as new ones: their start is now
      * @param int               $minutes              from now on
      * @param int               $longestMinutes       from the first hold of the line
      */
-    private function writeReservation(array $quantityByCartItemId, int $minutes, int $longestMinutes, ConnectionInterface $connection): void
+    private function writeReservation(array $quantityByCartItemId, array $lapsedCartItemIds, int $minutes, int $longestMinutes, ConnectionInterface $connection): void
     {
-        $since = \sprintf(
-            'IF(`reserved_until` IS NULL OR `reserved_since` IS NULL '
-            .'OR (`reserved_until` <= NOW() AND `reserved_until` < `reserved_since` + INTERVAL %d MINUTE), NOW(), `reserved_since`)',
-            $longestMinutes,
-        );
+        $since = 'IF(`reserved_until` IS NULL OR `reserved_since` IS NULL'
+            .([] === $lapsedCartItemIds ? '' : ' OR `id` IN ('.implode(',', array_map('intval', $lapsedCartItemIds)).')')
+            .', NOW(), `reserved_since`)';
 
         $idsByQuantity = [];
 
@@ -550,7 +603,7 @@ final readonly class StockReservationService
         foreach ($idsByQuantity as $quantity => $cartItemIds) {
             $statement = $connection->prepare(
                 'UPDATE `cart_item` SET `reserved_since` = '.$since.', '
-                .'`reserved_until` = LEAST(NOW() + INTERVAL :minutes MINUTE, '.$since.' + INTERVAL :longestMinutes MINUTE), '
+                .'`reserved_until` = GREATEST(NOW(), LEAST(NOW() + INTERVAL :minutes MINUTE, '.$since.' + INTERVAL :longestMinutes MINUTE)), '
                 .'`reserved_quantity` = :quantity WHERE `id` IN ('.implode(',', array_map('intval', $cartItemIds)).')',
             );
             $statement->bindValue(':minutes', $minutes, \PDO::PARAM_INT);

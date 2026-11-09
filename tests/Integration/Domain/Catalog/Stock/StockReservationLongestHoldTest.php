@@ -87,6 +87,31 @@ final class StockReservationLongestHoldTest extends ActionIntegrationTestCase
         self::assertTrue($this->isHeld($buyerLine), 'Once the refreshed hold has outlived the longest hold, the buyer holds the unit.');
     }
 
+    /**
+     * A script that holds again a second after each date ran out never starts the longest hold
+     * again: past the bound the line is dated at each attempt, never held, and the buyer gets the unit.
+     */
+    public function testAScriptThatHoldsAgainJustAfterEachExpiryLetsTheLastUnitGoOnceTheLongestHoldIsOver(): void
+    {
+        $service = $this->getService(StockReservationService::class);
+        $product = $this->product(1);
+
+        [$script, $scriptLine] = $this->cartWith($product);
+        $service->holdForCheckout($script);
+
+        for ($attempt = 1; $attempt <= 12; ++$attempt) {
+            $this->age($script, 16);
+            $service->holdForCheckout($script);
+        }
+
+        self::assertFalse($this->isHeld($scriptLine), 'After 192 minutes, the line of the script holds nothing.');
+
+        [$buyer, $buyerLine] = $this->cartWith($product);
+        $service->holdForCheckout($buyer);
+
+        self::assertTrue($this->isHeld($buyerLine), 'The buyer holds the last unit.');
+    }
+
     public function testWithinTheLongestHoldARefreshKeepsTheUnit(): void
     {
         $service = $this->getService(StockReservationService::class);

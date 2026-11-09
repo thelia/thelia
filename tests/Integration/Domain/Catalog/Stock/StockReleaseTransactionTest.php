@@ -58,7 +58,7 @@ final class StockReleaseTransactionTest extends ActionIntegrationTestCase
     {
         parent::setUp();
 
-        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_DURATION] as $name) {
+        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_DURATION, StockSettings::RESERVATION_HAS_HELD] as $name) {
             $this->settingsBefore[$name] = ConfigQuery::create()->findOneByName($name)?->getValue();
         }
 
