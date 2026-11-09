@@ -229,8 +229,6 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
                 ORDER BY `order`.created_at DESC
             ) as tmp
         ';
-
-        return $query;
     }
 
     /**
