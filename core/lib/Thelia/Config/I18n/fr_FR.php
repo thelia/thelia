@@ -1251,4 +1251,6 @@ return [
     'Order %ref is canceled: nothing of it ships.' => 'La commande %ref est annulée : plus rien ne s\'expédie.',
     'Order %ref is refunded: nothing of it ships.' => 'La commande %ref est remboursée : plus rien ne s\'expédie.',
     'Delivery module %id does not exist.' => 'Le module de livraison %id n\'existe pas.',
+    'Uncategorized' => 'Non catégorisé',
+    'Services' => 'Services',
 ];

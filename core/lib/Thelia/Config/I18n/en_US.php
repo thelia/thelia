@@ -1210,4 +1210,6 @@ return [
     'Order %ref is canceled: nothing of it ships.' => 'Order %ref is canceled: nothing of it ships.',
     'Order %ref is refunded: nothing of it ships.' => 'Order %ref is refunded: nothing of it ships.',
     'Delivery module %id does not exist.' => 'Delivery module %id does not exist.',
+    'Uncategorized' => 'Uncategorized',
+    'Services' => 'Services',
 ];
