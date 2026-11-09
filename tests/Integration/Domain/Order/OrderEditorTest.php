@@ -520,9 +520,7 @@ final class OrderEditorTest extends IntegrationTestCase
         self::assertSame($before, $written($this), 'A refused edit leaves nothing in the history.');
     }
 
-    /**
-     * @dataProvider invalidEdits
-     */
+    #[DataProvider('invalidEdits')]
     public function testInvalidValuesAreRefused(OrderEditRefusal $refusal, \Closure $edit): void
     {
         $this->expectRefusal($refusal);
