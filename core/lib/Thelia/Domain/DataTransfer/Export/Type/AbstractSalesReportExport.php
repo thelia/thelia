@@ -21,6 +21,7 @@ use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Export\ArrayAbstractExport;
 use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
+use Thelia\Domain\DataTransfer\Export\SaleUnitScopedExportInterface;
 use Thelia\Domain\Report\Sales\SalesReportCalculator;
 use Thelia\Domain\Report\Sales\SalesReportCriteria;
 use Thelia\Domain\Report\Sales\StatusScope;
@@ -32,16 +33,23 @@ use Thelia\Model\OrderQuery;
  * calculation the back-office screen reads, so that a file holds the very rows of the screen.
  *
  * Without a start the period opens on the first order of the shop (today when there is none),
- * without an end it runs up to today; a start after the end is an empty export, not a file.
+ * without an end it runs up to today; a start after the end is an empty export, not a file. The
+ * orders are narrowed to the sale units of the administrator who runs the export, when it is
+ * restricted to some.
  */
-abstract class AbstractSalesReportExport extends ArrayAbstractExport implements MailableReportInterface
+abstract class AbstractSalesReportExport extends ArrayAbstractExport implements MailableReportInterface, SaleUnitScopedExportInterface
 {
     public const USE_RANGE_DATE = true;
 
     private const int PERCENT_PRECISION = 2;
 
     /** @var list<int>|null */
-    protected ?array $saleUnitIds = null;
+    private ?array $saleUnitIds = null;
+
+    public function restrictToSaleUnits(?array $saleUnitIds): void
+    {
+        $this->saleUnitIds = $saleUnitIds;
+    }
 
     protected function calculator(): SalesReportCalculator
     {

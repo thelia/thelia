@@ -47,6 +47,7 @@ use Thelia\Domain\DataTransfer\Job\JobTable;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunExportJobHandler;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
 use Thelia\Messenger\Event\FailedJobRemovedEvent;
 use Thelia\Messenger\JobFailureMessage;
 use Thelia\Messenger\JobSetAsideException;
@@ -280,6 +281,7 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
             $this->lifecycle($bus, 'sync://'),
+            $this->getService(AdminSaleUnitScope::class),
         );
         $handler(new RunExportJob($job->getId()));
 
@@ -1436,6 +1438,7 @@ final class ExportJobTest extends IntegrationTestCase
             $this->getService(SerializerManager::class),
             $this->getService(ArchiverManager::class),
             $this->lifecycle($bus),
+            $this->getService(AdminSaleUnitScope::class),
         );
     }
 

@@ -26,6 +26,7 @@ use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Export\ExportPeriod;
 use Thelia\Domain\DataTransfer\Export\ExportStorage;
+use Thelia\Domain\DataTransfer\Export\SaleUnitScopedExportInterface;
 use Thelia\Domain\DataTransfer\Service\ExportCachePurger;
 use Thelia\Log\Tlog;
 use Thelia\Messenger\JobFailureMessage;
@@ -96,12 +97,13 @@ class ExportHandler
         bool $includeDocuments = false,
         ?array $rangeDate = null,
         ?\Closure $onProgress = null,
+        ?array $saleUnitIds = null,
     ): ExportEvent {
         if (!$export->isHandlerAvailable()) {
             throw new HandlerUnavailableException(Translator::getInstance()->trans('The export "%ref" cannot be run: its handler class "%class" is not available. The module that provided it has probably been removed.', ['%ref' => $export->getRef(), '%class' => $export->getHandleClass()]));
         }
 
-        $instance = $this->configuredInstance($export, $archiver, $language, $includeImages, $includeDocuments, $rangeDate);
+        $instance = $this->configuredInstance($export, $archiver, $language, $includeImages, $includeDocuments, $rangeDate, $saleUnitIds);
         $event = new ExportEvent($instance, $serializer, $archiver);
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
@@ -154,6 +156,7 @@ class ExportHandler
 
     /**
      * @param array{start?: mixed, end?: mixed}|null $rangeDate
+     * @param list<int>|null                         $saleUnitIds
      */
     private function configuredInstance(
         Export $export,
@@ -162,6 +165,7 @@ class ExportHandler
         bool $includeImages,
         bool $includeDocuments,
         ?array $rangeDate,
+        ?array $saleUnitIds,
     ): AbstractExport {
         $instance = $export->getHandleClassInstance();
         $instance->setLang($language);
@@ -180,6 +184,10 @@ class ExportHandler
 
         if (null !== $rangeDate) {
             $instance->setRangeDate($rangeDate);
+        }
+
+        if ($instance instanceof SaleUnitScopedExportInterface) {
+            $instance->restrictToSaleUnits($saleUnitIds);
         }
 
         return $instance;
