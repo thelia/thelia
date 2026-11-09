@@ -32,15 +32,22 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
  * (a ProductQuery for `products`) and the resource name. It adds its condition with
  * `where()` or `addAnd()`, never `add()`, which would replace a condition already set on the
  * same column. It reads the visitor and the context itself, and does nothing for a query or a
- * resource it does not concern. The condition is written into the statement as it is: nothing
- * is bound, and every value in it is an integer read from the database or cast with (int).
+ * resource it does not concern. A value that comes from the request or the session is bound
+ * (`where('column = ?', $value)`) or cast with (int), never written into the SQL as it is.
  *
- * Declaring none costs nothing: no iteration, no query, no criterion. A scope costs the
- * conditions it adds to the statements the facets already run, never a statement of its own
- * per listing: write it as one SQL condition, not as a loop over the records.
+ * Declaring none costs nothing: no query and no criterion. A scope costs the conditions it
+ * adds to the statements the facets already run, never a statement of its own per listing:
+ * write it as one SQL condition, not as a loop over the records. It is called several times
+ * per response, so what it reads about the visitor (the point of sale, the market) is kept for
+ * the request instead of being read again on each call.
  *
- * The facets endpoint is not among the paths of the data access cache, so a scope that follows
- * the visitor needs no cache key of its own on the core side.
+ * The facets endpoint is not among the paths of the data access cache
+ * (`thelia.api.data_access.cache.allowed_prefixes`), so a scope needs no cache key on that
+ * side. A theme that renders the facets on a page served from the shared HTTP cache needs the
+ * scope to follow something the cache keys on (the URL, a cookie), or the page to leave that
+ * cache. The list the facets accompany is another matter: `/api/front/products` is in the data
+ * access cache, and a module that restricts that list with a collection extension must keep it
+ * out of the cache or key it, as a ProductVisibilityRuleInterface does by being declared.
  */
 #[AutoconfigureTag(self::TAG)]
 interface FacetScopeInterface
