@@ -24,7 +24,7 @@ left reachable by its id is not hidden, it is only harder to find.
 | Combinations of a product (`ProductSaleElementsAccessService`) | yes |
 | Quick order, and a purchase list loaded into it (`ReferenceResolver`) | yes; the purchase list itself is not |
 | `product`, `accessory` and `product_sale_elements` loops | yes, front only |
-| Listing facets (`/api/front/tfilters/products`) | yes, a hidden product feeds no facet and is not counted |
+| Listing facets (`/api/front/tfilters/products`) | yes, a hidden product feeds no facet and is not counted; to narrow the facets alone, see `FacetScopeInterface` in `docs/product-listing-facets.md` |
 | Theme sitemap (Flexy) | yes, as the default group sees the catalog (`ProductVisibility::visibleProductClauseForDefaultVisitor()`), whoever generates it: the sitemap is cached for everybody |
 | Prices, attribute combinations, feature values, associated contents, images and documents read by the id of a product or of a combination, and the links between a combination and an image | yes, a hidden product answers 404 on them and the collection leaves it out |
 | Categories read by the id of a product | the categories closed to the group are left out (see [Categories closed to a customer group](#categories-closed-to-a-customer-group)) |
