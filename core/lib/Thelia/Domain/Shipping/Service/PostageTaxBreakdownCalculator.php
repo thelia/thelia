@@ -136,7 +136,7 @@ readonly class PostageTaxBreakdownCalculator
         float $untaxedPostage,
         ?string $locale = null,
     ): array {
-        return $this->split($this->basesOfOrder($order), $country, $state, round($untaxedPostage, 2), $locale);
+        return $this->split($this->basesOfOrder($order), $country, $state, MoneyRounding::toTheCent($untaxedPostage), $locale);
     }
 
     /**
@@ -157,7 +157,8 @@ readonly class PostageTaxBreakdownCalculator
                 continue;
             }
 
-            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + (float) $line->getQuantity() * (float) ($line->getWasInPromo() ? $line->getPromoPrice() : $line->getPrice());
+            // What the line is charged untaxed, by the rounding rule of the order: its tax rows are not read.
+            $bases[$taxRuleId] = ($bases[$taxRuleId] ?? 0.0) + $line->getLineTotals((bool) $line->getWasInPromo(), null, 0.0)['untaxed'];
         }
 
         return $bases;
