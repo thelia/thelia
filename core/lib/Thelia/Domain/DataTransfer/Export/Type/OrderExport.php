@@ -21,6 +21,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
 use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
+use Thelia\Domain\DataTransfer\Export\SaleUnitScopedExportInterface;
 use Thelia\Domain\Order\Sql\OrderAmountSql;
 use Thelia\Model\OrderStatusQuery;
 
@@ -30,7 +31,7 @@ use Thelia\Model\OrderStatusQuery;
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
  */
-class OrderExport extends JsonFileAbstractExport implements MailableReportInterface
+class OrderExport extends JsonFileAbstractExport implements MailableReportInterface, SaleUnitScopedExportInterface
 {
     public const FILE_NAME = 'order';
     public const USE_RANGE_DATE = true;
@@ -78,6 +79,14 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
         'order_postage_tax_rule_title' => 'shipping_tax_rule_title',
         'order_product_tax_title' => 'tax',
     ];
+
+    /** @var list<int>|null */
+    private ?array $saleUnitIds = null;
+
+    public function restrictToSaleUnits(?array $saleUnitIds): void
+    {
+        $this->saleUnitIds = null === $saleUnitIds ? null : array_values(array_unique(array_map('intval', $saleUnitIds)));
+    }
 
     protected function getData(): array|string|ModelCriteria
     {
@@ -278,6 +287,11 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $conditions[] = '`order`.created_at '.$comparisons[$bound].' :'.$bound;
+        }
+
+        // The orders of the sale units the administrator is restricted to: a national order is left out.
+        if (null !== $this->saleUnitIds) {
+            $conditions[] = [] === $this->saleUnitIds ? '1 = 0' : '`order`.sale_unit_id IN ('.implode(', ', $this->saleUnitIds).')';
         }
 
         if ($conditions === []) {
