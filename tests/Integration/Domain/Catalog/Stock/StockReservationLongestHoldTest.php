@@ -108,6 +108,27 @@ final class StockReservationLongestHoldTest extends ActionIntegrationTestCase
         $service->holdForCheckout($other);
     }
 
+    public function testABuyerWhoComesBackAfterTheDateRanOutHoldsTheUnitAgainWithoutThePurge(): void
+    {
+        $service = $this->getService(StockReservationService::class);
+        $product = $this->product(1);
+
+        [$buyer, $buyerLine] = $this->cartWith($product);
+        $service->holdForCheckout($buyer);
+
+        $this->age($buyer, 120);
+        self::assertFalse($this->isHeld($buyerLine), 'Two hours after its single hold, the line is no longer held.');
+
+        $service->holdForCheckout($buyer);
+
+        self::assertTrue($this->isHeld($buyerLine), 'A date that ran out before the longest hold is not a refresh: holding again holds the unit, purge or not.');
+
+        [$other] = $this->cartWith($product);
+
+        $this->expectException(StockReservationRefusedException::class);
+        $service->holdForCheckout($other);
+    }
+
     public function testAReleaseStartsTheLongestHoldAgain(): void
     {
         $service = $this->getService(StockReservationService::class);
