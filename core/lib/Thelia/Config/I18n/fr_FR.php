@@ -1166,4 +1166,6 @@ return [
     'Orders created' => 'Commandes créées',
     'Orders paid' => 'Commandes payées',
     'Paid orders out of created orders' => 'Commandes payées sur commandes créées',
+    'Uncategorized' => 'Non catégorisé',
+    'Services' => 'Services',
 ];

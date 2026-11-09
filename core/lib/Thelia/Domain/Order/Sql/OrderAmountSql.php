@@ -84,18 +84,26 @@ final class OrderAmountSql
     /**
      * The discount the order was charged with: never more than its goods, since the total of
      * an order does not go below its postage.
+     *
+     * @param string|null $itemsTaxedTotal the taxed goods of the order when the statement already
+     *                                     computed them, so that they are not computed again
      */
-    public static function appliedDiscount(string $orderAlias): string
+    public static function appliedDiscount(string $orderAlias, ?string $itemsTaxedTotal = null): string
     {
-        return 'LEAST('.$orderAlias.'.discount, '.self::itemsTaxedTotal($orderAlias).')';
+        return 'LEAST(COALESCE('.$orderAlias.'.discount, 0), '.($itemsTaxedTotal ?? self::itemsTaxedTotal($orderAlias)).')';
     }
 
     /**
      * What the customer paid for the order: its taxed goods, less the discount, plus the postage.
+     *
+     * @param string|null $itemsTaxedTotal the taxed goods of the order when the statement already
+     *                                     computed them, so that they are not computed again
      */
-    public static function orderTotal(string $orderAlias): string
+    public static function orderTotal(string $orderAlias, ?string $itemsTaxedTotal = null): string
     {
-        return '('.self::itemsTaxedTotal($orderAlias).' - '.self::appliedDiscount($orderAlias).' + '.$orderAlias.'.postage)';
+        $itemsTaxedTotal ??= self::itemsTaxedTotal($orderAlias);
+
+        return '('.$itemsTaxedTotal.' - '.self::appliedDiscount($orderAlias, $itemsTaxedTotal).' + '.$orderAlias.'.postage)';
     }
 
     public static function bindRoundingPivots(StatementInterface $statement): void

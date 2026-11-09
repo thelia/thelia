@@ -1125,4 +1125,6 @@ return [
     'Orders created' => 'Orders created',
     'Orders paid' => 'Orders paid',
     'Paid orders out of created orders' => 'Paid orders out of created orders',
+    'Uncategorized' => 'Uncategorized',
+    'Services' => 'Services',
 ];
