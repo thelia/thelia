@@ -243,7 +243,7 @@ class Content extends BaseContent implements FileModelParentInterface, Publishab
             $productCategory->changeAbsolutePosition($this->getPosition());
         }
 
-        parent::postSave();
+        parent::postSave($con);
     }
 
     /**

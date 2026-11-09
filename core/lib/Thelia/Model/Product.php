@@ -346,7 +346,7 @@ class Product extends BaseProduct implements FileModelParentInterface
             $productCategory->changeAbsolutePosition($this->getPosition());
         }
 
-        parent::postSave();
+        parent::postSave($con);
 
         // In the transaction of the write, so that no cart is left holding a line of the other
         // form: the one point that covers the API, the back office, the actions and the service.
