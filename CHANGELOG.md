@@ -1,4 +1,8 @@
-# 3.3.3 (unreleased)
+# 3.3.3
+
+Patch release of the 3.3 line. It adds an extension point that lets a module narrow the products the facets of a listing are counted on, so that they match a listing that shows only part of the catalogue. It ships `setup/update/sql/3.3.3.sql`, which only records the version.
+
+A module that implements `FacetScopeInterface` requires `thelia/core` `>=3.3.3`: the interface does not exist in 3.3.0 to 3.3.2.
 
 ## API
 
