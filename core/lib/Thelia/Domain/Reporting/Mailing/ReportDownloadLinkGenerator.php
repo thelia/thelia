@@ -25,7 +25,8 @@ use Thelia\Model\ConfigQuery;
  * The link is signed with the application secret and carries its expiry, the file name
  * the download is saved under included: whoever holds it gets the file until then, without
  * signing in. The address is the one of the shop (`url_site`) and not the one of a
- * request, as the link is built from a command, where there is none.
+ * request, as the link is built from a command, where there is none: built during a
+ * request, it is the same link.
  */
 final readonly class ReportDownloadLinkGenerator
 {
@@ -48,11 +49,29 @@ final readonly class ReportDownloadLinkGenerator
 
         $url = '' === $siteUrl
             ? $this->urlGenerator->generate(self::ROUTE, $parameters, UrlGeneratorInterface::ABSOLUTE_URL)
-            : $siteUrl.$this->urlGenerator->generate(self::ROUTE, $parameters, UrlGeneratorInterface::ABSOLUTE_PATH);
+            : $siteUrl.$this->pathFromTheShopRoot($parameters);
 
         // Not a route parameter: it travels as a query parameter, signed with the rest.
         $url .= '?name='.rawurlencode($downloadName);
 
         return new ReportDownloadLink($this->uriSigner->sign($url, $expiresAt), \DateTimeImmutable::createFromInterface($expiresAt));
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private function pathFromTheShopRoot(array $parameters): string
+    {
+        $path = $this->urlGenerator->generate(self::ROUTE, $parameters, UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        // During a request served from a subdirectory, the router prefixes the path with it,
+        // and `url_site` already ends with it: the link would name it twice.
+        $baseUrl = $this->urlGenerator->getContext()->getBaseUrl();
+
+        if ('' !== $baseUrl && str_starts_with($path, $baseUrl.'/')) {
+            return substr($path, \strlen($baseUrl));
+        }
+
+        return $path;
     }
 }
