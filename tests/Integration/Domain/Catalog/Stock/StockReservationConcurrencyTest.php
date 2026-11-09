@@ -80,7 +80,7 @@ final class StockReservationConcurrencyTest extends ActionIntegrationTestCase
     {
         parent::setUp();
 
-        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_DURATION] as $name) {
+        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_DURATION, StockSettings::RESERVATION_HAS_HELD] as $name) {
             $this->settingsBefore[$name] = ConfigQuery::create()->findOneByName($name)?->getValue();
         }
 
@@ -89,6 +89,9 @@ final class StockReservationConcurrencyTest extends ActionIntegrationTestCase
         ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
         ConfigQuery::write(StockSettings::RESERVATION_SCOPE, 'checkout');
         ConfigQuery::write(StockSettings::RESERVATION_DURATION, '15');
+        // A shop that held already: this process holds inside a transaction (which no caller does),
+        // whose view would miss the row another process creates at its first hold.
+        ConfigQuery::write(StockSettings::RESERVATION_HAS_HELD, '1');
         ConfigQuery::resetCache();
 
         $eventName = TheliaEvents::getModuleEvent(TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK, 'Cheque');

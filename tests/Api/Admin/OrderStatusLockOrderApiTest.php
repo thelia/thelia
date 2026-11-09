@@ -63,7 +63,7 @@ final class OrderStatusLockOrderApiTest extends ApiTestCase
     {
         parent::setUp();
 
-        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE] as $name) {
+        foreach (['check-available-stock', 'allow_negative_stock', StockSettings::RESERVATION_ENABLED, StockSettings::RESERVATION_SCOPE, StockSettings::RESERVATION_HAS_HELD] as $name) {
             $this->settingsBefore[$name] = ConfigQuery::create()->findOneByName($name)?->getValue();
         }
 

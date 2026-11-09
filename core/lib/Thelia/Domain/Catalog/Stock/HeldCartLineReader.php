@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Stock;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\ProductSaleElement\StockReservationLine;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\Map\CartItemTableMap;
 
 /**
@@ -71,6 +73,33 @@ final readonly class HeldCartLineReader
     }
 
     /**
+     * Those of the lines a query selects that are told as held, read with no lock before a write
+     * deletes them with something else (a product, a sale element, a customer).
+     *
+     * @return array<int, list<StockReservationLine>> by cart id; a cart that holds nothing is absent
+     */
+    public function among(CartItemQuery $lines): array
+    {
+        $byCart = [];
+        $rows = (clone $lines)
+            ->filterByReservedUntil(null, Criteria::ISNOTNULL)
+            ->orderById()
+            ->select(['Id', 'CartId', 'ProductSaleElementsId', 'Quantity', 'ReservedQuantity'])
+            ->find()
+            ->getData();
+
+        foreach ($rows as $row) {
+            $byCart[(int) $row['CartId']][] = new StockReservationLine(
+                (int) $row['Id'],
+                (int) $row['ProductSaleElementsId'],
+                round((float) ($row['ReservedQuantity'] ?? $row['Quantity']), 6),
+            );
+        }
+
+        return $byCart;
+    }
+
+    /**
      * Those of the lines that are told as held, with the quantity they were told with, read with no
      * lock: for a caller that only compares (what a rollback or a later hold left).
      *
@@ -111,7 +140,7 @@ final readonly class HeldCartLineReader
      *
      * @param list<int> $cartItemIds
      *
-     * @return array<int, array{productSaleElementsId: int, quantity: float, announced: ?float}> by line id; `announced` is the quantity the line was told with, null when it is not told as held
+     * @return array<int, array{productSaleElementsId: int, quantity: float, announced: ?float, expiredForSeconds: int}> by line id; `announced` is the quantity the line was told with, null when it is not told as held; `expiredForSeconds` how long ago its date ran out, 0 when it did not (or it has none)
      */
     public function lockedLines(array $cartItemIds, ConnectionInterface $connection): array
     {
@@ -121,15 +150,18 @@ final readonly class HeldCartLineReader
 
         foreach (array_chunk($cartItemIds, self::CHUNK) as $chunk) {
             $statement = $connection->prepare(
-                'SELECT `id`, `product_sale_elements_id`, `quantity`, `reserved_until` IS NOT NULL, COALESCE(`reserved_quantity`, `quantity`) FROM `cart_item` WHERE `id` IN ('.implode(',', $chunk).') ORDER BY `id` FOR UPDATE',
+                'SELECT `id`, `product_sale_elements_id`, `quantity`, `reserved_until` IS NOT NULL, COALESCE(`reserved_quantity`, `quantity`), '
+                .'GREATEST(COALESCE(TIMESTAMPDIFF(SECOND, `reserved_until`, NOW()), 0), 0) '
+                .'FROM `cart_item` WHERE `id` IN ('.implode(',', $chunk).') ORDER BY `id` FOR UPDATE',
             );
             $statement->execute();
 
-            foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $productSaleElementsId, $quantity, $told, $toldQuantity]) {
+            foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $productSaleElementsId, $quantity, $told, $toldQuantity, $expiredForSeconds]) {
                 $lines[(int) $id] = [
                     'productSaleElementsId' => (int) $productSaleElementsId,
                     'quantity' => round((float) $quantity, 6),
                     'announced' => 1 === (int) $told ? round((float) $toldQuantity, 6) : null,
+                    'expiredForSeconds' => (int) $expiredForSeconds,
                 ];
             }
         }

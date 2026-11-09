@@ -237,14 +237,14 @@ final class VisitorSellableStockTest extends ActionIntegrationTestCase
         self::assertSame(1.0, $answer[(int) $cart->getCartItems()->getFirst()->getId()]['available']);
     }
 
-    public function testThePurgeOfAShopThatDoesNotReserveRunsNoQuery(): void
+    /** A shop that turned the reservation off after holding a line still purges it (StockReservationEventsTest). */
+    public function testThePurgeOfAShopThatNeverReservedRunsNoQuery(): void
     {
-        $product = $this->product(1);
-        $cart = $this->held($product, 1);
-        $line = $cart->getCartItems()->getFirst() ?? \Thelia\Model\CartItemQuery::create()->filterByCartId($cart->getId())->findOne($this->connection());
-        $this->connection()->exec('UPDATE cart_item SET reserved_until = NOW() - INTERVAL 1 MINUTE WHERE id = '.(int) $line->getId());
         ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
         ConfigQuery::resetCache();
+        $cart = $this->factory->cart(null, ['currency' => $this->factory->currency()]);
+        $this->factory->cartItem($cart, $this->product(1), null, ['quantity' => 1.0]);
+        $this->getService(CheckoutFacade::class)->holdStock($cart);
         $purger = $this->getService(StockReservationPurger::class);
         $cleared = -1;
 

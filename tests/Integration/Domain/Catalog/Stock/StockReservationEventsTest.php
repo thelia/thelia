@@ -29,6 +29,7 @@ use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\Service\CartPurger;
+use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationRefusedException;
 use Thelia\Domain\Catalog\Stock\StockReservationAnnouncer;
 use Thelia\Domain\Catalog\Stock\StockReservationPurger;
@@ -652,6 +653,109 @@ final class StockReservationEventsTest extends ActionIntegrationTestCase
         self::assertNotSame($oldCartId, (int) $event->getCart()->getId(), 'The cart was copied.');
         self::assertEquals([['released', $oldCartId, [$this->lineOf($line, 2.0)]]], array_values(array_filter($this->told, static fn (array $told): bool => 'released' === $told[0])));
         self::assertFalse($this->isHeld($line));
+    }
+
+    /**
+     * A line untouched for two reservation durations after its date ran out is held again as a new
+     * one: its old hold is told released, the new one reserved, and it spends the budget.
+     */
+    public function testALineHeldAgainLongAfterItsDateRanOutIsToldReleasedThenReservedAndSpendsTheBudget(): void
+    {
+        [$cart, $line] = $this->cartWith($this->product(5), 2);
+        $this->checkout()->holdStock($cart);
+        $this->connection()->exec('UPDATE cart_item SET reserved_since = reserved_since - INTERVAL 60 MINUTE, reserved_until = NOW() - INTERVAL 31 MINUTE WHERE id = '.(int) $line->getId());
+        $budget = $this->cartBudgetLeft($cart);
+        $this->told = [];
+
+        $this->checkout()->holdStock($cart);
+
+        self::assertEquals(
+            [['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]], ['reserved', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]],
+            $this->told,
+        );
+        self::assertTrue($this->isHeld($line));
+        self::assertSame($budget - 1, $this->cartBudgetLeft($cart), 'A new hold spends the budget.');
+        self::assertSame(1, (int) $this->connection()->query('SELECT reserved_since >= NOW() - INTERVAL 1 MINUTE FROM cart_item WHERE id = '.(int) $line->getId())->fetchColumn(), 'Its longest hold counts from now.');
+    }
+
+    public function testALineHeldBeforeTheReservationWasTurnedOffIsToldReleasedWhenRemoved(): void
+    {
+        [$cart, $line] = $this->cartWith($this->product(5), 2);
+        $this->checkout()->holdStock($cart);
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
+        $this->told = [];
+
+        $this->getService(CartFacade::class)->removeItem(new CartItemDeleteDTO($cart, (int) $line->getId()));
+
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
+    }
+
+    public function testALineHeldBeforeTheStockCheckWasTurnedOffIsToldReleasedByThePurge(): void
+    {
+        [$cart, $line] = $this->cartWith($this->product(5), 2);
+        $this->checkout()->holdStock($cart);
+        $this->expire($line);
+        ConfigQuery::write('check-available-stock', '0');
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '0');
+        $this->told = [];
+
+        $this->getService(StockReservationPurger::class)->purgeExpired();
+
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
+        self::assertNull($this->toldQuantity($line), 'The purge cleared it.');
+    }
+
+    public function testAHeldLineTakenOutWhenItsProductBecomesAPackIsToldReleased(): void
+    {
+        $product = $this->product(5);
+        [$cart, $line] = $this->cartWith($product, 2);
+        $this->checkout()->holdStock($cart);
+        $this->told = [];
+
+        $this->getService(BundleCompositionService::class)->setBundleSettings((int) $product->getId(), true);
+        $this->getService(StockReservationAnnouncer::class)->flush();
+
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
+    }
+
+    public function testTheHeldLinesOfADeletedProductAreToldReleased(): void
+    {
+        $product = $this->product(5);
+        [$cart, $line] = $this->cartWith($product, 2);
+        $this->checkout()->holdStock($cart);
+        $this->told = [];
+
+        $product->delete($this->connection());
+        $this->getService(StockReservationAnnouncer::class)->flush();
+
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
+    }
+
+    public function testTheHeldLinesOfADeletedSaleElementAreToldReleased(): void
+    {
+        $product = $this->product(5);
+        [$cart, $line] = $this->cartWith($product, 2);
+        $this->checkout()->holdStock($cart);
+        $this->told = [];
+
+        $product->getDefaultSaleElements()->delete($this->connection());
+        $this->getService(StockReservationAnnouncer::class)->flush();
+
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
+    }
+
+    public function testTheHeldLinesOfADeletedCustomerAreToldReleased(): void
+    {
+        [$customer, $currency] = $this->aBuyer();
+        $cart = $this->aCart($customer, $currency);
+        $line = $this->factory->cartItem($cart, $this->product(5), null, ['quantity' => 2.0]);
+        $this->checkout()->holdStock($cart);
+        $this->told = [];
+
+        $customer->delete($this->connection());
+        $this->getService(StockReservationAnnouncer::class)->flush();
+
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
     }
 
     private function reserve(string $scope): void

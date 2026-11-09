@@ -24,7 +24,8 @@ use Thelia\Model\Map\CartItemTableMap;
  * Clears the reservations that have run out, so that the lines stop carrying a date nobody
  * reads any more. Housekeeping only: an expired reservation is never counted, purged or not.
  *
- * A shop that does not reserve has nothing to clear: the answer is immediate, no query is run. The
+ * A shop that never reserved has nothing to clear: the answer is immediate, no query is run. A shop
+ * that turned the reservation off still clears, and tells, the lines it held before. The
  * lines are found through `idx_cart_item_reserved_until`, oldest first, so that the scan reads the
  * expired dates only and never the carts being filled.
  *
@@ -50,7 +51,7 @@ final readonly class StockReservationPurger
      */
     public function purgeExpired(int $batchSize = self::DEFAULT_BATCH_SIZE): int
     {
-        if (!$this->stockSettings->reservationEnabled()) {
+        if (!$this->stockSettings->reservationEnabled() && !$this->stockSettings->linesMayBeHeld()) {
             return 0;
         }
 

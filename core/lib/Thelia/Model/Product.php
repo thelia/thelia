@@ -350,6 +350,8 @@ class Product extends BaseProduct implements FileModelParentInterface
 
         // In the transaction of the write, so that no cart is left holding a line of the other
         // form: the one point that covers the API, the back office, the actions and the service.
+        // The lines that held stock were read before the update, and are told as released
+        // (StockReservationRemovalListener).
         if ($this->changesTheFormOfTheProduct) {
             $this->changesTheFormOfTheProduct = false;
             CartItemQuery::create()->filterByProductId($this->getId())->delete($con);
