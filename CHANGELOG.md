@@ -1,3 +1,9 @@
+# 3.3.3 (unreleased)
+
+## API
+
+- A module narrows the products the facets of a listing are read from, apart from the visibility rules, with a class that implements `Thelia\Api\Bridge\Propel\Filter\CustomFilters\FacetScopeInterface` (autoconfigured, tag `api.thelia.facet_scope`). `FilterService` calls `restrict(ModelCriteria $query, string $resource)` of each scope next to the product visibility, for the narrowed set and for each set relaxed of a checked group, so that a value held only by a product the listing does not show is neither offered nor counted. The condition is added with `where()` and costs no statement of its own; a shop that declares no scope runs the statements it ran before. `FilterService` takes the scopes as a new last constructor argument, optional.
+
 # 3.3.2
 
 Patch release of the 3.3 line. It narrows two more resources of the admin API to the sale units of a restricted administrator and stops the tax calculator from reading the same tax titles again and again. It ships `setup/update/sql/3.3.2.sql`, which only records the version.
