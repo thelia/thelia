@@ -23,7 +23,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
 use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
-use Thelia\Model\ConfigQuery;
+use Thelia\Domain\Order\Sql\OrderAmountSql;
 use Thelia\Model\Currency;
 use Thelia\Model\OrderStatusQuery;
 
@@ -37,24 +37,6 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
 {
     public const FILE_NAME = 'order';
     public const USE_RANGE_DATE = true;
-
-    /**
-     * Orders placed before Thelia 2.4 were totalled without any rounding at all.
-     * ConfigQuery has no constant for it: it is not a mode a shop can be set to,
-     * only a state some rows are frozen in.
-     */
-    private const ROUNDING_MODE_LEGACY = 0;
-
-    private const UNIT_PRICE = 'IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)';
-
-    /**
-     * The same unit price with the promotional price read as a text, the way it was read
-     * while order_product.promo_price was a VARCHAR: the type of IF() is the one of its
-     * operands, so the price of a line that is not on promotion is read as text too.
-     */
-    private const UNIT_PRICE_AS_TEXT = 'IF(order_product.was_in_promo = 1, COALESCE(CAST(order_product.promo_price AS CHAR), \'\'), order_product.price)';
-
-    private const UNIT_TAX = 'IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)';
 
     protected array $orderAndAliases = [
         'order_ref' => 'ref',
@@ -150,9 +132,7 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
     {
         $stmt = Propel::getConnection()->prepare($query);
         $stmt->bindValue('locale', $this->language->getLocale());
-        $stmt->bindValue('legacy_rounding_pivot', (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
-        $stmt->bindValue('sum_of_roundings_pivot', (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
-        $stmt->bindValue('text_promo_price_pivot', (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
+        OrderAmountSql::bindRoundingPivots($stmt);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
@@ -272,72 +252,14 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
     }
 
     /**
-     * Totals the lines of an order the way it was invoiced.
-     *
-     * One query covers the whole order history, and the rule an order was
-     * charged with depends on when it was placed: an order frozen by the 2.4
-     * upgrade was totalled without any rounding, an order placed before a shop
-     * switched to rounding of sums keeps the historical rule, and the rest
-     * follow the shop. Thelia\Model\Order::getTotalAmount() is the reference the
-     * three branches mirror — an export that disagrees with it states an amount
-     * the customer was never charged.
-     *
-     * Whatever the branch, an order placed while order_product.promo_price was a
-     * text keeps the total it was invoiced with.
+     * Totals the lines of an order the way it was invoiced: OrderAmountSql states the rule of
+     * each order, the sum of the order is brought back to a decimal.
      */
     private function orderTotal(bool $taxed): string
     {
         return '
-                    CAST(SUM(
-                        CASE
-                            WHEN `order`.id <= :legacy_rounding_pivot THEN '.$this->lineTotalOfOrder(self::ROUNDING_MODE_LEGACY, $taxed).'
-                            WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotalOfOrder(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
-                            ELSE '.$this->lineTotalOfOrder(ConfigQuery::getOrderRoundingMode(), $taxed).'
-                        END
+                    CAST(SUM('.OrderAmountSql::lineTotal('order_product', '`order`.id', $taxed).'
                     ) AS DECIMAL(16,6))';
-    }
-
-    /**
-     * Chooses, line by line, how the promotional price is read. The choice is made on the line and not on the
-     * price operand: an IF takes the type of its operands, so a text read for the frozen orders would make the
-     * unit price of every order a text. The frozen line is a floating point number once rounded, and so is the
-     * quantity (a FLOAT) times a decimal: the cast to a DECIMAL is made on the SUM of the order, not on the line,
-     * because a CASE takes the type of its widest branch and would turn the cast line back into a DOUBLE.
-     */
-    private function lineTotalOfOrder(int $roundingMode, bool $taxed): string
-    {
-        return 'CASE
-                                WHEN `order`.id <= :text_promo_price_pivot THEN '.$this->lineTotal($roundingMode, $taxed, self::UNIT_PRICE_AS_TEXT).'
-                                ELSE '.$this->lineTotal($roundingMode, $taxed, self::UNIT_PRICE).'
-                            END';
-    }
-
-    /**
-     * One line total, rounded where the given mode says to round: on the unit
-     * amounts under sum of roundings, on the line total under rounding of sums,
-     * nowhere at all for an order frozen by the 2.4 upgrade.
-     */
-    private function lineTotal(int $roundingMode, bool $taxed, string $unitPrice): string
-    {
-        $roundUnitAmounts = ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS === $roundingMode;
-
-        $unitAmount = $roundUnitAmounts ? 'ROUND('.$unitPrice.', 2)' : $unitPrice;
-
-        if ($taxed) {
-            $unitTax = $roundUnitAmounts ? 'ROUND('.self::UNIT_TAX.', 2)' : self::UNIT_TAX;
-
-            $unitAmount = '('.$unitAmount.' + (
-                                SELECT COALESCE(SUM('.$unitTax.'), 0)
-                                FROM order_product_tax
-                                WHERE order_product_tax.order_product_id = order_product.id
-                            ))';
-        }
-
-        $lineTotal = 'order_product.quantity * '.$unitAmount;
-
-        return ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode
-            ? 'ROUND('.$lineTotal.', 2)'
-            : $lineTotal;
     }
 
     /**
