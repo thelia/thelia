@@ -181,5 +181,50 @@
                 </description>
             </export_descriptive>
         </export>
+
+        <export id="thelia.export.sales_by_category" class="Thelia\Domain\DataTransfer\Export\Type\SalesByCategoryExport" category_id="thelia.export.reports">
+            <export_descriptive locale="en_US">
+                <title>Sales by category</title>
+                <description>
+                    Paid sales of the period by category, each category summing its subcategories, with the revenue of the previous period, the change, the quantities, the orders and the share of the revenue. The discounts, the shipping costs and the total close the file. Without a period, from the first order until today.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Ventes par catégorie</title>
+                <description>
+                    Ventes encaissées de la période par catégorie, chaque catégorie cumulant ses sous-catégories, avec le chiffre d'affaires de la période précédente, la variation, les quantités, les commandes et la part du chiffre d'affaires. Les remises, les frais de port et le total terminent le fichier. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.sales_by_product" class="Thelia\Domain\DataTransfer\Export\Type\SalesByProductExport" category_id="thelia.export.reports">
+            <export_descriptive locale="en_US">
+                <title>Sales by product</title>
+                <description>
+                    Paid sales of the period by product, best seller first, with the revenue of the previous period, the change, the quantity and the share of the revenue. Without a period, from the first order until today.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Ventes par produit</title>
+                <description>
+                    Ventes encaissées de la période par produit, meilleures ventes en tête, avec le chiffre d'affaires de la période précédente, la variation, la quantité et la part du chiffre d'affaires. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.sales_by_customer" class="Thelia\Domain\DataTransfer\Export\Type\SalesByCustomerExport" category_id="thelia.export.reports">
+            <export_descriptive locale="en_US">
+                <title>Sales by customer</title>
+                <description>
+                    Paid sales of the period by customer, biggest total first, with the number of orders, the average basket, the last order and the total of the previous period. Without a period, from the first order until today.
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Ventes par client</title>
+                <description>
+                    Ventes encaissées de la période par client, plus gros total en tête, avec le nombre de commandes, le panier moyen, la dernière commande et le total de la période précédente. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                </description>
+            </export_descriptive>
+        </export>
     </exports>
 </config>
