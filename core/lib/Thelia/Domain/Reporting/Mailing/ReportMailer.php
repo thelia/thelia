@@ -14,12 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Reporting\Mailing;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
+use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Domain\DataTransfer\ExportHandler;
@@ -110,7 +110,7 @@ final readonly class ReportMailer
         $filePath = $event->getFilePath();
 
         if (0 === $rows) {
-            $this->discard($filePath);
+            ExportStorage::discard($filePath);
 
             return $this->mailEach($recipients, $storeEmail, $parameters, $locale, null, ReportDeliveryMode::None, true, $onServed);
         }
@@ -127,7 +127,7 @@ final readonly class ReportMailer
             try {
                 return $this->mailEach($recipients, $storeEmail, $parameters, $locale, [$filePath, $downloadName], ReportDeliveryMode::Attached, false, $onServed);
             } finally {
-                $this->discard($filePath);
+                ExportStorage::discard($filePath);
             }
         }
 
@@ -135,7 +135,7 @@ final readonly class ReportMailer
         try {
             $storedFile = ReportMailStorage::adopt($filePath);
         } catch (\Throwable $notAdopted) {
-            $this->discard($filePath);
+            ExportStorage::discard($filePath);
 
             throw $notAdopted;
         }
@@ -231,13 +231,6 @@ final readonly class ReportMailer
             Tlog::getInstance()->addWarning(\sprintf('The summary of a report could not be computed (%s): %s', $notSummarized::class, $notSummarized->getMessage()));
 
             return [];
-        }
-    }
-
-    private function discard(?string $filePath): void
-    {
-        if (null !== $filePath && is_file($filePath)) {
-            (new Filesystem())->remove($filePath);
         }
     }
 
