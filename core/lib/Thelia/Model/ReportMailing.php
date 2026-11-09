@@ -20,8 +20,8 @@ use Thelia\Domain\Reporting\Mailing\ReportSchedule;
 use Thelia\Model\Base\ReportMailing as BaseReportMailing;
 
 /**
- * One share of what an order is paid with: a payment module, an amount and where the
- * share stands.
+ * A report sent by e-mail on a schedule: an export, the period it covers and the list of
+ * recipients it goes to.
  */
 class ReportMailing extends BaseReportMailing
 {
