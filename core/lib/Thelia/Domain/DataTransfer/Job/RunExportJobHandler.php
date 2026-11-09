@@ -23,6 +23,8 @@ use Thelia\Domain\DataTransfer\Exception\JobRefusedException;
 use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Domain\DataTransfer\ExportHandler;
+use Thelia\Domain\SaleUnit\Access\AdminSaleUnitScope;
+use Thelia\Model\AdminQuery;
 use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 
@@ -44,6 +46,7 @@ final readonly class RunExportJobHandler
         private SerializerManager $serializerManager,
         private ArchiverManager $archiverManager,
         private JobLifecycle $lifecycle,
+        private AdminSaleUnitScope $saleUnitScope,
     ) {
     }
 
@@ -99,9 +102,25 @@ final readonly class RunExportJobHandler
             static function (int $rows) use ($job): void {
                 $job->setProcessedRows($rows)->setUpdatedAt(new \DateTime())->save();
             },
+            $this->saleUnitsOf($job),
         );
 
         $this->record($job, $event, $archiver instanceof ArchiverInterface ? $archiver->getExtension() : $serializer->getExtension());
+    }
+
+    /**
+     * The sale units the administrator who asked for the export is restricted to, null when it
+     * is not (or when no administrator asked: the console, a scheduled report). The job is run
+     * by a worker, outside any request: the administrator is the one the row names.
+     *
+     * @return list<int>|null
+     */
+    private function saleUnitsOf(ExportJob $job): ?array
+    {
+        $adminId = $job->getAdminId();
+        $admin = null === $adminId ? null : AdminQuery::create()->findPk($adminId);
+
+        return null === $admin ? null : $this->saleUnitScope->allowedSaleUnitIds($admin);
     }
 
     /**
