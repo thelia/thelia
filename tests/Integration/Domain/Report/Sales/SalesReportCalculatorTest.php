@@ -169,6 +169,28 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
         self::assertSame('A product deleted since', $gone->title, 'A product deleted since keeps the title its order line stored.');
     }
 
+    public function testTheSalesOfACategoryDeletedSinceStayInTheRevenueAsUncategorized(): void
+    {
+        $kept = $this->category('Kept');
+        $this->product($kept, 'KEPT');
+        $closed = $this->category('Closed since');
+        $this->product($closed, 'ORPHAN');
+
+        $order = $this->paidOrder();
+        $this->line($order, 'KEPT', '10.000000', 1);
+        $this->line($order, 'ORPHAN', '30.000000', 1);
+        $before = $this->calculator->reconciliation($this->june());
+
+        $closed->delete($this->getPropelConnection());
+
+        $rows = $this->calculator->byCategory($this->june(), 'en_US');
+        self::assertSame(
+            [[CategoryRowKind::Category, $kept->getId(), 10.0], [CategoryRowKind::Uncategorized, null, 30.0]],
+            array_map(static fn (CategorySalesRow $row): array => [$row->kind, $row->categoryId, $row->revenue], $rows),
+        );
+        self::assertEqualsWithDelta($before->linesTotal, $this->calculator->reconciliation($this->june())->linesTotal, 0.000001, 'Deleting a category takes nothing out of the revenue.');
+    }
+
     public function testTheComponentsOfABundleAreNotCountedAsSold(): void
     {
         $packs = $this->category('Packs');
