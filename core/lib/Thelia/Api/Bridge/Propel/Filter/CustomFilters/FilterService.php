@@ -58,6 +58,9 @@ readonly class FilterService
         private readonly Translator $translator,
         private readonly ?ProductVisibility $productVisibility = null,
         private readonly ?CategoryVisibility $categoryVisibility = null,
+        /** @var iterable<FacetScopeInterface> */
+        #[AutowireIterator(FacetScopeInterface::TAG)]
+        private readonly iterable $facetScopes = [],
     ) {
     }
 
@@ -243,6 +246,7 @@ readonly class FilterService
             $query = $this->filterWithTFilter(tfilters: $selection, resource: $resource, categoryDepth: $categoryDepth, openToVisitorOnly: true);
             $this->restrictToVisibility($query, $visible);
             $this->restrictToVisitorCatalog($query);
+            $this->restrictToFacetScopes($query, $resource);
             $this->restrictToScope($query, $scopeIds);
             $this->restrictToBrowsedBrand($query, $browsedBrandId);
 
@@ -305,6 +309,7 @@ readonly class FilterService
         $query = $this->filterWithTFilter(tfilters: $tfilters, resource: $resource, categoryDepth: $categoryDepth, openToVisitorOnly: true);
         $this->restrictToVisibility($query, $visible);
         $this->restrictToVisitorCatalog($query);
+        $this->restrictToFacetScopes($query, $resource);
         $this->restrictToScope($query, $scopeIds);
         $this->restrictToBrowsedBrand($query, $browsedBrandId);
 
@@ -577,6 +582,17 @@ readonly class FilterService
     {
         if ($query instanceof ProductQuery) {
             $this->productVisibility?->applyTo($query, ProductTableMap::COL_ID);
+        }
+    }
+
+    /**
+     * What a module declares through FacetScopeInterface: the facets describe the products its
+     * listings show, not the whole catalogue. Nothing happens, nothing is read, when none is declared.
+     */
+    private function restrictToFacetScopes(ModelCriteria $query, string $resource): void
+    {
+        foreach ($this->facetScopes as $facetScope) {
+            $facetScope->restrict($query, $resource);
         }
     }
 
