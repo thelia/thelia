@@ -92,6 +92,7 @@ final class QuantityDoublePrecisionMigrationTest extends IntegrationTestCase
 
         $statements = [];
         $table = null;
+        $column = null;
 
         foreach (explode(";\n", $script) as $chunk) {
             $sql = trim(preg_replace('/^\s*--.*$/m', '', $chunk) ?? '');
@@ -100,11 +101,12 @@ final class QuantityDoublePrecisionMigrationTest extends IntegrationTestCase
                 continue;
             }
 
-            if (1 === preg_match("/`TABLE_NAME` = '(\\w+)'/", $sql, $match)) {
-                $table = $match[1];
+            if (1 === preg_match("/`TABLE_NAME` = '(\\w+)' AND `COLUMN_NAME` = '(\\w+)'/", $sql, $match)) {
+                [, $table, $column] = $match;
             }
 
-            if ('cart_item' === $table) {
+            // The other columns of a cart line converted by the script (`reserved_quantity`) are not the probe's.
+            if ('cart_item' === $table && 'quantity' === $column) {
                 $statements[] = str_replace(['`cart_item`', "'cart_item'"], ['`'.self::PROBE.'`', "'".self::PROBE."'"], $sql);
             }
         }
