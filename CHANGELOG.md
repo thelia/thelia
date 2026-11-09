@@ -73,6 +73,7 @@
 
 ## API
 
+- A module narrows the products the facets of a listing are read from, apart from the visibility rules, with a class that implements `Thelia\Api\Bridge\Propel\Filter\CustomFilters\FacetScopeInterface` (autoconfigured, tag `api.thelia.facet_scope`). `FilterService` calls `restrict(ModelCriteria $query, string $resource)` of each scope next to the product visibility, for the narrowed set and for each set relaxed of a checked group, so that a value held only by a product the listing does not show is neither offered nor counted. The condition is added with `where()` and costs no statement of its own; a shop that declares no scope runs the statements it ran before. `FilterService` takes the scopes as a new last constructor argument, optional.
 - `Thelia\Api\Bridge\Propel\FrontOperation::isFront()` tells whether an API Platform operation is served under `/front/`, for a processor, a provider or an extension that behaves differently there than on the admin side.
 
 ## Tests
