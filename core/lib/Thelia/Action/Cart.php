@@ -690,7 +690,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     private function quantityReconciler(): CartQuantityReconciler
     {
-        return $this->cartQuantityReconciler ?? new CartQuantityReconciler($this->quantityPolicy ?? new QuantityPolicy(), $this->requestStack);
+        return $this->cartQuantityReconciler ?? new CartQuantityReconciler($this->quantityPolicy ?? new QuantityPolicy(), $this->requestStack, $this->stockReservation);
     }
 
     /**
@@ -732,7 +732,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $product = $productSaleElements->getProduct();
 
-        if (0 !== (int) $product->getVirtual() || null === $availableQuantity || $requestedQuantity <= $availableQuantity) {
+        if (0 !== (int) $product->getVirtual() || null === $availableQuantity || round($requestedQuantity, 6) <= round($availableQuantity, 6)) {
             return;
         }
 
@@ -997,7 +997,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
                 if ($decision->removesTheLine()) {
                     $changes[] = $this->lineChange($cartItem, $quantity, 0.0, $price, $price);
+                    $held = $this->stockReservation?->heldLinesOf((int) $cart->getId(), (int) $cartItem->getId()) ?? [];
                     $cartItem->delete();
+                    $this->stockReservation?->announceReleased((int) $cart->getId(), $held);
 
                     continue;
                 }

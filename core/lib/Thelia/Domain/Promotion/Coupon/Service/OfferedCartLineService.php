@@ -396,7 +396,7 @@ class OfferedCartLineService implements ResetInterface
         $cartId = (int) $cart->getId();
 
         if (null !== $ceiling && null !== $this->reservedQuantityProvider) {
-            $ceiling -= $this->reservedQuantityProvider->reservedByOtherCarts((int) $productSaleElements->getId(), $cart->getSaleUnitId(), $cartId > 0 ? $cartId : null);
+            $ceiling = SellableStock::leftOf($ceiling, $this->reservedQuantityProvider->reservedByOtherCarts((int) $productSaleElements->getId(), $cart->getSaleUnitId(), $cartId > 0 ? $cartId : null));
         }
 
         return null === $ceiling ? $requestedQuantity : max(0, min($requestedQuantity, (int) $ceiling));

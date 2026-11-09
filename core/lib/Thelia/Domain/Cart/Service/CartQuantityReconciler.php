@@ -23,6 +23,7 @@ use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
 use Thelia\Domain\Catalog\Quantity\QuantityDecision;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
+use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Promotion\Coupon\Type\FreeProduct;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
@@ -46,6 +47,7 @@ final readonly class CartQuantityReconciler
     public function __construct(
         private QuantityPolicy $quantityPolicy = new QuantityPolicy(),
         private ?RequestStack $requestStack = null,
+        private ?StockReservationService $stockReservation = null,
     ) {
     }
 
@@ -128,7 +130,11 @@ final readonly class CartQuantityReconciler
     public function apply(CartItem $line, QuantityDecision $decision): void
     {
         if (null === $decision->quantity) {
+            // A line that held stock goes with its release told to the listeners of the reservations.
+            $cartId = (int) $line->getCartId();
+            $held = $this->stockReservation?->heldLinesOf($cartId, (int) $line->getId()) ?? [];
             $line->delete();
+            $this->stockReservation?->announceReleased($cartId, $held);
 
             return;
         }

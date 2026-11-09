@@ -29,6 +29,7 @@ use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\DTO\CartItemDeleteDTO;
 use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\Service\CartPurger;
+use Thelia\Domain\Cart\Service\CartQuantityReconciler;
 use Thelia\Domain\Catalog\Bundle\BundleCompositionService;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationRefusedException;
 use Thelia\Domain\Catalog\Stock\StockReservationAnnouncer;
@@ -554,6 +555,51 @@ final class StockReservationEventsTest extends ActionIntegrationTestCase
 
         self::assertContainsEquals(['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]], $this->told);
         self::assertSame(0, (int) $this->connection()->query('SELECT COUNT(*) FROM cart_item WHERE id = '.(int) $line->getId())->fetchColumn());
+    }
+
+    public function testALineTheSaleUnitSwitchLeavesUnderTheMinimumOfItsRulesIsToldAsReleased(): void
+    {
+        $currency = $this->factory->currency();
+        $first = $this->factory->saleUnit();
+        $second = $this->factory->saleUnit();
+        $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $currency, ['baseQuantity' => 100, 'basePrice' => 10.0]);
+        $product->getDefaultSaleElements()->setMinQuantity('2.000000')->save($this->connection());
+        $cart = $this->factory->cart(null, ['currency' => $currency]);
+        $cart->setSaleUnitId($first->getId())->save($this->connection());
+        $line = $this->factory->cartItem($cart, $product, $product->getDefaultSaleElements(), ['quantity' => 2.0, 'price' => '10.000000', 'promoPrice' => '10.000000']);
+        $this->checkout()->holdStock($cart);
+        $this->told = [];
+
+        // The second unit has one left: the line could keep one, which is under the minimum of two.
+        $this->factory->saleUnitProductSaleElements($second, $product->getDefaultSaleElements(), 1.0);
+        $this->getService(SaleUnitContext::class)->setSaleUnit($second);
+
+        try {
+            $this->dispatcher->dispatch(new CartEvent($cart), TheliaEvents::CART_FOLLOW_SALE_UNIT);
+            $this->getService(StockReservationAnnouncer::class)->flush();
+        } finally {
+            $this->getService(SaleUnitContext::class)->reset();
+        }
+
+        self::assertSame(0, (int) $this->connection()->query('SELECT COUNT(*) FROM cart_item WHERE id = '.(int) $line->getId())->fetchColumn());
+        self::assertContainsEquals(['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]], $this->told);
+    }
+
+    public function testAHeldLineTheQuantityRulesRemoveOnReadingTheCartBackIsToldAsReleased(): void
+    {
+        $product = $this->product(5);
+        [$cart, $line] = $this->cartWith($product, 2);
+        $this->checkout()->holdStock($cart);
+        $this->told = [];
+
+        // The rules of the combination changed since: nothing under three is sold any more.
+        $product->getDefaultSaleElements()->setMinQuantity('3.000000')->setQuantityStep('3.000000')->save($this->connection());
+
+        $this->getService(CartQuantityReconciler::class)->reconcile($cart, $this->dispatcher);
+        $this->getService(StockReservationAnnouncer::class)->flush();
+
+        self::assertSame(0, (int) $this->connection()->query('SELECT COUNT(*) FROM cart_item WHERE id = '.(int) $line->getId())->fetchColumn());
+        self::assertEquals([['released', (int) $cart->getId(), [$this->lineOf($line, 2.0)]]], $this->told);
     }
 
     public function testThePurgeTellsTheHeldLinesOfTheCartsItDeletes(): void

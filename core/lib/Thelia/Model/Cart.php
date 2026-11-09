@@ -261,7 +261,7 @@ class Cart extends BaseCart
         $ceiling = SellableStock::ceilingOfPse($productSaleElements, $saleUnitQuantities[(int) $productSaleElements->getId()] ?? null);
 
         if (null !== $ceiling && null !== $cartLineAvailability) {
-            $ceiling -= $cartLineAvailability->reservedByOtherCarts($productSaleElements, $this);
+            $ceiling = SellableStock::leftOf($ceiling, $cartLineAvailability->reservedByOtherCarts($productSaleElements, $this));
         }
 
         return null === $ceiling
