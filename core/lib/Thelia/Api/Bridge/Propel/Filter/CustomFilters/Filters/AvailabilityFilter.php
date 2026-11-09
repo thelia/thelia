@@ -21,6 +21,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaAggreg
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockSettings;
@@ -199,16 +200,17 @@ final readonly class AvailabilityFilter implements TheliaFilterInterface, Thelia
      * A sale element out of stock that is still open for sale: its sale mode sells without limit, or
      * sells below zero and its preorder limit is not used up (the stock plus the limit is above zero).
      * Reservations of other carts are not looked at: a facet is a count over the catalogue, not an
-     * answer for a cart.
+     * answer for a cart. The sum is read on the thousandth, the finest decimal a stock is kept on.
      */
     private static function sellsBelowZeroClause(string $alias): string
     {
         return \sprintf(
-            '%1$s.out_of_stock_policy = %2$d OR (%1$s.out_of_stock_policy = %3$d AND %1$s.quantity + %4$s > 0)',
+            '%1$s.out_of_stock_policy = %2$d OR (%1$s.out_of_stock_policy = %3$d AND ROUND(%1$s.quantity + %4$s, %5$d) > 0)',
             $alias,
             OutOfStockPolicy::Unlimited->value,
             OutOfStockPolicy::Limited->value,
             SellableStock::allowedBelowZeroSql($alias),
+            QuantityScale::MAXIMUM_DECIMALS,
         );
     }
 
@@ -236,11 +238,12 @@ final readonly class AvailabilityFilter implements TheliaFilterInterface, Thelia
         );
 
         return \sprintf(
-            '(%1$s.out_of_stock_policy = %2$d OR %1$s.quantity + (%3$s) - %4$s > 0)',
+            '(%1$s.out_of_stock_policy = %2$d OR ROUND(%1$s.quantity + (%3$s) - %4$s, %5$d) > 0)',
             $alias,
             OutOfStockPolicy::Unlimited->value,
             SellableStock::allowedBelowZeroSql($alias),
             $reserved,
+            QuantityScale::MAXIMUM_DECIMALS,
         );
     }
 

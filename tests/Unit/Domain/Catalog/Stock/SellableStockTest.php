@@ -51,6 +51,15 @@ final class SellableStockTest extends TestCase
         self::assertSame(0.0, $stock->forPse($saleElements, null, null, 99), 'Physical 1, another cart holds 1: nothing for this one.');
     }
 
+    public function testWhatIsLeftOfAStockSoldByMeasureIsCountedOnTheMillionth(): void
+    {
+        $stock = new SellableStock($this->reserving(0.4));
+
+        self::assertSame(0.3, $stock->forPse($this->saleElements(0.7, OutOfStockPolicy::Refuse), null, null, 99), 'Other carts hold 0.4 kg of 0.7 kg: 0.3 kg is left, not 0.29999999999999993.');
+        self::assertSame([1 => 0.3], $stock->forMany([$this->saleElements(0.7, OutOfStockPolicy::Refuse)]));
+        self::assertSame(0.3, SellableStock::ceilingOf(0.1, OutOfStockPolicy::Limited, 0.2), 'A stock of 0.1 kg and a limit of 0.2 kg sell 0.3 kg.');
+    }
+
     public function testTheReservationsAreAskedForTheCartAndTheTargetOfTheQuestion(): void
     {
         $provider = new class implements ReservedQuantityProvider {

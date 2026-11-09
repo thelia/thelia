@@ -31,6 +31,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Domain\Catalog\Stock\PreorderRule;
 use Thelia\Domain\Catalog\Stock\SellableStock;
@@ -741,17 +742,20 @@ class Order extends BaseAction implements EventSubscriberInterface
             $ceiling = SellableStock::ceilingOf($before, $policy, $productSaleElements->getPreorderLimit());
 
             /* Check if we have enough stock: what the sale element may still sell, below zero included when it sells there */
-            if ($checkAvailableStock && null !== $ceiling && $quantity > max(0.0, $ceiling - $reservedByOtherCarts)) {
+            if ($checkAvailableStock && null !== $ceiling && $quantity > SellableStock::leftOf($ceiling, $reservedByOtherCarts)) {
                 throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
             }
 
             $offset = -$quantity;
         }
 
-        Tlog::getInstance()->addError('Product stock: '.$before.' -> '.($before + $offset));
+        // On the finest decimal a quantity is sold with, as every other stock movement (StockDecrementer).
+        $after = round($before + $offset, QuantityScale::MAXIMUM_DECIMALS);
+
+        Tlog::getInstance()->addError('Product stock: '.$before.' -> '.$after);
 
         $productSaleElements
-            ->setQuantity($before + $offset)
+            ->setQuantity($after)
             ->save();
 
         if (0.0 === $offset) {

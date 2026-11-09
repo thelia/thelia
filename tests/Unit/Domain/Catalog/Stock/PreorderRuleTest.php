@@ -35,6 +35,8 @@ final class PreorderRuleTest extends TestCase
         yield 'a stock below zero counts as none' => [1.0, -2.0, 0.0, OutOfStockPolicy::Limited, true];
         yield 'a reservation below zero counts as none' => [3.0, 3.0, -4.0, OutOfStockPolicy::Unlimited, false];
         yield 'nothing asked is no preorder' => [0.0, 0.0, 0.0, OutOfStockPolicy::Unlimited, false];
+        yield 'the last 0.3 kg once other carts hold 0.4 of 0.7' => [0.3, 0.7, 0.4, OutOfStockPolicy::Limited, false];
+        yield 'a gram beyond what the other carts leave' => [0.301, 0.7, 0.4, OutOfStockPolicy::Limited, true];
     }
 
     #[DataProvider('quantities')]
@@ -49,5 +51,13 @@ final class PreorderRuleTest extends TestCase
         self::assertTrue(PreorderRule::nextUnitIsPreorder(1.0, 1.0, OutOfStockPolicy::Limited));
         self::assertTrue(PreorderRule::nextUnitIsPreorder(0.0, 0.0, OutOfStockPolicy::Unlimited));
         self::assertFalse(PreorderRule::nextUnitIsPreorder(0.0, 0.0, OutOfStockPolicy::Refuse));
+    }
+
+    public function testTheNextUnitOfAQuantitySoldByMeasureIsAPreorderOnlyOnceNothingPhysicalIsLeft(): void
+    {
+        self::assertFalse(PreorderRule::nextUnitIsPreorder(0.5, 0.0, OutOfStockPolicy::Limited), 'Half a kilogram is still on the shelf.');
+        self::assertFalse(PreorderRule::nextUnitIsPreorder(0.7, 0.4, OutOfStockPolicy::Limited), 'Other carts hold 0.4 of 0.7: 0.3 is left.');
+        self::assertTrue(PreorderRule::nextUnitIsPreorder(0.7, 0.7, OutOfStockPolicy::Limited));
+        self::assertTrue(PreorderRule::nextUnitIsPreorder(0.3, 0.1 + 0.2, OutOfStockPolicy::Limited), 'Two holds that add up to the stock leave nothing.');
     }
 }

@@ -119,6 +119,30 @@ final class SellableCartStockTest extends ActionIntegrationTestCase
         self::assertSame(8.0, $this->quantityOfTheLine(), 'Thirteen at most: eight and six make fourteen, the line keeps what it had.');
     }
 
+    public function testTheLastGramsOfAStockSoldByMeasureAreTakenToTheGram(): void
+    {
+        $product = $this->product(0, OutOfStockPolicy::Refuse, null);
+        $product->getDefaultSaleElements()
+            ->setQuantity(0.3)
+            ->setQuantityDecimals(1)
+            ->setMinQuantity('0.100000')
+            ->setQuantityStep('0.100000')
+            ->save($this->getPropelConnection());
+        $saleElements = $product->getDefaultSaleElements();
+
+        foreach ([0.1, 0.2] as $quantity) {
+            $this->getService(CartFacade::class)->addItem(new CartItemAddDTO(
+                cart: $this->cart,
+                productId: $product->getId(),
+                productSaleElementId: $saleElements->getId(),
+                quantity: $quantity,
+                append: true,
+            ));
+        }
+
+        self::assertSame(0.3, $this->quantityOfTheLine(), '0.1 kg and 0.2 kg make the 0.3 kg in stock, not 0.30000000000000004.');
+    }
+
     public function testAnAdditionToALineWithinWhatMayBeSoldIsTaken(): void
     {
         $product = $this->product(3, OutOfStockPolicy::Limited, 10.0);

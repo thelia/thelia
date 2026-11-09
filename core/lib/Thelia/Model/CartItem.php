@@ -200,7 +200,7 @@ class CartItem extends BaseCartItem
                 ? ($availableQuantity ?? SellableStock::ceilingOfPse($productSaleElements) ?? \INF)
                 : ($availableQuantity ?? \INF);
 
-            if (0 === $product->getVirtual() && $available < $value) {
+            if (0 === $product->getVirtual() && round($available, 6) < round((float) $value, 6)) {
                 $this->setQuantity($currentQuantity);
                 throw new NotEnoughStockException(Translator::getInstance()->trans('Not enough stock for product '.$product->getRef()));
             }
@@ -228,7 +228,9 @@ class CartItem extends BaseCartItem
         }
 
         $currentQuantity = $this->getQuantity();
-        $newQuantity = $currentQuantity + $value;
+        // On the millionth a quantity is stored to: 0.1 kg and 0.2 kg make 0.3 kg, not 0.30000000000000004.
+        // Compared on it too, an unlimited availability (INF) included.
+        $newQuantity = round($currentQuantity + $value, 6);
 
         if (ConfigQuery::checkAvailableStock()) {
             $productSaleElements = $this->getProductSaleElements();
@@ -237,7 +239,7 @@ class CartItem extends BaseCartItem
                 ? ($availableQuantity ?? SellableStock::ceilingOfPse($productSaleElements) ?? \INF)
                 : ($availableQuantity ?? \INF);
 
-            if (0 === $product->getVirtual() && $available < $newQuantity) {
+            if (0 === $product->getVirtual() && round($available, 6) < $newQuantity) {
                 $newQuantity = $currentQuantity;
             }
         }

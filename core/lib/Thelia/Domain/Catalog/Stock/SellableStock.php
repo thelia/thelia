@@ -56,7 +56,7 @@ final readonly class SellableStock
         return match ($policy) {
             OutOfStockPolicy::Refuse => $physicalQuantity,
             OutOfStockPolicy::Unlimited => null,
-            OutOfStockPolicy::Limited => $physicalQuantity + max(0.0, $preorderLimit ?? 0.0),
+            OutOfStockPolicy::Limited => self::onTheMillionth($physicalQuantity + max(0.0, $preorderLimit ?? 0.0)),
         };
     }
 
@@ -114,7 +114,7 @@ final readonly class SellableStock
 
         $reserved = $this->reservedQuantityProvider->reservedByOtherCarts((int) $productSaleElements->getId(), $saleUnitId, $excludedCartId);
 
-        return max(0.0, $ceiling - $reserved);
+        return self::leftOf($ceiling, $reserved);
     }
 
     /**
@@ -174,7 +174,7 @@ final readonly class SellableStock
             $ceiling = $ceilings[$id];
 
             $answers[$id] = new SellableQuantity(
-                null === $ceiling ? null : max(0.0, $ceiling - $held),
+                null === $ceiling ? null : self::leftOf($ceiling, $held),
                 $physicals[$id],
                 $held,
                 OutOfStockPolicy::fromStored($one->getOutOfStockPolicy()),
@@ -264,5 +264,20 @@ final readonly class SellableStock
         }
 
         return $result;
+    }
+
+    /**
+     * What a ceiling leaves once a quantity is taken from it, never below zero, on the millionth a
+     * quantity is stored to: 0.7 kg less the 0.4 kg other carts hold leaves 0.3 kg, the binary
+     * difference (0.29999999999999993) would refuse a buyer of 0.3 kg.
+     */
+    public static function leftOf(float $ceiling, float $taken): float
+    {
+        return max(0.0, self::onTheMillionth($ceiling - $taken));
+    }
+
+    private static function onTheMillionth(float $quantity): float
+    {
+        return round($quantity, 6);
     }
 }
