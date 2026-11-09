@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
 use Thelia\Domain\DataTransfer\Export\Type\OrderLineExport;
 use Thelia\Model\ConfigQuery;
@@ -95,6 +96,57 @@ final class OrderExportTest extends IntegrationTestCase
 
         self::assertContains($recent->getRef(), $refs);
         self::assertNotContains($old->getRef(), $refs);
+    }
+
+    public function testAnExportRestrictedToSaleUnitsKeepsTheOrdersOfThoseUnitsOnly(): void
+    {
+        [$mine, $theirs, $national] = $this->ordersOnTwoSaleUnitsAndNone();
+
+        $refs = $this->exportedRefs(null, [$mine->getSaleUnitId()]);
+
+        self::assertContains($mine->getRef(), $refs);
+        self::assertNotContains($theirs->getRef(), $refs);
+        self::assertNotContains($national->getRef(), $refs, 'A national order belongs to none of the units.');
+    }
+
+    public function testTheOrderLineExportIsRestrictedToSaleUnitsToo(): void
+    {
+        [$mine, $theirs, $national] = $this->ordersOnTwoSaleUnitsAndNone();
+
+        $export = new OrderLineExport();
+        $export->setLang(Lang::getDefaultLanguage());
+        $export->setRangeDate(null);
+        $export->restrictToSaleUnits([$mine->getSaleUnitId()]);
+
+        $refs = [];
+
+        foreach ($export as $row) {
+            $refs[] = $row['order_ref'] ?? null;
+        }
+
+        self::assertContains($mine->getRef(), $refs);
+        self::assertNotContains($theirs->getRef(), $refs);
+        self::assertNotContains($national->getRef(), $refs);
+    }
+
+    public function testAnEmptyListOfSaleUnitsReachesNoOrder(): void
+    {
+        $this->ordersOnTwoSaleUnitsAndNone();
+
+        $this->expectException(DataTransferNoDataFoundException::class);
+
+        $this->exportedRefs(null, []);
+    }
+
+    public function testWithoutSaleUnitsTheExportIsNotRestricted(): void
+    {
+        [$mine, $theirs, $national] = $this->ordersOnTwoSaleUnitsAndNone();
+
+        $refs = $this->exportedRefs(null, null);
+
+        self::assertContains($mine->getRef(), $refs);
+        self::assertContains($theirs->getRef(), $refs);
+        self::assertContains($national->getRef(), $refs);
     }
 
     /**
@@ -503,15 +555,38 @@ final class OrderExportTest extends IntegrationTestCase
     }
 
     /**
+     * An order of each of two sale units, and a national one.
+     *
+     * @return array{Order, Order, Order}
+     */
+    private function ordersOnTwoSaleUnitsAndNone(): array
+    {
+        $orders = [];
+
+        foreach ([$this->factory->saleUnit()->getId(), $this->factory->saleUnit()->getId(), null] as $saleUnitId) {
+            $order = $this->factory->order();
+            $order->setRef('EXP-'.uniqid());
+            $order->setSaleUnitId($saleUnitId);
+            $order->save($this->getPropelConnection());
+            $this->factory->orderProduct($order);
+            $orders[] = $order;
+        }
+
+        return [$orders[0], $orders[1], $orders[2]];
+    }
+
+    /**
      * @param array<string, \DateTime|null>|null $rangeDate
+     * @param list<int>|null                     $saleUnitIds
      *
      * @return array<int, string>
      */
-    private function exportedRefs(?array $rangeDate): array
+    private function exportedRefs(?array $rangeDate, ?array $saleUnitIds = null): array
     {
         $export = new OrderExport();
         $export->setLang(Lang::getDefaultLanguage());
         $export->setRangeDate($rangeDate);
+        $export->restrictToSaleUnits($saleUnitIds);
 
         $refs = [];
 
