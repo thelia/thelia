@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEditEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Order\DTO\AddedOrderLine;
 use Thelia\Domain\Order\DTO\OrderEdit;
 use Thelia\Domain\Order\DTO\OrderEditPreview;
@@ -322,6 +323,12 @@ final readonly class OrderEditor
             }
         }
 
+        // A line keeps the decimals it was sold with (frozen on the line): the minimum and the step
+        // of the combination are left to the merchant, who edits an order already placed.
+        foreach ($edit->quantities as $lineId => $quantity) {
+            self::assertFitsTheDecimals($quantity, (int) $lines[$lineId]->getQuantityDecimals(), (string) $lineId);
+        }
+
         foreach ([...array_values($edit->unitPrices), ...array_filter(array_map(static fn (AddedOrderLine $added): ?string => $added->unitPrice, $edit->addedLines), static fn (?string $price): bool => null !== $price)] as $price) {
             if (1 !== preg_match(self::AMOUNT_PATTERN, $price)) {
                 throw new OrderEditRefusedException(OrderEditRefusal::InvalidPrice);
@@ -529,6 +536,8 @@ final readonly class OrderEditor
             throw new OrderEditRefusedException(OrderEditRefusal::BundleLine, (string) $added->productSaleElementsId);
         }
 
+        self::assertFitsTheDecimals($added->quantity, (int) $productSaleElements->getQuantityDecimals(), (string) $added->productSaleElementsId);
+
         $prices = $productSaleElements->getPricesByCurrency($order->getCurrency(), (float) $order->getCustomer()?->getDiscount());
         $promo = 1 === (int) $productSaleElements->getPromo();
         $price = $added->unitPrice ?? (string) $prices->getPrice();
@@ -629,6 +638,16 @@ final readonly class OrderEditor
 
         if ((float) $order->getDiscount() > $order->getTotalAmount($tax, false, false) + 0.000001) {
             throw new OrderEditRefusedException(OrderEditRefusal::InvalidDiscount, 'the discount exceeds the order total');
+        }
+    }
+
+    /**
+     * @throws OrderEditRefusedException 2.5 of a line sold by the piece, 1.2345 kg of a line sold to the hundredth
+     */
+    private static function assertFitsTheDecimals(float $quantity, int $decimals, string $detail): void
+    {
+        if (!QuantityScale::fits($quantity, max(0, min(QuantityScale::MAXIMUM_DECIMALS, $decimals)))) {
+            throw new OrderEditRefusedException(OrderEditRefusal::InvalidQuantity, \sprintf('%s: %d decimal(s) at most', $detail, $decimals));
         }
     }
 }

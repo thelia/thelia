@@ -546,6 +546,52 @@ final class OrderEditorTest extends IntegrationTestCase
         yield 'quantity above the bound' => [OrderEditRefusal::InvalidQuantity, static fn (self $t) => new OrderEdit(quantities: [$t->lineId() => 1.0e300])];
         yield 'added quantity above the bound' => [OrderEditRefusal::InvalidQuantity, static fn (self $t) => new OrderEdit(addedLines: [new AddedOrderLine(1, 10000000.0)])];
         yield 'nothing' => [OrderEditRefusal::NothingToEdit, static fn (self $t) => new OrderEdit()];
+        yield 'a fraction of a line sold by the piece' => [OrderEditRefusal::InvalidQuantity, static fn (self $t) => new OrderEdit(quantities: [$t->lineId() => 2.5])];
+    }
+
+    /**
+     * A line keeps the decimals it was sold with: 1,2345 kg on a line sold to the hundredth would
+     * be printed 1,23 kg and charged otherwise. The minimum and the step of the combination are
+     * left to the merchant, who edits an order already placed.
+     */
+    public function testAnEditedQuantityKeepsTheDecimalsTheLineWasSoldWithAndLeavesTheMinimumAndTheStepFree(): void
+    {
+        $this->pse->setQuantityDecimals(2)->setMinQuantity('0.500000')->setQuantityStep('0.500000')->save($this->getPropelConnection());
+        $this->line->setQuantityDecimals(2)->save($this->getPropelConnection());
+
+        try {
+            $this->editor->edit($this->order, new OrderEdit(quantities: [$this->lineId() => 1.2345]));
+            self::fail('Four decimals on a line sold to the hundredth are refused.');
+        } catch (OrderEditRefusedException $refusal) {
+            self::assertSame(OrderEditRefusal::InvalidQuantity, $refusal->refusal);
+            self::assertStringContainsString('decimal(s) at most', $refusal->getMessage());
+        }
+
+        $this->editor->edit($this->order, new OrderEdit(quantities: [$this->lineId() => 1.25]));
+
+        self::assertSame(1.25, (float) OrderProductQuery::create()->findPk($this->lineId())->getQuantity(), 'Under the minimum and off the step of the combination: the merchant decides.');
+    }
+
+    public function testAnAddedLineTakesTheDecimalsOfItsCombination(): void
+    {
+        $byThePiece = $this->aProduct(['baseQuantity' => 10])->getDefaultSaleElements();
+        $byMeasure = $this->aProduct(['baseQuantity' => 10])->getDefaultSaleElements();
+        $byMeasure->setQuantityDecimals(1)->setMinQuantity('0.100000')->setQuantityStep('0.100000')->setUnitCode('kg')->save($this->getPropelConnection());
+
+        try {
+            $this->editor->edit($this->order, new OrderEdit(addedLines: [new AddedOrderLine((int) $byThePiece->getId(), 1.5)]));
+            self::fail('Half a piece is refused.');
+        } catch (OrderEditRefusedException $refusal) {
+            self::assertSame(OrderEditRefusal::InvalidQuantity, $refusal->refusal);
+            self::assertStringContainsString('decimal(s) at most', $refusal->getMessage());
+        }
+
+        $this->editor->edit($this->order, new OrderEdit(addedLines: [new AddedOrderLine((int) $byMeasure->getId(), 1.5)]));
+
+        $added = OrderProductQuery::create()->filterByOrderId($this->order->getId())->filterByProductSaleElementsId($byMeasure->getId())->findOne();
+        self::assertSame(1.5, (float) $added->getQuantity());
+        self::assertSame(1, (int) $added->getQuantityDecimals());
+        self::assertSame('kg', $added->getUnitCode());
     }
 
     public function testAFreeLineIsAllowedByAForcedPriceOfZero(): void
@@ -719,6 +765,39 @@ final class OrderEditorTest extends IntegrationTestCase
             self::assertEqualsWithDelta($sum, (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(1.5, (float) $order->getPostageTax(), 0.0001);
             self::assertEqualsWithDelta(11.5, (float) $order->getPostage(), 0.0001);
+        } finally {
+            ConfigQuery::write('postage_tax_strategy', (string) $previous);
+        }
+    }
+
+    /**
+     * The postage is split on what each tax rule of the order is charged, line by line: 1000 units
+     * at 0.005 are charged 10.00 under the sum of roundings (0.01 a unit), not 5.00.
+     */
+    public function testAnEditedPostageIsSplitOnTheLineTotalsTheOrderCharges(): void
+    {
+        $previous = ConfigQuery::read('postage_tax_strategy');
+        ConfigQuery::write('postage_tax_strategy', 'pro_rata');
+
+        try {
+            $reduced = $this->createFixtureFactory();
+            $rule = $reduced->taxRule(['isDefault' => false]);
+            (new TaxRuleCountry())
+                ->setTaxRuleId($rule->getId())
+                ->setCountryId($this->country()->getId())
+                ->setTaxId($reduced->tax(['requirements' => ['percent' => '10'], 'title' => 'VAT 10'])->getId())
+                ->setPosition(1)
+                ->save($this->getPropelConnection());
+            $screws = $reduced->product($reduced->category(), $rule, $reduced->currency(), ['title' => 'Screw', 'baseQuantity' => 5000]);
+
+            $this->editor->edit($this->order, new OrderEdit(
+                addedLines: [new AddedOrderLine((int) $screws->getDefaultSaleElements()->getId(), 1000.0, '0.005000')],
+                untaxedPostage: '10.000000',
+            ));
+
+            // Goods at 20 % charged 20.00, goods at 10 % charged 10.00: 6.67 and 3.33 of the postage.
+            $order = OrderQuery::create()->findPk($this->order->getId());
+            self::assertEqualsWithDelta(1.33 + 0.33, (float) $order->getPostageTax(), 0.0101);
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
         }
