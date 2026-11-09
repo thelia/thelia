@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Catalog\Stock;
 
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
@@ -32,6 +33,7 @@ final readonly class VisitorSellableStock
     public function __construct(
         private SellableStock $sellableStock,
         private VisitorCart $visitorCart,
+        private SaleUnitContext $saleUnitContext,
     ) {
     }
 
@@ -117,9 +119,12 @@ final readonly class VisitorSellableStock
             $counted[$id] = $one;
         }
 
+        // The reservations are counted on the stock the physical quantity is read from: the own stock
+        // of the sale unit being served, even for a visitor who has no cart yet.
         $cart = $this->visitorCart->current();
+        $saleUnitId = $cart?->getSaleUnitId() ?? $this->saleUnitContext->getSaleUnit()?->getId();
 
-        foreach ($this->sellableStock->answersFor($counted, $cart?->getSaleUnitId(), $this->visitorCart->currentId()) as $id => $answer) {
+        foreach ($this->sellableStock->answersFor($counted, $saleUnitId, $this->visitorCart->currentId()) as $id => $answer) {
             $result[$id] = ['available' => $answer->available, 'preorder' => $answer->nextUnitIsPreorder()];
         }
 
