@@ -33,6 +33,9 @@ final readonly class StockSettings
     public const DEFAULT_RESERVATION_DURATION_MINUTES = 15;
     public const DEFAULT_LOW_STOCK_THRESHOLD = 5.0;
 
+    /** How many reservation durations a line may stay held from its first hold. */
+    public const LONGEST_HOLD_IN_DURATIONS = 4;
+
     public function reservationEnabled(): bool
     {
         $stored = ConfigQuery::read(self::RESERVATION_ENABLED, '0');
@@ -57,6 +60,16 @@ final readonly class StockSettings
         }
 
         return (int) $stored;
+    }
+
+    /**
+     * Minutes a line may stay held from its first hold, however often it is held again: past them,
+     * holding again no longer pushes the date back, and the stock goes back on sale once the date
+     * runs out. A buyer going back and forth in the checkout stays well within it.
+     */
+    public function longestHoldMinutes(): int
+    {
+        return self::LONGEST_HOLD_IN_DURATIONS * $this->reservationDurationMinutes();
     }
 
     /** The threshold of the shop; 0 is a valid value, a missing or negative one gives the default. */

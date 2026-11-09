@@ -2439,6 +2439,7 @@ CREATE TABLE `cart_item`
     `bundle_composition` TEXT COMMENT 'the components a customer chose for a bundle line, as canonical JSON; null outside a bundle',
     `reserved_until` DATETIME COMMENT 'the stock of the line is held for the cart until this moment; null or past: not held',
     `reserved_quantity` FLOAT COMMENT 'the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told',
+    `reserved_since` DATETIME COMMENT 'the moment the line was first held since its last release; a hold is never pushed back past a bound from it',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
