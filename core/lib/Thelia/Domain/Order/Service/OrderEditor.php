@@ -144,6 +144,7 @@ final readonly class OrderEditor
             }
 
             Order::forgetCachedTotals((int) $order->getId());
+            Calculator::forgetOrderTaxFactor($order);
             $this->assertDiscountIsCovered($order);
 
             if (null !== $before) {
