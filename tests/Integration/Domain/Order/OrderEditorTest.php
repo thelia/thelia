@@ -987,7 +987,7 @@ final class OrderEditorTest extends IntegrationTestCase
         $this->editor->edit($this->order, new OrderEdit(
             addedLines: [new AddedOrderLine((int) $other->getDefaultSaleElements()->getId(), 2.0)],
             quantities: [$this->lineId() => 1.0],
-            discount: '1.000000',
+            discount: '5.000000',
         ));
 
         $tester = new CommandTester((new Application(self::$kernel))->find('pdf:render'));
@@ -1008,6 +1008,10 @@ final class OrderEditorTest extends IntegrationTestCase
                 $tester->assertCommandIsSuccessful();
                 self::assertStringStartsWith('%PDF', (string) file_get_contents($file));
                 self::assertStringContainsString('Gadget', $html, \sprintf('The %s carries the line added by the edit.', $document));
+
+                if ('invoice' === $document) {
+                    self::assertMatchesRegularExpression('/Remise TTC<\/p>\s*<\/td>\s*<td[^>]*><p>5,00/', $html, 'The invoice shows the discount set by the edit.');
+                }
             } finally {
                 if (file_exists($file)) {
                     unlink($file);
