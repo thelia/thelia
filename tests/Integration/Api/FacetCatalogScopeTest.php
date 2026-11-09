@@ -15,7 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Api;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FacetScopeInterface;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilterInterface;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\FilterService;
 use Thelia\Api\Resource\Filter;
 use Thelia\Api\Resource\FilterValue;
@@ -23,6 +27,7 @@ use Thelia\Model\ChoiceFilter;
 use Thelia\Model\FeatureProduct;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\Template;
 use Thelia\Test\IntegrationTestCase;
 
@@ -91,24 +96,35 @@ final class FacetCatalogScopeTest extends IntegrationTestCase
         self::assertSame(['Local' => 1], $this->counts($facets, 'brand'));
     }
 
+    /**
+     * Each scope hides a different product: the Remote brand and the Red value survive only if
+     * the loop stops after the first scope.
+     */
     public function testEveryScopeIsAskedAndTheyNarrowTogether(): void
     {
-        $remote = $this->elsewhereProductIds[0];
-        $second = new class($remote) implements FacetScopeInterface {
-            public function __construct(private readonly int $hiddenProductId)
-            {
-            }
+        [$remoteBlue, $remoteRed] = $this->elsewhereProductIds;
 
-            public function restrict(ModelCriteria $query, string $resource): void
-            {
-                $query->where(\sprintf('%s <> %d', ProductTableMap::COL_ID, $this->hiddenProductId));
-            }
-        };
+        $this->filterService = $this->withScopes([$this->hiding([$remoteBlue]), $this->hiding([$remoteRed])]);
 
-        $this->filterService = $this->withScopes([$second]);
+        $facets = $this->facets([]);
 
-        // Only one of the two hidden products is gone: the red one stays.
-        self::assertSame(['Blue' => 1, 'Red' => 1], $this->counts($this->facets([]), 'feature'));
+        self::assertSame(['Blue' => 1], $this->counts($facets, 'feature'));
+        self::assertSame(['Local' => 1], $this->counts($facets, 'brand'));
+    }
+
+    /**
+     * A facet that does not count by aggregate, as a module's would, is read from the products
+     * themselves: the query that feeds it is the scope's too.
+     */
+    public function testAFacetReadFromTheProductsAlsoFollowsTheScope(): void
+    {
+        $reference = $this->referenceFacet();
+
+        $this->filterService = $this->withScopes([], [$reference]);
+        self::assertSame(['ELSEWHERE-BLUE', 'ELSEWHERE-RED', 'LOCAL-BLUE'], array_keys($this->counts($this->facets([]), 'reference')));
+
+        $this->filterService = $this->withScopes([$this->hidingElsewhere()], [$reference]);
+        self::assertSame(['LOCAL-BLUE'], array_keys($this->counts($this->facets([]), 'reference')));
     }
 
     public function testAScopeIsGivenTheResourceTheFacetsDescribe(): void
@@ -132,27 +148,46 @@ final class FacetCatalogScopeTest extends IntegrationTestCase
 
         foreach ($seen as [$resource, $queryClass]) {
             self::assertSame('products', $resource);
-            self::assertSame(\Thelia\Model\ProductQuery::class, $queryClass);
+            self::assertSame(ProductQuery::class, $queryClass);
         }
     }
 
+    /**
+     * Without `#[AutowireIterator]` the container falls back on the empty default and every
+     * scope of every module is silently ignored; without `#[AutoconfigureTag]` no module class
+     * is ever collected.
+     */
     public function testTheContainerGivesTheServiceTheScopesItCollects(): void
     {
-        self::assertIsIterable((new \ReflectionProperty($this->getService(FilterService::class), 'facetScopes'))->getValue($this->getService(FilterService::class)));
+        $service = $this->getService(FilterService::class);
+
+        self::assertInstanceOf(RewindableGenerator::class, (new \ReflectionProperty($service, 'facetScopes'))->getValue($service));
+
+        $tags = array_map(
+            static fn (\ReflectionAttribute $attribute): ?string => $attribute->getArguments()[0] ?? null,
+            (new \ReflectionClass(FacetScopeInterface::class))->getAttributes(AutoconfigureTag::class),
+        );
+
+        self::assertSame([FacetScopeInterface::TAG], $tags);
+        self::assertSame('api.thelia.facet_scope', FacetScopeInterface::TAG);
     }
 
     /**
-     * @param list<FacetScopeInterface> $scopes
+     * @param list<FacetScopeInterface>   $scopes
+     * @param list<TheliaFilterInterface> $extraFilters facets added to the ones of the core
      */
-    private function withScopes(array $scopes): FilterService
+    private function withScopes(array $scopes, array $extraFilters = []): FilterService
     {
         $arguments = [];
 
         foreach ((new \ReflectionClass(FilterService::class))->getConstructor()->getParameters() as $parameter) {
             $name = $parameter->getName();
-            $arguments[$name] = 'facetScopes' === $name
-                ? $scopes
-                : (new \ReflectionProperty($this->filterService, $name))->getValue($this->filterService);
+            $value = (new \ReflectionProperty($this->filterService, $name))->getValue($this->filterService);
+            $arguments[$name] = match ($name) {
+                'facetScopes' => $scopes,
+                'filters' => [...$value, ...$extraFilters],
+                default => $value,
+            };
         }
 
         return new FilterService(...$arguments);
@@ -160,7 +195,15 @@ final class FacetCatalogScopeTest extends IntegrationTestCase
 
     private function hidingElsewhere(): FacetScopeInterface
     {
-        return new class($this->elsewhereProductIds) implements FacetScopeInterface {
+        return $this->hiding($this->elsewhereProductIds);
+    }
+
+    /**
+     * @param list<int> $hiddenProductIds
+     */
+    private function hiding(array $hiddenProductIds): FacetScopeInterface
+    {
+        return new class($hiddenProductIds) implements FacetScopeInterface {
             /**
              * @param list<int> $hiddenProductIds
              */
@@ -171,6 +214,33 @@ final class FacetCatalogScopeTest extends IntegrationTestCase
             public function restrict(ModelCriteria $query, string $resource): void
             {
                 $query->where(\sprintf('%s NOT IN (%s)', ProductTableMap::COL_ID, implode(', ', $this->hiddenProductIds)));
+            }
+        };
+    }
+
+    /**
+     * A facet of a module: not aggregated, it offers the reference of each product it is given.
+     */
+    private function referenceFacet(): TheliaFilterInterface
+    {
+        return new class implements TheliaFilterInterface {
+            public function getResourceType(): array
+            {
+                return ['products'];
+            }
+
+            public static function getFilterName(): array
+            {
+                return ['reference'];
+            }
+
+            public function filter(ModelCriteria $query, $value, bool $isMinOrMaxFilter = false, ?int $categoryDepth = null): void
+            {
+            }
+
+            public function getValue(ActiveRecordInterface $activeRecord, string $locale, $valueSearched = null, ?int $depth = 1): ?array
+            {
+                return [(new FilterValue())->setId((int) $activeRecord->getId())->setTitle((string) $activeRecord->getRef())];
             }
         };
     }
