@@ -35,7 +35,8 @@ use Thelia\Model\Map\CartItemTableMap;
  * hold of the line (`reserved_since`, StockSettings::longestHoldMinutes()): a cart that comes back
  * to the checkout again and again cannot keep the stock off sale for ever. Past that bound the line
  * is still told as held until the purge, a removal or an order releases it; only then may a new
- * hold, which spends the budget, start it again. The lines of a virtual product and the lines of
+ * hold, which spends the budget, start it again. A date that ran out before the bound (the cart
+ * left and came back later) is not a refresh: the next hold counts the longest hold from itself. The lines of a virtual product and the lines of
  * a pack are never held: the first take no stock, the second take the stock of their components.
  *
  * Every hold runs in a transaction of its own that locks the stock rows first, in ascending id,
@@ -520,7 +521,10 @@ final readonly class StockReservationService
     /**
      * The lines the hold covers: their date pushed back and the quantity they are told with. The
      * date is pushed back by the duration, but never past the longest hold counted from the first
-     * hold of the line, which a line held for the first time (no date, or no start) takes now.
+     * hold of the line, which a line held for the first time (no date, or no start) takes now. So
+     * does a line whose date ran out before the longest hold: nothing refreshed it in time, and
+     * keeping its old start would write a date already past. A line that reached the bound keeps
+     * its start until it is released.
      *
      * The start is written first and read again by the date: the same expression gives the same
      * moment whether the database assigns the columns one after the other or all at once.
@@ -531,7 +535,11 @@ final readonly class StockReservationService
      */
     private function writeReservation(array $quantityByCartItemId, int $minutes, int $longestMinutes, ConnectionInterface $connection): void
     {
-        $since = 'IF(`reserved_until` IS NULL OR `reserved_since` IS NULL, NOW(), `reserved_since`)';
+        $since = \sprintf(
+            'IF(`reserved_until` IS NULL OR `reserved_since` IS NULL '
+            .'OR (`reserved_until` <= NOW() AND `reserved_until` < `reserved_since` + INTERVAL %d MINUTE), NOW(), `reserved_since`)',
+            $longestMinutes,
+        );
 
         $idsByQuantity = [];
 
