@@ -17,6 +17,7 @@ can be hidden, moved, and drawn as checkboxes, radio buttons, a text field or a 
 | Its counts | `TheliaAggregatedFilterInterface::getAggregatedValues()`: one query for the whole listing |
 | The facet column | `FilterService::getFilters()`, served by `/api/front/tfilters/products` |
 | The narrowing | `FilterService::filterWithTFilter()`, from the `tfilters` query parameter |
+| The scope of a listing | `FacetScopeInterface` (tag `api.thelia.facet_scope`, autoconfigured): a module narrows the products the facets are read from, see below |
 | The merchant settings | a `choice_filter` row per category or template, tied to the facet by the `type` of a `choice_filter_other` row |
 
 A facet with no value to offer is not shown. A listing outside any category, brand or ranked
@@ -25,6 +26,34 @@ set of ids gets no facet at all.
 A facet that is not attached to a feature or an attribute needs a `choice_filter_other` row to
 be reachable from the back office: `setup/insert.sql.tpl` for a fresh install and the pending
 update script for an upgraded shop, matched by `type` and never by id.
+
+## Narrowing the facets to what a listing shows
+
+A shop whose listings show only part of the catalogue (the points of sale a product is sold in,
+a market) must count the same products in the facets as in the list. A rule of
+`ProductVisibilityRuleInterface` would do it, and would also hide the product from the cart and
+the product page. For the facets alone, a module implements
+`Thelia\Api\Bridge\Propel\Filter\CustomFilters\FacetScopeInterface`:
+
+```php
+final readonly class SoldInCurrentShopScope implements FacetScopeInterface
+{
+    public function restrict(ModelCriteria $query, string $resource): void
+    {
+        if ($query instanceof ProductQuery && 'products' === $resource) {
+            $query->where('EXISTS (SELECT 1 FROM ... WHERE ... = product.id AND ... = '.$this->currentShopId().')');
+        }
+    }
+}
+```
+
+`FilterService` calls every scope for each set of products it reads, next to the product
+visibility. The condition joins the statements the facets already run: no statement of its own,
+and no cost at all when no scope is declared. Use `where()`, never `add()` (it replaces a
+condition on the same column), and keep what is read about the visitor for the request, since
+`restrict()` runs once per set. The facets endpoint is not in the data access cache; the list the
+facets accompany is, and the module keeps it out or keys it. The listing and the facets restrict
+separately: the module writes the same condition for both.
 
 ## Availability
 
@@ -88,6 +117,7 @@ the product ids and joins nothing, so the order the listing is sorted in is unto
 |---|---|
 | Counts, sibling values, scopes | `tests/Integration/Api/FacetSelectionTest.php` |
 | Availability | `tests/Integration/Api/AvailabilityFacetTest.php` |
+| Scope of a module (`FacetScopeInterface`) | `tests/Integration/Api/FacetCatalogScopeTest.php` |
 | Customer rating, with and without a source | `tests/Integration/Api/RatingFacetTest.php` |
 | Price | `tests/Integration/Api/PriceFacetTest.php` |
 | Rows of an upgraded shop | `tests/Integration/Install/ChoiceFilterOtherListingFacetRowsMigrationTest.php` |

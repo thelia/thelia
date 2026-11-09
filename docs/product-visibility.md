@@ -21,7 +21,7 @@ left reachable by its id is not hidden, it is only harder to find.
 | Combinations of a product (`ProductSaleElementsAccessService`) | yes |
 | Quick order, and a purchase list loaded into it (`ReferenceResolver`) | yes; the purchase list itself is not |
 | `product`, `accessory` and `product_sale_elements` loops | yes, front only |
-| Listing facets (`/api/front/tfilters/products`) | yes, a hidden product feeds no facet and is not counted |
+| Listing facets (`/api/front/tfilters/products`) | yes, a hidden product feeds no facet and is not counted; to narrow the facets alone, see `FacetScopeInterface` in `docs/product-listing-facets.md` |
 | Theme sitemap (Flexy) | yes, through `ReservedSaleVisibility`, for the visitor who generates it: the sitemap is then cached for everybody |
 | Images, documents, prices, features, attribute combinations, categories and associated contents read by the id of a product or of a combination | no |
 | Products listed by a sale (`/api/front/sales`) | no |
