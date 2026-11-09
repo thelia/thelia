@@ -163,9 +163,29 @@ final class LowStockAlertTest extends ActionIntegrationTestCase
                 'product_title' => (string) $product->setLocale(\Thelia\Model\Lang::getDefaultLanguage()->getLocale())->getTitle(),
                 'quantity' => 19.0,
                 'threshold' => 20.0,
+                'quantity_decimals' => 0,
+                'unit_code' => null,
             ],
             $sent[0],
         );
+    }
+
+    /**
+     * The template writes the stock left with its unit and decimals (format_quantity): "4,25 kg".
+     */
+    public function testTheAlertOfACombinationSoldByMeasureCarriesItsDecimalsAndItsUnit(): void
+    {
+        $pse = $this->pse(30.0);
+        $pse->setQuantityDecimals(2)->setMinQuantity('0.250000')->setQuantityStep('0.250000')->setUnitCode('kg')->save();
+        $mailer = $this->recordingMailer();
+
+        (new LowStockAlertMailer($mailer))->onLowStockReached(new LowStockReachedEvent($pse->getId(), 4.25, 5.0));
+
+        $sent = $mailer->parametersOfMessagesSent('low_stock_alert');
+        self::assertCount(1, $sent);
+        self::assertSame(4.25, $sent[0]['quantity']);
+        self::assertSame(2, $sent[0]['quantity_decimals'] ?? null);
+        self::assertSame('kg', $sent[0]['unit_code'] ?? null);
     }
 
     /**

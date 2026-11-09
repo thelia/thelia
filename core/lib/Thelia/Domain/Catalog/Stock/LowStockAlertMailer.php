@@ -58,6 +58,9 @@ final readonly class LowStockAlertMailer
                 'product_title' => (string) $product->getTitle(),
                 'quantity' => $event->getQuantity(),
                 'threshold' => $event->getThreshold(),
+                // So that the template writes the stock left with its unit (format_quantity): "4,25 kg".
+                'quantity_decimals' => (int) $pse->getQuantityDecimals(),
+                'unit_code' => $pse->getUnitCode(),
             ]);
         } catch (\Throwable $exception) {
             Tlog::getInstance()->error(\sprintf('The low stock alert of sale element %d was not sent: %s', $event->getProductSaleElementsId(), $exception->getMessage()));
