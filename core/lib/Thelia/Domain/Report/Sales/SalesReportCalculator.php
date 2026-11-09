@@ -329,47 +329,43 @@ final readonly class SalesReportCalculator
      */
     private function categoryFigures(SalesReportCriteria $criteria): array
     {
-        $sql = 'WITH RECURSIVE '.$this->soldLineSql($criteria).',
+        // Each line is counted twice, once under its category and the ancestors of it (or its
+        // kind, without one) and once under the total: its amount is computed once beforehand.
+        $sql = 'WITH RECURSIVE '.$this->soldLineSql($criteria, computedOnce: true).',
             category_ancestor (category_id, ancestor_id, depth) AS (
-                SELECT DISTINCT sold_line.category_id, sold_line.category_id, 0
-                FROM sold_line
-                WHERE sold_line.category_id IS NOT NULL
+                SELECT category.id, category.id, 0
+                FROM category
                 UNION ALL
                 SELECT category_ancestor.category_id, parent_category.id, category_ancestor.depth + 1
                 FROM category_ancestor
                 INNER JOIN category ON category.id = category_ancestor.ancestor_id
                 INNER JOIN category AS parent_category ON parent_category.id = category.parent
                 WHERE category_ancestor.depth < '.self::MAX_CATEGORY_DEPTH.'
+            ),
+            figure_target (target, figure_key, depth) AS (
+                SELECT CONCAT(\'category:\', category_ancestor.category_id), CONCAT(\'category:\', category_ancestor.ancestor_id), category_ancestor.depth
+                FROM category_ancestor
+                UNION ALL
+                SELECT \''.CategoryRowKind::Uncategorized->value.'\', \''.CategoryRowKind::Uncategorized->value.'\', 0
+                UNION ALL
+                SELECT \''.CategoryRowKind::Services->value.'\', \''.CategoryRowKind::Services->value.'\', 0
+                UNION ALL
+                SELECT \'total\', \'total\', 0
             )
             SELECT
-                CONCAT(\'category:\', category_ancestor.ancestor_id) AS figure_key,
+                figure_target.figure_key,
                 CAST(SUM(sold_line.line_total) AS DECIMAL(16,6)) AS revenue,
-                CAST(SUM(CASE WHEN category_ancestor.depth = 0 THEN sold_line.line_total ELSE 0 END) AS DECIMAL(16,6)) AS own_revenue,
+                CAST(SUM(CASE WHEN figure_target.depth = 0 THEN sold_line.line_total ELSE 0 END) AS DECIMAL(16,6)) AS own_revenue,
                 SUM(sold_line.counted_quantity) AS quantity,
                 COUNT(DISTINCT sold_line.counted_order_id) AS order_count
             FROM sold_line
-            INNER JOIN category_ancestor ON category_ancestor.category_id = sold_line.category_id
-            GROUP BY category_ancestor.ancestor_id
-            HAVING '.self::SOLD_HAVING.'
-            UNION ALL
-            SELECT
-                sold_line.kind,
-                CAST(SUM(sold_line.line_total) AS DECIMAL(16,6)),
-                CAST(SUM(sold_line.line_total) AS DECIMAL(16,6)),
-                SUM(sold_line.counted_quantity),
-                COUNT(DISTINCT sold_line.counted_order_id)
-            FROM sold_line
-            WHERE sold_line.category_id IS NULL
-            GROUP BY sold_line.kind
-            HAVING '.self::SOLD_HAVING.'
-            UNION ALL
-            SELECT
-                \'total\',
-                CAST(COALESCE(SUM(sold_line.line_total), 0) AS DECIMAL(16,6)),
-                CAST(COALESCE(SUM(sold_line.line_total), 0) AS DECIMAL(16,6)),
-                COALESCE(SUM(sold_line.counted_quantity), 0),
-                COUNT(DISTINCT sold_line.counted_order_id)
-            FROM sold_line';
+            CROSS JOIN (SELECT 0 AS under_total UNION ALL SELECT 1) AS pass
+            INNER JOIN figure_target ON figure_target.target = CASE
+                WHEN pass.under_total = 1 THEN \'total\'
+                ELSE COALESCE(CONCAT(\'category:\', sold_line.category_id), sold_line.kind)
+            END
+            GROUP BY figure_target.figure_key
+            HAVING '.self::SOLD_HAVING;
 
         $figures = [];
 
@@ -391,14 +387,19 @@ final readonly class SalesReportCalculator
      * and the order of a bundle component are null, so that it is not counted as sold.
      *
      * @param string $extraCondition a condition on `op` (the order line), with its own named parameters
+     * @param bool   $computedOnce   for a query that reads each line several times: MariaDB merges a
+     *                               common table expression into the query that reads it, and would
+     *                               compute the amount of a line at each reading. DISTINCT, over
+     *                               rows each line makes unique, keeps it a table of its own
      */
-    private function soldLineSql(SalesReportCriteria $criteria, string $extraCondition = ''): string
+    private function soldLineSql(SalesReportCriteria $criteria, string $extraCondition = '', bool $computedOnce = false): string
     {
         $service = "'".OrderProduct::LINE_TYPE_SERVICE."'";
         $component = "'".OrderProduct::LINE_TYPE_BUNDLE_COMPONENT."'";
 
         return 'sold_line AS (
-                SELECT
+                SELECT'.($computedOnce ? ' DISTINCT' : '').'
+                    op.id AS line_id,
                     op.order_id,
                     op.product_ref,
                     op.title AS line_title,
