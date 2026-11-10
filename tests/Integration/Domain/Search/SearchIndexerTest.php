@@ -113,6 +113,29 @@ final class SearchIndexerTest extends IntegrationTestCase
         self::assertFalse($this->engine->has('product', $id, 'en_US'));
     }
 
+    public function testARemovalTakesTheDocumentOutOfEveryIndexedLocaleWithoutReadingTheCatalogue(): void
+    {
+        $product = $this->product('Old table');
+        $this->indexer->synchronize('product', [$product->getId()], self::LOCALES);
+
+        $this->indexer->remove('product', [$product->getId()]);
+
+        foreach (self::LOCALES as $locale) {
+            self::assertFalse($this->engine->has('product', $product->getId(), $locale), $locale);
+        }
+    }
+
+    public function testARemovalOfAFamilyWithoutProviderLeavesTheIndexAsItWas(): void
+    {
+        $product = $this->product('Old table');
+        $this->indexer->synchronize('product', [$product->getId()], self::LOCALES);
+        $before = $this->engine->documents;
+
+        $this->indexer->remove('unknown', [$product->getId()]);
+
+        self::assertEquals($before, $this->engine->documents);
+    }
+
     public function testPlayingTheSameSynchronizationTwiceLeavesTheSameIndex(): void
     {
         $product = $this->product('Garden chair');

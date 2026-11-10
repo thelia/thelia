@@ -22,10 +22,12 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Thelia\Domain\Search\EventListener\SearchIndexingListener;
-use Thelia\Domain\Search\Message\SynchronizeSearchDocuments;
+use Thelia\Domain\Search\Message\IndexDocument;
+use Thelia\Domain\Search\Message\RemoveDocument;
 use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexingQueue;
 use Thelia\Model\Product;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
@@ -67,7 +69,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
 
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('product', [$product->getId()])], $this->dispatched);
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
     }
 
     public function testAProductHiddenWithoutTouchingItsTextIsQueued(): void
@@ -78,7 +80,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $product->setVisible(0)->save();
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('product', [$product->getId()])], $this->dispatched);
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
     }
 
     public function testANewProductIsQueued(): void
@@ -88,7 +90,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $product = $this->product();
         $listener->flush();
 
-        self::assertContainsEquals(new SynchronizeSearchDocuments('product', [$product->getId()]), $this->dispatched);
+        self::assertContainsEquals(new IndexDocument('product', [$product->getId()]), $this->dispatched);
     }
 
     public function testAProductSavedWithoutAnIndexedChangeIsNotQueued(): void
@@ -123,7 +125,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $brand->setVisible(0)->save();
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('brand', [$brand->getId()])], $this->dispatched);
+        self::assertEquals([new IndexDocument('brand', [$brand->getId()])], $this->dispatched);
     }
 
     public function testRenamingABrandQueuesTheProductsThatShowItsName(): void
@@ -136,7 +138,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $brand->setLocale('en_US')->setTitle('Renamed brand')->save();
         $listener->flush();
 
-        self::assertContainsEquals(new SynchronizeSearchDocuments('product', [$product->getId()]), $this->dispatched);
+        self::assertContainsEquals(new IndexDocument('product', [$product->getId()]), $this->dispatched);
     }
 
     public function testAContentHiddenWithoutTouchingItsTextIsQueued(): void
@@ -147,10 +149,10 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $content->setVisible(0)->save();
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('content', [$content->getId()])], $this->dispatched);
+        self::assertEquals([new IndexDocument('content', [$content->getId()])], $this->dispatched);
     }
 
-    public function testADeletedProductIsQueuedSoTheIndexForgetsIt(): void
+    public function testADeletedProductIsQueuedForRemoval(): void
     {
         $product = $this->product();
         $id = $product->getId();
@@ -159,7 +161,31 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $product->delete();
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('product', [$id])], $this->dispatched);
+        self::assertEquals([new RemoveDocument('product', [$id])], $this->dispatched);
+    }
+
+    public function testAProductSavedThenDeletedInTheSameWorkIsOnlyRemoved(): void
+    {
+        $product = $this->product();
+        $id = $product->getId();
+        $listener = $this->listen(withEngine: true);
+
+        $product->setLocale('en_US')->setTitle('Renamed')->save();
+        $product->delete();
+        $listener->flush();
+
+        self::assertEquals([new RemoveDocument('product', [$id])], $this->dispatched);
+    }
+
+    public function testADeletedTranslationReindexesItsProduct(): void
+    {
+        $product = $this->product();
+        $listener = $this->listen(withEngine: true);
+
+        ProductI18nQuery::create()->filterById($product->getId())->filterByLocale('en_US')->findOne()?->delete();
+        $listener->flush();
+
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
     }
 
     public function testASubcategoryDeletedWithItsParentIsQueued(): void
@@ -171,7 +197,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $parent->delete();
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('category', [$parent->getId(), $child->getId()])], $this->dispatched);
+        self::assertEquals([new RemoveDocument('category', [$parent->getId(), $child->getId()])], $this->dispatched);
     }
 
     public function testDeletingABrandQueuesItAndTheProductsThatShowedItsName(): void
@@ -185,8 +211,8 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $listener->flush();
 
         self::assertEqualsCanonicalizing([
-            new SynchronizeSearchDocuments('brand', [$brand->getId()]),
-            new SynchronizeSearchDocuments('product', [$product->getId()]),
+            new RemoveDocument('brand', [$brand->getId()]),
+            new IndexDocument('product', [$product->getId()]),
         ], $this->dispatched);
     }
 
@@ -198,7 +224,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $product->getDefaultSaleElements()->setEanCode('4006381333931')->save();
         $listener->flush();
 
-        self::assertEquals([new SynchronizeSearchDocuments('product', [$product->getId()])], $this->dispatched);
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
     }
 
     public function testNothingIsQueuedWithoutAnEngine(): void
@@ -254,7 +280,7 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $product->setRef('HANDLED-'.$product->getId())->save();
         $this->dispatcher()->dispatch(new WorkerMessageHandledEvent(new Envelope(new \stdClass()), 'async'));
 
-        self::assertEquals([new SynchronizeSearchDocuments('product', [$product->getId()])], $this->dispatched);
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
     }
 
     public function testAJobFailingInlineIsLoggedWithWhatTheHandlerThrew(): void
