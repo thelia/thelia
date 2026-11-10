@@ -28,6 +28,9 @@ use Thelia\Domain\Payment\Exception\InstantPaymentRefusedException;
 use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
 use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
 use Thelia\Domain\Payment\Exception\StoredMethodRefusedException;
+use Thelia\Domain\Subscription\Exception\SubscriptionActionRefusedException;
+use Thelia\Domain\Subscription\Exception\SubscriptionException;
+use Thelia\Domain\Subscription\Exception\SubscriptionTransitionRefusedException;
 
 return static function (ContainerConfigurator $container): void {
     $container->extension('api_platform', [
@@ -78,6 +81,11 @@ return static function (ContainerConfigurator $container): void {
             // written, asked again it is judged on what the other request left.
             OrderStatusChangeConflictException::class => 409,
             InvalidBundleCompositionException::class => 422,
+            // What the state of a subscription does not allow (cancel a cancelled one, pause one that
+            // is not pausable): a state of the resource, not a malformed request.
+            SubscriptionActionRefusedException::class => 409,
+            SubscriptionTransitionRefusedException::class => 409,
+            SubscriptionException::class => 422,
         ],
         'defaults' => [
             'pagination_client_items_per_page' => true,
