@@ -427,6 +427,27 @@ final class OfferedCartLineServiceTest extends ActionIntegrationPromotionTestCas
         self::assertSame(['Cadeau du mois'], $service->getUnavailablePromotions());
     }
 
+    /**
+     * A gift is offered by the unit: a line whose quantity went fractional (1.5) is brought
+     * back to the whole quantity the promotion grants, not read as the 1 it truncates to.
+     */
+    public function testAnOfferedLineWithAFractionalQuantityIsBroughtBackToTheGrantedQuantity(): void
+    {
+        $promotion = $this->factory->coupon();
+        $gift = $this->product();
+        $cart = $this->factory->cart();
+        $line = $this->offeredLine($cart, $gift, $promotion);
+        $line->setQuantity(1.5)->save();
+
+        $changed = $this->service($this->requestStackWithSession())->reconcile([$this->offer($promotion, $gift, 1)], $cart);
+
+        self::assertTrue($changed);
+        $lines = $this->offeredLines($cart);
+        self::assertCount(1, $lines);
+        self::assertSame($line->getId(), $lines[0]->getId());
+        self::assertSame(1.0, $lines[0]->getQuantity());
+    }
+
     public function testAGrantedLineFollowsTheRequestedQuantityUpToTheStock(): void
     {
         $promotion = $this->factory->coupon();
