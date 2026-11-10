@@ -384,6 +384,17 @@ final class TheliaEvents
     public const ORDER_PAYMENT_PART_RELEASE = 'action.order.paymentPart.release';
 
     /**
+     * Subscriptions: a subscription created, a change of its status, the charge of one of
+     * its installments paid or failed. Dispatched once the change is committed, to announce
+     * it, never to perform it; inside a transaction the caller opened, "committed" means the
+     * nested level only.
+     */
+    public const SUBSCRIPTION_CREATE = 'action.subscription.create';
+    public const SUBSCRIPTION_STATUS_CHANGE = 'action.subscription.statusChange';
+    public const SUBSCRIPTION_INSTALLMENT_PAID = 'action.subscription.installmentPaid';
+    public const SUBSCRIPTION_INSTALLMENT_FAILED = 'action.subscription.installmentFailed';
+
+    /**
      * Shipments: a parcel, or a set of parcels leaving together, carrying part or all
      * of an order. Dispatched once the shipment is committed, to announce what
      * happened (history, e-mails, modules), never to perform it: the writer is

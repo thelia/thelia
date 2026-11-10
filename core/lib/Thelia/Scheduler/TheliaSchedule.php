@@ -67,6 +67,8 @@ final readonly class TheliaSchedule implements ScheduleProviderInterface
         private string $stockReservationPurge,
         #[Autowire(env: 'THELIA_SCHEDULE_REPORT_MAILS')]
         private string $reportMails,
+        #[Autowire(env: 'THELIA_SCHEDULE_SUBSCRIPTION_BILLING')]
+        private string $subscriptionBilling = '',
     ) {
     }
 
@@ -99,6 +101,7 @@ final readonly class TheliaSchedule implements ScheduleProviderInterface
             [$this->contentPublication, 'content:publish-scheduled'],
             [$this->stockReservationPurge, 'stock:reservation:purge'],
             [$this->reportMails, 'report:send-due'],
+            [$this->subscriptionBilling, 'subscription:bill-due'],
         ];
     }
 }
