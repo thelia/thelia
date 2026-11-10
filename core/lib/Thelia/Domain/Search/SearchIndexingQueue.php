@@ -18,14 +18,18 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Service\ResetInterface;
-use Thelia\Domain\Search\Message\SynchronizeSearchDocuments;
+use Thelia\Domain\Search\Message\IndexDocument;
+use Thelia\Domain\Search\Message\RemoveDocument;
 
 final class SearchIndexingQueue implements ResetInterface
 {
     public const int IDS_PER_MESSAGE = 100;
 
     /** @var array<string, array<int, true>> */
-    private array $ids = [];
+    private array $toIndex = [];
+
+    /** @var array<string, array<int, true>> */
+    private array $toRemove = [];
 
     public function __construct(
         private readonly MessageBusInterface $bus,
@@ -35,26 +39,47 @@ final class SearchIndexingQueue implements ResetInterface
 
     public function add(string $family, int $id): void
     {
-        $this->ids[$family][$id] = true;
+        if (!isset($this->toRemove[$family][$id])) {
+            $this->toIndex[$family][$id] = true;
+        }
+    }
+
+    public function remove(string $family, int $id): void
+    {
+        $this->toRemove[$family][$id] = true;
+        unset($this->toIndex[$family][$id]);
     }
 
     public function flush(): void
     {
-        $pending = $this->ids;
+        $toIndex = $this->toIndex;
+        $toRemove = $this->toRemove;
         $this->reset();
 
-        foreach ($pending as $family => $ids) {
+        foreach ($toRemove as $family => $ids) {
             foreach (array_chunk(array_keys($ids), self::IDS_PER_MESSAGE) as $chunk) {
-                try {
-                    $this->bus->dispatch(new SynchronizeSearchDocuments($family, $chunk));
-                } catch (\Throwable $exception) {
-                    $this->logger->error('Search indexing of {count} {family} document(s) could not be queued: {exception}.', [
-                        'count' => \count($chunk),
-                        'family' => $family,
-                        'exception' => self::describe($exception),
-                    ]);
-                }
+                $this->dispatch(new RemoveDocument($family, $chunk));
             }
+        }
+
+        foreach ($toIndex as $family => $ids) {
+            foreach (array_chunk(array_keys($ids), self::IDS_PER_MESSAGE) as $chunk) {
+                $this->dispatch(new IndexDocument($family, $chunk));
+            }
+        }
+    }
+
+    private function dispatch(IndexDocument|RemoveDocument $message): void
+    {
+        try {
+            $this->bus->dispatch($message);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Search {operation} of {count} {family} document(s) could not be queued: {exception}.', [
+                'operation' => $message instanceof RemoveDocument ? 'removal' : 'indexing',
+                'count' => \count($message->ids),
+                'family' => $message->family,
+                'exception' => self::describe($exception),
+            ]);
         }
     }
 
@@ -71,6 +96,7 @@ final class SearchIndexingQueue implements ResetInterface
 
     public function reset(): void
     {
-        $this->ids = [];
+        $this->toIndex = [];
+        $this->toRemove = [];
     }
 }

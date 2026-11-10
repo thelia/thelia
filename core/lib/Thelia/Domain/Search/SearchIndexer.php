@@ -70,4 +70,30 @@ final readonly class SearchIndexer
             'milliseconds' => (int) ((hrtime(true) - $startedAt) / 1_000_000),
         ]);
     }
+
+    /**
+     * @param list<int> $ids
+     */
+    public function remove(string $family, array $ids): void
+    {
+        $engine = $this->engines->engine();
+
+        if (null === $engine || [] === $ids) {
+            return;
+        }
+
+        $provider = $this->providers->get($family);
+
+        if (null === $provider) {
+            $this->logger->warning('Search removal skipped: no document provider for the family {family}.', ['family' => $family]);
+
+            return;
+        }
+
+        $ids = array_values(array_unique($ids));
+
+        foreach ($provider->isTranslatable() ? $this->locales->indexed() : [null] as $locale) {
+            $engine->remove($family, $ids, $locale);
+        }
+    }
 }

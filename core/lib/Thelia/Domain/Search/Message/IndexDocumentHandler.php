@@ -18,13 +18,13 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Thelia\Domain\Search\SearchIndexer;
 
 #[AsMessageHandler]
-final readonly class SynchronizeSearchDocumentsHandler
+final readonly class IndexDocumentHandler
 {
     public function __construct(private SearchIndexer $indexer)
     {
     }
 
-    public function __invoke(SynchronizeSearchDocuments $message): void
+    public function __invoke(IndexDocument $message): void
     {
         $this->indexer->synchronize($message->family, $message->ids, $message->locales);
     }

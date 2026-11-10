@@ -50,25 +50,28 @@ use Thelia\Model\ProductSaleElements;
 final readonly class SearchIndexingListener implements EventSubscriberInterface
 {
     private const array FAMILIES = [
-        ProductEvent::POST_DELETE => ProductDocumentProvider::FAMILY,
         ProductI18nEvent::POST_SAVE => ProductDocumentProvider::FAMILY,
         ProductI18nEvent::POST_DELETE => ProductDocumentProvider::FAMILY,
         CategoryEvent::POST_SAVE => CategoryDocumentProvider::FAMILY,
-        CategoryEvent::POST_DELETE => CategoryDocumentProvider::FAMILY,
         CategoryI18nEvent::POST_SAVE => CategoryDocumentProvider::FAMILY,
         CategoryI18nEvent::POST_DELETE => CategoryDocumentProvider::FAMILY,
         ContentEvent::POST_SAVE => ContentDocumentProvider::FAMILY,
-        ContentEvent::POST_DELETE => ContentDocumentProvider::FAMILY,
         ContentI18nEvent::POST_SAVE => ContentDocumentProvider::FAMILY,
         ContentI18nEvent::POST_DELETE => ContentDocumentProvider::FAMILY,
         FolderEvent::POST_SAVE => FolderDocumentProvider::FAMILY,
-        FolderEvent::POST_DELETE => FolderDocumentProvider::FAMILY,
         FolderI18nEvent::POST_SAVE => FolderDocumentProvider::FAMILY,
         FolderI18nEvent::POST_DELETE => FolderDocumentProvider::FAMILY,
         BrandEvent::POST_SAVE => BrandDocumentProvider::FAMILY,
-        BrandEvent::POST_DELETE => BrandDocumentProvider::FAMILY,
         BrandI18nEvent::POST_SAVE => BrandDocumentProvider::FAMILY,
         BrandI18nEvent::POST_DELETE => BrandDocumentProvider::FAMILY,
+    ];
+
+    private const array REMOVED_FAMILIES = [
+        ProductEvent::POST_DELETE => ProductDocumentProvider::FAMILY,
+        CategoryEvent::POST_DELETE => CategoryDocumentProvider::FAMILY,
+        ContentEvent::POST_DELETE => ContentDocumentProvider::FAMILY,
+        FolderEvent::POST_DELETE => FolderDocumentProvider::FAMILY,
+        BrandEvent::POST_DELETE => BrandDocumentProvider::FAMILY,
     ];
 
     private const array INDEXED_PRODUCT_COLUMNS = [ProductTableMap::COL_REF, ProductTableMap::COL_VISIBLE, ProductTableMap::COL_BRAND_ID];
@@ -105,6 +108,10 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
             $subscribed[$eventName] = ['onModelWrite', 0];
         }
 
+        foreach (array_keys(self::REMOVED_FAMILIES) as $eventName) {
+            $subscribed[$eventName] = ['onModelDelete', 0];
+        }
+
         $subscribed[BrandI18nEvent::POST_DELETE] = [['onModelWrite', 0], ['onBrandProductsChange', 0]];
 
         return $subscribed;
@@ -117,6 +124,17 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
 
             if (null !== $id) {
                 $this->queue->add(self::FAMILIES[$eventName], (int) $id);
+            }
+        });
+    }
+
+    public function onModelDelete(object $event, string $eventName): void
+    {
+        $this->safely(function () use ($event, $eventName): void {
+            $id = $event->getModel()->getId();
+
+            if (null !== $id) {
+                $this->queue->remove(self::REMOVED_FAMILIES[$eventName], (int) $id);
             }
         });
     }

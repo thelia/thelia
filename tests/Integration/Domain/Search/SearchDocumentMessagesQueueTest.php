@@ -18,17 +18,18 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Thelia\Command\SearchReindexCommand;
-use Thelia\Domain\Search\Message\SynchronizeSearchDocuments;
+use Thelia\Domain\Search\Message\IndexDocument;
+use Thelia\Domain\Search\Message\RemoveDocument;
 use Thelia\Messenger\Message\UndecodableJob;
 use Thelia\Test\IntegrationTestCase;
 
-final class SynchronizeSearchDocumentsQueueTest extends IntegrationTestCase
+final class SearchDocumentMessagesQueueTest extends IntegrationTestCase
 {
     public function testAQueuedSynchronizationIsReadBackAsItWasSent(): void
     {
         $serializer = static::getContainer()->get('messenger.default_serializer');
         \assert($serializer instanceof SerializerInterface);
-        $sent = new SynchronizeSearchDocuments('product', [3, 1, 2], ['en_US', 'fr_FR']);
+        $sent = new IndexDocument('product', [3, 1, 2], ['en_US', 'fr_FR']);
 
         $read = $serializer->decode($serializer->encode(new Envelope($sent, [new TransportNamesStamp([SearchReindexCommand::QUEUE_TRANSPORT])])));
 
@@ -41,8 +42,20 @@ final class SynchronizeSearchDocumentsQueueTest extends IntegrationTestCase
     {
         $serializer = static::getContainer()->get('messenger.default_serializer');
         \assert($serializer instanceof SerializerInterface);
-        $sent = new SynchronizeSearchDocuments('brand', [7]);
+        $sent = new IndexDocument('brand', [7]);
 
         self::assertEquals($sent, $serializer->decode($serializer->encode(new Envelope($sent)))->getMessage());
+    }
+
+    public function testAQueuedRemovalIsReadBackAsItWasSent(): void
+    {
+        $serializer = static::getContainer()->get('messenger.default_serializer');
+        \assert($serializer instanceof SerializerInterface);
+        $sent = new RemoveDocument('product', [4, 2]);
+
+        $read = $serializer->decode($serializer->encode(new Envelope($sent)))->getMessage();
+
+        self::assertNotInstanceOf(UndecodableJob::class, $read);
+        self::assertEquals($sent, $read);
     }
 }

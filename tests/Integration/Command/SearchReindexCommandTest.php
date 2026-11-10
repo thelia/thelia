@@ -29,7 +29,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Thelia\Command\SearchReindexCommand;
 use Thelia\Domain\Search\Contract\SearchableDocumentProviderInterface;
-use Thelia\Domain\Search\Message\SynchronizeSearchDocuments;
+use Thelia\Domain\Search\Message\IndexDocument;
 use Thelia\Domain\Search\Provider\BrandDocumentProvider;
 use Thelia\Domain\Search\Provider\ProductDocumentProvider;
 use Thelia\Domain\Search\SearchDocumentProviders;
@@ -403,10 +403,10 @@ final class SearchReindexCommandTest extends IntegrationTestCase
         return $tester;
     }
 
-    private function messageOf(Envelope $envelope): SynchronizeSearchDocuments
+    private function messageOf(Envelope $envelope): IndexDocument
     {
         $message = $envelope->getMessage();
-        self::assertInstanceOf(SynchronizeSearchDocuments::class, $message);
+        self::assertInstanceOf(IndexDocument::class, $message);
 
         return $message;
     }
