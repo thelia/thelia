@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Customer\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -21,6 +22,9 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
+use Thelia\Domain\Subscription\Enum\ActorType;
+use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
+use Thelia\Domain\Subscription\SubscriptionStateMachine;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
@@ -37,6 +41,7 @@ use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderReturnQuery;
 use Thelia\Model\OrderReturnVersionQuery;
+use Thelia\Model\SubscriptionQuery;
 use Thelia\Model\TagElement;
 use Thelia\Model\TagElementQuery;
 
@@ -70,8 +75,9 @@ final readonly class CustomerAnonymizer
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
-     * @param CustomerGroupAssignment|null                    $customerGroupAssignment what announces the move to the default group; without it, the move is written and not announced
-     * @param StockReservationService|null                    $stockReservation        what tells the listeners of the reservations the lines the carts held; without it, the carts go without a word
+     * @param CustomerGroupAssignment|null                    $customerGroupAssignment  what announces the move to the default group; without it, the move is written and not announced
+     * @param StockReservationService|null                    $stockReservation         what tells the listeners of the reservations the lines the carts held; without it, the carts go without a word
+     * @param SubscriptionStateMachine|null                   $subscriptionStateMachine what ends the running subscriptions; without it, they are left as they are
      */
     public function __construct(
         private CustomerPaymentMethodService $customerPaymentMethodService,
@@ -79,6 +85,7 @@ final readonly class CustomerAnonymizer
         private iterable $personalDataProviders = [],
         private ?CustomerGroupAssignment $customerGroupAssignment = null,
         private ?StockReservationService $stockReservation = null,
+        private ?SubscriptionStateMachine $subscriptionStateMachine = null,
     ) {
     }
 
@@ -96,6 +103,7 @@ final readonly class CustomerAnonymizer
             $this->anonymizeOrderReturns($customer, $connection);
             $this->anonymizeOrderConsents($customer, $connection);
             $this->anonymizeOrderHistory($customer, $connection);
+            $this->endSubscriptions($customer);
             $this->deleteCarts($customer, $connection);
             $this->deleteAddresses($customer, $connection);
             $this->deleteCustomerLists($customer, $connection);
@@ -341,6 +349,31 @@ final readonly class CustomerAnonymizer
         }
 
         AddressQuery::create()->filterById($addressIds)->delete($connection);
+    }
+
+    /**
+     * A subscription is charged to the stored method that is dropped just after, in the name of
+     * a person who is no longer one: the running ones are cancelled and ended now, by the
+     * system, through the state machine (so each leaves its history), with nothing left to
+     * bill. The orders they emitted are accounting records and are left as they are, as is the
+     * history of the subscription, which names no one.
+     */
+    private function endSubscriptions(Customer $customer): void
+    {
+        if (null === $this->subscriptionStateMachine) {
+            return;
+        }
+
+        $now = new \DateTime();
+        $note = 'The customer data was erased.';
+
+        foreach (SubscriptionQuery::create()->filterByCustomerId($customer->getId())->filterByStatus(SubscriptionStatus::Ended->value, Criteria::NOT_EQUAL)->find() as $subscription) {
+            if (SubscriptionStatus::Cancelled->value !== $subscription->getStatus()) {
+                $subscription = $this->subscriptionStateMachine->transition($subscription, SubscriptionStatus::Cancelled, ActorType::System, null, $note, ['CancelAt' => $now]);
+            }
+
+            $this->subscriptionStateMachine->transition($subscription, SubscriptionStatus::Ended, ActorType::System, null, $note, ['NextBillingAt' => null, 'NextRetryAt' => null, 'CancelAt' => $now]);
+        }
     }
 
     private function deleteNewsletterSubscription(Customer $customer, ConnectionInterface $connection): void

@@ -35,10 +35,13 @@ use Thelia\Model\TagElement;
 use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Integration\Domain\Subscription\SubscriptionScenario;
 use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
 
 final class CustomerPersonalDataExporterTest extends IntegrationTestCase
 {
+    use SubscriptionScenario;
+
     private FixtureFactory $factory;
 
     protected function setUp(): void
@@ -46,10 +49,12 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
         parent::setUp();
         $this->factory = $this->createFixtureFactory();
         StoredMethodsPaymentModule::reset();
+        $this->setUpTheSubscriptionShop();
     }
 
     protected function tearDown(): void
     {
+        $this->tearDownTheSubscriptionShop();
         StoredMethodsPaymentModule::reset();
 
         parent::tearDown();
@@ -369,6 +374,35 @@ final class CustomerPersonalDataExporterTest extends IntegrationTestCase
             json_encode($personalData, \JSON_THROW_ON_ERROR),
             'The provider token must never appear in the customer export.',
         );
+    }
+
+    /**
+     * What was subscribed to, with the values frozen on the subscription, each installment with
+     * the reference of its order, the history, and the label of the method: never its token.
+     */
+    public function testExportIncludesTheSubscriptionsWithoutTheTokenOfTheirMethod(): void
+    {
+        [$subscription, , $method] = $this->aSubscription(['CommitmentCount' => 3]);
+        $this->moveTo('2028-03-01 10:00:00');
+        $this->biller()->bill((int) $subscription->getId());
+        $this->aSubscription();
+
+        $personalData = $this->getService(CustomerPersonalDataExporter::class)->export($subscription->getCustomer());
+
+        self::assertContains('subscriptions', CustomerPersonalDataExporter::CORE_SECTION_NAMES);
+        self::assertCount(1, $personalData['subscriptions'], 'Only the subscriptions of this customer.');
+        $exported = $personalData['subscriptions'][0];
+        self::assertSame($subscription->getRef(), $exported['reference']);
+        self::assertSame('active', $exported['status']);
+        self::assertSame('month', $exported['period_unit']);
+        self::assertSame(3, $exported['commitment_count']);
+        self::assertSame('Visa ending 4242', $exported['payment_method_label']);
+        self::assertSame($subscription->getInitialOrder()->getRef(), $exported['initial_order_reference']);
+        self::assertSame([1, 2], array_column($exported['installments'], 'number'));
+        self::assertSame(['paid', 'paid'], array_column($exported['installments'], 'state'));
+        self::assertSame(['active'], array_column($exported['history'], 'to'), 'The creation is the one line of history of a subscription that never changed status.');
+        self::assertSame([], $this->getService(CustomerPersonalDataExporter::class)->export($this->aCustomer())['subscriptions']);
+        self::assertStringNotContainsString((string) $method->getToken(), json_encode($personalData, \JSON_THROW_ON_ERROR), 'The token of the method never appears in the export.');
     }
 
     private function paymentModuleRow(string $moduleClass): Module
