@@ -475,4 +475,6 @@ return [
     'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)' => 'Rekening die het verkoopdagboek crediteert met de verzendkosten, bijv. 708500 (verplicht voor de boekhoudexports)',
     'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)' => 'Omzetrekening en rekening van de geïnde belasting per tarief, bijv. 20:706200:445720,5.5:706055:445705,0:706000 (verplicht voor de boekhoudexports)',
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Rekening die met commerciële creditnota\'s (korting, rabat, terugbetaling van een verschil) wordt gedebiteerd, bijv. 709000 (omzetrekening van hun tarief indien leeg)',
+    'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Aantal geweigerde afschrijvingen van een termijn waarna een abonnement wordt opgeschort (3 bij een ongeldige waarde)',
+    'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Dagen tussen twee afschrijvingen van een geweigerde termijn van een abonnement (2 bij een ongeldige waarde)',
 ];

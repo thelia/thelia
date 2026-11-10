@@ -1618,4 +1618,6 @@ return [
     'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)' => 'Compte crédité du port par le journal des ventes, par exemple 708500 (obligatoire pour les exports comptables)',
     'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)' => 'Compte de ventes et compte de TVA collectée par taux, par exemple 20:706200:445720,5.5:706055:445705,0:706000 (obligatoire pour les exports comptables)',
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Compte débité des avoirs commerciaux (rabais, remise, remboursement de différence), par exemple 709000 (compte de ventes de leur taux si vide)',
+    'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Nombre de prélèvements refusés d\'une échéance au-delà duquel un abonnement est suspendu (3 si invalide)',
+    'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Jours entre deux prélèvements d\'une échéance refusée d\'un abonnement (2 si invalide)',
 ];

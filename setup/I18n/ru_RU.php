@@ -1587,4 +1587,6 @@ return [
     'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)' => 'Счёт, который журнал продаж кредитует на сумму доставки, например 708500 (обязателен для бухгалтерских выгрузок)',
     'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)' => 'Счёт продаж и счёт начисленного налога по каждой ставке, например 20:706200:445720,5.5:706055:445705,0:706000 (обязателен для бухгалтерских выгрузок)',
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Счёт, который дебетуется коммерческими кредит-нотами (скидка, уступка, возврат разницы), например 709000 (счёт продаж их ставки, если пусто)',
+    'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Число отклонённых списаний платежа, после которого подписка приостанавливается (3 при неверном значении)',
+    'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Дней между двумя списаниями отклонённого платежа подписки (2 при неверном значении)',
 ];

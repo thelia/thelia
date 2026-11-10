@@ -136,7 +136,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
 (126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW()),
 (127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW()),
-(128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW())
+(128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW()),
+(129, 'subscription_retry_attempts', '3', 0, 0, NOW(), NOW()),
+(130, 'subscription_retry_interval_days', '2', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2511,6 +2513,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'de_DE', 'Erlöskonto und Konto der vereinnahmten Steuer je Steuersatz, z. B. 20:706200:445720,5.5:706055:445705,0:706000 (für die Buchhaltungsexporte erforderlich)', NULL, NULL, NULL),
     (126, 'de_DE', 'Konto, das mit kaufmännischen Gutschriften (Rabatt, Nachlass, Erstattung einer Differenz) belastet wird, z. B. 709000 (Erlöskonto ihres Steuersatzes wenn leer)', NULL, NULL, NULL),
     (128, 'de_DE', 'Wer die Preise des Shops sieht: visible, logged_in (nur angemeldete Kunden) oder on_request (kein Preis, eine Anfrageschaltfläche)', NULL, NULL, NULL),
+    (129, 'de_DE', 'Anzahl abgelehnter Abbuchungen einer Rate, nach der ein Abonnement ausgesetzt wird (3 bei ungültigem Wert)', NULL, NULL, NULL),
+    (130, 'de_DE', 'Tage zwischen zwei Abbuchungen einer abgelehnten Rate eines Abonnements (2 bei ungültigem Wert)', NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2615,6 +2619,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'en_US', 'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', NULL, NULL, NULL),
     (126, 'en_US', 'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', NULL, NULL, NULL),
     (128, 'en_US', 'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)', NULL, NULL, NULL),
+    (129, 'en_US', 'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)', NULL, NULL, NULL),
+    (130, 'en_US', 'Days between two charges of a declined installment of a subscription (2 when invalid)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2719,6 +2725,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'es_ES', 'Cuenta de ventas y cuenta del impuesto repercutido por tipo, p. ej. 20:706200:445720,5.5:706055:445705,0:706000 (obligatoria para las exportaciones contables)', NULL, NULL, NULL),
     (126, 'es_ES', 'Cuenta que carga los abonos comerciales (rebaja, descuento, reembolso de una diferencia), p. ej. 709000 (cuenta de ventas de su tipo si está vacía)', NULL, NULL, NULL),
     (128, 'es_ES', 'Quién ve los precios de la tienda: visible, logged_in (solo clientes identificados) u on_request (sin precio, un botón de solicitud)', NULL, NULL, NULL),
+    (129, 'es_ES', 'Número de cobros rechazados de una cuota tras el cual se suspende una suscripción (3 si no es válido)', NULL, NULL, NULL),
+    (130, 'es_ES', 'Días entre dos cobros de una cuota rechazada de una suscripción (2 si no es válido)', NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2823,6 +2831,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'fr_FR', 'Compte de ventes et compte de TVA collectée par taux, par exemple 20:706200:445720,5.5:706055:445705,0:706000 (obligatoire pour les exports comptables)', NULL, NULL, NULL),
     (126, 'fr_FR', 'Compte débité des avoirs commerciaux (rabais, remise, remboursement de différence), par exemple 709000 (compte de ventes de leur taux si vide)', NULL, NULL, NULL),
     (128, 'fr_FR', 'Qui voit les prix de la boutique : visible, logged_in (clients identifiés seulement) ou on_request (aucun prix, un bouton de demande)', NULL, NULL, NULL),
+    (129, 'fr_FR', 'Nombre de prélèvements refusés d\'une échéance au-delà duquel un abonnement est suspendu (3 si invalide)', NULL, NULL, NULL),
+    (130, 'fr_FR', 'Jours entre deux prélèvements d\'une échéance refusée d\'un abonnement (2 si invalide)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2927,6 +2937,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'it_IT', 'Conto vendite e conto IVA a debito per aliquota, ad es. 20:706200:445720,5.5:706055:445705,0:706000 (obbligatorio per le esportazioni contabili)', NULL, NULL, NULL),
     (126, 'it_IT', 'Conto addebitato delle note di credito commerciali (ribasso, sconto, rimborso di una differenza), ad es. 709000 (conto vendite della loro aliquota se vuoto)', NULL, NULL, NULL),
     (128, 'it_IT', NULL, NULL, NULL, NULL),
+    (129, 'it_IT', NULL, NULL, NULL, NULL),
+    (130, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -3031,6 +3043,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'nl_NL', 'Omzetrekening en rekening van de geïnde belasting per tarief, bijv. 20:706200:445720,5.5:706055:445705,0:706000 (verplicht voor de boekhoudexports)', NULL, NULL, NULL),
     (126, 'nl_NL', 'Rekening die met commerciële creditnota\'s (korting, rabat, terugbetaling van een verschil) wordt gedebiteerd, bijv. 709000 (omzetrekening van hun tarief indien leeg)', NULL, NULL, NULL),
     (128, 'nl_NL', 'Wie de prijzen van de winkel ziet: visible, logged_in (alleen ingelogde klanten) of on_request (geen prijs, een aanvraagknop)', NULL, NULL, NULL),
+    (129, 'nl_NL', 'Aantal geweigerde afschrijvingen van een termijn waarna een abonnement wordt opgeschort (3 bij een ongeldige waarde)', NULL, NULL, NULL),
+    (130, 'nl_NL', 'Dagen tussen twee afschrijvingen van een geweigerde termijn van een abonnement (2 bij een ongeldige waarde)', NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -3134,7 +3148,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'ru_RU', 'Счёт, который журнал продаж кредитует на сумму доставки, например 708500 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
     (125, 'ru_RU', 'Счёт продаж и счёт начисленного налога по каждой ставке, например 20:706200:445720,5.5:706055:445705,0:706000 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
     (126, 'ru_RU', 'Счёт, который дебетуется коммерческими кредит-нотами (скидка, уступка, возврат разницы), например 709000 (счёт продаж их ставки, если пусто)', NULL, NULL, NULL),
-    (128, 'ru_RU', 'Кто видит цены магазина: visible, logged_in (только авторизованные клиенты) или on_request (без цены, кнопка запроса)', NULL, NULL, NULL)
+    (128, 'ru_RU', 'Кто видит цены магазина: visible, logged_in (только авторизованные клиенты) или on_request (без цены, кнопка запроса)', NULL, NULL, NULL),
+    (129, 'ru_RU', 'Число отклонённых списаний платежа, после которого подписка приостанавливается (3 при неверном значении)', NULL, NULL, NULL),
+    (130, 'ru_RU', 'Дней между двумя списаниями отклонённого платежа подписки (2 при неверном значении)', NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks
