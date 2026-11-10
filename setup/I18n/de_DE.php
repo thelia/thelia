@@ -1177,4 +1177,6 @@ return [
     'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)' => 'Konto, dem das Verkaufsjournal die Versandkosten gutschreibt, z. B. 708500 (für die Buchhaltungsexporte erforderlich)',
     'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)' => 'Erlöskonto und Konto der vereinnahmten Steuer je Steuersatz, z. B. 20:706200:445720,5.5:706055:445705,0:706000 (für die Buchhaltungsexporte erforderlich)',
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Konto, das mit kaufmännischen Gutschriften (Rabatt, Nachlass, Erstattung einer Differenz) belastet wird, z. B. 709000 (Erlöskonto ihres Steuersatzes wenn leer)',
+    'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Anzahl abgelehnter Abbuchungen einer Rate, nach der ein Abonnement ausgesetzt wird (3 bei ungültigem Wert)',
+    'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Tage zwischen zwei Abbuchungen einer abgelehnten Rate eines Abonnements (2 bei ungültigem Wert)',
 ];

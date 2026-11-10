@@ -1999,6 +1999,7 @@
     <column description="the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told" name="reserved_quantity" type="DOUBLE" />
     <column description="the moment the line was first held since its last release; a hold is never pushed back past a bound from it" name="reserved_since" type="TIMESTAMP" />
     <column description="the price list whose line priced this line; no foreign key, so that the trace outlives the list and the cart is priced again once the list is gone" name="price_list_id" type="INTEGER" />
+    <column description="the subscription plan the line is bought on; NULL: a one-off purchase" name="subscription_plan_id" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
@@ -2024,11 +2025,17 @@
     <index name="idx_cart_item_reserved_until">
       <index-column name="reserved_until" />
     </index>
+    <foreign-key foreignTable="subscription_plan" name="fk_cart_item_subscription_plan_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="subscription_plan_id" />
+    </foreign-key>
     <index name="idx_cart_item_offered_by_coupon_id">
       <index-column name="offered_by_coupon_id" />
     </index>
     <index name="idx_cart_item_price_list_id">
       <index-column name="price_list_id" />
+    </index>
+    <index name="fk_cart_item_subscription_plan_id_idx">
+      <index-column name="subscription_plan_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -4098,5 +4105,171 @@
     <column defaultValue="0" description="how many times the period has been tried again for the recipients still waiting; back to 0 with each new period" name="pending_attempts" required="true" type="TINYINT" />
     <column defaultValue="NULL" name="last_sent_at" type="TIMESTAMP" />
     <behavior name="timestampable" />
+  </table>
+  <!-- Subscriptions with recurring billing. A plan says how a product is sold by subscription
+       (period, trial, number of installments, commitment) and what it costs per currency. A
+       subscription copies the plan when it is created: editing the plan never changes a running
+       subscription. The shop keeps the calendar: each installment is one order at most, recorded
+       in subscription_order, whose unique key on (subscription, installment number) is what keeps
+       an installment from being ordered twice. -->
+  <table name="subscription_plan" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
+    <column defaultValue="month" description="one of PeriodUnit: week, month, quarter or year" name="period_unit" required="true" size="8" type="VARCHAR" />
+    <column defaultValue="1" description="how many period units an installment pays for" name="period_count" required="true" type="INTEGER" />
+    <column defaultValue="0" description="days served before the first charge; 0: no trial" name="trial_days" required="true" type="INTEGER" />
+    <column description="how many installments the subscription is billed in total; NULL: until it is cancelled" name="installment_count" type="INTEGER" />
+    <column description="how many installments the customer commits to before a cancellation takes effect; NULL: no commitment" name="commitment_count" type="INTEGER" />
+    <column defaultValue="0" description="whether the customer may pause a subscription to this plan" name="pausable" required="true" type="TINYINT" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
+    <column defaultValue="0" name="position" required="true" type="INTEGER" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <foreign-key foreignTable="product" name="fk_subscription_plan_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <index name="idx_subscription_plan_product_id_position">
+      <index-column name="product_id" />
+      <index-column name="position" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
+  </table>
+  <table name="subscription_plan_price" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="subscription_plan_id" required="true" type="INTEGER" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column defaultValue="0.000000" description="the price without taxes of one installment of one unit" name="price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="0" description="the price is converted from the price in the default currency rather than typed" name="from_default_currency" required="true" type="TINYINT" />
+    <foreign-key foreignTable="subscription_plan" name="fk_subscription_plan_price_subscription_plan_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="subscription_plan_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_subscription_plan_price_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <unique name="subscription_plan_price_plan_currency_unique">
+      <unique-column name="subscription_plan_id" />
+      <unique-column name="currency_id" />
+    </unique>
+    <index name="idx_subscription_plan_price_currency_id">
+      <index-column name="currency_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="subscription" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="ref" required="true" size="45" type="VARCHAR" />
+    <column name="customer_id" required="true" type="INTEGER" />
+    <column description="the plan the subscription was taken on; its values are copied below, NULL once the plan is deleted" name="subscription_plan_id" type="INTEGER" />
+    <column description="the sale element delivered at each installment; NULL once it is deleted, and the subscription can no longer be billed" name="product_sale_elements_id" type="INTEGER" />
+    <column defaultValue="1" name="quantity" required="true" type="INTEGER" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column name="lang_id" required="true" type="INTEGER" />
+    <column description="copied from the plan: week, month, quarter or year" name="period_unit" required="true" size="8" type="VARCHAR" />
+    <column defaultValue="1" description="copied from the plan" name="period_count" required="true" type="INTEGER" />
+    <column description="copied from the plan; NULL: until it is cancelled" name="installment_count" type="INTEGER" />
+    <column description="copied from the plan; NULL: no commitment" name="commitment_count" type="INTEGER" />
+    <column defaultValue="0" description="copied from the plan" name="pausable" required="true" type="TINYINT" />
+    <column defaultValue="0.000000" description="the price without taxes of one unit, frozen from the plan in the currency of the subscription" name="unit_price" required="true" scale="6" size="16" type="DECIMAL" />
+    <column description="the order the subscription was taken with" name="initial_order_id" type="INTEGER" />
+    <column name="delivery_module_id" required="true" type="INTEGER" />
+    <column name="payment_module_id" required="true" type="INTEGER" />
+    <column description="the stored method the installments are charged to; NULL once it is forgotten, and a charge is then declined" name="customer_payment_method_id" type="INTEGER" />
+    <column defaultValue="active" description="one of SubscriptionStatus, written by SubscriptionStateMachine alone" name="status" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="1" description="the day of the month the periods end on, kept when a month is shorter" name="billing_anchor_day" required="true" type="TINYINT" />
+    <column name="current_period_start" type="TIMESTAMP" />
+    <column name="current_period_end" type="TIMESTAMP" />
+    <column description="when the next installment is due; NULL once nothing is due any more" name="next_billing_at" type="TIMESTAMP" />
+    <column description="when a failed installment is tried again; NULL when none waits" name="next_retry_at" type="TIMESTAMP" />
+    <column defaultValue="0" description="how many charges of the current installment were declined in a row" name="failure_count" required="true" type="INTEGER" />
+    <column defaultValue="0" description="how many installments were paid, the initial order included when there is no trial" name="installments_billed" required="true" type="INTEGER" />
+    <column description="when a cancelled subscription ends" name="cancel_at" type="TIMESTAMP" />
+    <column name="paused_at" type="TIMESTAMP" />
+    <foreign-key foreignTable="customer" name="fk_subscription_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <foreign-key foreignTable="subscription_plan" name="fk_subscription_subscription_plan_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="subscription_plan_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_subscription_product_sale_elements_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order" name="fk_subscription_initial_order_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="InitialOrder">
+      <reference foreign="id" local="initial_order_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_payment_method" name="fk_subscription_customer_payment_method_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_payment_method_id" />
+    </foreign-key>
+    <unique name="subscription_ref_unique">
+      <unique-column name="ref" />
+    </unique>
+    <index name="idx_subscription_status_next_billing_at">
+      <index-column name="status" />
+      <index-column name="next_billing_at" />
+    </index>
+    <index name="idx_subscription_status_next_retry_at">
+      <index-column name="status" />
+      <index-column name="next_retry_at" />
+    </index>
+    <index name="idx_subscription_customer_id_status">
+      <index-column name="customer_id" />
+      <index-column name="status" />
+    </index>
+    <index name="fk_subscription_subscription_plan_id_idx">
+      <index-column name="subscription_plan_id" />
+    </index>
+    <index name="fk_subscription_product_sale_elements_id_idx">
+      <index-column name="product_sale_elements_id" />
+    </index>
+    <index name="fk_subscription_initial_order_id_idx">
+      <index-column name="initial_order_id" />
+    </index>
+    <index name="fk_subscription_customer_payment_method_id_idx">
+      <index-column name="customer_payment_method_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="subscription_order" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="subscription_id" required="true" type="INTEGER" />
+    <column description="1 for the first installment" name="installment_number" required="true" type="INTEGER" />
+    <column description="the order of the installment, charged again on a retry; NULL until it is placed" name="order_id" type="INTEGER" />
+    <column defaultValue="pending" description="one of SubscriptionOrderState: pending, paid or failed" name="state" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="0" description="how many charges of the installment were tried" name="attempt_count" required="true" type="INTEGER" />
+    <column description="what the payment module answered to the last failed charge, never a token" name="last_error" size="255" type="VARCHAR" />
+    <foreign-key foreignTable="subscription" name="fk_subscription_order_subscription_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="subscription_id" />
+    </foreign-key>
+    <foreign-key foreignTable="order" name="fk_subscription_order_order_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="order_id" />
+    </foreign-key>
+    <unique name="subscription_order_installment_unique">
+      <unique-column name="subscription_id" />
+      <unique-column name="installment_number" />
+    </unique>
+    <index name="fk_subscription_order_order_id_idx">
+      <index-column name="order_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="subscription_history" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="subscription_id" required="true" type="INTEGER" />
+    <column description="NULL for the creation" name="from_status" size="16" type="VARCHAR" />
+    <column name="to_status" required="true" size="16" type="VARCHAR" />
+    <column description="customer, admin or system" name="actor_type" required="true" size="16" type="VARCHAR" />
+    <column name="actor_id" type="INTEGER" />
+    <column name="note" size="255" type="VARCHAR" />
+    <foreign-key foreignTable="subscription" name="fk_subscription_history_subscription_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="subscription_id" />
+    </foreign-key>
+    <index name="idx_subscription_history_subscription_id">
+      <index-column name="subscription_id" />
+    </index>
+    <behavior name="timestampable">
+      <parameter name="disable_updated_at" value="true" />
+    </behavior>
   </table>
 </database>

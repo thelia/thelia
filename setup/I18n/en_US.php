@@ -1744,4 +1744,6 @@ return [
     'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)' => 'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)',
     'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)' => 'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)',
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)',
+    'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)',
+    'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Days between two charges of a declined installment of a subscription (2 when invalid)',
 ];
