@@ -149,6 +149,10 @@ invoice reference, a warning: such an order belongs to no period and is booked b
 hand; without, they are simply not invoiced), and, when the credit notes cannot be read (no module, or the
 `CreditNote` module active without its tables), that they are not in the journal.
 
+A report keeps at most `ExportReport::MAX_WARNINGS` warnings and ends the list with
+the number of those it left out; `ExportJob::recordReport()` cuts what remains of a
+report that would still be longer than the column of the job.
+
 ## Not covered
 
 - Matching (`EcritureLet`) and the payments received.

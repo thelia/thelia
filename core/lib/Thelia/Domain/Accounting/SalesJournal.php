@@ -130,6 +130,8 @@ final class SalesJournal
                 ? $translator->trans('The CreditNote module is active but its tables cannot be read: its credit notes are not in this journal, book them separately.', [], null, $locale)
                 : $translator->trans('No credit note module is installed: refunds made without credit note are not in this journal.', [], null, $locale));
         }
+
+        $report->closeWarnings($locale);
     }
 
     /**

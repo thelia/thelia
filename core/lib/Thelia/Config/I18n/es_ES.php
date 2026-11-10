@@ -886,6 +886,7 @@ return [
     '%count orders placed in the period are not invoiced: they have no piece.' => '%count pedidos realizados en el periodo no están facturados: no tienen asiento.',
     '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.' => '%count pedidos del periodo tienen una fecha de factura pero no una referencia de factura: no están en el diario.',
     '%count pieces, debit %debit, credit %credit.' => '%count asientos, debe %debit, haber %credit.',
+    '%count more warnings are not listed.' => '%count advertencias más no se detallan.',
     'Invoice %ref %customer' => 'Factura %ref %customer',
     'No credit note module is installed: refunds made without credit note are not in this journal.' => 'No hay ningún módulo de abonos instalado: los reembolsos hechos sin abono no están en este diario.',
     'Sales at %rate' => 'Ventas al %rate',
