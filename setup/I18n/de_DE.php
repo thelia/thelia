@@ -1183,7 +1183,7 @@ return [
     'Message sent to the customer when the charge of an installment of its subscription fails' => 'Nachricht an den Kunden, wenn die Abbuchung einer Rate seines Abonnements fehlschlägt',
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Zahlung für Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} fehlgeschlagen',
     'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Nachricht an den Kunden und an den Shop, wenn ein Abonnement ausgesetzt wird',
-    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde ausgesetzt',
+    '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} nach {{ failure_count }} fehlgeschlagenen Abbuchungen ausgesetzt{% else %}Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde ausgesetzt{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Nachricht an den Kunden, wenn ein Abonnement gekündigt wird',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde gekündigt',
 ];
