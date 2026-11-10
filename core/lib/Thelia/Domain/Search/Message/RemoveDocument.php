@@ -18,21 +18,19 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Thelia\Messenger\Message\DescribedJob;
 
 #[Exclude]
-final readonly class SynchronizeSearchDocuments implements DescribedJob
+final readonly class RemoveDocument implements DescribedJob
 {
     /**
-     * @param list<int>         $ids
-     * @param list<string>|null $locales
+     * @param list<int> $ids
      */
     public function __construct(
         public string $family,
         public array $ids,
-        public ?array $locales = null,
     ) {
     }
 
     public function describe(): string
     {
-        return \sprintf('Search index of %d %s document(s)', \count($this->ids), $this->family);
+        return \sprintf('Search index removal of %d %s document(s)', \count($this->ids), $this->family);
     }
 }

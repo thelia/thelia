@@ -31,7 +31,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Thelia\Domain\Search\Contract\SearchableDocumentProviderInterface;
 use Thelia\Domain\Search\Contract\SearchEngineInterface;
-use Thelia\Domain\Search\Message\SynchronizeSearchDocuments;
+use Thelia\Domain\Search\Message\IndexDocument;
 use Thelia\Domain\Search\SearchDocumentProviders;
 use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexer;
@@ -233,7 +233,7 @@ class SearchReindexCommand extends ContainerAwareCommand
 
             if ($queue) {
                 foreach (array_chunk($ids, SearchIndexingQueue::IDS_PER_MESSAGE) as $chunk) {
-                    $this->bus->dispatch(new Envelope(new SynchronizeSearchDocuments($family, $chunk, $locales), [new TransportNamesStamp([self::QUEUE_TRANSPORT])]));
+                    $this->bus->dispatch(new Envelope(new IndexDocument($family, $chunk, $locales), [new TransportNamesStamp([self::QUEUE_TRANSPORT])]));
                 }
             } else {
                 $this->indexer->synchronize($family, $ids, $locales);
