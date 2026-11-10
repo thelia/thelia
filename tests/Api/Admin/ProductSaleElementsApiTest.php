@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Admin;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Test\ApiTestCase;
 
@@ -161,6 +162,34 @@ final class ProductSaleElementsApiTest extends ApiTestCase
         self::assertSame(2, $reloaded->getQuantityDecimals());
         self::assertSame('kg', $reloaded->getUnitCode());
         self::assertEqualsWithDelta(37.5, $reloaded->getQuantity(), 0.0001);
+    }
+
+    /**
+     * A partial write carries only what it changes: the rules it does not post keep their value
+     * in the database, they are not brought back to 1 (a step of 0.5 would become a step of 1).
+     */
+    public function testAPartialWriteOfOneRuleFieldLeavesTheOtherRulesAsTheyAre(): void
+    {
+        $token = $this->authenticateAsAdmin();
+
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $pse = $factory->productSaleElement($product, ['ref' => 'PSE-PARTIAL-RULES']);
+        $pse->setMinQuantity('0.500000')->setQuantityStep('0.500000')->setQuantityDecimals(1)->setUnitQuantity('2.000000')->setReferenceUnitQuantity('1.000000')->setUnitCode('kg')->save();
+
+        foreach ([['quantityDecimals' => 2], ['quantityDecimals' => 1], ['unitCode' => 'kg']] as $payload) {
+            $response = $this->jsonRequest('PATCH', '/api/admin/product_sale_elements/'.$pse->getId(), $payload, $token, 'merge-patch+json');
+
+            self::assertJsonResponseSuccessful($response);
+
+            ProductSaleElementsTableMap::clearInstancePool();
+            $reloaded = ProductSaleElementsQuery::create()->findPk($pse->getId());
+            self::assertSame('0.500000', $reloaded->getMinQuantity(), json_encode($payload).' moved the minimum.');
+            self::assertSame('0.500000', $reloaded->getQuantityStep(), json_encode($payload).' moved the step.');
+            self::assertSame('2.000000', $reloaded->getUnitQuantity(), json_encode($payload).' moved the unit quantity.');
+            self::assertSame('1.000000', $reloaded->getReferenceUnitQuantity(), json_encode($payload).' moved the reference unit quantity.');
+            self::assertSame('kg', $reloaded->getUnitCode());
+        }
     }
 
     /**
