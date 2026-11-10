@@ -14,9 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
+use Thelia\Exception\UserFacingFailure;
+
 /**
- * A chart of accounts that cannot be read: refused as a whole, never half applied.
+ * A chart of accounts that cannot be read, or that lacks an account the export needs: refused as a
+ * whole, never half applied. Its message names what to set, for the administrator to read.
  */
-final class InvalidAccountingChartException extends \InvalidArgumentException
+final class InvalidAccountingChartException extends \InvalidArgumentException implements UserFacingFailure
 {
 }

@@ -23,6 +23,7 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatus;
@@ -134,19 +135,26 @@ final class AccountingExportsBackOfficeTest extends WebIntegrationTestCase
     public function testWithoutAChartTheExportSaysWhatToSet(): void
     {
         ConfigQuery::write(AccountingChart::CUSTOMER_ACCOUNT_KEY, '');
+        ConfigQuery::write(AccountingChart::SHIPPING_ACCOUNT_KEY, '');
+        ConfigQuery::write(AccountingChart::RATE_ACCOUNTS_KEY, '');
         $exportId = (int) ExportQuery::create()->findOneByRef('thelia.export.sales_journal')->getId();
 
         $crawler = $this->client->request('GET', '/admin/export/'.$exportId);
         $token = (string) $crawler->filter('input[name="_token"]')->attr('value');
         $this->client->request('POST', '/admin/export/'.$exportId, [
             '_token' => $token,
-            'language' => (string) Lang::getDefaultLanguage()->getId(),
+            'language' => (string) LangQuery::create()->findOneByLocale('en_US')->getId(),
             'serializer' => 'thelia.fec',
         ]);
 
         self::assertSame(302, $this->client->getResponse()->getStatusCode());
-        $this->client->followRedirect();
-        self::assertStringContainsString('chart of accounts', (string) $this->client->getResponse()->getContent());
+        $crawler = $this->client->followRedirect();
+
+        $flash = $crawler->filter('[data-testid="bo-flash-error"]')->text('');
+        self::assertStringContainsString('the customer account', $flash);
+        self::assertStringContainsString('the shipping account', $flash);
+        self::assertStringContainsString('the accounts of the tax rates', $flash);
+        self::assertStringNotContainsString('server error', $flash);
     }
 
     private function invoicedOrder(): void
