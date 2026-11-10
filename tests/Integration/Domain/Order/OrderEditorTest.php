@@ -797,7 +797,7 @@ final class OrderEditorTest extends IntegrationTestCase
 
             // Goods at 20 % charged 20.00, goods at 10 % charged 10.00: 6.67 and 3.33 of the postage.
             $order = OrderQuery::create()->findPk($this->order->getId());
-            self::assertEqualsWithDelta(1.33 + 0.33, (float) $order->getPostageTax(), 0.0101);
+            self::assertEqualsWithDelta(1.33 + 0.33, (float) $order->getPostageTax(), 0.001);
         } finally {
             ConfigQuery::write('postage_tax_strategy', (string) $previous);
         }
