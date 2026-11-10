@@ -48,6 +48,15 @@ final class ImportHandlerTest extends IntegrationTestCase
         self::assertNotContains('exe', $extensions);
     }
 
+    public function testTheFecFormatIsNotAnImportFormat(): void
+    {
+        $handler = $this->importHandler();
+
+        self::assertNotContains('txt', $handler->getAcceptedExtensions());
+        self::assertNotContains('text/plain', $handler->getAcceptedMimeTypes());
+        self::assertNull($handler->matchSerializerByExtension('journal.txt'));
+    }
+
     public function testAcceptedMimeTypesAreDerivedFromTheRegisteredHandlers(): void
     {
         $mimeTypes = $this->importHandler()->getAcceptedMimeTypes();

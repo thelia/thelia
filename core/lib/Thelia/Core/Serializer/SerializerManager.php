@@ -16,6 +16,7 @@ namespace Thelia\Core\Serializer;
 
 use Exception;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\DataTransfer\Export\AbstractExport;
 
 /**
  * Class SerializerManager.
@@ -47,6 +48,36 @@ class SerializerManager
     public function getSerializers(): array
     {
         return $this->serializers;
+    }
+
+    /**
+     * The serializers an import can read: those made for some exports only are left out.
+     *
+     * @return array<string, SerializerInterface>
+     */
+    public function getImportSerializers(): array
+    {
+        return array_filter($this->serializers, static fn (SerializerInterface $serializer): bool => !$serializer instanceof ExportOnlySerializerInterface);
+    }
+
+    /**
+     * The serializers an export can be written with.
+     *
+     * @return array<string, SerializerInterface>
+     */
+    public function getExportSerializers(AbstractExport $export): array
+    {
+        return array_filter($this->serializers, static fn (SerializerInterface $serializer): bool => !$serializer instanceof ExportOnlySerializerInterface || $serializer->supportsExport($export));
+    }
+
+    /**
+     * @throws SerializerNotForExportException when the serializer is made for other exports
+     */
+    public static function ensureItWrites(SerializerInterface $serializer, AbstractExport $export): void
+    {
+        if ($serializer instanceof ExportOnlySerializerInterface && !$serializer->supportsExport($export)) {
+            throw new SerializerNotForExportException(Translator::getInstance()->trans('The format "%format" is not made for this export: choose another one.', ['%format' => $serializer->getName()]));
+        }
     }
 
     /**

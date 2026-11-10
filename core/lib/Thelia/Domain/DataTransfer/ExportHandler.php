@@ -21,6 +21,7 @@ use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\File\FolderFile;
 use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Exception\HandlerUnavailableException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
@@ -105,6 +106,7 @@ class ExportHandler
         $event = new ExportEvent($instance, $serializer, $archiver);
 
         $this->eventDispatcher->dispatch($event, TheliaEvents::EXPORT_BEGIN);
+        SerializerManager::ensureItWrites($event->getSerializer(), $event->getExport());
 
         $this->onProgress = $onProgress;
         $this->rowsWritten = 0;

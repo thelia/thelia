@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Order;
 
@@ -40,10 +38,8 @@ use Thelia\Model\Order;
  * The journal hands the frozen amounts of a whole batch of orders, read at once; an order
  * built alone reads its own the same way, as a batch of one.
  */
-final class SalesPieceBuilder
+final class SalesPieceBuilder extends AbstractPieceBuilder
 {
-    private ?string $locale = null;
-
     /**
      * @throws OrderNotExportableException
      */
@@ -86,21 +82,7 @@ final class SalesPieceBuilder
 
         $notes = $discounted ? $this->taxesOffTheirRates($orderRef, $products, $shipping, $taxes, $productLines, \count($postageWeights)) : [];
 
-        $entries = [new AccountingEntry(AccountingEntry::ROLE_CUSTOMER, $chart->customerAccount, null, $totalCents, 0)];
-
-        foreach (PieceAmounts::byRate($products) as $rate => $cents) {
-            $entries[] = new AccountingEntry(AccountingEntry::ROLE_PRODUCT, $this->accountsOf($chart, $rate, $orderRef)['product'], $rate, 0, $cents);
-        }
-
-        // The shipping has an account of its own: only its tax needs the accounts of its rate.
-        foreach (PieceAmounts::byRate($shipping) as $rate => $cents) {
-            $entries[] = new AccountingEntry(AccountingEntry::ROLE_SHIPPING, $chart->shippingAccount, $rate, 0, $cents);
-        }
-
-        foreach (PieceAmounts::byRate($taxes) as $rate => $cents) {
-            $taxAccount = $this->accountsOf($chart, $rate, $orderRef)['tax'] ?? throw new OrderNotExportableException($this->trans('Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
-            $entries[] = new AccountingEntry(AccountingEntry::ROLE_TAX, $taxAccount, $rate, 0, $cents);
-        }
+        $entries = $this->invoiceEntries($chart, $orderRef, $totalCents, $products, $shipping, $taxes);
 
         $foreignCurrencyCode = null;
 
@@ -153,7 +135,7 @@ final class SalesPieceBuilder
             }
 
             $rate = PieceAmounts::rateOf($chart, $unitPrice, $unitTax);
-            [$lineAmount, $lineTax] = self::lineAsInvoiced($order, $quantity, $unitPrice, $unitTaxAmounts);
+            [$lineAmount, $lineTax] = $order->getLineAmounts($quantity, $unitPrice, $unitTaxAmounts);
             $amounts[$rate] = ($amounts[$rate] ?? 0.0) + $lineAmount;
             $taxes[$rate] = ($taxes[$rate] ?? 0.0) + $lineTax;
             $counts[$rate] = ($counts[$rate] ?? 0) + 1;
@@ -200,35 +182,6 @@ final class SalesPieceBuilder
     }
 
     /**
-     * A line excluding tax and its tax, rounded as Order::getTotalAmount() rounds them for the
-     * invoice: each unit amount to the cent before the quantity under the sum of roundings,
-     * the line total under the rounding of sums, nothing for an order older than both.
-     *
-     * @param list<float> $unitTaxes
-     *
-     * @return array{float, float}
-     */
-    private static function lineAsInvoiced(Order $order, float $quantity, float $unitPrice, array $unitTaxes): array
-    {
-        $orderId = (int) $order->getId();
-
-        if (ConfigQuery::isOrderWithLegacyRounding($orderId)) {
-            return [$quantity * $unitPrice, $quantity * array_sum($unitTaxes)];
-        }
-
-        if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === ConfigQuery::getOrderRoundingMode($orderId)) {
-            $amount = round($quantity * $unitPrice, 2);
-
-            return [$amount, round($quantity * ($unitPrice + array_sum($unitTaxes)), 2) - $amount];
-        }
-
-        return [
-            $quantity * round($unitPrice, 2),
-            $quantity * array_sum(array_map(static fn (float $tax): float => round($tax, 2), $unitTaxes)),
-        ];
-    }
-
-    /**
      * @return array{array<string, float>, array<string, float>}
      */
     private function postageWeightsByRate(FrozenOrderAmounts $frozen, float $untaxedPostage, float $postageTax, AccountingChart $chart): array
@@ -251,12 +204,14 @@ final class SalesPieceBuilder
         return [$amounts, $taxes];
     }
 
-    /**
-     * @return array{product: string, tax: ?string}
-     */
-    private function accountsOf(AccountingChart $chart, string $rate, string $orderRef): array
+    protected function noAccountsMessage(string $ref, string $rate): string
     {
-        return $chart->accountsOf($rate) ?? throw new OrderNotExportableException($this->trans('Order %ref: it was taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $orderRef, '%rate' => $rate.'%']));
+        return $this->trans('Order %ref: it was taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $ref, '%rate' => $rate.'%']);
+    }
+
+    protected function noTaxAccountMessage(string $ref, string $rate): string
+    {
+        return $this->trans('Order %ref: tax was collected at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $ref, '%rate' => $rate.'%']);
     }
 
     /**
@@ -290,25 +245,9 @@ final class SalesPieceBuilder
                 $shares[$rate] = ($shares[$rate] ?? 0) + $sign * $cents;
             }
         } else {
-            $largest = array_key_first($shares);
-
-            foreach ($shares as $rate => $share) {
-                if (abs($share) > abs($shares[$largest])) {
-                    $largest = $rate;
-                }
-            }
-
-            $shares[$largest] += $difference;
+            $shares[PieceAmounts::largest($shares)] += $difference;
         }
 
         return array_filter($shares, static fn (int $share): bool => 0 !== $share);
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function trans(string $message, array $parameters): string
-    {
-        return Translator::getInstance()->trans($message, $parameters, null, $this->locale);
     }
 }

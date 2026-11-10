@@ -56,6 +56,10 @@ final readonly class ExportJobLauncher
         // Refused here, in the request, rather than by a worker minutes later.
         $this->serializerManager->has($serializerId, true);
 
+        if ($export->isHandlerAvailable()) {
+            SerializerManager::ensureItWrites($this->serializerManager->get($serializerId), $export->getHandleClassInstance());
+        }
+
         if (null !== $archiverId && !$this->archiverManager->get($archiverId, true) instanceof ArchiverInterface) {
             throw new JobRefusedException(\sprintf('The archiver "%s" is not available on this server.', $archiverId));
         }
