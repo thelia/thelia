@@ -18,10 +18,13 @@ use Thelia\Domain\Catalog\Bundle\Exception\InvalidBundleCompositionException;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Domain\Subscription\Exception\SubscriptionPlanPriceMissingException;
+use Thelia\Domain\Subscription\SubscriptionPlanPricing;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
+use Thelia\Model\SubscriptionPlanQuery;
 
 /**
  * Writes on cart lines what a customer pays, as the customer price context resolves
@@ -40,12 +43,18 @@ use Thelia\Model\Customer;
  * from the default one of its sale element: the components the customer chose, less the
  * discount of the bundle, then the discounts of the group and of the customer. A composition
  * the bundle can no longer hold leaves the line alone, at its last price: the order refuses it.
+ *
+ * A line bought on a subscription plan is priced by the plan, never by the catalog: what one
+ * installment costs in the currency of the cart, or nothing while the plan has a trial (the
+ * first installment is charged when the trial ends). The prices of the groups, the rules and
+ * the operations of the catalog do not apply to it.
  */
 final readonly class CartLinePricer
 {
     public function __construct(
         private CustomerPriceContextInterface $customerPriceContext,
         private ?BundleEffectivePriceSource $bundleEffectivePriceSource = null,
+        private ?SubscriptionPlanPricing $subscriptionPlanPricing = null,
     ) {
     }
 
@@ -149,7 +158,7 @@ final readonly class CartLinePricer
         $bundlePrices = $this->bundleLinePricesOf($lines, $currency, $customer);
         $otherLines = array_filter(
             $lines,
-            static fn (CartItem $line, int $index): bool => !\array_key_exists($index, $bundlePrices),
+            static fn (CartItem $line, int $index): bool => !\array_key_exists($index, $bundlePrices) && null === $line->getSubscriptionPlanId(),
             \ARRAY_FILTER_USE_BOTH,
         );
         $quantities = [];
@@ -170,6 +179,16 @@ final readonly class CartLinePricer
         $resolved = [];
 
         foreach ($lines as $index => $line) {
+            if (null !== $line->getSubscriptionPlanId()) {
+                $planPrice = $bundleLinesOnly ? null : $this->planPriceOf($line, $currency);
+
+                if (null !== $planPrice) {
+                    $resolved[] = [$line, $planPrice];
+                }
+
+                continue;
+            }
+
             $price = \array_key_exists($index, $bundlePrices)
                 ? $bundlePrices[$index]
                 : ($bundleLinesOnly ? null : $prices[(int) $line->getProductSaleElementsId()] ?? null);
@@ -229,6 +248,23 @@ final readonly class CartLinePricer
         }
 
         return $prices;
+    }
+
+    private function planPriceOf(CartItem $line, Currency $currency): ?ResolvedPrice
+    {
+        $plan = SubscriptionPlanQuery::create()->findPk($line->getSubscriptionPlanId());
+
+        if (null === $plan || null === $this->subscriptionPlanPricing) {
+            return null;
+        }
+
+        try {
+            $price = $plan->getTrialDays() > 0 ? 0.0 : (float) $this->subscriptionPlanPricing->priceOf($plan, $currency);
+        } catch (SubscriptionPlanPriceMissingException) {
+            return null;
+        }
+
+        return new ResolvedPrice($price, $price, false, false, ResolvedPrice::SOURCE_BASE, 0, 0.0, 0.0);
     }
 
     private function differs(CartItem $line, ResolvedPrice $price): bool

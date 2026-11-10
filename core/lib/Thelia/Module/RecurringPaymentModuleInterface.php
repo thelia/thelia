@@ -29,7 +29,8 @@ use Thelia\Model\Order;
  *
  * The first order of a subscription goes through the checkout as usual and must leave a
  * stored method behind (CustomerPaymentMethodService::register()), even when it costs
- * nothing because of a trial: the module then registers the method without charging.
+ * nothing because of a trial: the module then registers the method without charging, and turns
+ * that order paid itself (as FreeOrder does), since no payment notification will follow.
  */
 interface RecurringPaymentModuleInterface extends PaymentModuleWithStoredMethodsInterface
 {
