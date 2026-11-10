@@ -1750,7 +1750,7 @@ return [
     'Message sent to the customer when the charge of an installment of its subscription fails' => 'Message sent to the customer when the charge of an installment of its subscription fails',
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}',
     'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Message sent to the customer, and to the shop, when a subscription is suspended',
-    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended',
+    '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Message sent to the customer when a subscription is cancelled',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled',
 ];

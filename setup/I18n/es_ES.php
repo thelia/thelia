@@ -1218,7 +1218,7 @@ return [
     'Message sent to the customer when the charge of an installment of its subscription fails' => 'Mensaje enviado al cliente cuando falla el cobro de una cuota de su suscripción',
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Fallo en el pago de su suscripción {{ subscription_ref }} en {{ config("store_name") }}',
     'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Mensaje enviado al cliente y a la tienda cuando se suspende una suscripción',
-    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está suspendida',
+    '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Suscripción {{ subscription_ref }} suspendida tras {{ failure_count }} cobros fallidos{% else %}Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está suspendida{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Mensaje enviado al cliente cuando se cancela una suscripción',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está cancelada',
 ];

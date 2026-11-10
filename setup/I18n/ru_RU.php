@@ -1593,7 +1593,7 @@ return [
     'Message sent to the customer when the charge of an installment of its subscription fails' => 'Сообщение клиенту, когда списание очередного платежа по подписке не удалось',
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Не удалось списать платёж по вашей подписке {{ subscription_ref }} в {{ config("store_name") }}',
     'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Сообщение клиенту и магазину при приостановке подписки',
-    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} приостановлена',
+    '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Подписка {{ subscription_ref }} приостановлена после {{ failure_count }} неудачных списаний{% else %}Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} приостановлена{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Сообщение клиенту при отмене подписки',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} отменена',
 ];

@@ -481,7 +481,7 @@ return [
     'Message sent to the customer when the charge of an installment of its subscription fails' => 'Bericht aan de klant wanneer de afschrijving van een termijn van zijn abonnement mislukt',
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Betaling voor uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} mislukt',
     'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Bericht aan de klant en aan de winkel wanneer een abonnement wordt opgeschort',
-    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgeschort',
+    '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} opgeschort na {{ failure_count }} mislukte afschrijvingen{% else %}Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgeschort{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Bericht aan de klant wanneer een abonnement wordt opgezegd',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgezegd',
 ];
