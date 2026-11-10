@@ -25,11 +25,18 @@ use Thelia\Model\ProductSaleElements;
 final readonly class ReferenceUnitPriceCalculator
 {
     /**
-     * Null when the combination does not say what one unit sold contains.
+     * Null when the combination does not say what one unit sold contains, or carries a rule the quantity rules refuse.
      */
     public function compute(float $displayedPrice, ProductSaleElements|QuantityRule $rule): ?ReferenceUnitPrice
     {
-        $rule = $rule instanceof QuantityRule ? $rule : QuantityRule::fromProductSaleElements($rule);
+        if (!$rule instanceof QuantityRule) {
+            try {
+                $rule = QuantityRule::fromProductSaleElements($rule);
+            } catch (InvalidQuantityRuleException) {
+                // A rule written in SQL or by a module that the rules refuse: no reference price, not a failed page.
+                return null;
+            }
+        }
 
         if (!$rule->hasReferencePrice() || null === $rule->unitQuantity || null === $rule->referenceUnitQuantity || null === $rule->unitCode) {
             return null;

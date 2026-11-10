@@ -72,4 +72,12 @@ final class ReferenceUnitPriceCalculatorTest extends TestCase
 
         self::assertSame(13.32, (new ReferenceUnitPriceCalculator())->compute(9.99, $combination)?->price);
     }
+
+    public function testACombinationWithARuleTheQuantityRulesRefuseHasNoReferencePrice(): void
+    {
+        // Written in SQL or by a module: a step of 0 and a unit quantity of 0.
+        $combination = (new ProductSaleElements())->setQuantityStep('0.000000')->setUnitQuantity('0.000000')->setReferenceUnitQuantity('1.000000')->setUnitCode('l');
+
+        self::assertNull((new ReferenceUnitPriceCalculator())->compute(9.99, $combination));
+    }
 }
