@@ -84,6 +84,10 @@ schema in the module breaks the read.
 - The discount is taken off the products in proportion of their amount in tax
   and untaxed at the rate of each. The module copies the discount of an order to
   `discount_with_tax` and `discount_without_tax` alike: only the first is read.
+- The module never writes the exchange rate of a credit note (`credit_note.currency_rate`
+  stays NULL): a credit note in another currency is booked at the rate of its order,
+  the one its invoice was booked at; without rate and without order, it is left out
+  and named in the report.
 - A commercial credit note (types `rebate`, `discount`, `difference_refund`) is
   debited to `accounting_commercial_credit_account` when it is set: a reduction
   granted after the invoice goes to 709 in the French chart, where a discount on
