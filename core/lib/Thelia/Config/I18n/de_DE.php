@@ -863,6 +863,7 @@ return [
     '%count orders placed in the period are not invoiced: they have no piece.' => '%count im Zeitraum aufgegebene Bestellungen sind nicht in Rechnung gestellt: Sie haben keinen Beleg.',
     '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.' => '%count Bestellungen des Zeitraums haben ein Rechnungsdatum, aber keine Rechnungsnummer: Sie sind nicht im Journal.',
     '%count pieces, debit %debit, credit %credit.' => '%count Belege, Soll %debit, Haben %credit.',
+    '%count more warnings are not listed.' => '%count weitere Warnungen werden nicht aufgeführt.',
     'Invoice %ref %customer' => 'Rechnung %ref %customer',
     'No credit note module is installed: refunds made without credit note are not in this journal.' => 'Kein Gutschriftenmodul ist installiert: Erstattungen ohne Gutschrift sind nicht in diesem Journal.',
     'Sales at %rate' => 'Umsätze zu %rate',

@@ -23,9 +23,25 @@ class ExportJob extends BaseExportJob implements DataTransferJob
 {
     use DataTransferJobTrait;
 
+    /**
+     * The size of the column of the report, in bytes.
+     */
+    public const REPORT_MAX_BYTES = 65535;
+
+    /**
+     * The report as the column can hold it: warnings are dropped from the end until it fits,
+     * so that no report keeps the job from being saved.
+     */
     public function recordReport(ExportReport $report): static
     {
-        return $this->setReport(json_encode(['lines' => $report->lines(), 'warnings' => $report->warnings()], \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE));
+        $lines = $report->lines();
+        $warnings = $report->warnings();
+
+        do {
+            $json = json_encode(['lines' => $lines, 'warnings' => $warnings], \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE);
+        } while (\strlen($json) > self::REPORT_MAX_BYTES && (null !== array_pop($warnings) || null !== array_pop($lines)));
+
+        return $this->setReport($json);
     }
 
     /**
@@ -38,26 +54,14 @@ class ExportJob extends BaseExportJob implements DataTransferJob
             return null;
         }
 
-        $report = new ExportReport();
-
         try {
             $stored = json_decode($this->getReport(), true, 3, \JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
-            return $report;
+            return new ExportReport();
         }
 
-        foreach (\is_array($stored['lines'] ?? null) ? $stored['lines'] : [] as $line) {
-            if (\is_string($line)) {
-                $report->addLine($line);
-            }
-        }
+        $strings = static fn (mixed $values): array => \is_array($values) ? array_values(array_filter($values, \is_string(...))) : [];
 
-        foreach (\is_array($stored['warnings'] ?? null) ? $stored['warnings'] : [] as $warning) {
-            if (\is_string($warning)) {
-                $report->addWarning($warning);
-            }
-        }
-
-        return $report;
+        return ExportReport::recorded($strings($stored['lines'] ?? null), $strings($stored['warnings'] ?? null));
     }
 }

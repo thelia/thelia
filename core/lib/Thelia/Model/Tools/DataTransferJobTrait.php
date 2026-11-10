@@ -42,6 +42,9 @@ trait DataTransferJobTrait
 
     public function refresh(): void
     {
+        // A save that threw leaves Propel believing the object is still saving: it would
+        // ignore every later save, and a failed job would stay running.
+        $this->alreadyInSave = false;
         $this->reload();
     }
 }

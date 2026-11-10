@@ -18,6 +18,7 @@ use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Thelia\Domain\Accounting\AccountingChart;
+use Thelia\Domain\DataTransfer\Export\ExportReport;
 use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Domain\DataTransfer\Export\Type\SalesJournalExport;
@@ -338,6 +339,35 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         $report = $job->getExportReport() ?? self::fail('The job kept no report.');
         self::assertMatchesRegularExpression('/[1-9]\d* pieces?, debit /', implode("\n", $report->lines()));
         self::assertStringContainsString('credit note', implode("\n", $report->warnings()));
+    }
+
+    public function testAJournalWithMoreWarningsThanTheReportKeepsEndsDoneAndSaysHowManyAreLeftOut(): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720,5.5:706055:445705');
+        $orders = [];
+
+        for ($i = 0; $i < ExportReport::MAX_WARNINGS + 30; ++$i) {
+            $orders[] = $this->invoicedOrder('2026-02-13', [[100.0, 1, 20.0], [10.0, 3, 0.55]], discount: 15.0);
+        }
+
+        $export = ExportQuery::create()->findOneByRef('thelia.export.sales_journal') ?? self::fail('The sales journal is not in the catalogue.');
+        $job = $this->getService(ExportJobLauncher::class)->launch(
+            $export,
+            'thelia.fec',
+            language: LangQuery::create()->findOneByLocale('en_US'),
+            rangeDate: ['start' => new \DateTime('2026-02-01 00:00:00'), 'end' => new \DateTime('2026-02-28 23:59:59')],
+        );
+        $job->reload();
+        $file = (string) $job->getFilePath();
+        $kept = is_file($file);
+        ExportStorage::discard($file);
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
+        self::assertTrue($kept, 'The file of the journal is kept.');
+        $warnings = ($job->getExportReport() ?? self::fail('The job kept no report.'))->warnings();
+        self::assertLessThanOrEqual(ExportReport::MAX_WARNINGS + 1, \count($warnings));
+        self::assertStringContainsString('more warnings are not listed.', implode("\n", $warnings));
+        self::assertMatchesRegularExpression('/^\d+ more warnings are not listed\.$/', end($warnings));
     }
 
     public function testTheJobOfAnExportThatReportsNothingKeepsNoReport(): void

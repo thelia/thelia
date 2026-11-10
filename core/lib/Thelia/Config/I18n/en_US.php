@@ -1129,6 +1129,7 @@ return [
     '%count orders placed in the period are not invoiced: they have no piece.' => '%count orders placed in the period are not invoiced: they have no piece.',
     '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.' => '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.',
     '%count pieces, debit %debit, credit %credit.' => '%count pieces, debit %debit, credit %credit.',
+    '%count more warnings are not listed.' => '%count more warnings are not listed.',
     'Invoice %ref %customer' => 'Invoice %ref %customer',
     'No credit note module is installed: refunds made without credit note are not in this journal.' => 'No credit note module is installed: refunds made without credit note are not in this journal.',
     'Sales at %rate' => 'Sales at %rate',

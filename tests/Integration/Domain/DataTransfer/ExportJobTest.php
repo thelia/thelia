@@ -53,6 +53,7 @@ use Thelia\Messenger\JobSetAsideException;
 use Thelia\Messenger\Transport\ConfiguredQueues;
 use Thelia\Messenger\Transport\ShopDatabaseConnection;
 use Thelia\Model\Export;
+use Thelia\Model\ExportJob;
 use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
@@ -60,6 +61,7 @@ use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\DataTransfer\ImageHeavyExport;
 use Thelia\Tests\Support\DataTransfer\ModuleJsonFileExport;
 use Thelia\Tests\Support\DataTransfer\ModuleWrittenExportHandler;
+use Thelia\Tests\Support\DataTransfer\VerboseReportExport;
 
 /**
  * An export asked for in the back office is a job: without a queue it runs in the
@@ -182,6 +184,29 @@ final class ExportJobTest extends IntegrationTestCase
         self::assertSame(JobStatus::FAILED, $job->getJobStatus());
         self::assertStringContainsString('Vendor\\Removed\\Module\\Export', (string) $job->getError());
         self::assertNotNull($job->getFinishedAt());
+    }
+
+    /**
+     * The report of an export is a column of 64 KB: a report longer than that is cut, it
+     * does not keep the job from ending with its file.
+     */
+    public function testAReportTooLongForItsColumnLeavesTheJobDoneWithItsFile(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(VerboseReportExport::class)->save($this->getPropelConnection());
+        VerboseReportExport::$fileName = 'verbose-report-'.uniqid();
+        $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        $this->handler()(new RunExportJob((int) $job->getId()));
+        $job->reload();
+        $this->files[] = (string) $job->getFilePath();
+
+        self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
+        self::assertFileExists((string) $job->getFilePath());
+        $report = $job->getExportReport() ?? self::fail('The job kept no report.');
+        self::assertSame(['2 rows.'], $report->lines());
+        self::assertNotSame([], $report->warnings());
+        self::assertLessThanOrEqual(ExportJob::REPORT_MAX_BYTES, \strlen((string) $job->getReport()));
     }
 
     public function testAFailedExportReplayedOnceItCanRunIsWritten(): void
@@ -522,6 +547,29 @@ final class ExportJobTest extends IntegrationTestCase
         }
 
         self::assertSame([], glob(THELIA_CACHE_DIR.'export/*'.ImageHeavyExport::$fileName.'*'));
+    }
+
+    /**
+     * A row whose save failed is not saved again by the object that failed (Propel leaves
+     * it believing it is still saving): the failure is recorded all the same, and the job
+     * is not left running.
+     */
+    public function testAJobWhoseRowCouldNotBeSavedEndsFailedNotRunning(): void
+    {
+        $export = $this->ordersExport();
+        $export->setHandleClass(ImageHeavyExport::class)->save($this->getPropelConnection());
+        ImageHeavyExport::$fileName = 'unsaved-'.uniqid().'-'.str_repeat('x', 260);
+        $job = $this->launcherWith($this->queue())->launch($export, self::SERIALIZER, language: Lang::getDefaultLanguage());
+
+        try {
+            ($this->handler())(new RunExportJob((int) $job->getId()));
+            self::fail('The row cannot hold the path of the file.');
+        } catch (JobSetAsideException) {
+        }
+
+        $job->reload();
+        self::assertSame(JobStatus::FAILED, $job->getJobStatus());
+        self::assertNotSame('', (string) $job->getError());
     }
 
     /**
