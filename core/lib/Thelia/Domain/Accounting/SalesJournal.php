@@ -135,6 +135,49 @@ final class SalesJournal
     }
 
     /**
+     * The totals of the pieces of a period, read again from the orders and the credit notes:
+     * the report of an export is left as it is.
+     *
+     * @throws InvalidAccountingChartException when the chart of accounts is missing an account
+     */
+    public function totals(AccountingChart $chart, ?\DateTimeInterface $from, ?\DateTimeInterface $to, string $locale): JournalTotals
+    {
+        $creditNotes = new CreditNoteReader();
+        $creditNoteCount = $creditNotes->isModuleActive() && $creditNotes->hasItsTables() ? 0 : null;
+        $count = 0;
+        $debit = 0;
+        $credit = 0;
+        $taxable = 0;
+        $tax = 0;
+
+        foreach ($this->pieces($chart, $from, $to, new ExportReport(), $locale) as $piece) {
+            ++$count;
+
+            if (null !== $creditNoteCount && $piece->isCreditNote()) {
+                ++$creditNoteCount;
+            }
+
+            foreach ($piece->entries as $entry) {
+                $debit += $entry->debitCents;
+                $credit += $entry->creditCents;
+
+                if (null === $entry->rateKey) {
+                    continue;
+                }
+
+                // A credit note debits what an invoice credits: it takes its amounts off.
+                if (AccountingEntry::ROLE_TAX === $entry->role) {
+                    $tax += $entry->creditCents - $entry->debitCents;
+                } else {
+                    $taxable += $entry->creditCents - $entry->debitCents;
+                }
+            }
+        }
+
+        return new JournalTotals($count, $creditNoteCount, $debit, $credit, $taxable, $tax);
+    }
+
+    /**
      * Each batch starts after the last order of the previous one, by invoice date then id: an
      * order invoiced while the export runs cannot shift the batches, and none is read twice.
      * The customer, the invoice address and the currency come with the order; the lines,

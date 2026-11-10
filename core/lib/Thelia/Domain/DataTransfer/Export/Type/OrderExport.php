@@ -17,14 +17,11 @@ namespace Thelia\Domain\DataTransfer\Export\Type;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\Template\Helper\FormatService;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
 use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Currency;
 use Thelia\Model\OrderStatusQuery;
 
 /**
@@ -136,14 +133,9 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
         return [
             new ReportSummaryLine($translator->trans('Orders', [], 'core', $locale), (string) $count),
             new ReportSummaryLine($translator->trans('Paid orders', [], 'core', $locale), (string) $paidCount),
-            new ReportSummaryLine($translator->trans('Revenue incl. tax', [], 'core', $locale), $this->money($revenue, $locale)),
-            new ReportSummaryLine($translator->trans('Average order value', [], 'core', $locale), $this->money(0 === $paidCount ? 0.0 : $revenue / $paidCount, $locale)),
+            ReportSummaryLine::money($translator->trans('Revenue incl. tax', [], 'core', $locale), $revenue, $locale),
+            ReportSummaryLine::money($translator->trans('Average order value', [], 'core', $locale), 0 === $paidCount ? 0.0 : $revenue / $paidCount, $locale),
         ];
-    }
-
-    private function money(float $amount, string $locale): string
-    {
-        return (new FormatService(new RequestStack()))->money($amount, Currency::getDefaultCurrency()->getId(), $locale);
     }
 
     private function statement(string $query): StatementInterface

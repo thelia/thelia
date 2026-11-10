@@ -21,7 +21,9 @@ use Thelia\Domain\Accounting\AccountingEntry;
 use Thelia\Domain\Accounting\SalesJournal;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Export\ExportReport;
+use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
+use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Model\Lang;
 
 /**
@@ -33,7 +35,7 @@ use Thelia\Model\Lang;
  * dates them.
  * The rows are written as the pieces are read: a year of invoices is never held at once.
  */
-class SalesJournalExport extends AbstractExport implements ReportingExportInterface
+class SalesJournalExport extends AbstractExport implements ReportingExportInterface, MailableReportInterface
 {
     public const FILE_NAME = 'sales_journal';
     public const USE_RANGE_DATE = true;
@@ -51,6 +53,30 @@ class SalesJournalExport extends AbstractExport implements ReportingExportInterf
     public function report(): ExportReport
     {
         return $this->report;
+    }
+
+    /**
+     * The totals of the period, computed again from the orders and the credit notes: the
+     * rows of the export are not read.
+     *
+     * @return list<ReportSummaryLine>
+     */
+    public function summarize(): array
+    {
+        $locale = $this->locale();
+        $translator = Translator::getInstance();
+        $totals = (new SalesJournal())->totals(AccountingChart::fromSettings(), $this->rangeDate['start'] ?? null, $this->rangeDate['end'] ?? null, $locale);
+
+        $lines = [new ReportSummaryLine($translator->trans('Pieces', [], 'core', $locale), (string) $totals->pieces)];
+
+        if (null !== $totals->creditNotes) {
+            $lines[] = new ReportSummaryLine($translator->trans('Credit notes among them', [], 'core', $locale), (string) $totals->creditNotes);
+        }
+
+        $lines[] = ReportSummaryLine::money($translator->trans('Total debit', [], 'core', $locale), $totals->debitCents / 100, $locale);
+        $lines[] = ReportSummaryLine::money($translator->trans('Total credit', [], 'core', $locale), $totals->creditCents / 100, $locale);
+
+        return $lines;
     }
 
     public function current(): mixed

@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Domain\Accounting\AccountingChart;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\Reporting\Mailing\ReportDeliveryMode;
 use Thelia\Domain\Reporting\Mailing\ReportDownloadLinkGenerator;
@@ -27,6 +28,8 @@ use Thelia\Domain\Reporting\Mailing\ReportMailer;
 use Thelia\Domain\Reporting\Mailing\ReportMailingSettings;
 use Thelia\Domain\Reporting\Mailing\ReportMailStorage;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatus;
 
 final class ReportMailerTest extends ReportMailingTestCase
@@ -262,6 +265,36 @@ final class ReportMailerTest extends ReportMailingTestCase
 
         self::assertFalse($result->empty);
         self::assertSame(['Carts created', 'Orders created', 'Orders paid'], \array_slice(array_column($this->renderedWith()[0]['summary'], 'label'), 0, 3));
+    }
+
+    public function testTheSalesJournalAndTheTaxSummaryCarryTheirTotals(): void
+    {
+        ConfigQuery::write(AccountingChart::CUSTOMER_ACCOUNT_KEY, '411000');
+        ConfigQuery::write(AccountingChart::SHIPPING_ACCOUNT_KEY, '708500');
+        ConfigQuery::write(AccountingChart::RATE_ACCOUNTS_KEY, '20:706200:445720');
+        ConfigQuery::resetCache();
+        $order = $this->orderYesterday();
+        $order
+            ->setCurrencyId((int) CurrencyQuery::create()->findOneByByDefault(1)->getId())
+            ->setInvoiceRef('RPT-INV-'.$order->getId())
+            ->setInvoiceDate(new \DateTime('yesterday 12:00'))
+            ->save($this->getPropelConnection());
+        (new OrderProductTax())->setOrderProductId($order->getOrderProducts()->getFirst()->getId())->setTitle('VAT')->setAmount('2')->setPromoAmount('2')->save($this->getPropelConnection());
+
+        $this->mailer()->send($this->mailing(exportRef: 'thelia.export.sales_journal'), $this->yesterday());
+        $this->mailer()->send($this->mailing(exportRef: 'thelia.export.tax_summary'), $this->yesterday());
+
+        $journal = $this->renderedWith()[0]['summary'];
+        self::assertSame(['Pieces', 'Total debit', 'Total credit'], array_column($journal, 'label'));
+        self::assertSame('1', $journal[0]['value']);
+        self::assertStringContainsString('24.00', $journal[1]['value']);
+        self::assertSame($journal[1]['value'], $journal[2]['value'], 'a piece is balanced');
+
+        $taxes = $this->renderedWith()[1]['summary'];
+        self::assertSame(['Taxable amount', 'Tax collected', 'Pieces'], array_column($taxes, 'label'));
+        self::assertStringContainsString('20.00', $taxes[0]['value']);
+        self::assertStringContainsString('4.00', $taxes[1]['value']);
+        self::assertSame('1', $taxes[2]['value']);
     }
 
     private function mailer(?ReportDownloadLinkGenerator $linkGenerator = null): ReportMailer

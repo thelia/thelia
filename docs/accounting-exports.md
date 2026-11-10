@@ -157,6 +157,13 @@ A report keeps at most `ExportReport::MAX_WARNINGS` warnings and ends the list w
 the number of those it left out; `ExportJob::recordReport()` cuts what remains of a
 report that would still be longer than the column of the job.
 
+Both exports implement `MailableReportInterface`: the scheduled report mailing, which
+sends the export as a CSV file, opens its mail with their totals, computed again by
+`SalesJournal::totals()` and never from the rows of the export. The journal gives the
+number of pieces, of which credit notes while the module is read, the total debit and
+the total credit; the tax summary the amount taxed, the tax collected and the number of
+pieces. A mailing of an export launched without a chart of accounts fails as a whole.
+
 ## Not covered
 
 - Matching (`EcritureLet`) and the payments received.

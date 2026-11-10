@@ -287,6 +287,49 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
         self::assertSame(2, $rows[0]['pieces']);
     }
 
+    public function testTheSummaryOfTheJournalCountsTheCreditNotesAndLeavesItsRowsAlone(): void
+    {
+        $order = $this->invoicedOrder('10', [[100.0, 1, 20.0]]);
+        $this->creditNote('rebate', 'accepted', '20', null, [['other', 25.0, 30.0, 1, null]]);
+        $expected = $this->rows(new SalesJournalExport());
+
+        $export = new SalesJournalExport();
+        $this->configured($export);
+        $export->rewind();
+        $export->next();
+        $summary = $export->summarize();
+        $rows = [];
+
+        while ($export->valid()) {
+            $rows[] = $export->current();
+            $export->next();
+        }
+
+        self::assertSame(['Pieces', 'Credit notes among them', 'Total debit', 'Total credit'], array_column($summary, 'label'));
+        self::assertSame('2', $summary[0]->value);
+        self::assertSame('1', $summary[1]->value);
+        self::assertStringContainsString('150.00', $summary[2]->value);
+        self::assertStringContainsString('150.00', $summary[3]->value);
+        self::assertSame(\count($expected) - 1, \count($rows), 'The summary did not move the rows of the export.');
+        self::assertContains((string) $order->getInvoiceRef(), array_column($expected, 'PieceRef'));
+    }
+
+    public function testTheSummaryOfTheTaxSummaryTakesTheCreditNotesOff(): void
+    {
+        $this->invoicedOrder('10', [[100.0, 1, 20.0]]);
+        $this->creditNote('rebate', 'accepted', '20', null, [['other', 25.0, 30.0, 1, null]]);
+        $this->rows(new TaxSummaryExport());
+
+        $export = new TaxSummaryExport();
+        $this->configured($export);
+        $summary = $export->summarize();
+
+        self::assertSame(['Taxable amount', 'Tax collected', 'Pieces'], array_column($summary, 'label'));
+        self::assertStringContainsString('75.00', $summary[0]->value);
+        self::assertStringContainsString('15.00', $summary[1]->value);
+        self::assertSame('2', $summary[2]->value);
+    }
+
     public function testACreditNoteInAnotherCurrencyIsBookedInTheShopCurrencyAtItsRate(): void
     {
         $foreign = CurrencyQuery::create()->filterByByDefault(0)->findOne() ?? self::markTestSkipped('The test database has a single currency.');
@@ -520,12 +563,7 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
      */
     private function rows(SalesJournalExport|TaxSummaryExport $export): array
     {
-        ConfigQuery::write(AccountingChart::CUSTOMER_ACCOUNT_KEY, '411000');
-        ConfigQuery::write(AccountingChart::SHIPPING_ACCOUNT_KEY, '708500');
-        ConfigQuery::write(AccountingChart::RATE_ACCOUNTS_KEY, '20:706200:445720,5.5:706055:445705,0:706000');
-        $export->setLang(LangQuery::create()->findOneByLocale('en_US'));
-        $start = new \DateTime(self::MONTH.'-01 00:00:00');
-        $export->setRangeDate(['start' => $start, 'end' => (clone $start)->modify('last day of this month 23:59:59')]);
+        $this->configured($export);
 
         $rows = [];
 
@@ -534,5 +572,15 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
         }
 
         return $rows;
+    }
+
+    private function configured(SalesJournalExport|TaxSummaryExport $export): void
+    {
+        ConfigQuery::write(AccountingChart::CUSTOMER_ACCOUNT_KEY, '411000');
+        ConfigQuery::write(AccountingChart::SHIPPING_ACCOUNT_KEY, '708500');
+        ConfigQuery::write(AccountingChart::RATE_ACCOUNTS_KEY, '20:706200:445720,5.5:706055:445705,0:706000');
+        $export->setLang(LangQuery::create()->findOneByLocale('en_US'));
+        $start = new \DateTime(self::MONTH.'-01 00:00:00');
+        $export->setRangeDate(['start' => $start, 'end' => (clone $start)->modify('last day of this month 23:59:59')]);
     }
 }
