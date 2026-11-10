@@ -58,6 +58,22 @@ final readonly class SubscriptionNotificationListener
     public const string SUSPENDED = 'subscription_suspended';
     public const string CANCELLED = 'subscription_cancelled';
 
+    /**
+     * Variables only some messages carry. The parser of the mailer is shared and keeps what it was
+     * assigned: a message that does not set one passes it as null, or it would print the value of
+     * the previous mail of a billing run.
+     */
+    private const array NOT_GIVEN = [
+        'order_id' => null,
+        'order_ref' => null,
+        'installment_number' => null,
+        'failure_count' => null,
+        'failure_kind' => null,
+        'retry_date' => null,
+        'recipient' => null,
+        'actor_type' => null,
+    ];
+
     public function __construct(
         private MailerFactory $mailer,
         private RequestStack $requestStack,
@@ -114,6 +130,7 @@ final readonly class SubscriptionNotificationListener
 
         return [
             'subscription_id' => (int) $subscription->getId(),
+            'customer_id' => (int) $subscription->getCustomerId(),
             'subscription_ref' => (string) $subscription->getRef(),
             'subscription_status' => (string) $subscription->getStatus(),
             'product_title' => null === $product ? '' : (string) $product->setLocale((string) $locale)->getTitle(),
@@ -134,6 +151,7 @@ final readonly class SubscriptionNotificationListener
      */
     private function send(Subscription $subscription, string $messageCode, array $variables, bool $toTheShop = false): void
     {
+        $variables += self::NOT_GIVEN;
         $customer = $subscription->getCustomer();
         $locale = self::localeOf($subscription);
         $pushed = $this->giveTheJobARequest();
@@ -149,7 +167,7 @@ final readonly class SubscriptionNotificationListener
                 $messageCode,
                 [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
                 [$customer->getEmail() => $customer->getFirstname().' '.$customer->getLastname()],
-                $variables + ['customer_id' => (int) $customer->getId()],
+                $variables,
                 $locale,
             );
         } catch (\Throwable $throwable) {

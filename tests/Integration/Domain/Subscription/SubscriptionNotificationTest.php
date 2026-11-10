@@ -154,4 +154,31 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
         self::assertSame($byTheCustomer->getRef(), $this->recorder->log[0]['variables']['subscription_ref']);
         self::assertNotNull($this->recorder->log[0]['variables']['cancel_at_date']);
     }
+
+    /**
+     * The parser of the mailer keeps what it was assigned: a mail that leaves a variable out shows the
+     * one of the previous mail of the run. Every variable a message may use is passed, null when absent.
+     */
+    public function testAMailWithoutAnOrderPassesNullNotNothingSoThePreviousOrderIsNotKept(): void
+    {
+        [$subscription] = $this->aSubscription();
+        RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Declined;
+
+        $this->moveTo('2028-02-29 10:00:00');
+        $this->biller()->bill((int) $subscription->getId());
+        $subscription->reload();
+        $this->getService(SubscriptionManager::class)->cancel($subscription, ActorType::Customer, (int) $subscription->getCustomerId());
+
+        self::assertSame(['subscription_payment_failed', 'subscription_cancelled'], array_column($this->recorder->log, 'code'));
+        [$failed, $cancelled] = array_column($this->recorder->log, 'variables');
+        self::assertNotNull($failed['order_ref'], 'The failed installment has an order.');
+
+        foreach (['order_id', 'order_ref', 'installment_number', 'failure_count', 'failure_kind', 'retry_date', 'recipient'] as $name) {
+            self::assertArrayHasKey($name, $cancelled, $name.' is passed.');
+            self::assertNull($cancelled[$name], $name.' of the cancellation is null, not the one of the previous mail.');
+        }
+
+        self::assertSame('customer', $cancelled['actor_type']);
+        self::assertSame((int) $subscription->getCustomerId(), $cancelled['customer_id']);
+    }
 }
