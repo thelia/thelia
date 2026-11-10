@@ -69,6 +69,39 @@ final class QuantityDoublePrecisionMigrationTest extends IntegrationTestCase
         self::assertSame(['0.0005', '1234.5678'], $this->quantities());
     }
 
+    /**
+     * Every column the script converts, read from the script, is a DOUBLE in the schema a
+     * fresh install builds: the scratch table above proves the statements, not the schema.
+     */
+    public function testEveryColumnTheScriptConvertsIsADoubleInTheSchema(): void
+    {
+        $script = (string) file_get_contents(THELIA_SETUP_DIRECTORY.'update'.\DIRECTORY_SEPARATOR.'sql'.\DIRECTORY_SEPARATOR.'3.4.0.sql');
+        preg_match_all('/ALTER TABLE `(\w+)` MODIFY `(\w+)` DOUBLE/', $script, $matches, \PREG_SET_ORDER);
+        $converted = array_values(array_unique(array_map(static fn (array $match): string => $match[1].'.'.$match[2], $matches)));
+        sort($converted);
+
+        self::assertSame([
+            'cart_item.quantity',
+            'cart_item.reserved_quantity',
+            'order_product.quantity',
+            'order_return_line.quantity',
+            'order_return_line.quantity_received',
+            'order_shipment_item.quantity',
+            'product_sale_elements.low_stock_threshold',
+            'product_sale_elements.preorder_limit',
+            'product_sale_elements.quantity',
+        ], $converted);
+
+        foreach ($converted as $qualified) {
+            [$table, $column] = explode('.', $qualified);
+            $type = $this->connection()
+                ->query("SELECT `DATA_TYPE` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = '".$table."' AND `COLUMN_NAME` = '".$column."'")
+                ->fetchColumn();
+
+            self::assertSame('double', $type, $qualified.' is not stored in double precision.');
+        }
+    }
+
     private function createProbe(string $definition): void
     {
         $this->connection()->exec('CREATE TABLE `'.self::PROBE.'` (`id` INTEGER NOT NULL AUTO_INCREMENT, `quantity` '.$definition.', PRIMARY KEY (`id`)) ENGINE=InnoDB');
