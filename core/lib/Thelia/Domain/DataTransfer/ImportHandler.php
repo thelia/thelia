@@ -185,7 +185,7 @@ class ImportHandler
     {
         $extensions = [];
 
-        foreach ($this->serializerManager->getSerializers() as $serializer) {
+        foreach ($this->serializerManager->getImportSerializers() as $serializer) {
             $extensions[] = strtolower($serializer->getExtension());
         }
 
@@ -205,7 +205,7 @@ class ImportHandler
     {
         $mimeTypes = [];
 
-        foreach ($this->serializerManager->getSerializers() as $serializer) {
+        foreach ($this->serializerManager->getImportSerializers() as $serializer) {
             $mimeTypes[] = $serializer->getMimeType();
         }
 
@@ -303,7 +303,7 @@ class ImportHandler
         $extension = pathinfo((string) $fileName, \PATHINFO_EXTENSION);
 
         /** @var AbstractSerializer $serializer */
-        foreach ($this->serializerManager->getSerializers() as $serializer) {
+        foreach ($this->serializerManager->getImportSerializers() as $serializer) {
             if (0 === strcasecmp($extension, $serializer->getExtension())) {
                 return $serializer;
             }

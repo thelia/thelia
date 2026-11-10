@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Accounting;
 
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\Currency;
 
 /**
@@ -31,10 +30,8 @@ use Thelia\Model\Currency;
  *   account of commercial credit notes when the chart has one.
  * - The total of the credit note is the anchor: a cent of rounding goes to the largest line.
  */
-final class CreditPieceBuilder
+final class CreditPieceBuilder extends AbstractPieceBuilder
 {
-    private ?string $locale = null;
-
     /**
      * @throws OrderNotExportableException
      */
@@ -74,21 +71,7 @@ final class CreditPieceBuilder
             self::onTheLargest($difference, $productCents, $shippingCents);
         }
 
-        $entries = [new AccountingEntry(AccountingEntry::ROLE_CUSTOMER, $chart->customerAccount, null, $totalCents, 0)];
-
-        foreach (PieceAmounts::byRate(array_filter($productCents)) as $rate => $cents) {
-            $account = $this->accountsOf($chart, $rate, $ref)['product'];
-            $entries[] = new AccountingEntry(AccountingEntry::ROLE_PRODUCT, $note->isCommercial() ? $chart->commercialCreditAccount ?? $account : $account, $rate, 0, $cents);
-        }
-
-        foreach (PieceAmounts::byRate(array_filter($shippingCents)) as $rate => $cents) {
-            $entries[] = new AccountingEntry(AccountingEntry::ROLE_SHIPPING, $chart->shippingAccount, $rate, 0, $cents);
-        }
-
-        foreach (PieceAmounts::byRate(array_filter($taxCents)) as $rate => $cents) {
-            $taxAccount = $this->accountsOf($chart, $rate, $ref)['tax'] ?? throw new OrderNotExportableException($this->trans('Credit note %ref: it gives back tax at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $ref, '%rate' => $rate.'%']));
-            $entries[] = new AccountingEntry(AccountingEntry::ROLE_TAX, $taxAccount, $rate, 0, $cents);
-        }
+        $entries = $this->invoiceEntries($chart, $ref, $totalCents, array_filter($productCents), array_filter($shippingCents), array_filter($taxCents), $note->isCommercial() ? $chart->commercialCreditAccount : null);
 
         $foreignCurrencyCode = null;
 
@@ -166,8 +149,8 @@ final class CreditPieceBuilder
      */
     private static function onTheLargest(int $difference, array &$products, array &$shipping): void
     {
-        $product = self::largest($products);
-        $postage = self::largest($shipping);
+        $product = PieceAmounts::largest($products);
+        $postage = PieceAmounts::largest($shipping);
 
         if (null !== $product && (null === $postage || abs($products[$product]) >= abs($shipping[$postage]))) {
             $products[$product] += $difference;
@@ -176,35 +159,13 @@ final class CreditPieceBuilder
         }
     }
 
-    /**
-     * @param array<string, int> $amounts
-     */
-    private static function largest(array $amounts): ?string
+    protected function noAccountsMessage(string $ref, string $rate): string
     {
-        $largest = null;
-
-        foreach ($amounts as $rate => $cents) {
-            if (null === $largest || abs($cents) > abs($amounts[$largest])) {
-                $largest = (string) $rate;
-            }
-        }
-
-        return $largest;
+        return $this->trans('Credit note %ref: it gives back an amount taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $ref, '%rate' => $rate.'%']);
     }
 
-    /**
-     * @return array{product: string, tax: ?string}
-     */
-    private function accountsOf(AccountingChart $chart, string $rate, string $ref): array
+    protected function noTaxAccountMessage(string $ref, string $rate): string
     {
-        return $chart->accountsOf($rate) ?? throw new OrderNotExportableException($this->trans('Credit note %ref: it gives back an amount taxed at %rate, a rate the chart of accounts has no account for.', ['%ref' => $ref, '%rate' => $rate.'%']));
-    }
-
-    /**
-     * @param array<string, string> $parameters
-     */
-    private function trans(string $message, array $parameters): string
-    {
-        return Translator::getInstance()->trans($message, $parameters, null, $this->locale);
+        return $this->trans('Credit note %ref: it gives back tax at %rate, a rate the chart of accounts gives no tax account.', ['%ref' => $ref, '%rate' => $rate.'%']);
     }
 }

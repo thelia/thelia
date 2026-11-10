@@ -1175,6 +1175,7 @@ return [
     '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.' => '%count commandes de la période ont une date de facture mais pas de référence de facture : elles ne sont pas dans le journal.',
     '%count pieces, debit %debit, credit %credit.' => '%count pièces, débit %debit, crédit %credit.',
     '%count more warnings are not listed.' => '%count autres avertissements ne sont pas listés.',
+    'The format "%format" is not made for this export: choose another one.' => 'Le format « %format » n\'est pas prévu pour cet export : choisissez-en un autre.',
     'Invoice %ref %customer' => 'Facture %ref %customer',
     'No credit note module is installed: refunds made without credit note are not in this journal.' => 'Aucun module d\'avoirs n\'est installé : les remboursements faits sans avoir ne sont pas dans ce journal.',
     'Sales at %rate' => 'Ventes à %rate',

@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Core\Serializer\Serializer;
 
 use Thelia\Core\Serializer\AbstractSerializer;
+use Thelia\Core\Serializer\ExportOnlySerializerInterface;
+use Thelia\Domain\DataTransfer\Export\AbstractExport;
+use Thelia\Domain\DataTransfer\Export\Type\SalesJournalExport;
 
 /**
  * The French accounting entries file (fichier des écritures comptables): fields separated
@@ -28,7 +31,7 @@ use Thelia\Core\Serializer\AbstractSerializer;
  * guarded against spreadsheets: the file is read by an accounting program, which must get
  * the labels as they are.
  */
-class FECSerializer extends AbstractSerializer
+class FECSerializer extends AbstractSerializer implements ExportOnlySerializerInterface
 {
     /**
      * The fields of the format, in their order.
@@ -37,6 +40,11 @@ class FECSerializer extends AbstractSerializer
 
     private const DATE_FIELDS = ['EcritureDate', 'PieceDate', 'DateLet', 'ValidDate'];
     private const AMOUNT_FIELDS = ['Debit', 'Credit', 'Montantdevise'];
+
+    public function supportsExport(AbstractExport $export): bool
+    {
+        return $export instanceof SalesJournalExport;
+    }
 
     public function getId(): string
     {

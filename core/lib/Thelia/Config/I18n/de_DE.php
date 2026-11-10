@@ -864,6 +864,7 @@ return [
     '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.' => '%count Bestellungen des Zeitraums haben ein Rechnungsdatum, aber keine Rechnungsnummer: Sie sind nicht im Journal.',
     '%count pieces, debit %debit, credit %credit.' => '%count Belege, Soll %debit, Haben %credit.',
     '%count more warnings are not listed.' => '%count weitere Warnungen werden nicht aufgeführt.',
+    'The format "%format" is not made for this export: choose another one.' => 'Das Format „%format“ ist für diesen Export nicht vorgesehen: Wählen Sie ein anderes.',
     'Pieces' => 'Belege',
     'Credit notes among them' => 'Davon Gutschriften',
     'Total debit' => 'Soll gesamt',

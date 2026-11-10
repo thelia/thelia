@@ -135,6 +135,24 @@ final class PieceAmounts
         return array_values(array_filter($converted, static fn (AccountingEntry $entry): bool => 0 !== $entry->debitCents || 0 !== $entry->creditCents));
     }
 
+    /**
+     * The rate of the largest amount, the first one when several are as large.
+     *
+     * @param array<string, int> $amounts
+     */
+    public static function largest(array $amounts): ?string
+    {
+        $largest = null;
+
+        foreach ($amounts as $rate => $cents) {
+            if (null === $largest || abs($cents) > abs($amounts[$largest])) {
+                $largest = (string) $rate;
+            }
+        }
+
+        return $largest;
+    }
+
     public static function cents(float $amount): int
     {
         return (int) round($amount * 100);

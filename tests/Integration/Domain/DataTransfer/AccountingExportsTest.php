@@ -17,16 +17,21 @@ namespace Thelia\Tests\Integration\Domain\DataTransfer;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Thelia\Core\Serializer\SerializerManager;
+use Thelia\Core\Serializer\SerializerNotForExportException;
 use Thelia\Domain\Accounting\AccountingChart;
 use Thelia\Domain\DataTransfer\Export\ExportReport;
 use Thelia\Domain\DataTransfer\Export\ExportStorage;
 use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
 use Thelia\Domain\DataTransfer\Export\Type\SalesJournalExport;
 use Thelia\Domain\DataTransfer\Export\Type\TaxSummaryExport;
+use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\DataTransfer\Job\ExportJobLauncher;
 use Thelia\Domain\DataTransfer\Job\JobStatus;
+use Thelia\Exception\UserFacingFailure;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\ExportJobQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -298,6 +303,44 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
 
         self::assertSame(1, preg_match('/(\S+\.txt)/', $tester->getDisplay(), $file));
         self::assertSame(implode("\t", self::FEC_FIELDS)."\r\n", (string) file_get_contents($file[1]));
+    }
+
+    public function testTheFecFormatIsOfferedToTheAccountingExportsOnly(): void
+    {
+        $serializers = $this->getService(SerializerManager::class);
+        $orders = (ExportQuery::create()->findOneByRef('thelia.export.orders') ?? self::fail('The order export is not in the catalogue.'))->getHandleClassInstance();
+
+        self::assertArrayNotHasKey('thelia.fec', $serializers->getExportSerializers($orders));
+        self::assertArrayHasKey('thelia.csv', $serializers->getExportSerializers($orders));
+        self::assertArrayHasKey('thelia.fec', $serializers->getExportSerializers(new SalesJournalExport()));
+        self::assertArrayNotHasKey('thelia.fec', $serializers->getExportSerializers(new TaxSummaryExport()));
+        self::assertArrayNotHasKey('thelia.fec', $serializers->getImportSerializers());
+        self::assertArrayHasKey('thelia.csv', $serializers->getImportSerializers());
+    }
+
+    public function testAnOtherExportAskedInTheFecFormatIsRefusedBeforeAnyJobIsRecorded(): void
+    {
+        $export = ExportQuery::create()->findOneByRef('thelia.export.orders') ?? self::fail('The order export is not in the catalogue.');
+        $jobs = ExportJobQuery::create()->count();
+
+        try {
+            $this->getService(ExportJobLauncher::class)->launch($export, 'thelia.fec', language: Lang::getDefaultLanguage());
+            self::fail('The FEC format is not made for the order export.');
+        } catch (SerializerNotForExportException $refusal) {
+            self::assertInstanceOf(UserFacingFailure::class, $refusal);
+            self::assertStringContainsString('FEC', $refusal->getMessage());
+        }
+
+        self::assertSame($jobs, ExportJobQuery::create()->count());
+    }
+
+    public function testTheExportHandlerRefusesAFormatNotMadeForTheExport(): void
+    {
+        $export = ExportQuery::create()->findOneByRef('thelia.export.orders') ?? self::fail('The order export is not in the catalogue.');
+
+        $this->expectException(SerializerNotForExportException::class);
+
+        $this->getService(ExportHandler::class)->export($export, $this->getService(SerializerManager::class)->get('thelia.fec'), null, Lang::getDefaultLanguage());
     }
 
     public function testBothExportsAreInTheCatalogue(): void

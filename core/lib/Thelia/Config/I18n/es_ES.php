@@ -887,6 +887,7 @@ return [
     '%count orders of the period have an invoice date but no invoice reference: they are not in the journal.' => '%count pedidos del periodo tienen una fecha de factura pero no una referencia de factura: no están en el diario.',
     '%count pieces, debit %debit, credit %credit.' => '%count asientos, debe %debit, haber %credit.',
     '%count more warnings are not listed.' => '%count advertencias más no se detallan.',
+    'The format "%format" is not made for this export: choose another one.' => 'El formato «%format» no está previsto para esta exportación: elija otro.',
     'Pieces' => 'Asientos',
     'Credit notes among them' => 'De ellos, abonos',
     'Total debit' => 'Total debe',

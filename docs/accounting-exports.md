@@ -130,7 +130,7 @@ merged with the invoices in date order.
   tax and the number of pieces, less the credit notes, read from the same pieces,
   so it adds up to the tax lines of the journal.
 
-Written with the FEC serializer (`thelia.fec`, `FECSerializer`), the journal is
+Written with the FEC serializer (`thelia.fec`, `FECSerializer`, an `ExportOnlySerializerInterface`: it writes the sales journal only, any other export is refused, and its `.txt` is not an extension the imports accept), the journal is
 the accounting entries file: tab separated, CR LF, the field names first (even
 for a period without entry), every row in the order of the format, dates as
 YYYYMMDD, amounts with a decimal comma, UTF-8, no spreadsheet guard. The file is

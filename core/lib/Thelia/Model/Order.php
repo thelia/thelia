@@ -305,6 +305,36 @@ class Order extends BaseOrder
     }
 
     /**
+     * A line excluding tax and its tax, rounded as getTotalAmount() rounds them: each unit
+     * amount to the cent before the quantity under the sum of roundings, the line total under
+     * the rounding of sums, nothing for an order older than both. buildTotalAmountQuery() applies
+     * the same rule in SQL to the lines of the whole order.
+     *
+     * @param list<float> $unitTaxes
+     *
+     * @return array{float, float} the amount excluding tax, and the tax
+     */
+    public function getLineAmounts(float $quantity, float $unitPrice, array $unitTaxes): array
+    {
+        $orderId = (int) $this->getId();
+
+        if (ConfigQuery::isOrderWithLegacyRounding($orderId)) {
+            return [$quantity * $unitPrice, $quantity * array_sum($unitTaxes)];
+        }
+
+        if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === ConfigQuery::getOrderRoundingMode($orderId)) {
+            $amount = round($quantity * $unitPrice, 2);
+
+            return [$amount, round($quantity * ($unitPrice + array_sum($unitTaxes)), 2) - $amount];
+        }
+
+        return [
+            $quantity * round($unitPrice, 2),
+            $quantity * array_sum(array_map(static fn (float $tax): float => round($tax, 2), $unitTaxes)),
+        ];
+    }
+
+    /**
      * Totals the order lines the way CartItem::getTotalPrice() and
      * CartItem::getTotalTaxedPrice() total the cart lines, so that the amount
      * charged matches the amount the customer saw in the cart.

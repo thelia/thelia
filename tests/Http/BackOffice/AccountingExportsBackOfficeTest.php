@@ -132,6 +132,22 @@ final class AccountingExportsBackOfficeTest extends WebIntegrationTestCase
         self::assertMatchesRegularExpression('/[1-9]\d* pi(e|è)ces?/', $this->client->getCrawler()->filter('[data-testid="export-job-report"]')->text(''));
     }
 
+    public function testTheFecFormatIsOfferedToTheSalesJournalOnly(): void
+    {
+        $formats = function (string $ref): array {
+            $exportId = (int) ExportQuery::create()->findOneByRef($ref)->getId();
+            $crawler = $this->client->request('GET', '/admin/export/'.$exportId);
+            self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+            return $crawler->filter('#bo-export-serializer option')->each(static fn ($option): string => (string) $option->attr('value'));
+        };
+
+        self::assertContains('thelia.fec', $formats('thelia.export.sales_journal'));
+        self::assertNotContains('thelia.fec', $formats('thelia.export.tax_summary'));
+        self::assertNotContains('thelia.fec', $formats('thelia.export.orders'));
+        self::assertContains('thelia.csv', $formats('thelia.export.orders'));
+    }
+
     public function testWithoutAChartTheExportSaysWhatToSet(): void
     {
         ConfigQuery::write(AccountingChart::CUSTOMER_ACCOUNT_KEY, '');
