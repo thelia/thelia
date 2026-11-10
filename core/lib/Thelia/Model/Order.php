@@ -292,7 +292,7 @@ class Order extends BaseOrder
         // round the cart. A line sold by measure is where it shows: 1.25 kg at 14.82 is a
         // line of 18.525, charged 18.53, and the tax is the gap between the two rounded totals.
         $total = MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_taxed_price);
-        $tax = $total - MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_untaxed_price);
+        $tax = MoneyRounding::toTheCent($total - MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_untaxed_price));
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
