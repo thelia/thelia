@@ -25,6 +25,14 @@ enum PeriodUnit: string
     case Quarter = 'quarter';
     case Year = 'year';
 
+    /**
+     * @return list<string>
+     */
+    public static function values(): array
+    {
+        return array_map(static fn (self $unit): string => $unit->value, self::cases());
+    }
+
     /** How many months one unit lasts; null for the week, counted in days. */
     public function months(): ?int
     {
