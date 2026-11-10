@@ -16,10 +16,13 @@ namespace Thelia\Tests\Support\Payment;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\RecurringChargeResult;
 use Thelia\Model\CustomerPaymentMethod;
 use Thelia\Model\Order;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\AbstractPaymentModule;
 use Thelia\Module\RecurringPaymentModuleInterface;
 
@@ -113,15 +116,25 @@ final class RecurringTestPaymentModule extends AbstractPaymentModule implements 
 
     public function payWithStoredMethod(Order $order, CustomerPaymentMethod $method): ?Response
     {
-        return null;
+        return $this->pay($order);
     }
 
     public function forgetStoredMethod(CustomerPaymentMethod $method): void
     {
     }
 
+    /**
+     * What a module does with the order of a trial: nothing is charged, the method is
+     * registered at 0 and the order turns paid at once, the way FreeOrder settles an order
+     * with nothing to pay. An order with an amount is left unpaid here: the test turns it paid.
+     */
     public function pay(Order $order): ?Response
     {
+        if (0.0 === round($order->getTotalAmount(), 4)) {
+            $event = (new OrderEvent($order))->setStatus((int) OrderStatusQuery::getPaidStatus()->getId());
+            $this->getDispatcher()->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+        }
+
         return null;
     }
 

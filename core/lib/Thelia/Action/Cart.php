@@ -366,7 +366,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if ($appends) {
             $cartItem->addQuantity($quantity, $saleUnitQuantity)->save();
         } else {
-            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $this->catalogPricesOf($productSaleElements, $cart), $bundleComposition);
+            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $this->catalogPricesOf($productSaleElements, $cart), $bundleComposition, $event->getSubscriptionPlanId());
         }
 
         $this->settlePrices($cart);
@@ -785,6 +785,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         float $quantity,
         ProductPriceTools $productPrices,
         ?BundleComposition $bundleComposition = null,
+        ?int $subscriptionPlanId = null,
     ): CartItem {
         $cartItem = new CartItem();
         $cartItem->setDispatcher($dispatcher);
@@ -794,6 +795,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setProductSaleElementsId($productSaleElements->getId())
             ->setQuantity($quantity)
             ->setBundleComposition($bundleComposition?->toCanonicalJson())
+            // Set before the line is priced: a line bought on a plan is priced by the plan.
+            ->setSubscriptionPlanId($subscriptionPlanId)
             ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30));
 
         // The line is the proof of the price the shop agreed to: an order is built

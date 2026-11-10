@@ -28,6 +28,7 @@ readonly class CartItemAddDTO implements DTOEventActionInterface, CartDTOInterfa
         private bool $append = true,
         private bool $newness = true,
         private ?BundleComposition $bundleComposition = null,
+        private ?int $subscriptionPlanId = null,
     ) {
     }
 
@@ -41,6 +42,7 @@ readonly class CartItemAddDTO implements DTOEventActionInterface, CartDTOInterfa
             'append' => $this->append,
             'newness' => $this->newness,
             'bundleComposition' => $this->bundleComposition,
+            'subscriptionPlanId' => $this->subscriptionPlanId,
         ];
     }
 

@@ -46,6 +46,7 @@ use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
 use Thelia\Domain\Payment\OrderPaymentComposer;
 use Thelia\Domain\Payment\Service\OrderPaymentPartSettlement;
 use Thelia\Domain\Payment\StoredPaymentMethodPayment;
+use Thelia\Domain\Subscription\SubscriptionCartGuard;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
@@ -75,6 +76,7 @@ readonly class CheckoutPaymentService
         private CartPriceGuard $cartPriceGuard,
         private RequestStack $requestStack,
         private CartGuard $cartGuard,
+        private ?SubscriptionCartGuard $subscriptionCartGuard = null,
     ) {
     }
 
@@ -109,10 +111,10 @@ readonly class CheckoutPaymentService
      * to read it from, so it comes back here — and the two go down the same path, ORDER_PAY,
      * so there is no second way to place an order to keep in step with the first.
      *
-     * @throws GuestCheckoutNotAllowedException        when the shop stopped allowing this cart to be ordered without an account
+     * @throws GuestCheckoutNotAllowedException        when the shop stopped allowing this cart to be ordered without an account, or the cart holds a subscription
      * @throws CartLineUnavailableException            when the cart holds a product the buyer no longer sees (a restriction written since, a sign-in as a customer of another group)
      * @throws CartPricesChangedException              when a line of the cart is no longer at the price its buyer is owed: the lines are priced again, nothing else is written, and the same call goes through next
-     * @throws InvalidPaymentException                 when an unpaid order is presented again to a payment module its customer's group is now shut out of
+     * @throws InvalidPaymentException                 when an unpaid order is presented again to a payment module its customer's group is now shut out of, or a subscription is paid with a module that cannot charge its installments
      * @throws StoredMethodPaymentRateLimitedException when the customer already paid with a stored method too often this hour
      * @throws PaymentCompositionRefusedException      when the instant payment means of the cart and the payment module chosen cannot make up one payment
      * @throws CartAlreadyOrderedException             when this very cart was turned into an order by another request
@@ -124,6 +126,10 @@ readonly class CheckoutPaymentService
         $cart = $request->cart;
 
         $this->refuseAGuestTheShopNoLongerAllows($cart);
+
+        // A subscription is ordered by a signed-in customer, with a module that can charge its
+        // installments: asked here, where every path that places an order goes through.
+        $this->subscriptionCartGuard?->refuseUnlessSubscribable($cart, $request->paymentModuleId);
 
         // The tunnel refuses a line the catalog hides from the buyer, but this method is also
         // called by those who pay without validating first: the order is never written for one.

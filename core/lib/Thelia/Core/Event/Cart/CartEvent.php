@@ -31,6 +31,7 @@ class CartEvent extends ActionEvent
     protected ?BundleComposition $bundleComposition = null;
     protected ?float $bundleAvailability = null;
     protected bool $offeredByAPromotion = false;
+    protected ?int $subscriptionPlanId = null;
 
     public function __construct(
         protected Cart $cart,
@@ -191,6 +192,22 @@ class CartEvent extends ActionEvent
     public function isOfferedByAPromotion(): bool
     {
         return $this->offeredByAPromotion;
+    }
+
+    /**
+     * The subscription plan the line is bought on: null for a one-off purchase. Judged by
+     * SubscriptionCartGuard before the cart sees the addition.
+     */
+    public function setSubscriptionPlanId(?int $subscriptionPlanId): static
+    {
+        $this->subscriptionPlanId = $subscriptionPlanId;
+
+        return $this;
+    }
+
+    public function getSubscriptionPlanId(): ?int
+    {
+        return $this->subscriptionPlanId;
     }
 
     public function getCart(): Cart
