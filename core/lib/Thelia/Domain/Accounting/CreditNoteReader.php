@@ -25,7 +25,8 @@ use Thelia\Model\ModuleQuery;
  *
  * A credit note is in the journal once it has an invoice reference and a status the module
  * marks invoiced (accepted, used); the module also sets an invoice date at creation, so the
- * date alone says nothing. The credit notes are read by batches, after the last one read by
+ * date alone says nothing. The module never writes the exchange rate of a credit note: it
+ * is the one of its order, which the invoice it reverses was booked at. The credit notes are read by batches, after the last one read by
  * date and id: a batch is never shifted by a credit note numbered while the export runs.
  */
 final class CreditNoteReader
@@ -110,7 +111,7 @@ final class CreditNoteReader
         }
 
         $statement = $this->connection()->prepare(
-            'SELECT cn.id, cn.invoice_ref, cn.invoice_date, cn.currency_id, cn.currency_rate, cn.total_price_with_tax, cn.discount_with_tax,
+            'SELECT cn.id, cn.invoice_ref, cn.invoice_date, cn.currency_id, CASE WHEN cn.currency_rate > 0 THEN cn.currency_rate ELSE o.currency_rate END AS currency_rate, cn.total_price_with_tax, cn.discount_with_tax,
                     t.code AS type_code, c.ref AS customer_ref, a.company, a.firstname, a.lastname, cur.code AS currency_code
              FROM credit_note cn
              INNER JOIN credit_note_status s ON s.id = cn.status_id AND s.invoiced = 1
@@ -118,6 +119,7 @@ final class CreditNoteReader
              LEFT JOIN customer c ON c.id = cn.customer_id
              LEFT JOIN credit_note_address a ON a.id = cn.invoice_address_id
              LEFT JOIN currency cur ON cur.id = cn.currency_id
+             LEFT JOIN `order` o ON o.id = cn.order_id
              WHERE '.implode(' AND ', $conditions).'
              ORDER BY cn.invoice_date, cn.id
              LIMIT '.self::BATCH_SIZE,

@@ -303,6 +303,34 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
         self::assertSame(6000, $piece->entries[0]->foreignCents);
     }
 
+    public function testAFullRefundInAnotherCurrencyWithoutRateIsBookedAtTheRateOfItsOrder(): void
+    {
+        $foreign = CurrencyQuery::create()->filterByByDefault(0)->findOne() ?? self::markTestSkipped('The test database has a single currency.');
+        $order = $this->invoicedOrder('10', [[100.0, 1, 20.0], [10.0, 3, 0.55]], postage: 12.0, postageTax: 2.0);
+        $order->setCurrencyId((int) $foreign->getId())->setCurrencyRate(1.25)->save();
+        $creditNote = $this->creditNote('order_full_refund', 'accepted', '20', $order, $this->wholeOrder($order), currencyId: (int) $foreign->getId(), currencyRate: null);
+
+        $pieces = $this->pieces();
+        $invoice = $this->pieceOf($pieces, (string) $order->getInvoiceRef());
+        $credit = $this->pieceOf($pieces, $creditNote);
+
+        self::assertSame((string) $foreign->getCode(), $credit->foreignCurrencyCode);
+        self::assertNotNull($credit->entries[0]->foreignCents);
+        self::assertSame($this->reversed($invoice), $this->described($credit));
+    }
+
+    public function testACreditNoteInAnotherCurrencyWithoutRateNorOrderIsStillLeftOut(): void
+    {
+        $foreign = CurrencyQuery::create()->filterByByDefault(0)->findOne() ?? self::markTestSkipped('The test database has a single currency.');
+        $creditNote = $this->creditNote('rebate', 'accepted', '20', null, [['other', 50.0, 60.0, 1, null]], currencyId: (int) $foreign->getId(), currencyRate: null);
+
+        $report = new ExportReport();
+        $refs = array_map(static fn (AccountingPiece $piece): string => $piece->invoiceRef, $this->pieces($report));
+
+        self::assertNotContains($creditNote, $refs);
+        self::assertStringContainsString($creditNote.': it was issued in another currency without exchange rate', implode("\n", $report->warnings()));
+    }
+
     private static function createTheTablesOfTheModule(): void
     {
         $connection = Propel::getConnection('TheliaMain');
@@ -400,7 +428,7 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
      *
      * @return string the reference of the credit note
      */
-    private function creditNote(string $type, string $status, string $day, ?Order $order, array $details, float $discountWithoutTax = 0.0, float $discountWithTax = 0.0, bool $numbered = true, ?int $currencyId = null, float $currencyRate = 1.0, ?float $totalWithTax = null): string
+    private function creditNote(string $type, string $status, string $day, ?Order $order, array $details, float $discountWithoutTax = 0.0, float $discountWithTax = 0.0, bool $numbered = true, ?int $currencyId = null, ?float $currencyRate = 1.0, ?float $totalWithTax = null): string
     {
         $connection = Propel::getConnection('TheliaMain');
         $customer = $order?->getCustomer() ?? $this->factory->customer($this->factory->customerTitle());
