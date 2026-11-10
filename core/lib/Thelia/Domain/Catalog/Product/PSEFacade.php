@@ -28,6 +28,7 @@ use Thelia\Domain\Catalog\Product\DTO\PSEUpdateDTO;
 use Thelia\Domain\Catalog\Product\Exception\ProductNotFoundException;
 use Thelia\Domain\Catalog\Product\Exception\PSENotFoundException;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
@@ -197,7 +198,7 @@ final readonly class PSEFacade
         }
 
         $before = (float) $pse->getQuantity();
-        $newQuantity = max(0, $pse->getQuantity() - (new QuantityPolicy())->assertStockFits($quantity, $pse));
+        $newQuantity = max(0, round($pse->getQuantity() - (new QuantityPolicy())->assertStockFits($quantity, $pse), QuantityScale::MAXIMUM_DECIMALS));
         $pse->setQuantity($newQuantity)->save();
         $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
@@ -211,7 +212,7 @@ final readonly class PSEFacade
         }
 
         $before = (float) $pse->getQuantity();
-        $pse->setQuantity($pse->getQuantity() + (new QuantityPolicy())->assertStockFits($quantity, $pse))->save();
+        $pse->setQuantity(round($pse->getQuantity() + (new QuantityPolicy())->assertStockFits($quantity, $pse), QuantityScale::MAXIMUM_DECIMALS))->save();
         $this->stockLevelAnnouncer->announce($pseId, $before, (float) $pse->getQuantity());
     }
 
