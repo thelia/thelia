@@ -177,6 +177,20 @@ final class OrderRoundingModeTest extends ActionIntegrationTestCase
     }
 
     /**
+     * The tax is the gap between two totals in cents: 18.53 - 15.44 is 3.0900000000000016 as a
+     * float, and a tax reported so is not a tax to the cent.
+     */
+    public function testTheTaxOfAnOrderIsReportedToTheCent(): void
+    {
+        $order = $this->placeOrder($this->createCart([['price' => '12.35', 'quantity' => 1.25, 'vatPercent' => self::STANDARD_VAT]]));
+
+        $tax = 0.0;
+        $order->getTotalAmount($tax);
+
+        self::assertSame(3.09, $tax);
+    }
+
+    /**
      * The order rounds the sum of its lines under the sum of roundings: two lines
      * of 18.525 are charged 37.05. Each line shows 18.53, and the cart keeps
      * totalling what the order charges, not the 37.06 of the rounded lines.
