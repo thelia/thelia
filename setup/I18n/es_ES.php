@@ -1214,4 +1214,11 @@ return [
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Cuenta que carga los abonos comerciales (rebaja, descuento, reembolso de una diferencia), p. ej. 709000 (cuenta de ventas de su tipo si está vacía)',
     'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Número de cobros rechazados de una cuota tras el cual se suspende una suscripción (3 si no es válido)',
     'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Días entre dos cobros de una cuota rechazada de una suscripción (2 si no es válido)',
+    'Subscriptions' => 'Suscripciones',
+    'Message sent to the customer when the charge of an installment of its subscription fails' => 'Mensaje enviado al cliente cuando falla el cobro de una cuota de su suscripción',
+    'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Fallo en el pago de su suscripción {{ subscription_ref }} en {{ config("store_name") }}',
+    'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Mensaje enviado al cliente y a la tienda cuando se suspende una suscripción',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está suspendida',
+    'Message sent to the customer when a subscription is cancelled' => 'Mensaje enviado al cliente cuando se cancela una suscripción',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está cancelada',
 ];

@@ -1797,4 +1797,69 @@ WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
 
 DROP TEMPORARY TABLE `config_title_seed`;
 
+-- ---------------------------------------------------------------------
+-- Subscriptions: the back-office resource and the three messages
+--
+-- The back office needs the resource to exist before a profile can be
+-- granted it; INSERT IGNORE keeps a replay, and a grant already made, as
+-- they are. The messages are read back by name (a replay ignores the insert
+-- and hands back no id) and each gets its titles in a statement of its own.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.subscription', NOW(), NOW());
+
+SET @subscription_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.subscription');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@subscription_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@subscription_resource_id, 'de_DE', 'Abonnements', NULL, NULL, NULL),
+    (@subscription_resource_id, 'en_US', 'Subscriptions', NULL, NULL, NULL),
+    (@subscription_resource_id, 'es_ES', 'Suscripciones', NULL, NULL, NULL),
+    (@subscription_resource_id, 'fr_FR', 'Abonnements', NULL, NULL, NULL),
+    (@subscription_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@subscription_resource_id, 'nl_NL', 'Abonnementen', NULL, NULL, NULL),
+    (@subscription_resource_id, 'ru_RU', 'Подписки', NULL, NULL, NULL);
+
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('subscription_payment_failed', NULL, 'subscription_payment_failed.txt', 'subscription_payment_failed.html', NOW(), NOW()),
+    ('subscription_suspended', NULL, 'subscription_suspended.txt', 'subscription_suspended.html', NOW(), NOW()),
+    ('subscription_cancelled', NULL, 'subscription_cancelled.txt', 'subscription_cancelled.html', NOW(), NOW());
+
+SET @subscription_payment_failed_message_id := (SELECT `id` FROM `message` WHERE `name` = 'subscription_payment_failed');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@subscription_payment_failed_message_id, 'cs_CZ', NULL, 'Platba za vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} se nezdařila'),
+    (@subscription_payment_failed_message_id, 'de_DE', 'Nachricht an den Kunden, wenn die Abbuchung einer Rate seines Abonnements fehlschlägt', 'Zahlung für Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} fehlgeschlagen'),
+    (@subscription_payment_failed_message_id, 'en_US', 'Message sent to the customer when the charge of an installment of its subscription fails', 'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'es_ES', 'Mensaje enviado al cliente cuando falla el cobro de una cuota de su suscripción', 'Fallo en el pago de su suscripción {{ subscription_ref }} en {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'fr_FR', 'Message envoyé au client quand le prélèvement d''une échéance de son abonnement échoue', 'Échec du paiement de votre abonnement {{ subscription_ref }} sur {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'it_IT', NULL, 'Pagamento non riuscito per il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'nl_NL', 'Bericht aan de klant wanneer de afschrijving van een termijn van zijn abonnement mislukt', 'Betaling voor uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} mislukt'),
+    (@subscription_payment_failed_message_id, 'ru_RU', 'Сообщение клиенту, когда списание очередного платежа по подписке не удалось', 'Не удалось списать платёж по вашей подписке {{ subscription_ref }} в {{ config("store_name") }}');
+
+SET @subscription_suspended_message_id := (SELECT `id` FROM `message` WHERE `name` = 'subscription_suspended');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@subscription_suspended_message_id, 'cs_CZ', NULL, 'Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} je pozastaveno'),
+    (@subscription_suspended_message_id, 'de_DE', 'Nachricht an den Kunden und an den Shop, wenn ein Abonnement ausgesetzt wird', 'Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde ausgesetzt'),
+    (@subscription_suspended_message_id, 'en_US', 'Message sent to the customer, and to the shop, when a subscription is suspended', 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended'),
+    (@subscription_suspended_message_id, 'es_ES', 'Mensaje enviado al cliente y a la tienda cuando se suspende una suscripción', 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está suspendida'),
+    (@subscription_suspended_message_id, 'fr_FR', 'Message envoyé au client, et à la boutique, quand un abonnement est suspendu', 'Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est suspendu'),
+    (@subscription_suspended_message_id, 'it_IT', NULL, 'Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è sospeso'),
+    (@subscription_suspended_message_id, 'nl_NL', 'Bericht aan de klant en aan de winkel wanneer een abonnement wordt opgeschort', 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgeschort'),
+    (@subscription_suspended_message_id, 'ru_RU', 'Сообщение клиенту и магазину при приостановке подписки', 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} приостановлена');
+
+SET @subscription_cancelled_message_id := (SELECT `id` FROM `message` WHERE `name` = 'subscription_cancelled');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@subscription_cancelled_message_id, 'cs_CZ', NULL, 'Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} bylo zrušeno'),
+    (@subscription_cancelled_message_id, 'de_DE', 'Nachricht an den Kunden, wenn ein Abonnement gekündigt wird', 'Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde gekündigt'),
+    (@subscription_cancelled_message_id, 'en_US', 'Message sent to the customer when a subscription is cancelled', 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled'),
+    (@subscription_cancelled_message_id, 'es_ES', 'Mensaje enviado al cliente cuando se cancela una suscripción', 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está cancelada'),
+    (@subscription_cancelled_message_id, 'fr_FR', 'Message envoyé au client quand un abonnement est résilié', 'Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est résilié'),
+    (@subscription_cancelled_message_id, 'it_IT', NULL, 'Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è annullato'),
+    (@subscription_cancelled_message_id, 'nl_NL', 'Bericht aan de klant wanneer een abonnement wordt opgezegd', 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgezegd'),
+    (@subscription_cancelled_message_id, 'ru_RU', 'Сообщение клиенту при отмене подписки', 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} отменена');
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1746,4 +1746,11 @@ return [
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)',
     'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)',
     'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Days between two charges of a declined installment of a subscription (2 when invalid)',
+    'Subscriptions' => 'Subscriptions',
+    'Message sent to the customer when the charge of an installment of its subscription fails' => 'Message sent to the customer when the charge of an installment of its subscription fails',
+    'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}',
+    'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Message sent to the customer, and to the shop, when a subscription is suspended',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended',
+    'Message sent to the customer when a subscription is cancelled' => 'Message sent to the customer when a subscription is cancelled',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled',
 ];
