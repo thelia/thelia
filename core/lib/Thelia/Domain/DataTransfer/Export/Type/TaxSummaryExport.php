@@ -15,12 +15,15 @@ declare(strict_types=1);
 namespace Thelia\Domain\DataTransfer\Export\Type;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Accounting\AccountingChart;
 use Thelia\Domain\Accounting\AccountingEntry;
 use Thelia\Domain\Accounting\SalesJournal;
 use Thelia\Domain\DataTransfer\Export\ArrayAbstractExport;
 use Thelia\Domain\DataTransfer\Export\ExportReport;
+use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportingExportInterface;
+use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Model\Lang;
 
 /**
@@ -28,7 +31,7 @@ use Thelia\Model\Lang;
  * invoice and per rate: the amount taxed, the tax and the number of pieces. Read from the pieces of the sales
  * journal, so that both say the same thing to the cent.
  */
-class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInterface
+class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInterface, MailableReportInterface
 {
     public const FILE_NAME = 'tax_summary';
     public const USE_RANGE_DATE = true;
@@ -55,11 +58,30 @@ class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInt
     }
 
     /**
+     * The totals of the period, computed again from the orders and the credit notes: the
+     * rows of the export are not read.
+     *
+     * @return list<ReportSummaryLine>
+     */
+    public function summarize(): array
+    {
+        $locale = $this->locale();
+        $translator = Translator::getInstance();
+        $totals = (new SalesJournal())->totals(AccountingChart::fromSettings(), $this->rangeDate['start'] ?? null, $this->rangeDate['end'] ?? null, $locale);
+
+        return [
+            ReportSummaryLine::money($translator->trans('Taxable amount', [], 'core', $locale), $totals->taxableCents / 100, $locale),
+            ReportSummaryLine::money($translator->trans('Tax collected', [], 'core', $locale), $totals->taxCents / 100, $locale),
+            new ReportSummaryLine($translator->trans('Pieces', [], 'core', $locale), (string) $totals->pieces),
+        ];
+    }
+
+    /**
      * @return list<array<string, string|int>>
      */
     protected function getData(): array|string|ModelCriteria
     {
-        $locale = isset($this->language) ? (string) $this->language->getLocale() : (string) Lang::getDefaultLanguage()->getLocale();
+        $locale = $this->locale();
         $pieces = (new SalesJournal())->pieces(AccountingChart::fromSettings(), $this->rangeDate['start'] ?? null, $this->rangeDate['end'] ?? null, $this->report, $locale);
         $totals = [];
 
@@ -97,5 +119,10 @@ class TaxSummaryExport extends ArrayAbstractExport implements ReportingExportInt
             'tax_amount' => SalesJournal::amount($total['tax']),
             'pieces' => \count($total['pieces']),
         ], $totals));
+    }
+
+    private function locale(): string
+    {
+        return isset($this->language) ? (string) $this->language->getLocale() : (string) Lang::getDefaultLanguage()->getLocale();
     }
 }
