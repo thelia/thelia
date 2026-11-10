@@ -257,7 +257,9 @@ class OfferedCartLineService implements ResetInterface
 
         $modified = false;
 
-        if ((int) $line->getQuantity() !== $grantable) {
+        // A gift is granted by the unit, but the line quantity is a float: compared as
+        // an integer, a line at 1.5 would read as the 1 granted and never be brought back.
+        if ((float) $line->getQuantity() !== (float) $grantable) {
             $line->setQuantity($grantable);
             $modified = true;
         }
