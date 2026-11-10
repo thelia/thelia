@@ -97,6 +97,26 @@ final class PSEFacadeStockEventTest extends ActionIntegrationTestCase
         );
     }
 
+    /**
+     * The stock is a binary floating point number: 0.3 - 0.1 left as it comes is 0.19999999999999998,
+     * which is what the listeners are told, and what a longer chain of movements would keep adding to.
+     */
+    public function testTheStockMovedByTheFacadeIsKeptOnTheFinestDecimal(): void
+    {
+        $facade = $this->getService(PSEFacade::class);
+        $combination = $this->product?->getDefaultSaleElements();
+        self::assertNotNull($combination);
+        $combination->setQuantityDecimals(1)->setQuantity(0.3)->save();
+        $id = (int) $combination->getId();
+
+        $facade->decreaseStock($id, 0.1);
+        $facade->increaseStock($id, 0.1);
+
+        self::assertCount(2, $this->changes);
+        self::assertSame(0.2, $this->changes[0]->newQuantity);
+        self::assertSame(0.3, $this->changes[1]->newQuantity);
+    }
+
     public function testAChangeInsideATransactionOfTheCallerWaitsForItsCommit(): void
     {
         $connection = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
