@@ -477,4 +477,11 @@ return [
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Rekening die met commerciële creditnota\'s (korting, rabat, terugbetaling van een verschil) wordt gedebiteerd, bijv. 709000 (omzetrekening van hun tarief indien leeg)',
     'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Aantal geweigerde afschrijvingen van een termijn waarna een abonnement wordt opgeschort (3 bij een ongeldige waarde)',
     'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Dagen tussen twee afschrijvingen van een geweigerde termijn van een abonnement (2 bij een ongeldige waarde)',
+    'Subscriptions' => 'Abonnementen',
+    'Message sent to the customer when the charge of an installment of its subscription fails' => 'Bericht aan de klant wanneer de afschrijving van een termijn van zijn abonnement mislukt',
+    'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Betaling voor uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} mislukt',
+    'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Bericht aan de klant en aan de winkel wanneer een abonnement wordt opgeschort',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended' => 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgeschort',
+    'Message sent to the customer when a subscription is cancelled' => 'Bericht aan de klant wanneer een abonnement wordt opgezegd',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgezegd',
 ];

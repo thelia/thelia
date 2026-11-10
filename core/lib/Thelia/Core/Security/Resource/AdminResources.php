@@ -122,6 +122,7 @@ class AdminResources
     public const CUSTOMER_PAYMENT_METHOD = 'admin.customer.payment-method';
     public const CUSTOMER_GROUP = 'admin.customer.group';
     public const PRICING = 'admin.pricing';
+    public const SUBSCRIPTION = 'admin.subscription';
 
     /**
      * Create a new AdminRessources instance.
