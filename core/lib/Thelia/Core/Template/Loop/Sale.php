@@ -62,7 +62,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', 1),
             Argument::createIntListTypeArgument('product'),
-            Argument::createIntTypeArgument('currency', $this->getMainRequest()->getSession()->getCurrency()->getId()),
+            Argument::createIntTypeArgument('currency', $this->sessionCurrency()->getId()),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -237,7 +237,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             switch ($sale->getPriceOffsetType()) {
                 case \Thelia\Model\Sale::OFFSET_TYPE_AMOUNT:
                     $priceOffsetType = 'A';
-                    $priceOffsetSymbol = $this->getMainRequest()->getSession()->getCurrency()->getSymbol();
+                    $priceOffsetSymbol = $this->sessionCurrency()->getSymbol();
                     break;
                 case \Thelia\Model\Sale::OFFSET_TYPE_PERCENTAGE:
                     $priceOffsetType = 'P';
