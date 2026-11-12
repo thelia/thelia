@@ -383,6 +383,13 @@ final readonly class PaymentCaptureService
                 $moduleCode,
             ));
         } catch (ConflictingPaymentReferenceException $conflict) {
+            // A refusal took nothing, whatever reference it came with: a provider that names
+            // two refusals alike (after its transaction, say) leaves two failed lines, and the
+            // authorization keeps the whole amount.
+            if (PaymentTransactionState::FAILED === $result->state) {
+                return $this->refusalWithoutReference($transaction, $result, $moduleCode);
+            }
+
             // The module answered with a reference another line already carries: whether
             // the provider took the money this time cannot be told. The line stays pending,
             // reserving what it asked for, and says why; the provider's notification, with
@@ -405,14 +412,7 @@ final readonly class PaymentCaptureService
             // A refusal took nothing: it stands without the reference the journal cannot
             // hold, which nothing will ever need to find this line by.
             if (PaymentTransactionState::FAILED === $result->state) {
-                return $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->settle(
-                    $transaction,
-                    PaymentTransactionState::FAILED,
-                    null,
-                    $result->errorCode,
-                    $result->errorMessage,
-                    $moduleCode,
-                ));
+                return $this->refusalWithoutReference($transaction, $result, $moduleCode);
             }
 
             // Anything else cannot be written as it came: the line stays pending, reserving
@@ -481,5 +481,21 @@ final readonly class PaymentCaptureService
 
             return OrderPaymentTransactionQuery::create()->findPk($transaction->getId()) ?? $transaction;
         }
+    }
+
+    /**
+     * A refusal stands without the reference the journal could not hold: nothing will ever
+     * need to find a line that took nothing by it.
+     */
+    private function refusalWithoutReference(OrderPaymentTransaction $transaction, PaymentOperationResult $result, string $moduleCode): OrderPaymentTransaction
+    {
+        return $this->keepingTheLine(fn (): OrderPaymentTransaction => $this->recorder->settle(
+            $transaction,
+            PaymentTransactionState::FAILED,
+            null,
+            $result->errorCode,
+            $result->errorMessage,
+            $moduleCode,
+        ));
     }
 }
