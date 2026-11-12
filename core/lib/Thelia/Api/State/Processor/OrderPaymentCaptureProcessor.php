@@ -16,10 +16,14 @@ namespace Thelia\Api\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\OrderPaymentCapture;
@@ -37,6 +41,11 @@ use Thelia\Domain\Payment\Exception\PaymentProviderUnreachableException;
  * listening to that event sees both, and both share the guards of the capture service:
  * a capture waiting for its answer reserves what it asked for, and the same amount asked
  * again within a minute is a repetition, answered 409 rather than taken twice.
+ *
+ * Each administrator account also has a budget of captures per minute (the limiter
+ * api_admin_order_capture), counted once the order is known to be within its reach and
+ * before the payment module is called: past it, the capture is answered 429 with the
+ * delay to wait, and the provider is not called.
  */
 final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
 {
@@ -44,6 +53,9 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
         private EventDispatcherInterface $eventDispatcher,
         private ApiResourcePropelTransformerService $transformer,
         private ReachableOrder $reachableOrder,
+        #[Autowire(service: 'limiter.api_admin_order_capture')]
+        private RateLimiterFactoryInterface $captureLimiter,
+        private Security $security,
     ) {
     }
 
@@ -53,7 +65,15 @@ final readonly class OrderPaymentCaptureProcessor implements ProcessorInterface
             throw new \LogicException(\sprintf('Expected a %s, got %s.', OrderPaymentCapture::class, get_debug_type($data)));
         }
 
-        $event = new OrderPaymentCaptureEvent($this->reachableOrder->fromUriVariables($uriVariables), $data->amount);
+        $order = $this->reachableOrder->fromUriVariables($uriVariables);
+
+        $rateLimit = $this->captureLimiter->create($this->security->getUser()?->getUserIdentifier() ?? '')->consume();
+
+        if (!$rateLimit->isAccepted()) {
+            throw new TooManyRequestsHttpException(max(1, $rateLimit->getRetryAfter()->getTimestamp() - time()), 'Too many captures asked. Please retry later.');
+        }
+
+        $event = new OrderPaymentCaptureEvent($order, $data->amount);
 
         try {
             $this->eventDispatcher->dispatch($event, TheliaEvents::ORDER_PAYMENT_CAPTURE);

@@ -391,7 +391,11 @@ order is paid, which the order already exposes:
   module that could not reach its provider (`PaymentProviderUnreachableException`)
   a 502 with a generic message, the capture staying pending; any other
   `PaymentException` a 422. Anything else is a fault of the shop, answered 500. `amount` is bounded
-  by what the column holds. The global admin API rate limit applies on top.
+  by what the column holds. Each administrator account may ask for 10 captures a
+  minute (`THELIA_API_RATE_LIMIT_ORDER_CAPTURE`, limiter `api_admin_order_capture`),
+  counted once the order is known to be within its reach: past that, a 429 with
+  `Retry-After`, and the module is not called. The global admin API rate limit
+  applies on top.
 
 An administrator authenticated by a JWT holds no back-office session:
 `OrderHistoryActorResolver` reads the Symfony security token first, so the line
