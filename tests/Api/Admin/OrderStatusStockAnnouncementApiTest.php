@@ -37,8 +37,8 @@ use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
  * A payment written through `PATCH /api/admin/orders/{id}` takes the stock inside the transaction
- * the admin API opens around the status event: what it did to the stock is told once that
- * transaction is committed (the rollback: OrderStatusRolledBackStockAnnouncementApiTest).
+ * the core opens to write the status: what it did to the stock is told once that transaction is
+ * committed (a listener failing afterwards: OrderStatusRolledBackStockAnnouncementApiTest).
  */
 final class OrderStatusStockAnnouncementApiTest extends ApiTestCase
 {
@@ -119,13 +119,13 @@ final class OrderStatusStockAnnouncementApiTest extends ApiTestCase
 
         $statements = $this->statementsDuring(fn () => self::assertJsonResponseSuccessful($this->payThrough($order, $token)));
 
-        $orderLock = array_key_first(array_filter($statements, static fn (string $statement): bool => str_starts_with($statement, 'SELECT `status_id` FROM `order`') && str_contains($statement, 'FOR UPDATE')));
-        self::assertIsInt($orderLock, 'The order is locked first.');
-        self::assertStringContainsString(
-            'FROM `product_sale_elements` WHERE `id` IN ('.$combination->getId().') ORDER BY `id` FOR UPDATE',
-            $statements[$orderLock + 1] ?? '',
-            'The stock row the payment takes from is the very next statement.',
-        );
+        // A listener ahead of the core (the guard of the payment parts) may lock the order in a
+        // transaction of its own first: what counts is the transaction that writes the status, where
+        // the stock rows are locked right after the order.
+        $stockLock = array_key_first(array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'FROM `product_sale_elements` WHERE `id` IN ('.$combination->getId().') ORDER BY `id` FOR UPDATE')));
+        self::assertIsInt($stockLock, 'The stock row the payment takes from is locked.');
+        self::assertStringStartsWith('SELECT `status_id` FROM `order`', $statements[$stockLock - 1] ?? '', 'The order is locked right before the stock row the payment takes from.');
+        self::assertStringContainsString('FOR UPDATE', $statements[$stockLock - 1] ?? '');
     }
 
     /**
@@ -203,13 +203,13 @@ final class OrderStatusStockAnnouncementApiTest extends ApiTestCase
             'orderStatus' => '/api/admin/order_statutes/'.$sent->getId(),
         ], $token, 'merge-patch+json')));
 
-        $orderLock = array_key_first(array_filter($statements, static fn (string $statement): bool => str_starts_with($statement, 'SELECT `status_id` FROM `order`') && str_contains($statement, 'FOR UPDATE')));
-        self::assertIsInt($orderLock, 'The order is locked first.');
-        self::assertStringContainsString(
-            'FROM `product_sale_elements` WHERE `id` IN ('.$combination->getId().') ORDER BY `id` FOR UPDATE',
-            $statements[$orderLock + 1] ?? '',
-            'The stock row the action takes from is the very next statement.',
-        );
+        // A listener ahead of the core (the guard of the payment parts) may lock the order in a
+        // transaction of its own first: what counts is the transaction that writes the status, where
+        // the stock rows are locked right after the order.
+        $stockLock = array_key_first(array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'FROM `product_sale_elements` WHERE `id` IN ('.$combination->getId().') ORDER BY `id` FOR UPDATE')));
+        self::assertIsInt($stockLock, 'The stock row the action takes from is locked.');
+        self::assertStringStartsWith('SELECT `status_id` FROM `order`', $statements[$stockLock - 1] ?? '', 'The order is locked right before the stock row the action takes from.');
+        self::assertStringContainsString('FOR UPDATE', $statements[$stockLock - 1] ?? '');
         self::assertSame(4.0, $this->stockOf($combination), 'The action took its unit.');
         $this->getService(OrderStatusActionRunner::class)->reset();
     }
