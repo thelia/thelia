@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Tests\Unit\Domain\Order;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -224,7 +226,31 @@ final class OrderHistoryActorResolverTest extends TestCase
         self::assertNull($actor->adminId);
     }
 
-    private function resolverFor(?Admin $admin, ?Customer $customer, ?SecurityUserInterface $tokenUser = null): OrderHistoryActorResolver
+    public function testAModuleReportingOutsideTheBackOfficeIsTheAuthorEvenWithAnAdministratorInSession(): void
+    {
+        // The provider's return lands in a browser where an administrator is also signed
+        // in to the back office: the module reported the movement, not the administrator.
+        $admin = new Admin();
+        $admin->setId(7)->setLogin('alice');
+
+        $actor = $this->resolverFor($admin, null, null, '/payment/paybox/return')->resolve('Paybox');
+
+        self::assertSame(OrderHistoryActorType::MODULE, $actor->actorType);
+        self::assertSame('Paybox', $actor->label);
+    }
+
+    public function testABackOfficeGestureThroughAModuleStaysTheAdministrators(): void
+    {
+        $admin = new Admin();
+        $admin->setId(7)->setLogin('alice');
+
+        $actor = $this->resolverFor($admin, null, null, '/admin/order/update/12/payment-capture')->resolve('Paybox');
+
+        self::assertSame(OrderHistoryActorType::ADMIN, $actor->actorType);
+        self::assertSame('alice', $actor->label);
+    }
+
+    private function resolverFor(?Admin $admin, ?Customer $customer, ?SecurityUserInterface $tokenUser = null, ?string $path = null): OrderHistoryActorResolver
     {
         $securityContext = $this->createMock(SecurityContext::class);
         $securityContext->method('getAdminUser')->willReturn($admin);
@@ -236,6 +262,12 @@ final class OrderHistoryActorResolverTest extends TestCase
             $tokenStorage->setToken(new UsernamePasswordToken($tokenUser, 'api', $tokenUser->getRoles()));
         }
 
-        return new OrderHistoryActorResolver($securityContext, $tokenStorage);
+        $requestStack = new RequestStack();
+
+        if (null !== $path) {
+            $requestStack->push(Request::create($path));
+        }
+
+        return new OrderHistoryActorResolver($securityContext, $tokenStorage, $requestStack);
     }
 }

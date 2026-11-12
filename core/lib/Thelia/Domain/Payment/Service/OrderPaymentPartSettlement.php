@@ -56,7 +56,7 @@ use Thelia\Module\InstantPaymentModuleInterface;
  * locks are held: the pool, on in production, would hand back a part read before them,
  * pending when another request has settled it since.
  *
- * Inside a transaction someone else opened (the admin API wraps ORDER_UPDATE_STATUS in one),
+ * Inside a transaction someone else opened (a module may dispatch ORDER_UPDATE_STATUS in one),
  * the commit of this service only takes a nesting level off: the locks are held, and what is
  * written stays undone, until the caller commits. What the modules were told is not: a part
  * a module has given back is announced released, and a caller that rolls back afterwards
