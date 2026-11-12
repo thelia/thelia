@@ -261,6 +261,66 @@ final class PriceDisplayApiTest extends ApiTestCase
         self::assertSame(['R30', 'R20'], $this->refsOf('productSaleElements.productPrices.promoPrice[gt]=15', $this->customerToken()));
     }
 
+    /**
+     * The promotion of a hidden price reads false on the item: a filter on the flag must answer
+     * as if the product were not on promotion, whichever value it is asked for.
+     */
+    public function testTheFiltersOnThePromotionDoNotTellAVisitorWhichHiddenPriceIsOnPromotion(): void
+    {
+        $this->promote('R30');
+        $token = $this->customerToken();
+
+        self::assertSame(['R30'], $this->refsOf('productSaleElements.promo=true'));
+        self::assertSame(['R10', 'R20'], $this->refsOf('productSaleElements.promo=false'));
+
+        $this->shopShows(PriceDisplayMode::LoggedIn);
+
+        self::assertSame([], $this->refsOf('productSaleElements.promo=true'), 'a visitor is told of no promotion');
+        self::assertSame(['R30', 'R10', 'R20'], $this->refsOf('productSaleElements.promo=false'), 'every product reads promo=false to a visitor');
+        self::assertSame(['R30'], $this->refsOf('productSaleElements.promo=true', $token));
+        self::assertSame(['R10', 'R20'], $this->refsOf('productSaleElements.promo=false', $token));
+    }
+
+    public function testTheFilterOnThePromotionOfSaleElementsDoesNotTellAVisitorWhichHiddenPriceIsOnPromotion(): void
+    {
+        $this->promote('R30');
+        $token = $this->customerToken();
+
+        self::assertSame(['R30'], $this->refsOfSaleElements('promo=true'));
+        self::assertSame(['R10', 'R20'], $this->refsOfSaleElements('promo=false'));
+
+        $this->shopShows(PriceDisplayMode::LoggedIn);
+
+        self::assertSame([], $this->refsOfSaleElements('promo=true'), 'no sale element is promoted to a visitor');
+        self::assertSame(['R30', 'R10', 'R20'], $this->refsOfSaleElements('promo=false'), 'every one reads promo=false to a visitor');
+        self::assertSame(['R30'], $this->refsOfSaleElements('promo=true', $token));
+        self::assertSame(['R10', 'R20'], $this->refsOfSaleElements('promo=false', $token));
+    }
+
+    public function testTheFilterOnThePromotionAddsNothingToTheQueryWhileEveryPriceIsShown(): void
+    {
+        $this->promote('R30');
+        $statements = $this->recordSqlQueries(function (): void {
+            self::assertSame(['R30'], $this->refsOf('productSaleElements.promo=true'));
+        });
+
+        self::assertSame([], array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'price_display_product')), 'no condition on the mode of the products');
+    }
+
+    public function testAPriceListOfTheGroupOfTheCustomerOrdersTheProductsOnTheListPrice(): void
+    {
+        $group = $this->factory->customerGroup();
+        $list = $this->priceList('PRO');
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $this->products['R30']->getDefaultSaleElements(), '5');
+        $this->forgetPriceDisplayMemos();
+        $token = $this->customerToken($group);
+
+        self::assertSame(['R10', 'R20', 'R30'], $this->refsOf('untaxed_price_order=asc'), 'the visitor is not of the group');
+        self::assertSame(['R30', 'R10', 'R20'], $this->refsOf('untaxed_price_order=asc', $token));
+        self::assertSame(['R20', 'R10', 'R30'], $this->refsOf('untaxed_price_order=desc', $token));
+    }
+
     public function testTheTiersOfThePriceListOfTheCustomerAreServedWithTheirTaxes(): void
     {
         $pse = $this->products['R30']->getDefaultSaleElements();
@@ -352,6 +412,14 @@ final class PriceDisplayApiTest extends ApiTestCase
         self::assertSame(1, \count(array_filter($statements, static fn (string $statement): bool => str_contains($statement, 'AS "PriceDisplayMode"'))), 'one read of the modes for the page');
     }
 
+    private function promote(string $ref): void
+    {
+        $pse = $this->products[$ref]->getDefaultSaleElements();
+        $pse->setPromo(1)->save($this->getPropelConnection());
+        ProductPriceQuery::create()->filterByProductSaleElementsId($pse->getId())->update(['PromoPrice' => '5.000000']);
+        ProductPriceTableMap::clearInstancePool();
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -382,6 +450,27 @@ final class PriceDisplayApiTest extends ApiTestCase
         $payload = $this->read('/api/front/products?'.$ids.'&'.$query, $token);
 
         return array_column($payload['hydra:member'], 'ref');
+    }
+
+    /**
+     * The products whose default sale element the filter keeps, one read per product: the
+     * collection of sale elements cannot be narrowed to a few products in one.
+     *
+     * @return list<string>
+     */
+    private function refsOfSaleElements(string $query, ?string $token = null): array
+    {
+        $refs = [];
+
+        foreach ($this->products as $ref => $product) {
+            $payload = $this->read('/api/front/product_sale_elements?isDefault=true&product.id='.$product->getId().'&'.$query, $token);
+
+            if ([] !== $payload['hydra:member']) {
+                $refs[] = $ref;
+            }
+        }
+
+        return $refs;
     }
 
     private function customerToken(?\Thelia\Model\CustomerGroup $group = null): string

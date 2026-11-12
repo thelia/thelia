@@ -17,7 +17,7 @@ namespace Thelia\Api\Bridge\Propel\Filter;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
-final class BooleanFilter extends AbstractFilter
+class BooleanFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
@@ -28,13 +28,16 @@ final class BooleanFilter extends AbstractFilter
             return;
         }
 
-        $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
+        $query->where($this->fieldPathOf($property, $query, $context).' = ?', filter_var($value, \FILTER_VALIDATE_BOOLEAN));
+    }
 
+    protected function fieldPathOf(string $property, ModelCriteria $query, array $context): string
+    {
         if (\is_array($this->properties[$property])) {
-            $fieldPath = $this->properties[$property]['fieldPath'];
+            return $this->properties[$property]['fieldPath'];
         }
 
-        $query->where($fieldPath.' = ?', filter_var($value, \FILTER_VALIDATE_BOOLEAN));
+        return $this->getPropertyQueryPath($query, $property, $context);
     }
 
     public function getDescription(string $resourceClass): array
