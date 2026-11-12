@@ -36,7 +36,7 @@ class OrderLineExport extends OrderExport
 
     /**
      * The unit price of a line placed while order_product.promo_price was a text, read as it
-     * was then. See OrderExport::UNIT_PRICE_AS_TEXT.
+     * was then, as OrderAmountSql reads it for the order totals.
      */
     private const UNIT_PRICE_AS_TEXT = 'IF(order_product.was_in_promo = 1, COALESCE(CAST(order_product.promo_price AS CHAR), \'\'), order_product.price)';
 
