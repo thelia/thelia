@@ -25,20 +25,23 @@ use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Order\Exception\PickingSlipException;
+use Thelia\Domain\Order\Service\PickingSlipPdfService;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Model\LangQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderShipmentQuery;
 
-#[AsCommand(name: 'pdf:render', description: 'Render an order PDF (invoice or delivery) to a file without the HTTP flow, to preview it or work on its template')]
+#[AsCommand(name: 'pdf:render', description: 'Render an order PDF (invoice, delivery or picking slip) to a file without the HTTP flow, to preview it or work on its template')]
 class PdfRender extends ContainerAwareCommand
 {
-    private const DOCUMENTS = ['invoice', 'delivery'];
+    private const DOCUMENTS = ['invoice', 'delivery', PickingSlipPdfService::DOCUMENT];
 
     public function __construct(
         private readonly ParserResolver $parserResolver,
         private readonly TemplateHelperInterface $templateHelper,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly PickingSlipPdfService $pickingSlipPdfService,
     ) {
         parent::__construct();
     }
@@ -46,11 +49,11 @@ class PdfRender extends ContainerAwareCommand
     protected function configure(): void
     {
         $this
-            ->addArgument('document', InputArgument::REQUIRED, 'Document to render: invoice or delivery')
-            ->addOption('order', null, InputOption::VALUE_REQUIRED, 'Order id to render the document for')
+            ->addArgument('document', InputArgument::REQUIRED, 'Document to render: invoice, delivery or preparation (picking slip, one or several orders)')
+            ->addOption('order', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Order id to render the document for (repeat it for several orders, preparation only)')
             ->addOption('shipment', null, InputOption::VALUE_REQUIRED, 'Shipment id of the order, to render the delivery note of that parcel only')
             ->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Locale to render in, e.g. fr_FR (default: store default language)')
-            ->addOption('out', null, InputOption::VALUE_REQUIRED, 'Output file path, e.g. invoice.pdf (default: <document>-<order_ref>.pdf, or delivery-<shipment_ref>.pdf for a shipment)');
+            ->addOption('out', null, InputOption::VALUE_REQUIRED, 'Output file path, e.g. invoice.pdf (default: <document>-<order_ref>.pdf, delivery-<shipment_ref>.pdf for a shipment, preparation-<date>.pdf for several orders)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -63,7 +66,20 @@ class PdfRender extends ContainerAwareCommand
             return Command::FAILURE;
         }
 
-        $orderId = $input->getOption('order');
+        /** @var list<string> $orderIds */
+        $orderIds = (array) $input->getOption('order');
+
+        if (PickingSlipPdfService::DOCUMENT === $document) {
+            return $this->renderPickingSlip($input, $output, $orderIds);
+        }
+
+        if (1 < \count($orderIds)) {
+            $output->writeln(\sprintf('<error>Only the %s document takes several orders.</error>', PickingSlipPdfService::DOCUMENT));
+
+            return Command::FAILURE;
+        }
+
+        $orderId = $orderIds[0] ?? null;
 
         if (null === $orderId || null === $order = OrderQuery::create()->findPk((int) $orderId)) {
             $output->writeln(\sprintf('<error>Order %s not found.</error>', $orderId ?? '(missing --order)'));
@@ -137,6 +153,44 @@ class PdfRender extends ContainerAwareCommand
         file_put_contents($out, $pdfEvent->getPdf());
 
         $output->writeln(\sprintf('<info>Wrote %s (%d bytes).</info>', $out, \strlen((string) $pdfEvent->getPdf())));
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param list<string> $orderIds
+     */
+    private function renderPickingSlip(InputInterface $input, OutputInterface $output, array $orderIds): int
+    {
+        if ([] === $orderIds) {
+            $output->writeln('<error>Order (missing --order).</error>');
+
+            return Command::FAILURE;
+        }
+
+        if (null !== $input->getOption('shipment')) {
+            $output->writeln('<error>A shipment can only be rendered as a delivery document.</error>');
+
+            return Command::FAILURE;
+        }
+
+        $locale = $input->getOption('locale');
+        $lang = null !== $locale ? LangQuery::create()->findOneByLocale($locale) : null;
+
+        $this->initRequest($lang);
+
+        try {
+            $slip = $this->pickingSlipPdfService->render($orderIds, $lang?->getLocale());
+        } catch (PickingSlipException $exception) {
+            $output->writeln(\sprintf('<error>%s</error>', $exception->getMessage()));
+
+            return Command::FAILURE;
+        }
+
+        $out = $input->getOption('out') ?? $slip->fileName;
+        file_put_contents($out, $slip->content);
+
+        $output->writeln(\sprintf('<info>Wrote %s (%d bytes, %d orders).</info>', $out, \strlen($slip->content), $slip->orderCount));
 
         return Command::SUCCESS;
     }
