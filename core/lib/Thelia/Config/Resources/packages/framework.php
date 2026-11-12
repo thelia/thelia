@@ -171,6 +171,18 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => '%env(int:THELIA_API_RATE_LIMIT_ADMIN)%',
                 'interval' => '1 minute',
             ],
+            // Captures asked through the admin API, per administrator account. A capture
+            // takes money and calls the payment provider: the administration budget above
+            // is sized for screens that fan out into reads, far beyond what anyone captures
+            // by hand. The same capture asked twice within a minute is refused on its own
+            // (409); this caps how many different ones a single account asks for. The figure
+            // comes from the environment (see parameters/api_rate_limit.php) so a shop whose
+            // reconciliation tool captures in batches can raise it.
+            'api_admin_order_capture' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_ORDER_CAPTURE)%',
+                'interval' => '1 minute',
+            ],
             // A guest order tracking link is the only thing standing between a stranger
             // and someone else's order, and it names the order by a small number, so a
             // caller who cannot guess the signature can still try. Both windows are
