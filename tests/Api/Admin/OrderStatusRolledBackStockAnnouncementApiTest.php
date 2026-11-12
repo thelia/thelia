@@ -31,11 +31,13 @@ use Thelia\Test\ApiTestCase;
 use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
- * A payment written through `PATCH /api/admin/orders/{id}` that a later listener of the status event
- * refuses is rolled back with the transaction the admin API opened: the stock it took is given back,
- * and nothing of it is told, neither the change of stock nor the alert of a low stock.
+ * A payment written through `PATCH /api/admin/orders/{id}` is committed by the core with the stock it
+ * takes, as from the back office: the admin API holds no transaction around the status event, whose
+ * listeners call payment modules and write the payment journal, which a rollback would leave behind.
+ * A listener that fails after the core leaves the status and the stock as the core committed them,
+ * and what the stock went through is told once.
  *
- * The rollback has to be real: the fixtures are committed, and deleted by hand.
+ * Nothing is rolled back by the test transaction: the fixtures are committed, and deleted by hand.
  */
 final class OrderStatusRolledBackStockAnnouncementApiTest extends ApiTestCase
 {
@@ -111,7 +113,7 @@ final class OrderStatusRolledBackStockAnnouncementApiTest extends ApiTestCase
         parent::tearDown();
     }
 
-    public function testAPaymentALaterListenerRollsBackTellsNothing(): void
+    public function testAPaymentALaterListenerFailsAfterStaysWrittenAndIsToldOnce(): void
     {
         $factory = $this->createFixtureFactory();
         $category = $factory->category();
@@ -145,12 +147,15 @@ final class OrderStatusRolledBackStockAnnouncementApiTest extends ApiTestCase
             'orderProducts' => ['/api/admin/order_products/'.$line->getId()],
         ], $token, 'merge-patch+json');
 
-        self::assertGreaterThanOrEqual(400, $response->getStatusCode(), 'The change is refused.');
+        self::assertGreaterThanOrEqual(400, $response->getStatusCode(), 'The failure of the listener reaches the client.');
         $statement = Propel::getConnection()->prepare('SELECT `quantity` FROM `product_sale_elements` WHERE `id` = ?');
         $statement->execute([(int) $combination->getId()]);
-        self::assertSame(5.0, (float) $statement->fetchColumn(), 'The stock is rolled back with the status.');
-        self::assertSame([], $this->changes, 'No change of stock is told for a payment rolled back.');
-        self::assertSame([], $this->lowStock, 'No alert of low stock for a stock that never moved.');
+        self::assertSame(4.0, (float) $statement->fetchColumn(), 'The stock stays taken with the status the core committed.');
+        $statement = Propel::getConnection()->prepare('SELECT `status_id` FROM `order` WHERE `id` = ?');
+        $statement->execute([(int) $order->getId()]);
+        self::assertSame($paid, (int) $statement->fetchColumn(), 'The order stays paid.');
+        self::assertEquals([new StockLevelChange((int) $combination->getId(), 5.0, 4.0)], $this->changes, 'The change of stock is told once.');
+        self::assertSame([(int) $combination->getId()], $this->lowStock, 'The threshold crossed by the payment is signalled.');
     }
 
     private function listen(string $eventName, callable $listener, int $priority = 0): void

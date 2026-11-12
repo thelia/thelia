@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Cache\ConfigCacheService;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
@@ -134,6 +135,11 @@ abstract class WebIntegrationTestCase extends WebTestCase
         ModuleConfigQuery::resetConfigCache();
         // The postal code rules a request of the test read, rows rolled back since.
         AreaZipCodeRuleQuery::forgetRuleSets();
+
+        // The parser a page of the test rendered with stays current in a static: the next test
+        // would render the hooks of its Twig back-office pages with a parser of a kernel that
+        // is gone, and the blocks of the modules would be missing from them.
+        (new \ReflectionProperty(ParserResolver::class, 'currentParser'))->setValue(null, null);
 
         parent::tearDown();
     }
