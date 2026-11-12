@@ -122,9 +122,10 @@ final class StockSchemaMigrationTest extends IntegrationTestCase
         $this->runBlock(self::SCHEMA_BLOCK_TITLE);
 
         self::assertSame($this->freshInstallShape, $this->shape());
+        $columns = $this->column("SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' ORDER BY `ORDINAL_POSITION`");
         self::assertSame(
             ['reserved_until', 'reserved_quantity', 'reserved_since'],
-            \array_slice($this->column("SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' ORDER BY `ORDINAL_POSITION`"), -5, 3),
+            \array_slice($columns, (int) array_search('reserved_until', $columns, true), 3),
         );
     }
 

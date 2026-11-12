@@ -135,7 +135,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (124, 'accounting_shipping_account', '', 0, 0, NOW(), NOW()),
 (125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
 (126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW()),
-(127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW())
+(127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW()),
+(128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2277,7 +2278,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (66, 'admin.configuration.ai-mcp', NOW(), NOW()),
 (67, 'admin.customer.group', NOW(), NOW()),
 (68, 'admin.order.edit', NOW(), NOW()),
-(69, 'admin.order.payment-capture', NOW(), NOW())
+(69, 'admin.order.payment-capture', NOW(), NOW()),
+(70, 'admin.pricing', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2404,6 +2406,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'cs_CZ', NULL, NULL, NULL, NULL),
     (125, 'cs_CZ', NULL, NULL, NULL, NULL),
     (126, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (128, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2507,6 +2510,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'de_DE', 'Konto, dem das Verkaufsjournal die Versandkosten gutschreibt, z. B. 708500 (für die Buchhaltungsexporte erforderlich)', NULL, NULL, NULL),
     (125, 'de_DE', 'Erlöskonto und Konto der vereinnahmten Steuer je Steuersatz, z. B. 20:706200:445720,5.5:706055:445705,0:706000 (für die Buchhaltungsexporte erforderlich)', NULL, NULL, NULL),
     (126, 'de_DE', 'Konto, das mit kaufmännischen Gutschriften (Rabatt, Nachlass, Erstattung einer Differenz) belastet wird, z. B. 709000 (Erlöskonto ihres Steuersatzes wenn leer)', NULL, NULL, NULL),
+    (128, 'de_DE', 'Wer die Preise des Shops sieht: visible, logged_in (nur angemeldete Kunden) oder on_request (kein Preis, eine Anfrageschaltfläche)', NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2610,6 +2614,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'en_US', 'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)', NULL, NULL, NULL),
     (125, 'en_US', 'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', NULL, NULL, NULL),
     (126, 'en_US', 'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', NULL, NULL, NULL),
+    (128, 'en_US', 'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2713,6 +2718,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'es_ES', 'Cuenta que abona el diario de ventas con el envío, p. ej. 708500 (obligatoria para las exportaciones contables)', NULL, NULL, NULL),
     (125, 'es_ES', 'Cuenta de ventas y cuenta del impuesto repercutido por tipo, p. ej. 20:706200:445720,5.5:706055:445705,0:706000 (obligatoria para las exportaciones contables)', NULL, NULL, NULL),
     (126, 'es_ES', 'Cuenta que carga los abonos comerciales (rebaja, descuento, reembolso de una diferencia), p. ej. 709000 (cuenta de ventas de su tipo si está vacía)', NULL, NULL, NULL),
+    (128, 'es_ES', 'Quién ve los precios de la tienda: visible, logged_in (solo clientes identificados) u on_request (sin precio, un botón de solicitud)', NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2816,6 +2822,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'fr_FR', 'Compte crédité du port par le journal des ventes, par exemple 708500 (obligatoire pour les exports comptables)', NULL, NULL, NULL),
     (125, 'fr_FR', 'Compte de ventes et compte de TVA collectée par taux, par exemple 20:706200:445720,5.5:706055:445705,0:706000 (obligatoire pour les exports comptables)', NULL, NULL, NULL),
     (126, 'fr_FR', 'Compte débité des avoirs commerciaux (rabais, remise, remboursement de différence), par exemple 709000 (compte de ventes de leur taux si vide)', NULL, NULL, NULL),
+    (128, 'fr_FR', 'Qui voit les prix de la boutique : visible, logged_in (clients identifiés seulement) ou on_request (aucun prix, un bouton de demande)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2919,6 +2926,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'it_IT', 'Conto accreditato delle spese di spedizione dal giornale delle vendite, ad es. 708500 (obbligatorio per le esportazioni contabili)', NULL, NULL, NULL),
     (125, 'it_IT', 'Conto vendite e conto IVA a debito per aliquota, ad es. 20:706200:445720,5.5:706055:445705,0:706000 (obbligatorio per le esportazioni contabili)', NULL, NULL, NULL),
     (126, 'it_IT', 'Conto addebitato delle note di credito commerciali (ribasso, sconto, rimborso di una differenza), ad es. 709000 (conto vendite della loro aliquota se vuoto)', NULL, NULL, NULL),
+    (128, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -3022,6 +3030,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, 'nl_NL', 'Rekening die het verkoopdagboek crediteert met de verzendkosten, bijv. 708500 (verplicht voor de boekhoudexports)', NULL, NULL, NULL),
     (125, 'nl_NL', 'Omzetrekening en rekening van de geïnde belasting per tarief, bijv. 20:706200:445720,5.5:706055:445705,0:706000 (verplicht voor de boekhoudexports)', NULL, NULL, NULL),
     (126, 'nl_NL', 'Rekening die met commerciële creditnota\'s (korting, rabat, terugbetaling van een verschil) wordt gedebiteerd, bijv. 709000 (omzetrekening van hun tarief indien leeg)', NULL, NULL, NULL),
+    (128, 'nl_NL', 'Wie de prijzen van de winkel ziet: visible, logged_in (alleen ingelogde klanten) of on_request (geen prijs, een aanvraagknop)', NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -3124,7 +3133,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, 'ru_RU', 'Счёт клиента, который дебетует журнал продаж, например 411000 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
     (124, 'ru_RU', 'Счёт, который журнал продаж кредитует на сумму доставки, например 708500 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
     (125, 'ru_RU', 'Счёт продаж и счёт начисленного налога по каждой ставке, например 20:706200:445720,5.5:706055:445705,0:706000 (обязателен для бухгалтерских выгрузок)', NULL, NULL, NULL),
-    (126, 'ru_RU', 'Счёт, который дебетуется коммерческими кредит-нотами (скидка, уступка, возврат разницы), например 709000 (счёт продаж их ставки, если пусто)', NULL, NULL, NULL)
+    (126, 'ru_RU', 'Счёт, который дебетуется коммерческими кредит-нотами (скидка, уступка, возврат разницы), например 709000 (счёт продаж их ставки, если пусто)', NULL, NULL, NULL),
+    (128, 'ru_RU', 'Кто видит цены магазина: visible, logged_in (только авторизованные клиенты) или on_request (без цены, кнопка запроса)', NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks
@@ -15851,6 +15861,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'cs_CZ', NULL, NULL, NULL, NULL),
     (68, 'cs_CZ', NULL, NULL, NULL, NULL),
     (69, 'cs_CZ', 'Stržení platby objednávky', NULL, NULL, NULL),
+    (70, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15919,6 +15930,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'de_DE', 'Kundengruppen', NULL, NULL, NULL),
     (68, 'de_DE', NULL, NULL, NULL, NULL),
     (69, 'de_DE', 'Einzug der Bestellzahlung', NULL, NULL, NULL),
+    (70, 'de_DE', 'Preisgestaltung', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15987,6 +15999,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'en_US', 'Customer groups', NULL, NULL, NULL),
     (68, 'en_US', 'Editing the lines of an order', NULL, NULL, NULL),
     (69, 'en_US', 'Order payment capture', NULL, NULL, NULL),
+    (70, 'en_US', 'Pricing', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -16055,6 +16068,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'es_ES', 'Grupos de clientes', NULL, NULL, NULL),
     (68, 'es_ES', NULL, NULL, NULL, NULL),
     (69, 'es_ES', 'Captura del pago del pedido', NULL, NULL, NULL),
+    (70, 'es_ES', 'Tarifas', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -16123,6 +16137,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'fr_FR', 'Groupes de clients', NULL, NULL, NULL),
     (68, 'fr_FR', 'Modification des lignes d\'une commande', NULL, NULL, NULL),
     (69, 'fr_FR', 'Capture du paiement d\'une commande', NULL, NULL, NULL),
+    (70, 'fr_FR', 'Tarification', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -16191,6 +16206,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'it_IT', 'Gruppi di clienti', NULL, NULL, NULL),
     (68, 'it_IT', NULL, NULL, NULL, NULL),
     (69, 'it_IT', 'Cattura del pagamento dell\'ordine', NULL, NULL, NULL),
+    (70, 'it_IT', 'Listini', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -16259,6 +16275,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
     (68, 'nl_NL', NULL, NULL, NULL, NULL),
     (69, 'nl_NL', 'Incasso van de orderbetaling', NULL, NULL, NULL),
+    (70, 'nl_NL', 'Prijsstelling', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -16326,7 +16343,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'ru_RU', NULL, NULL, NULL, NULL),
     (67, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL),
     (68, 'ru_RU', NULL, NULL, NULL, NULL),
-    (69, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL)
+    (69, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL),
+    (70, 'ru_RU', 'Ценообразование', NULL, NULL, NULL)
 ;
 
 

@@ -1159,6 +1159,8 @@ return [
     'Offer newsletter sign-up to visitors (1 = yes, 0 = no)' => 'Besuchern die Newsletter-Anmeldung anbieten (1 = ja, 0 = nein)',
     'Customer groups' => 'Kundengruppen',
     'Default customer group' => 'Standard-Kundengruppe',
+    'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Wer die Preise des Shops sieht: visible, logged_in (nur angemeldete Kunden) oder on_request (kein Preis, eine Anfrageschaltfläche)',
+    'Pricing' => 'Preisgestaltung',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Den Bestand der Artikel eines Warenkorbs während der Bestellung reservieren (1 = ja, 0 = nein)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Wann der Bestand eines Warenkorbs reserviert wird: checkout (ab Beginn der Bestellung) oder cart (sobald ein Artikel im Warenkorb liegt)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minuten, die eine Bestandsreservierung gehalten wird, bei jedem Bestellschritt verlängert (15 bei ungültigem Wert)',

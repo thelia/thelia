@@ -446,6 +446,7 @@ return [
     'Saved payment methods' => 'Metodi di pagamento salvati',
     'Customer groups' => 'Gruppi di clienti',
     'Default customer group' => 'Gruppo di clienti predefinito',
+    'Pricing' => 'Listini',
     'Low stock on {{ config("store_name") }}' => 'Scorte basse su {{ config("store_name") }}',
     '{{ report_title }}: {{ period_start }} to {{ period_end }}' => '{{ report_title }}: dal {{ period_start }} al {{ period_end }}',
     'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}' => 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}',
