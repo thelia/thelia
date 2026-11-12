@@ -93,10 +93,10 @@ final class SalesJournal
             yield $piece;
         }
 
-        $report->addLine($translator->trans('%count pieces, debit %debit, credit %credit.', ['%count' => $count, '%debit' => self::amount($debit), '%credit' => self::amount($credit)], null, $locale));
+        $report->addLine($translator->trans('%count% piece, debit %debit, credit %credit.|%count% pieces, debit %debit, credit %credit.', ['%count%' => $count, '%debit' => self::amount($debit), '%credit' => self::amount($credit)], null, $locale));
 
         if ($withCreditNotes) {
-            $report->addLine($translator->trans('%count credit notes among them.', ['%count' => $creditNoteCount], null, $locale));
+            $report->addLine($translator->trans('%count% credit note among them.|%count% credit notes among them.', ['%count%' => $creditNoteCount], null, $locale));
         }
 
         $withoutReference = $this->period(OrderQuery::create(), $from, $to)
@@ -104,7 +104,7 @@ final class SalesJournal
             ->count();
 
         if ($withoutReference > 0) {
-            $report->addWarning($translator->trans('%count orders of the period have an invoice date but no invoice reference: they are not in the journal.', ['%count' => $withoutReference], null, $locale));
+            $report->addWarning($translator->trans('%count% order of the period has an invoice date but no invoice reference: it is not in the journal.|%count% orders of the period have an invoice date but no invoice reference: they are not in the journal.', ['%count%' => $withoutReference], null, $locale));
         }
 
         // An order without invoice date belongs to no period: it is counted in the period it was placed in.
@@ -114,7 +114,7 @@ final class SalesJournal
             ->count();
 
         if ($undated > 0) {
-            $report->addWarning($translator->trans('%count orders placed in the period have an invoice reference but no invoice date: they belong to no period, book them by hand.', ['%count' => $undated], null, $locale));
+            $report->addWarning($translator->trans('%count% order placed in the period has an invoice reference but no invoice date: it belongs to no period, book it by hand.|%count% orders placed in the period have an invoice reference but no invoice date: they belong to no period, book them by hand.', ['%count%' => $undated], null, $locale));
         }
 
         $notInvoiced = $this->placedIn($from, $to)
@@ -122,7 +122,7 @@ final class SalesJournal
             ->count();
 
         if ($notInvoiced > 0) {
-            $report->addLine($translator->trans('%count orders placed in the period are not invoiced: they have no piece.', ['%count' => $notInvoiced], null, $locale));
+            $report->addLine($translator->trans('%count% order placed in the period is not invoiced: it has no piece.|%count% orders placed in the period are not invoiced: they have no piece.', ['%count%' => $notInvoiced], null, $locale));
         }
 
         if (!$withCreditNotes) {

@@ -270,7 +270,7 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         $export = new SalesJournalExport();
         $this->rows($export, '2031-07');
 
-        self::assertContains('1 orders placed in the period have an invoice reference but no invoice date: they belong to no period, book them by hand.', $export->report()->warnings());
+        self::assertContains('1 order placed in the period has an invoice reference but no invoice date: it belongs to no period, book it by hand.', $export->report()->warnings());
         self::assertContains('2 orders placed in the period are not invoiced: they have no piece.', $export->report()->lines());
     }
 
@@ -283,6 +283,56 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         $this->rows($export, '2026-02', 'fr_FR');
 
         self::assertStringContainsString('Commande', implode("\n", $export->report()->warnings()));
+    }
+
+    /**
+     * @return iterable<string, array{string, int, string, string, string}>
+     */
+    public static function reportCounts(): iterable
+    {
+        yield 'one, English' => ['en_US', 1, '2031-08', '1 piece, debit ', '1 order placed in the period is not invoiced: it has no piece.'];
+        yield 'two, English' => ['en_US', 2, '2031-09', '2 pieces, debit ', '2 orders placed in the period are not invoiced: they have no piece.'];
+        yield 'one, French' => ['fr_FR', 1, '2031-10', '1 pièce, débit ', '1 commande passée dans la période n\'est pas facturée : elle n\'a pas de pièce.'];
+        yield 'two, French' => ['fr_FR', 2, '2031-11', '2 pièces, débit ', '2 commandes passées dans la période ne sont pas facturées : elles n\'ont pas de pièce.'];
+    }
+
+    #[DataProvider('reportCounts')]
+    public function testTheReportAgreesTheNounsWithTheirCount(string $locale, int $count, string $month, string $pieces, string $notInvoiced): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+        $connection = Propel::getConnection('TheliaMain');
+        $orderIds = [];
+
+        for ($index = 0; $index < $count; ++$index) {
+            $this->invoicedOrder($month.'-10', [[100.0, 1, 20.0]]);
+            $unbilled = $this->invoicedOrder($month.'-11', [[100.0, 1, 20.0]]);
+            $orderIds[] = (int) $unbilled->getId();
+        }
+
+        $connection->exec("UPDATE `order` SET invoice_ref = NULL, invoice_date = NULL, created_at = '".$month."-12 10:00:00' WHERE id IN (".implode(',', $orderIds).')');
+
+        $export = new SalesJournalExport();
+        $this->rows($export, $month, $locale);
+
+        self::assertStringContainsString($pieces, implode("\n", $export->report()->lines()));
+        self::assertContains($notInvoiced, $export->report()->lines());
+    }
+
+    public function testTheFecFormatIsNamedInTheLanguageOfTheBackOffice(): void
+    {
+        $fec = $this->getService(SerializerManager::class)->get('thelia.fec');
+        $session = $this->getService('request_stack')->getMainRequest()->getSession();
+        $previous = $session->getLang(false);
+
+        try {
+            $session->setLang(LangQuery::create()->findOneByLocale('en_US'));
+            self::assertSame('FEC (tab separated accounting entries)', $fec->getName());
+
+            $session->setLang(LangQuery::create()->findOneByLocale('fr_FR'));
+            self::assertSame('FEC (écritures comptables séparées par des tabulations)', $fec->getName());
+        } finally {
+            $session->setLang($previous ?? Lang::getDefaultLanguage());
+        }
     }
 
     public function testTheTaxSummaryListsTheRatesOfAMonthHighestFirst(): void

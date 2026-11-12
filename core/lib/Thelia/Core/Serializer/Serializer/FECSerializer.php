@@ -16,6 +16,7 @@ namespace Thelia\Core\Serializer\Serializer;
 
 use Thelia\Core\Serializer\AbstractSerializer;
 use Thelia\Core\Serializer\ExportOnlySerializerInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Export\Type\SalesJournalExport;
 
@@ -53,7 +54,7 @@ class FECSerializer extends AbstractSerializer implements ExportOnlySerializerIn
 
     public function getName(): string
     {
-        return 'FEC (tab separated accounting entries)';
+        return Translator::getInstance()->trans('FEC (tab separated accounting entries)');
     }
 
     public function getExtension(): string
