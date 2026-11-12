@@ -362,11 +362,7 @@ final class CheckoutApiTest extends ApiTestCase
     {
         $checkout = $this->readyCheckout();
         $factory = $this->createFixtureFactory();
-        $anotherModule = ModuleQuery::create()
-            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
-            ->filterById($checkout['paymentModule']->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)
-            ->findOne($this->getPropelConnection())
-            ?? throw new \RuntimeException('A second payment module is needed — run bin/test-prepare.');
+        $anotherModule = $factory->paymentModule();
         $token = $this->authenticateAsCustomer($checkout['customer']);
         $cartId = $checkout['cart']->getId();
         $this->walkTheSelections($cartId, $checkout, $token);
@@ -390,11 +386,7 @@ final class CheckoutApiTest extends ApiTestCase
     {
         $checkout = $this->readyCheckout();
         $factory = $this->createFixtureFactory();
-        $anotherModule = ModuleQuery::create()
-            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
-            ->filterById($checkout['paymentModule']->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)
-            ->findOne($this->getPropelConnection())
-            ?? throw new \RuntimeException('A second payment module is needed — run bin/test-prepare.');
+        $anotherModule = $factory->paymentModule();
         $group = $factory->customerGroup('checkout-api-select-pro', paymentModuleIds: [(int) $anotherModule->getId()]);
         $factory->assignCustomerGroup($checkout['customer'], $group);
         $token = $this->authenticateAsCustomer($checkout['customer']);
