@@ -53,7 +53,7 @@ final readonly class PickingSlipPdfService
 
     /**
      * @param list<int|string> $orderIds ids in the order the pages must come; an id that matches no order is dropped
-     * @param string|null      $locale   locale of the document (template parameter `locale`), the default language of the shop when null
+     * @param string|null      $locale   locale of the document (template parameter `picking_slip_locale`), the default language of the shop when null
      *
      * @throws PickingSlipException when nothing is left to print, when the batch is over the limit, or when the active PDF theme has no preparation document
      */
@@ -105,7 +105,7 @@ final readonly class PickingSlipPdfService
 
         $html = SaleUnitConfigScope::runFor(
             $saleUnitId,
-            static fn (): string => $parser->render(self::DOCUMENT, ['order_ids' => $foundIds, 'locale' => $locale]),
+            static fn (): string => $parser->render(self::DOCUMENT, ['order_ids' => $foundIds, 'picking_slip_locale' => $locale]),
         );
 
         $fileName = 1 === \count($orders)
