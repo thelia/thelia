@@ -16,6 +16,7 @@ namespace Thelia\Domain\Catalog\Product;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Thelia\Domain\Catalog\Restriction\CatalogRestrictionRule;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Sale\ReservedSaleProductRule;
 
@@ -29,7 +30,8 @@ use Thelia\Domain\Sale\ReservedSaleProductRule;
  * ProductVisibilityRuleInterface. A product is visible when each of them lets it
  * through. The categories the customer group of the visitor is restricted to
  * (ClosedCategoryProductRule) are one more of them, asked first and only while
- * some group has a list of categories.
+ * some group has a list of categories. The catalog restrictions of a customer
+ * (CatalogRestrictionRule) are one more, not tagged: they are not a module's rule.
  *
  * Enforced in the query rather than on the way out, so that a collection, an item
  * read and a count all agree on what the catalog holds: a product left reachable
@@ -50,6 +52,7 @@ final readonly class ProductVisibility
         #[AutowireIterator(ProductVisibilityRuleInterface::TAG)]
         private iterable $moduleRules = [],
         private ?ClosedCategoryProductRule $closedCategoryRule = null,
+        private ?CatalogRestrictionRule $catalogRestrictionRule = null,
     ) {
     }
 
@@ -121,6 +124,21 @@ final readonly class ProductVisibility
 
             if (null !== $closedCategoryClause) {
                 $clauses[] = \sprintf('(%s)', $closedCategoryClause);
+            }
+        }
+
+        // The catalog restrictions of the customer: a rule of the core, not a module's, so that
+        // it never counts in hasModuleRules(). Asked only once a restriction exists.
+        if (true === $this->catalogRestrictionRule?->isActive()) {
+            if (!$customerIsRead) {
+                $customer = $this->currentCustomerProvider->getCurrentCustomer();
+                $customerIsRead = true;
+            }
+
+            $restrictionClause = $this->catalogRestrictionRule->visibleProductClause($productIdColumn, $customer);
+
+            if (null !== $restrictionClause) {
+                $clauses[] = \sprintf('(%s)', $restrictionClause);
             }
         }
 

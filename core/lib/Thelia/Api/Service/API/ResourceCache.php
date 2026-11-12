@@ -20,6 +20,7 @@ use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Domain\Catalog\Category\CategoryVisibility;
 use Thelia\Domain\Catalog\Product\ProductTaxedPriceResolver;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Domain\Catalog\Restriction\CatalogScopeProbe;
 use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Pricing\PricingActivityChecker;
@@ -57,6 +58,17 @@ use Thelia\Model\Customer;
  * images of the products hold the group in their key too, whether or not anything is
  * priced per group.
  *
+ * A shop that shows its prices to identified customers only, or on request, tells a customer
+ * from a visitor in that key as well, whatever the group: the default group is both's, and what
+ * a customer is shown is not what a visitor is.
+ *
+ * The catalog restrictions and the price lists follow the same line: assigned to a customer
+ * group (the default group included, which is the visitors'), they put the group in the key of
+ * the price paths, and, for the restrictions, of the categories, the brands and what hangs on
+ * a product; assigned to a customer alone, they keep that customer out of the cache like a
+ * discount of their own. The restrictions are a rule of ProductVisibility (CatalogRestrictionRule)
+ * that is not counted among the rules of the modules: it is answered for here, per group.
+ *
  * Some answers are not the same for everybody whatever the group, and bypass the paths they
  * concern for as long as they hold: a product visibility rule declared by a module, which
  * narrows the catalog per visitor and may look at anything of them, bypasses the products
@@ -67,6 +79,9 @@ use Thelia\Model\Customer;
 readonly class ResourceCache
 {
     private const CATEGORY_PREFIX = '/api/front/categories';
+
+    /** The brands a restriction closes are out of their collection and 404 on their item, per customer. */
+    private const BRAND_PREFIX = '/api/front/brands';
 
     /**
      * The paths that carry no price but hang on a product: what the visitor may see of them
@@ -79,6 +94,11 @@ readonly class ResourceCache
 
     /** Prefix of the group id a price path holds in its key. */
     private const GROUP_SCOPE = '_group';
+
+    /** What a price path holds in its key, where a price may be shown to identified customers only. */
+    private const ANONYMOUS_SCOPE = '_anonymous';
+
+    private const IDENTIFIED_SCOPE = '_identified';
 
     /**
      * @param string[] $allowedPrefixes
@@ -105,6 +125,7 @@ readonly class ResourceCache
         private ?CurrentCustomerProvider $currentCustomerProvider = null,
         private ?ProductTaxedPriceResolver $taxedPriceResolver = null,
         private ?ProductPriceCurrencyListener $priceCurrency = null,
+        private ?CatalogScopeProbe $catalogScopeProbe = null,
     ) {
     }
 
@@ -129,7 +150,7 @@ readonly class ResourceCache
         // Never persist empty results: a transient miss (access denied, not
         // found) must not become a sticky cached value.
         if ($value !== null) {
-            $item->set($value)->expiresAfter($this->ttl);
+            $item->set($value)->expiresAfter($this->lifetimeOf($path));
             $this->pool->save($item);
         }
 
@@ -139,6 +160,22 @@ readonly class ResourceCache
     public function clear(): void
     {
         $this->pool->clear();
+    }
+
+    /**
+     * How long the answer of a path is kept: the lifetime of the cache, cut short for a price at
+     * the moment a price list opens or closes, which changes the prices of the groups it is
+     * assigned to without any write the invalidation could hear.
+     */
+    private function lifetimeOf(string $path): int
+    {
+        if (!$this->startsWithOneOf($path, $this->visitorDependentPricePrefixes)) {
+            return $this->ttl;
+        }
+
+        $seconds = $this->catalogScopeProbe?->secondsBeforeAPriceListOpensOrCloses();
+
+        return null === $seconds ? $this->ttl : min($this->ttl, $seconds);
     }
 
     /**
@@ -165,7 +202,7 @@ readonly class ResourceCache
 
         // The categories a group may browse follow its own list: the categories are not
         // priced, so they are not in the list above.
-        if (str_starts_with($path, self::CATEGORY_PREFIX)) {
+        if (str_starts_with($path, self::CATEGORY_PREFIX) || str_starts_with($path, self::BRAND_PREFIX)) {
             return $this->scopeOfVisibility();
         }
 
@@ -185,7 +222,22 @@ readonly class ResourceCache
     {
         $group = $this->scopeOfPriceGroup();
 
-        return null === $group ? null : $group.$this->scopeOfTaxedPriceDestination();
+        return null === $group ? null : $group.$this->scopeOfPriceDisplay().$this->scopeOfTaxedPriceDestination();
+    }
+
+    /**
+     * A price that only identified customers are shown (the shop or a product shows its prices
+     * to them, or on request only) is a price a visitor of the same group, the default one
+     * included, is not: the answer of a customer is never served to a visitor, and the other way
+     * round. A shop that shows every price everywhere keeps one entry for the two.
+     */
+    private function scopeOfPriceDisplay(): string
+    {
+        if (!$this->catalogActivityProbe->read()->hasNonVisiblePriceDisplay) {
+            return '';
+        }
+
+        return null === $this->currentCustomerProvider?->getCurrentCustomer() ? self::ANONYMOUS_SCOPE : self::IDENTIFIED_SCOPE;
     }
 
     /**
@@ -213,7 +265,13 @@ readonly class ResourceCache
 
         $customer = $this->currentCustomerProvider?->getCurrentCustomer();
 
-        if (!$this->pricingActivityChecker->pricesDependOnWhoIsAsking($customer) && !$this->categoriesAreClosedToSomeGroup()) {
+        // A restriction or a price list assigned to this customer alone: what they are shown
+        // is theirs, as a discount of their own is.
+        if (true === $this->catalogScopeProbe?->customerIsScopedAlone($customer)) {
+            return null;
+        }
+
+        if (!$this->pricingActivityChecker->pricesDependOnWhoIsAsking($customer) && !$this->categoriesAreClosedToSomeGroup() && !$this->catalogIsScopedPerGroup()) {
             return '';
         }
 
@@ -248,13 +306,28 @@ readonly class ResourceCache
      * The key of an answer that differs between two groups only by the categories closed
      * to one of them.
      */
-    private function scopeOfVisibility(): string
+    private function scopeOfVisibility(): ?string
     {
-        if (!$this->categoriesAreClosedToSomeGroup()) {
+        $customer = $this->currentCustomerProvider?->getCurrentCustomer();
+
+        // The restrictions of this customer alone close what nobody else of their group is shut out of.
+        if (true === $this->catalogScopeProbe?->customerHasRestrictionAlone($customer)) {
+            return null;
+        }
+
+        if (!$this->categoriesAreClosedToSomeGroup() && true !== $this->catalogScopeProbe?->anyGroupIsRestricted()) {
             return '';
         }
 
-        return self::GROUP_SCOPE.$this->customerGroupResolver->groupIdOf($this->currentCustomerProvider?->getCurrentCustomer());
+        return self::GROUP_SCOPE.$this->customerGroupResolver->groupIdOf($customer);
+    }
+
+    /**
+     * A catalog restriction or a price list is assigned to a customer group, whichever.
+     */
+    private function catalogIsScopedPerGroup(): bool
+    {
+        return true === $this->catalogScopeProbe?->anyGroupIsRestricted() || true === $this->catalogScopeProbe?->anyGroupHasPriceList();
     }
 
     private function categoriesAreClosedToSomeGroup(): bool

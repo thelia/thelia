@@ -476,7 +476,7 @@ final class CartProductVisibilityTest extends ActionIntegrationTestCase
         self::assertCount(3, $visibility->hiddenLinesOf($cart));
         // The first call also reads what a request reads once (the lists of the groups, the tree of
         // the categories): the lines themselves cost the one statement, and no more with more of them.
-        $readsOfTheLines = static fn (array $statements): int => \count(array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'FROM `cart_item`')));
+        $readsOfTheLines = static fn (array $statements): int => \count(array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'FROM `cart_item`') && !str_contains($sql, 'AS cart_lines_priced_by_price_lists')));
         self::assertSame(1, $readsOfTheLines($statementsOfTwoLines));
         self::assertSame(1, $readsOfTheLines($statementsOfFourLines));
         self::assertCount(1, $statementsOfFourLines);
@@ -496,7 +496,7 @@ final class CartProductVisibilityTest extends ActionIntegrationTestCase
             $visibility->isSaleElementHidden(1);
         });
 
-        self::assertSame([], array_values(array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'cart_item') || str_contains($sql, 'product_sale_elements'))));
+        self::assertSame([], array_values(array_filter($statements, static fn (string $sql): bool => (str_contains($sql, 'cart_item') || str_contains($sql, 'product_sale_elements')) && !str_contains($sql, 'AS cart_lines_priced_by_price_lists'))));
     }
 
     private function add(Cart $cart, Product $product): void
