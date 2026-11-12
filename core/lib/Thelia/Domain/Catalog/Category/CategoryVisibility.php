@@ -16,6 +16,7 @@ namespace Thelia\Domain\Catalog\Category;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Catalog\Restriction\CatalogRestrictionResolver;
 use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Sale\CurrentCustomerProvider;
@@ -43,7 +44,10 @@ use Thelia\Model\Map\CategoryTableMap;
  * - closed: every other one, hidden altogether: out of the lists, 404 on its page and on its
  *   API item.
  *
- * The list of one group never opens nor closes anything to another group.
+ * The list of one group never opens nor closes anything to another group. The catalog
+ * restrictions of a customer or of their group (CatalogRestrictionResolver) close categories
+ * on top of that, and closedCategoryIdsFor() and applyTo() answer for both: a category is
+ * browsable when the list of the group and the restrictions both let it through.
  *
  * What is read is kept for the request: the lists once, the tree once, and the sorting once
  * per group. A shop where no group is restricted reads no list: the existence of a restricted
@@ -66,6 +70,7 @@ final class CategoryVisibility implements ResetInterface
         private readonly CustomerGroupResolver $customerGroupResolver,
         private readonly CurrentCustomerProvider $currentCustomerProvider,
         private readonly CatalogActivityProbe $catalogActivityProbe,
+        private readonly CatalogRestrictionResolver $catalogRestrictionResolver,
     ) {
     }
 
@@ -79,12 +84,25 @@ final class CategoryVisibility implements ResetInterface
     }
 
     /**
-     * @return list<int> the categories the customer's group may not browse at all, neither open
-     *                   nor passing; a visitor who is not signed in, or a guest, is asked for the default group
+     * @return list<int> the categories the customer may not browse at all, neither open nor
+     *                   passing: the ones the customer's group is shut out of, joined with
+     *                   the ones the catalog restrictions of the customer close (a category
+     *                   is browsable only when both let it through); a visitor who is not
+     *                   signed in, or a guest, is asked for the default group
      */
     public function closedCategoryIdsFor(?Customer $customer): array
     {
-        return $this->accessFor($customer)['closed'] ?? [];
+        $closedToTheGroup = $this->accessFor($customer)['closed'] ?? [];
+        $closedByRestrictions = $this->catalogRestrictionResolver->closedCategoryIdsFor($customer);
+
+        if ([] === $closedByRestrictions) {
+            return $closedToTheGroup;
+        }
+
+        $closed = array_values(array_unique([...$closedToTheGroup, ...$closedByRestrictions]));
+        sort($closed);
+
+        return $closed;
     }
 
     /**
@@ -97,7 +115,10 @@ final class CategoryVisibility implements ResetInterface
 
     /**
      * @return list<int>|null the categories whose products the customer's group may see, the
-     *                        listed ones and their sub-trees; null when the group sees the whole catalog
+     *                        listed ones and their sub-trees; null when the group sees the whole catalog.
+     *                        The catalog restrictions of the customer are not in it: they open and close
+     *                        products by brand and by product too, which ProductVisibility asks of
+     *                        CatalogRestrictionRule
      */
     public function openCategoryIdsFor(?Customer $customer): ?array
     {

@@ -24,7 +24,10 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Catalog\Restriction\CatalogRestrictionResolver;
+use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Model\BrandQuery;
+use Thelia\Model\Map\BrandTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
@@ -51,6 +54,12 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
     use StandardI18nFieldsSearchTrait;
 
     protected $timestampable = true;
+
+    public function __construct(
+        private readonly CatalogRestrictionResolver $catalogRestrictionResolver,
+        private readonly CurrentCustomerProvider $currentCustomerProvider,
+    ) {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -106,6 +115,12 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
     public function buildModelCriteria(): ModelCriteria
     {
         $search = BrandQuery::create();
+
+        // The brands the catalog restrictions of the customer close are not listed on the front
+        // (the rule of BrandRestrictionExtension); the back office lists them all.
+        if (!$this->getBackendContext()) {
+            $this->catalogRestrictionResolver->applyToBrands($search, BrandTableMap::COL_ID, $this->currentCustomerProvider->getCurrentCustomer());
+        }
 
         /* manage translations */
         $this->configureI18nProcessing(
