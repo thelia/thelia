@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Order\Service;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
+use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Order\DTO\OrderHistoryActor;
@@ -61,6 +63,7 @@ final readonly class OrderHistoryActorResolver
     public function __construct(
         private SecurityContext $securityContext,
         private TokenStorageInterface $tokenStorage,
+        private ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -71,7 +74,8 @@ final readonly class OrderHistoryActorResolver
         // A token that names somebody closes the session: the request is that user's,
         // whoever else the browser is signed in as.
         $sessionCounts = !$tokenUser instanceof Admin && !$tokenUser instanceof Customer;
-        $adminUser = $tokenUser instanceof Admin ? $tokenUser : ($sessionCounts ? $this->securityContext->getAdminUser() : null);
+        $hasModuleCode = null !== $moduleCode && '' !== $moduleCode;
+        $adminUser = $this->actingAdministrator($moduleCode);
 
         if ($adminUser instanceof UserInterface) {
             return new OrderHistoryActor(
@@ -81,7 +85,7 @@ final readonly class OrderHistoryActorResolver
             );
         }
 
-        if (null !== $moduleCode && '' !== $moduleCode) {
+        if ($hasModuleCode) {
             return new OrderHistoryActor(OrderHistoryActorType::MODULE, $moduleCode);
         }
 
@@ -95,6 +99,53 @@ final readonly class OrderHistoryActorResolver
         }
 
         return OrderHistoryActor::system();
+    }
+
+    /**
+     * The administrator the change is made by, under the precedence above, or null when
+     * it is made by a module, a customer or the shop itself.
+     */
+    public function actingAdministrator(?string $moduleCode = null): ?UserInterface
+    {
+        $tokenUser = $this->tokenUser();
+
+        if ($tokenUser instanceof Admin) {
+            return $tokenUser;
+        }
+
+        // A customer token closes the session: the request is the customer's, whoever
+        // else the browser is signed in as.
+        if ($tokenUser instanceof Customer) {
+            return null;
+        }
+
+        // Outside the back office, a module that names itself is trusted over an
+        // administrator in session: a provider's return may land in a browser where an
+        // administrator is signed in too, and the module reported the movement, not them.
+        if (null !== $moduleCode && '' !== $moduleCode && !$this->isBackOfficeOrUnknownRequest()) {
+            return null;
+        }
+
+        $sessionAdmin = $this->securityContext->getAdminUser();
+
+        return $sessionAdmin instanceof UserInterface ? $sessionAdmin : null;
+    }
+
+    /**
+     * Without a request to look at, the administrator in session keeps the precedence it
+     * always had.
+     */
+    private function isBackOfficeOrUnknownRequest(): bool
+    {
+        $request = $this->requestStack?->getMainRequest();
+
+        if (null === $request) {
+            return true;
+        }
+
+        $path = RequestPath::decoded($request);
+
+        return '/admin' === $path || str_starts_with($path, '/admin/');
     }
 
     /**

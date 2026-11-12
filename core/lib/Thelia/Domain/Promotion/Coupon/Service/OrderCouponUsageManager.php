@@ -134,7 +134,7 @@ final readonly class OrderCouponUsageManager
     /**
      * The claim holds the line until the transaction ends, so a request switching
      * it at the same time waits for the outcome. A transaction opened by the
-     * caller (the admin API wraps a status change in one) keeps it until its own
+     * caller (a module may dispatch a status change inside one) keeps it until its own
      * commit.
      *
      * @param callable(ConnectionInterface): bool $work
