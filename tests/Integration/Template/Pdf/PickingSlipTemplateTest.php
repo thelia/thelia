@@ -64,6 +64,20 @@ final class PickingSlipTemplateTest extends IntegrationTestCase
         self::assertSame(1, $this->pageCount($pdf));
     }
 
+    public function testAnExplicitLocaleWinsOverTheLanguageOfTheShop(): void
+    {
+        $this->skipUnlessTheThemeHasThePickingSlip('picking_slip_locale');
+
+        $factory = $this->factory();
+        $order = $factory->order();
+        $factory->orderProduct($order, ['title' => 'Widget']);
+
+        [$html] = $this->render([$order], 'fr_FR');
+
+        self::assertStringContainsString('BON DE PRÉPARATION', $html);
+        self::assertStringNotContainsString('PICKING SLIP', $html);
+    }
+
     public function testAnOrderOfVirtualProductsSaysThereIsNothingToPick(): void
     {
         $this->skipUnlessTheThemeHasThePickingSlip();
@@ -128,7 +142,7 @@ final class PickingSlipTemplateTest extends IntegrationTestCase
      *
      * @return array{string, string} the HTML handed to the PDF engine, and the PDF
      */
-    private function render(array $orders): array
+    private function render(array $orders, ?string $locale = null): array
     {
         $html = '';
         $this->getService('event_dispatcher')->addListener(
@@ -139,7 +153,7 @@ final class PickingSlipTemplateTest extends IntegrationTestCase
             1000,
         );
 
-        $slip = $this->getService(PickingSlipPdfService::class)->render(array_map(static fn (Order $order): int => (int) $order->getId(), $orders));
+        $slip = $this->getService(PickingSlipPdfService::class)->render(array_map(static fn (Order $order): int => (int) $order->getId(), $orders), $locale);
 
         return [$html, $slip->content];
     }
@@ -149,13 +163,13 @@ final class PickingSlipTemplateTest extends IntegrationTestCase
         return (int) preg_match_all('#/Type\s*/Page\b(?!s)#', $pdf);
     }
 
-    private function skipUnlessTheThemeHasThePickingSlip(): void
+    private function skipUnlessTheThemeHasThePickingSlip(string $marker = self::MARKER): void
     {
         $themeRoot = $this->getService(TemplateHelperInterface::class)->getActivePdfTemplate()->getAbsolutePath();
         $path = $themeRoot.\DIRECTORY_SEPARATOR.'preparation.html.twig';
 
-        if (!file_exists($path) || !str_contains((string) file_get_contents($path), self::MARKER)) {
-            self::markTestSkipped(\sprintf('The installed PDF theme has no "%s" in preparation.html.twig.', self::MARKER));
+        if (!file_exists($path) || !str_contains((string) file_get_contents($path), $marker)) {
+            self::markTestSkipped(\sprintf('The installed PDF theme has no "%s" in preparation.html.twig.', $marker));
         }
     }
 }
