@@ -135,7 +135,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (124, 'accounting_shipping_account', '', 0, 0, NOW(), NOW()),
 (125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
 (126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW()),
-(127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW())
+(127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW()),
+(128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2277,7 +2278,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (66, 'admin.configuration.ai-mcp', NOW(), NOW()),
 (67, 'admin.customer.group', NOW(), NOW()),
 (68, 'admin.order.edit', NOW(), NOW()),
-(69, 'admin.order.payment-capture', NOW(), NOW())
+(69, 'admin.order.payment-capture', NOW(), NOW()),
+(70, 'admin.pricing', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2404,7 +2406,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (123, '{{ locale }}', {{ intl('Customer account the sales journal debits, e.g. 411000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
     (124, '{{ locale }}', {{ intl('Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
     (125, '{{ locale }}', {{ intl('Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
-    (126, '{{ locale }}', {{ intl('Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (126, '{{ locale }}', {{ intl('Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', locale) }}, NULL, NULL, NULL),
+    (128, '{{ locale }}', {{ intl('Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4143,7 +4146,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, '{{ locale }}', {{ intl('Configuration AI MCP tokens', locale) }}, NULL, NULL, NULL),
     (67, '{{ locale }}', {{ intl('Customer groups', locale) }}, NULL, NULL, NULL),
     (68, '{{ locale }}', {{ intl('Editing the lines of an order', locale) }}, NULL, NULL, NULL),
-    (69, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (69, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL),
+    (70, '{{ locale }}', {{ intl('Pricing', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

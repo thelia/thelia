@@ -151,6 +151,177 @@ EXECUTE create_table_statement;
 DEALLOCATE PREPARE create_table_statement;
 
 -- ---------------------------------------------------------------------
+-- Price lists, catalog restrictions and price display mode
+--
+-- A price list holds negotiated prices (a price or a percentage discount per
+-- sale element and minimum quantity) and is assigned to customer groups or to
+-- single customers. A catalog restriction opens or closes a category, a brand
+-- or a product to a group or a customer. `product`.`price_display_mode`
+-- overrides, for one product, the shop setting `price_display_mode`.
+--
+-- The foreign keys point at rows deleted with them (CASCADE), so a deleted
+-- group, customer, category, brand, product or sale element leaves no rule
+-- behind. `price_list_assignment` and `catalog_restriction` reference
+-- `customer_group`, created further down: foreign key checks are off for the
+-- whole script.
+--
+-- Replayable: each table is created through PREPARE/EXECUTE only when it is
+-- missing (a bare CREATE TABLE IF NOT EXISTS commits the transaction
+-- ModuleManagement opened, even when the table exists), each column is added
+-- only when missing. This block stays before any DML of the script.
+-- ---------------------------------------------------------------------
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'price_list');
+SET @statement := IF(@create_table, 'CREATE TABLE `price_list`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT \'stable machine name a deployment references a price list by, not meant as a label\',
+    `currency_id` INTEGER NOT NULL,
+    `priority` INTEGER DEFAULT 100 NOT NULL COMMENT \'the order in which the price lists are looked up for a customer, lowest first, a tie goes to the list assigned to the customer, then to the oldest list\',
+    `exclusive` TINYINT DEFAULT 0 NOT NULL COMMENT \'1 when a sale element the list does not price cannot be bought by the customers it is assigned to, unless a list of higher rank prices it\',
+    `starts_at` DATETIME COMMENT \'the list applies from this date on, NULL when it has no start\',
+    `ends_at` DATETIME COMMENT \'the list applies until this date, NULL when it has no end\',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT \'a list turned off applies to nobody, and is kept with its lines and assignments\',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `price_list_code_unique` (`code`),
+    INDEX `idx_price_list_currency_id` (`currency_id`),
+    INDEX `idx_price_list_priority` (`priority`),
+    CONSTRAINT `fk_price_list_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'price_list_i18n');
+SET @statement := IF(@create_table, 'CREATE TABLE `price_list_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT \'en_US\' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `price_list_i18n_fk_4100af`
+        FOREIGN KEY (`id`)
+        REFERENCES `price_list` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'price_list_item');
+SET @statement := IF(@create_table, 'CREATE TABLE `price_list_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `price_list_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `min_quantity` INTEGER DEFAULT 1 NOT NULL COMMENT \'the line applies from this quantity on, the line with the greatest minimum quantity not above the quantity wins\',
+    `price` DECIMAL(16,6) COMMENT \'the price without taxes, in the currency of the list; NULL when the line is a discount (exactly one of price and discount_percent is set)\',
+    `discount_percent` DECIMAL(16,6) COMMENT \'the discount, as a percentage of the catalog price; NULL when the line is a price (exactly one of price and discount_percent is set)\',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `price_list_item_unique` (`price_list_id`, `product_sale_elements_id`, `min_quantity`),
+    INDEX `idx_price_list_item_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_price_list_item_price_list_id`
+        FOREIGN KEY (`price_list_id`)
+        REFERENCES `price_list` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_price_list_item_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'price_list_assignment');
+SET @statement := IF(@create_table, 'CREATE TABLE `price_list_assignment`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `price_list_id` INTEGER NOT NULL,
+    `customer_group_id` INTEGER COMMENT \'the customer group the list is assigned to; exactly one of customer_group_id and customer_id is set\',
+    `customer_id` INTEGER COMMENT \'the customer the list is assigned to; exactly one of customer_group_id and customer_id is set\',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `price_list_assignment_group_unique` (`price_list_id`, `customer_group_id`),
+    UNIQUE INDEX `price_list_assignment_customer_unique` (`price_list_id`, `customer_id`),
+    INDEX `idx_price_list_assignment_customer_group_id` (`customer_group_id`),
+    INDEX `idx_price_list_assignment_customer_id` (`customer_id`),
+    CONSTRAINT `fk_price_list_assignment_price_list_id`
+        FOREIGN KEY (`price_list_id`)
+        REFERENCES `price_list` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_price_list_assignment_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_price_list_assignment_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'catalog_restriction');
+SET @statement := IF(@create_table, 'CREATE TABLE `catalog_restriction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_group_id` INTEGER COMMENT \'the customer group the rule applies to; exactly one of customer_group_id and customer_id is set\',
+    `customer_id` INTEGER COMMENT \'the customer the rule applies to; exactly one of customer_group_id and customer_id is set\',
+    `category_id` INTEGER COMMENT \'the category the rule targets, subcategories included; exactly one of category_id, brand_id and product_id is set\',
+    `brand_id` INTEGER COMMENT \'the brand the rule targets; exactly one of category_id, brand_id and product_id is set\',
+    `product_id` INTEGER COMMENT \'the product the rule targets; exactly one of category_id, brand_id and product_id is set\',
+    `mode` VARCHAR(8) NOT NULL COMMENT \'allow: once a customer has one allow rule, whatever no allow rule opens is closed, deny: the target is closed, and wins over allow\',
+    PRIMARY KEY (`id`),
+    INDEX `idx_catalog_restriction_customer_group_id` (`customer_group_id`),
+    INDEX `idx_catalog_restriction_customer_id` (`customer_id`),
+    INDEX `idx_catalog_restriction_category_id` (`category_id`),
+    INDEX `idx_catalog_restriction_brand_id` (`brand_id`),
+    INDEX `idx_catalog_restriction_product_id` (`product_id`),
+    CONSTRAINT `fk_catalog_restriction_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+-- ---------------------------------------------------------------------
 -- AI reasoning effort
 --
 -- `ai_tier_assignment.effort` is the effort of a tier, `ai_usage_setting.effort`
@@ -289,11 +460,44 @@ PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
 
+-- Placed after the bundle columns: AFTER names a column this script creates above.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product' AND `COLUMN_NAME` = 'price_display_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `product` ADD `price_display_mode` VARCHAR(16) COMMENT \'how the prices of the product show: visible, logged_in (identified customers only) or on_request (no price, a request button), NULL follows the shop setting price_display_mode\' AFTER `bundle_discount_type`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+-- The front asks on every request whether a product states a price display mode of its own: the index answers without reading the table.
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product' AND `INDEX_NAME` = 'idx_product_price_display_mode');
+SET @statement := IF(@add_index, 'ALTER TABLE `product` ADD INDEX `idx_product_price_display_mode` (`price_display_mode`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'product_version' AND `COLUMN_NAME` = 'price_display_mode');
+SET @statement := IF(@add_column, 'ALTER TABLE `product_version` ADD `price_display_mode` VARCHAR(16) COMMENT \'how the prices of the product show: visible, logged_in (identified customers only) or on_request (no price, a request button), NULL follows the shop setting price_display_mode\' AFTER `bundle_discount_type`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
 SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'bundle_composition');
 SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `bundle_composition` TEXT COMMENT \'the components a customer chose for a bundle line, as canonical JSON; null outside a bundle\' AFTER `offered_by_coupon_id`', 'DO 0');
 PREPARE add_column_statement FROM @statement;
 EXECUTE add_column_statement;
 DEALLOCATE PREPARE add_column_statement;
+
+-- A line priced by a price list keeps its trace after the list is turned off or deleted: the cart is then priced again.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'price_list_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `price_list_id` INTEGER COMMENT \'the price list whose line priced this line; no foreign key, so that the trace outlives the list and the cart is priced again once the list is gone\' AFTER `reserved_since`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'idx_cart_item_price_list_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `idx_cart_item_price_list_id` (`price_list_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
 
 CREATE TABLE IF NOT EXISTS `product_bundle_item`
 (
@@ -859,6 +1063,64 @@ INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_mes
     (@report_mail_message_id, 'it_IT', NULL, '{{ report_title }}: dal {{ period_start }} al {{ period_end }}', 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', '<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}'),
     (@report_mail_message_id, 'nl_NL', 'Per e-mail verzonden rapport', '{{ report_title }}: van {{ period_start }} tot {{ period_end }}', 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', '<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}'),
     (@report_mail_message_id, 'ru_RU', 'Отчёт, отправленный по электронной почте', '{{ report_title }}: с {{ period_start }} по {{ period_end }}', 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', '<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}');
+
+-- ---------------------------------------------------------------------
+-- Price display mode and pricing resource
+--
+-- `price_display_mode` is the shop setting of who sees the prices (visible,
+-- logged_in or on_request), `visible` until a merchant says otherwise, so no
+-- shop changes behaviour by being updated. INSERT IGNORE leaves a value a shop
+-- already wrote. `admin.pricing` is the resource of the price lists and of the
+-- catalog restrictions. Replaying the script changes nothing.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('price_display_mode', 'visible', 0, 0, NOW(), NOW());
+
+DROP TEMPORARY TABLE IF EXISTS `config_title_seed`;
+
+CREATE TEMPORARY TABLE `config_title_seed` (
+    `name` VARCHAR(255) NOT NULL,
+    `locale` CHAR(5) NOT NULL,
+    `title` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('price_display_mode', 'en_US', 'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)'),
+    ('price_display_mode', 'fr_FR', 'Qui voit les prix de la boutique : visible, logged_in (clients identifiés seulement) ou on_request (aucun prix, un bouton de demande)'),
+    ('price_display_mode', 'de_DE', 'Wer die Preise des Shops sieht: visible, logged_in (nur angemeldete Kunden) oder on_request (kein Preis, eine Anfrageschaltfläche)'),
+    ('price_display_mode', 'es_ES', 'Quién ve los precios de la tienda: visible, logged_in (solo clientes identificados) u on_request (sin precio, un botón de solicitud)'),
+    ('price_display_mode', 'nl_NL', 'Wie de prijzen van de winkel ziet: visible, logged_in (alleen ingelogde klanten) of on_request (geen prijs, een aanvraagknop)'),
+    ('price_display_mode', 'ru_RU', 'Кто видит цены магазина: visible, logged_in (только авторизованные клиенты) или on_request (без цены, кнопка запроса)');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `config_title_seed`.`locale`, `config_title_seed`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name`;
+
+UPDATE `config_i18n`
+INNER JOIN `config` ON `config`.`id` = `config_i18n`.`id`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name` AND `config_title_seed`.`locale` = `config_i18n`.`locale`
+SET `config_i18n`.`title` = `config_title_seed`.`title`
+WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
+
+DROP TEMPORARY TABLE `config_title_seed`;
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.pricing', NOW(), NOW());
+
+SET @pricing_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.pricing');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@pricing_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@pricing_resource_id, 'de_DE', 'Preisgestaltung', NULL, NULL, NULL),
+    (@pricing_resource_id, 'en_US', 'Pricing', NULL, NULL, NULL),
+    (@pricing_resource_id, 'es_ES', 'Tarifas', NULL, NULL, NULL),
+    (@pricing_resource_id, 'fr_FR', 'Tarification', NULL, NULL, NULL),
+    (@pricing_resource_id, 'it_IT', 'Listini', NULL, NULL, NULL),
+    (@pricing_resource_id, 'nl_NL', 'Prijsstelling', NULL, NULL, NULL),
+    (@pricing_resource_id, 'ru_RU', 'Ценообразование', NULL, NULL, NULL);
 
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
     ('admin.order.edit', NOW(), NOW());

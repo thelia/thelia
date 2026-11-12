@@ -50,6 +50,7 @@ CREATE TABLE `product`
     `bundle_price_mode` VARCHAR(16) DEFAULT 'fixed' NOT NULL COMMENT 'fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount',
     `bundle_discount` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'discount of a computed bundle, in percent or in the currency amount (see bundle_discount_type)',
     `bundle_discount_type` VARCHAR(16) DEFAULT 'percent' NOT NULL COMMENT 'percent or amount',
+    `price_display_mode` VARCHAR(16) COMMENT 'how the prices of the product show: visible, logged_in (identified customers only) or on_request (no price, a request button), NULL follows the shop setting price_display_mode',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -60,6 +61,7 @@ CREATE TABLE `product`
     INDEX `idx_product_tax_rule_id` (`tax_rule_id`),
     INDEX `fk_product_template_id` (`template_id`),
     INDEX `fk_product_brand1_idx` (`brand_id`),
+    INDEX `idx_product_price_display_mode` (`price_display_mode`),
     CONSTRAINT `fk_product_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -732,6 +734,148 @@ CREATE TABLE `customer_group_category`
     CONSTRAINT `fk_customer_group_category_category_id`
         FOREIGN KEY (`category_id`)
         REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- price_list
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `price_list`;
+
+CREATE TABLE `price_list`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(64) NOT NULL COMMENT 'stable machine name a deployment references a price list by, not meant as a label',
+    `currency_id` INTEGER NOT NULL,
+    `priority` INTEGER DEFAULT 100 NOT NULL COMMENT 'the order in which the price lists are looked up for a customer, lowest first, a tie goes to the list assigned to the customer, then to the oldest list',
+    `exclusive` TINYINT DEFAULT 0 NOT NULL COMMENT '1 when a sale element the list does not price cannot be bought by the customers it is assigned to, unless a list of higher rank prices it',
+    `starts_at` DATETIME COMMENT 'the list applies from this date on, NULL when it has no start',
+    `ends_at` DATETIME COMMENT 'the list applies until this date, NULL when it has no end',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a list turned off applies to nobody, and is kept with its lines and assignments',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `price_list_code_unique` (`code`),
+    INDEX `idx_price_list_currency_id` (`currency_id`),
+    INDEX `idx_price_list_priority` (`priority`),
+    CONSTRAINT `fk_price_list_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- price_list_item
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `price_list_item`;
+
+CREATE TABLE `price_list_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `price_list_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `min_quantity` INTEGER DEFAULT 1 NOT NULL COMMENT 'the line applies from this quantity on, the line with the greatest minimum quantity not above the quantity wins',
+    `price` DECIMAL(16,6) COMMENT 'the price without taxes, in the currency of the list; NULL when the line is a discount (exactly one of price and discount_percent is set)',
+    `discount_percent` DECIMAL(16,6) COMMENT 'the discount, as a percentage of the catalog price; NULL when the line is a price (exactly one of price and discount_percent is set)',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `price_list_item_unique` (`price_list_id`, `product_sale_elements_id`, `min_quantity`),
+    INDEX `idx_price_list_item_product_sale_elements_id` (`product_sale_elements_id`),
+    CONSTRAINT `fk_price_list_item_price_list_id`
+        FOREIGN KEY (`price_list_id`)
+        REFERENCES `price_list` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_price_list_item_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- price_list_assignment
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `price_list_assignment`;
+
+CREATE TABLE `price_list_assignment`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `price_list_id` INTEGER NOT NULL,
+    `customer_group_id` INTEGER COMMENT 'the customer group the list is assigned to; exactly one of customer_group_id and customer_id is set',
+    `customer_id` INTEGER COMMENT 'the customer the list is assigned to; exactly one of customer_group_id and customer_id is set',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `price_list_assignment_group_unique` (`price_list_id`, `customer_group_id`),
+    UNIQUE INDEX `price_list_assignment_customer_unique` (`price_list_id`, `customer_id`),
+    INDEX `idx_price_list_assignment_customer_group_id` (`customer_group_id`),
+    INDEX `idx_price_list_assignment_customer_id` (`customer_id`),
+    CONSTRAINT `fk_price_list_assignment_price_list_id`
+        FOREIGN KEY (`price_list_id`)
+        REFERENCES `price_list` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_price_list_assignment_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_price_list_assignment_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- catalog_restriction
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `catalog_restriction`;
+
+CREATE TABLE `catalog_restriction`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `customer_group_id` INTEGER COMMENT 'the customer group the rule applies to; exactly one of customer_group_id and customer_id is set',
+    `customer_id` INTEGER COMMENT 'the customer the rule applies to; exactly one of customer_group_id and customer_id is set',
+    `category_id` INTEGER COMMENT 'the category the rule targets, subcategories included; exactly one of category_id, brand_id and product_id is set',
+    `brand_id` INTEGER COMMENT 'the brand the rule targets; exactly one of category_id, brand_id and product_id is set',
+    `product_id` INTEGER COMMENT 'the product the rule targets; exactly one of category_id, brand_id and product_id is set',
+    `mode` VARCHAR(8) NOT NULL COMMENT 'allow: once a customer has one allow rule, whatever no allow rule opens is closed, deny: the target is closed, and wins over allow',
+    PRIMARY KEY (`id`),
+    INDEX `idx_catalog_restriction_customer_group_id` (`customer_group_id`),
+    INDEX `idx_catalog_restriction_customer_id` (`customer_id`),
+    INDEX `idx_catalog_restriction_category_id` (`category_id`),
+    INDEX `idx_catalog_restriction_brand_id` (`brand_id`),
+    INDEX `idx_catalog_restriction_product_id` (`product_id`),
+    CONSTRAINT `fk_catalog_restriction_customer_group_id`
+        FOREIGN KEY (`customer_group_id`)
+        REFERENCES `customer_group` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_catalog_restriction_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -2449,6 +2593,7 @@ CREATE TABLE `cart_item`
     `reserved_until` DATETIME COMMENT 'the stock of the line is held for the cart until this moment; null or past: not held',
     `reserved_quantity` DOUBLE COMMENT 'the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told',
     `reserved_since` DATETIME COMMENT 'the moment the line was first held since its last release; a hold is never pushed back past a bound from it',
+    `price_list_id` INTEGER COMMENT 'the price list whose line priced this line; no foreign key, so that the trace outlives the list and the cart is priced again once the list is gone',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -2458,6 +2603,7 @@ CREATE TABLE `cart_item`
     INDEX `idx_cart_item_pse_reserved_until` (`product_sale_elements_id`, `reserved_until`),
     INDEX `idx_cart_item_reserved_until` (`reserved_until`),
     INDEX `idx_cart_item_offered_by_coupon_id` (`offered_by_coupon_id`),
+    INDEX `idx_cart_item_price_list_id` (`price_list_id`),
     CONSTRAINT `fk_cart_item_cart_id`
         FOREIGN KEY (`cart_id`)
         REFERENCES `cart` (`id`)
@@ -4447,6 +4593,24 @@ CREATE TABLE `customer_group_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- price_list_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `price_list_i18n`;
+
+CREATE TABLE `price_list_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `price_list_i18n_fk_4100af`
+        FOREIGN KEY (`id`)
+        REFERENCES `price_list` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- folder_i18n
 -- ---------------------------------------------------------------------
 
@@ -5218,6 +5382,7 @@ CREATE TABLE `product_version`
     `bundle_price_mode` VARCHAR(16) DEFAULT 'fixed' NOT NULL COMMENT 'fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount',
     `bundle_discount` DECIMAL(16,6) DEFAULT 0 NOT NULL COMMENT 'discount of a computed bundle, in percent or in the currency amount (see bundle_discount_type)',
     `bundle_discount_type` VARCHAR(16) DEFAULT 'percent' NOT NULL COMMENT 'percent or amount',
+    `price_display_mode` VARCHAR(16) COMMENT 'how the prices of the product show: visible, logged_in (identified customers only) or on_request (no price, a request button), NULL follows the shop setting price_display_mode',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

@@ -121,6 +121,7 @@ class AdminResources
     public const TAG = 'admin.configuration.tag';
     public const CUSTOMER_PAYMENT_METHOD = 'admin.customer.payment-method';
     public const CUSTOMER_GROUP = 'admin.customer.group';
+    public const PRICING = 'admin.pricing';
 
     /**
      * Create a new AdminRessources instance.

@@ -1194,6 +1194,8 @@ return [
     'Offer newsletter sign-up to visitors (1 = yes, 0 = no)' => 'Ofrecer a los visitantes la suscripción al boletín (1 = sí, 0 = no)',
     'Customer groups' => 'Grupos de clientes',
     'Default customer group' => 'Grupo de clientes por defecto',
+    'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Quién ve los precios de la tienda: visible, logged_in (solo clientes identificados) u on_request (sin precio, un botón de solicitud)',
+    'Pricing' => 'Tarifas',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Reservar el stock de los artículos de un carrito mientras el cliente finaliza la compra (1 = sí, 0 = no)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Momento en que se reserva el stock de un carrito: checkout (desde el inicio del pedido) o cart (en cuanto un artículo está en el carrito)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minutos que se mantiene una reserva de stock, ampliada en cada paso del pedido (15 si no es válido)',

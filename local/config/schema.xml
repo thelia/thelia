@@ -65,6 +65,7 @@
     <column defaultValue="fixed" description="fixed: the price is the one of the bundle sale element, computed: the sum of the components less the discount" name="bundle_price_mode" required="true" size="16" type="VARCHAR" />
     <column defaultValue="0" description="discount of a computed bundle, in percent or in the currency amount (see bundle_discount_type)" name="bundle_discount" required="true" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="percent" description="percent or amount" name="bundle_discount_type" required="true" size="16" type="VARCHAR" />
+    <column defaultValue="NULL" description="how the prices of the product show: visible, logged_in (identified customers only) or on_request (no price, a request button), NULL follows the shop setting price_display_mode" name="price_display_mode" size="16" type="VARCHAR" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -85,6 +86,9 @@
     </index>
     <index name="fk_product_brand1_idx">
       <index-column name="brand_id" />
+    </index>
+    <index name="idx_product_price_display_mode">
+      <index-column name="price_display_mode" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
@@ -625,6 +629,124 @@
     </foreign-key>
     <index name="idx_customer_group_category_category_id">
       <index-column name="category_id" />
+    </index>
+  </table>
+  <table name="price_list" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="stable machine name a deployment references a price list by, not meant as a label" name="code" required="true" size="64" type="VARCHAR" />
+    <column name="currency_id" required="true" type="INTEGER" />
+    <column defaultValue="100" description="the order in which the price lists are looked up for a customer, lowest first, a tie goes to the list assigned to the customer, then to the oldest list" name="priority" required="true" type="INTEGER" />
+    <column defaultValue="0" description="1 when a sale element the list does not price cannot be bought by the customers it is assigned to, unless a list of higher rank prices it" name="exclusive" required="true" type="TINYINT" />
+    <column defaultValue="NULL" description="the list applies from this date on, NULL when it has no start" name="starts_at" type="DATETIME" />
+    <column defaultValue="NULL" description="the list applies until this date, NULL when it has no end" name="ends_at" type="DATETIME" />
+    <column defaultValue="1" description="a list turned off applies to nobody, and is kept with its lines and assignments" name="active" required="true" type="TINYINT" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <foreign-key foreignTable="currency" name="fk_price_list_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <unique name="price_list_code_unique">
+      <unique-column name="code" />
+    </unique>
+    <index name="idx_price_list_currency_id">
+      <index-column name="currency_id" />
+    </index>
+    <index name="idx_price_list_priority">
+      <index-column name="priority" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title" />
+    </behavior>
+  </table>
+  <table name="price_list_item" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="price_list_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column defaultValue="1" description="the line applies from this quantity on, the line with the greatest minimum quantity not above the quantity wins" name="min_quantity" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the price without taxes, in the currency of the list; NULL when the line is a discount (exactly one of price and discount_percent is set)" name="price" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="NULL" description="the discount, as a percentage of the catalog price; NULL when the line is a price (exactly one of price and discount_percent is set)" name="discount_percent" scale="6" size="16" type="DECIMAL" />
+    <foreign-key foreignTable="price_list" name="fk_price_list_item_price_list_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="price_list_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product_sale_elements" name="fk_price_list_item_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_sale_elements_id" />
+    </foreign-key>
+    <unique name="price_list_item_unique">
+      <unique-column name="price_list_id" />
+      <unique-column name="product_sale_elements_id" />
+      <unique-column name="min_quantity" />
+    </unique>
+    <index name="idx_price_list_item_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="price_list_assignment" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="price_list_id" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the customer group the list is assigned to; exactly one of customer_group_id and customer_id is set" name="customer_group_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the customer the list is assigned to; exactly one of customer_group_id and customer_id is set" name="customer_id" type="INTEGER" />
+    <foreign-key foreignTable="price_list" name="fk_price_list_assignment_price_list_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="price_list_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer_group" name="fk_price_list_assignment_customer_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_price_list_assignment_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <unique name="price_list_assignment_group_unique">
+      <unique-column name="price_list_id" />
+      <unique-column name="customer_group_id" />
+    </unique>
+    <unique name="price_list_assignment_customer_unique">
+      <unique-column name="price_list_id" />
+      <unique-column name="customer_id" />
+    </unique>
+    <index name="idx_price_list_assignment_customer_group_id">
+      <index-column name="customer_group_id" />
+    </index>
+    <index name="idx_price_list_assignment_customer_id">
+      <index-column name="customer_id" />
+    </index>
+  </table>
+  <table name="catalog_restriction" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the customer group the rule applies to; exactly one of customer_group_id and customer_id is set" name="customer_group_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the customer the rule applies to; exactly one of customer_group_id and customer_id is set" name="customer_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the category the rule targets, subcategories included; exactly one of category_id, brand_id and product_id is set" name="category_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the brand the rule targets; exactly one of category_id, brand_id and product_id is set" name="brand_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the product the rule targets; exactly one of category_id, brand_id and product_id is set" name="product_id" type="INTEGER" />
+    <column description="allow: once a customer has one allow rule, whatever no allow rule opens is closed, deny: the target is closed, and wins over allow" name="mode" required="true" size="8" type="VARCHAR" />
+    <foreign-key foreignTable="customer_group" name="fk_catalog_restriction_customer_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_group_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_catalog_restriction_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <foreign-key foreignTable="category" name="fk_catalog_restriction_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="category_id" />
+    </foreign-key>
+    <foreign-key foreignTable="brand" name="fk_catalog_restriction_brand_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="brand_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product" name="fk_catalog_restriction_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <index name="idx_catalog_restriction_customer_group_id">
+      <index-column name="customer_group_id" />
+    </index>
+    <index name="idx_catalog_restriction_customer_id">
+      <index-column name="customer_id" />
+    </index>
+    <index name="idx_catalog_restriction_category_id">
+      <index-column name="category_id" />
+    </index>
+    <index name="idx_catalog_restriction_brand_id">
+      <index-column name="brand_id" />
+    </index>
+    <index name="idx_catalog_restriction_product_id">
+      <index-column name="product_id" />
     </index>
   </table>
   <table name="lang" namespace="Thelia\Model">
@@ -1876,6 +1998,7 @@
     <column description="the stock of the line is held for the cart until this moment; null or past: not held" name="reserved_until" type="TIMESTAMP" />
     <column description="the quantity the listeners of the reservations were told the line holds, read to tell its release; null: nothing told" name="reserved_quantity" type="DOUBLE" />
     <column description="the moment the line was first held since its last release; a hold is never pushed back past a bound from it" name="reserved_since" type="TIMESTAMP" />
+    <column description="the price list whose line priced this line; no foreign key, so that the trace outlives the list and the cart is priced again once the list is gone" name="price_list_id" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
@@ -1903,6 +2026,9 @@
     </index>
     <index name="idx_cart_item_offered_by_coupon_id">
       <index-column name="offered_by_coupon_id" />
+    </index>
+    <index name="idx_cart_item_price_list_id">
+      <index-column name="price_list_id" />
     </index>
     <behavior name="timestampable" />
   </table>
