@@ -158,6 +158,11 @@ class CSVSerializer extends AbstractSerializer
             fclose($fd);
         }
 
+        // An export without any row leaves an empty file: there is no line feed to remove.
+        if (0 === $fileObject->getSize()) {
+            return;
+        }
+
         // Remove last line feed
         $fileObject->ftruncate($fileObject->getSize() - 1);
 
