@@ -292,6 +292,7 @@ final readonly class PriceListLineImport
     {
         $fromReference = null;
         $fromId = null;
+        $sharedBy = [];
 
         if (null !== $row->saleElementReference) {
             $matches = $saleElementIdsByReference[mb_strtolower($row->saleElementReference)] ?? [];
@@ -301,10 +302,15 @@ final readonly class PriceListLineImport
             }
 
             if (\count($matches) > 1) {
-                return new PriceListImportLineError($row->line, PriceListImportLineError::AMBIGUOUS_REFERENCE, $this->printable($row->saleElementReference));
-            }
+                // The reference is shared (nothing makes it unique): only the identifier of the line can tell which one it names.
+                if (null === $row->saleElementId) {
+                    return new PriceListImportLineError($row->line, PriceListImportLineError::AMBIGUOUS_REFERENCE, $this->printable($row->saleElementReference));
+                }
 
-            $fromReference = $matches[0];
+                $sharedBy = $matches;
+            } else {
+                $fromReference = $matches[0];
+            }
         }
 
         if (null !== $row->saleElementId) {
@@ -320,6 +326,10 @@ final readonly class PriceListLineImport
         }
 
         if (null !== $fromReference && null !== $fromId && $fromReference !== $fromId) {
+            return new PriceListImportLineError($row->line, PriceListImportLineError::REFERENCE_AND_ID_DISAGREE);
+        }
+
+        if ([] !== $sharedBy && !\in_array($fromId, $sharedBy, true)) {
             return new PriceListImportLineError($row->line, PriceListImportLineError::REFERENCE_AND_ID_DISAGREE);
         }
 
