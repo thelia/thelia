@@ -16,6 +16,7 @@ namespace Thelia\Domain\Pricing;
 
 use Propel\Runtime\Propel;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Domain\Pricing\PriceVisibility\PriceDisplayMode;
 use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\Map\CatalogPriceRuleTableMap;
 use Thelia\Model\Sale;
@@ -33,6 +34,10 @@ use Thelia\Model\Sale;
  * evaluate them, and a rule between two windows costs one indexed join, not a wrong
  * price. A discount of a group outside 0..100 counts for nothing, as in
  * {@see \Thelia\Model\CustomerGroup::effectiveDiscountRate()}.
+ *
+ * The existence check of a product that states a mode other than visible reads the index
+ * `idx_product_price_display_mode`, not the table; the one of a cart line that still carries
+ * the trace of a price list reads `idx_cart_item_price_list_id`.
  *
  * The statement names only constants and table names: nothing is bound.
  */
@@ -117,9 +122,27 @@ class CatalogActivityProbe implements ResetInterface
                 EXISTS (
                     SELECT 1 FROM `customer_group` other
                     WHERE other.display_taxed_price <> (SELECT display_taxed_price FROM `customer_group` WHERE is_default = 1 ORDER BY id LIMIT 1)
-                ) AS groups_display_prices_otherwise',
+                ) AS groups_display_prices_otherwise,
+                EXISTS (SELECT 1 FROM `price_list` WHERE active = 1) AS price_lists,
+                EXISTS (SELECT 1 FROM `catalog_restriction`) AS catalog_restrictions,
+                (
+                    (SELECT `value` FROM `config` WHERE `name` = %3$s) IN (%4$s)
+                    OR EXISTS (SELECT 1 FROM `product` WHERE price_display_mode IN (%4$s))
+                ) AS non_visible_price_display,
+                EXISTS (
+                    SELECT 1 FROM `price_list_assignment` assignment
+                    INNER JOIN `price_list` assigned_list ON assigned_list.id = assignment.price_list_id AND assigned_list.active = 1
+                    WHERE assignment.customer_group_id = (SELECT id FROM `customer_group` WHERE is_default = 1 ORDER BY id LIMIT 1)
+                ) AS default_group_price_lists,
+                EXISTS (
+                    SELECT 1 FROM `catalog_restriction` default_restriction
+                    WHERE default_restriction.customer_group_id = (SELECT id FROM `customer_group` WHERE is_default = 1 ORDER BY id LIMIT 1)
+                ) AS default_group_catalog_restrictions,
+                EXISTS (SELECT 1 FROM `cart_item` WHERE price_list_id IS NOT NULL) AS cart_lines_priced_by_price_lists',
             CatalogPriceRule::AUDIENCE_MODE_PUBLIC,
             Sale::AUDIENCE_MODE_PUBLIC,
+            "'".PriceDisplayMode::CONFIG_KEY."'",
+            "'".PriceDisplayMode::LoggedIn->value."', '".PriceDisplayMode::OnRequest->value."'",
         ));
         $statement->execute();
 
@@ -136,6 +159,12 @@ class CatalogActivityProbe implements ResetInterface
             defaultCustomerGroupId: null === ($row['default_group_id'] ?? null) || '' === $row['default_group_id'] ? null : (int) $row['default_group_id'],
             defaultCustomerGroupDisplaysTaxedPrices: 1 === (int) ($row['default_group_displays_taxed_prices'] ?? 1),
             hasCustomerGroupDisplayingPricesOtherwise: 1 === (int) ($row['groups_display_prices_otherwise'] ?? 0),
+            hasPriceLists: 1 === (int) ($row['price_lists'] ?? 0),
+            hasCatalogRestrictions: 1 === (int) ($row['catalog_restrictions'] ?? 0),
+            hasNonVisiblePriceDisplay: 1 === (int) ($row['non_visible_price_display'] ?? 0),
+            hasDefaultGroupPriceLists: 1 === (int) ($row['default_group_price_lists'] ?? 0),
+            hasDefaultGroupCatalogRestrictions: 1 === (int) ($row['default_group_catalog_restrictions'] ?? 0),
+            hasCartLinesPricedByPriceLists: 1 === (int) ($row['cart_lines_priced_by_price_lists'] ?? 0),
         );
     }
 }

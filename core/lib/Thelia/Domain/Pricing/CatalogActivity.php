@@ -43,6 +43,18 @@ final readonly class CatalogActivity
         public bool $defaultCustomerGroupDisplaysTaxedPrices = true,
         /** A customer group shows prices the other way round from the default group. */
         public bool $hasCustomerGroupDisplayingPricesOtherwise = false,
+        /** A price list that is turned on exists (its period and its customers are looked at by its own reader). */
+        public bool $hasPriceLists = false,
+        /** A catalog restriction (a customer or a group limited to, or kept from, categories, brands or products) exists. */
+        public bool $hasCatalogRestrictions = false,
+        /** The shop shows its prices to identified customers only or on request, or a product states a mode of its own other than visible. */
+        public bool $hasNonVisiblePriceDisplay = false,
+        /** A price list that is turned on is assigned to the default customer group, the group of every visitor. */
+        public bool $hasDefaultGroupPriceLists = false,
+        /** A catalog restriction is assigned to the default customer group, the group of every visitor. */
+        public bool $hasDefaultGroupCatalogRestrictions = false,
+        /** A line of a cart still carries the trace of the price list that priced it, whether the list is still on, or gone. */
+        public bool $hasCartLinesPricedByPriceLists = false,
     ) {
     }
 
@@ -52,5 +64,24 @@ final readonly class CatalogActivity
     public function customerGroupsPriceAnything(): bool
     {
         return $this->hasCustomerGroupPrices || $this->hasDiscountedCustomerGroup;
+    }
+
+    /**
+     * What an anonymous visitor is shown may differ from what the plain catalog shows: a mode
+     * that hides the prices, a price list or a restriction of the default group.
+     */
+    public function visitorsMayBeShownApart(): bool
+    {
+        return $this->hasNonVisiblePriceDisplay || $this->hasDefaultGroupPriceLists || $this->hasDefaultGroupCatalogRestrictions;
+    }
+
+    /**
+     * Something prices a customer other than the plain catalog does, without a rule or an
+     * operation: a customer group, or a price list, including one that was turned off or deleted
+     * while a cart still holds a line it priced.
+     */
+    public function customersMayBePricedApart(): bool
+    {
+        return $this->customerGroupsPriceAnything() || $this->hasPriceLists || $this->hasCartLinesPricedByPriceLists;
     }
 }

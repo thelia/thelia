@@ -103,7 +103,7 @@ final readonly class CartPriceGuard
 
     private function concernsThisShop(): bool
     {
-        return $this->catalogActivityProbe->read()->customerGroupsPriceAnything();
+        return $this->catalogActivityProbe->read()->customersMayBePricedApart();
     }
 
     /**

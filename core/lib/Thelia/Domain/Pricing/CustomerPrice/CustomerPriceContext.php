@@ -19,6 +19,8 @@ use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CatalogActivityProbe;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Pricing\PriceList\PriceListMatch;
+use Thelia\Domain\Pricing\PriceList\PriceListResolverInterface;
 use Thelia\Domain\Pricing\Rule\Storage\BasePriceLoader;
 use Thelia\Domain\Pricing\Rule\Storage\BasePrices;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
@@ -62,13 +64,55 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         private readonly CustomerGroupResolver $customerGroupResolver,
         private readonly CustomerDiscountRate $customerDiscountRate,
         private readonly ?SaleUnitContext $saleUnitContext = null,
+        private readonly ?PriceListResolverInterface $priceListResolver = null,
     ) {
     }
 
-    public function resolve(array $productSaleElementsIds, Currency $currency, ?Customer $customer): array
+    public function resolve(array $productSaleElementsIds, Currency $currency, ?Customer $customer, array $quantities = []): array
     {
         $productSaleElementsIds = array_values(array_unique(array_map('intval', $productSaleElementsIds)));
 
+        if ([] === $productSaleElementsIds) {
+            return [];
+        }
+
+        $matches = $this->priceListResolver?->resolve($productSaleElementsIds, $currency, $customer, $quantities) ?? [];
+
+        if ([] === $matches) {
+            return $this->resolveByChain($productSaleElementsIds, $currency, $customer);
+        }
+
+        $chainIds = array_values(array_filter(
+            $productSaleElementsIds,
+            static fn (int $pseId): bool => null === ($matches[$pseId] ?? null)?->untaxedPrice,
+        ));
+        $chainPrices = $this->resolveByChain($chainIds, $currency, $customer);
+        $groupId = $this->customerGroupResolver->groupIdOf($customer);
+        $prices = [];
+
+        foreach ($productSaleElementsIds as $pseId) {
+            $match = $matches[$pseId] ?? null;
+
+            if (null !== $match && null !== $match->untaxedPrice) {
+                $prices[$pseId] = $this->priceListPrice($match, $groupId);
+            } elseif (isset($chainPrices[$pseId])) {
+                $prices[$pseId] = null === $match ? $chainPrices[$pseId] : $chainPrices[$pseId]->closedBy($match->priceListId);
+            }
+        }
+
+        return $prices;
+    }
+
+    /**
+     * What the discounts, the rules and the groups make of the catalog price, for the sale elements
+     * no price list prices.
+     *
+     * @param list<int> $productSaleElementsIds
+     *
+     * @return array<int, ResolvedPrice>
+     */
+    private function resolveByChain(array $productSaleElementsIds, Currency $currency, ?Customer $customer): array
+    {
         if ([] === $productSaleElementsIds) {
             return [];
         }
@@ -135,6 +179,7 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
 
     public function resolveBundlePrices(array $bundlePrices, ?Customer $customer): array
     {
+        // A bundle priced by its components ignores the price lists: they price sale elements.
         if ([] === $bundlePrices) {
             return [];
         }
@@ -168,6 +213,28 @@ final class CustomerPriceContext implements CustomerPriceContextInterface, Reset
         $groupId = (int) ($group?->getId() ?? $this->customerGroupResolver->defaultGroupId());
 
         return [$groupId, $activity->hasDiscountedCustomerGroup ? (float) $group?->effectiveDiscountRate() : 0.0];
+    }
+
+    /**
+     * The price of a price list line: the price, with no promotion and no discount on top of it.
+     */
+    private function priceListPrice(PriceListMatch $match, int $groupId): ResolvedPrice
+    {
+        $price = (float) $match->untaxedPrice;
+
+        return new ResolvedPrice(
+            $price,
+            $price,
+            false,
+            false,
+            ResolvedPrice::SOURCE_PRICE_LIST,
+            $groupId,
+            0.0,
+            0.0,
+            true,
+            $match->priceListId,
+            $match->tiers,
+        );
     }
 
     /**

@@ -63,7 +63,7 @@ class PricingActivityChecker implements ResetInterface
         $activity = $this->catalogActivityProbe->read();
 
         return $this->hasDiscountedCustomer($customer)
-            || $activity->customerGroupsPriceAnything()
+            || $activity->customersMayBePricedApart()
             || $activity->hasActivePublicRule
             || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()
             || (null !== $customer && ($activity->hasActiveNamedRule || $activity->hasActiveReservedSale));
@@ -185,7 +185,8 @@ class PricingActivityChecker implements ResetInterface
     /**
      * Two visitors may owe two different prices for the same sale element, whoever
      * they are: a shared cache of prices then has to step aside. Rules and operations
-     * reserved for customer groups are among the named ones and the reserved ones.
+     * reserved for customer groups are among the named ones and the reserved ones; a price list
+     * is assigned to a customer or to a group, so it prices two visitors apart as well.
      */
     public function hasVisitorDependentPricing(): bool
     {
@@ -193,7 +194,7 @@ class PricingActivityChecker implements ResetInterface
 
         return $activity->hasActiveNamedRule
             || $activity->hasActiveReservedSale
-            || $activity->customerGroupsPriceAnything();
+            || $activity->customersMayBePricedApart();
     }
 
     /**

@@ -78,13 +78,15 @@ final readonly class QuickOrderFacade
     }
 
     /**
+     * @param Cart|null $cart the cart that would receive the lines: what it already holds of a sale element counts for its tier
+     *
      * @throws QuickOrderRateLimitedException
      */
-    public function resolve(Customer $customer, ReferenceQuantityLines $lines, Currency $currency): QuickOrderTable
+    public function resolve(Customer $customer, ReferenceQuantityLines $lines, Currency $currency, ?Cart $cart = null): QuickOrderTable
     {
         $this->spendBudget($customer);
 
-        return $this->resolver->resolve($customer, $lines, $currency);
+        return $this->resolver->resolve($customer, $lines, $currency, $cart);
     }
 
     /**
@@ -116,7 +118,7 @@ final readonly class QuickOrderFacade
             throw new QuickOrderCartNotFoundException('Cart not found.');
         }
 
-        $table = $this->resolver->resolve($customer, $lines, $cart->getCurrency() ?? Currency::getDefaultCurrency());
+        $table = $this->resolver->resolve($customer, $lines, $cart->getCurrency() ?? Currency::getDefaultCurrency(), $cart);
 
         // Every resolved line is judged before the first one is written: a line the
         // destination refuses leaves the cart as it was, the others included.

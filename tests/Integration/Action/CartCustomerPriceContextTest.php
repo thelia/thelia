@@ -414,7 +414,8 @@ final class CartCustomerPriceContextTest extends ActionIntegrationTestCase
     {
         return array_values(array_filter(
             $statements,
-            static fn (string $statement): bool => str_starts_with(ltrim($statement), $verb) && str_contains($statement, $fragment),
+            // The catalog activity probe names `cart_item` in one of its existence checks: it is not a read of the lines.
+            static fn (string $statement): bool => str_starts_with(ltrim($statement), $verb) && str_contains($statement, $fragment) && !str_contains($statement, 'AS cart_lines_priced_by_price_lists'),
         ));
     }
 
