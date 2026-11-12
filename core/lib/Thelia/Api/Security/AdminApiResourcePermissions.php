@@ -33,6 +33,7 @@ use Thelia\Api\Resource\Cart;
 use Thelia\Api\Resource\CartAddress;
 use Thelia\Api\Resource\CartItem;
 use Thelia\Api\Resource\CatalogPriceRule;
+use Thelia\Api\Resource\CatalogRestriction;
 use Thelia\Api\Resource\Category;
 use Thelia\Api\Resource\CategoryDocument;
 use Thelia\Api\Resource\CategoryImage;
@@ -79,6 +80,9 @@ use Thelia\Api\Resource\OrderReturnStatus;
 use Thelia\Api\Resource\OrderShipment;
 use Thelia\Api\Resource\OrderShipmentItem;
 use Thelia\Api\Resource\OrderStatus;
+use Thelia\Api\Resource\PriceList;
+use Thelia\Api\Resource\PriceListAssignment;
+use Thelia\Api\Resource\PriceListItem;
 use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductAssociatedContent;
 use Thelia\Api\Resource\ProductAssociation;
@@ -180,6 +184,11 @@ final readonly class AdminApiResourcePermissions
         OrderReturnLine::class => AdminResources::ORDER_RETURN,
         OrderReturnStatus::class => AdminResources::ORDER_RETURN,
         OrderReturnReason::class => AdminResources::ORDER_RETURN_REASON,
+        // The negotiated prices and the assortments of the customers: one resource, one right.
+        PriceList::class => AdminResources::PRICING,
+        PriceListAssignment::class => AdminResources::PRICING,
+        PriceListItem::class => AdminResources::PRICING,
+        CatalogRestriction::class => AdminResources::PRICING,
         Product::class => AdminResources::PRODUCT,
         ProductAssociatedContent::class => AdminResources::PRODUCT,
         ProductAssociation::class => AdminResources::PRODUCT,
