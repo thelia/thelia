@@ -77,8 +77,8 @@ class PricingActivityChecker implements ResetInterface
      *
      * What changes the order is the group of the visitor (a visitor with no account, a guest
      * and a console command belong to the default group) pricing something of its own or
-     * discounting the others, a rule or an operation reserved for named customers, or the sale
-     * unit. A rate that applies to every price alike, the discount of the customer, moves no
+     * discounting the others, a rule or an operation reserved for named customers, a price list,
+     * or the sale unit. A rate that applies to every price alike, the discount of the customer, moves no
      * product past another: it does not count. Neither do the groups the visitor is not in.
      *
      * Unlike {@see mayPriceBeyondCatalog()}, a running public rule does not count: it prices
@@ -90,6 +90,13 @@ class PricingActivityChecker implements ResetInterface
 
         if ((null !== $customer && ($activity->hasActiveNamedRule || $activity->hasActiveReservedSale))
             || true === $this->saleUnitPricingActivityChecker?->currentSaleUnitPricesAnything()) {
+            return true;
+        }
+
+        // A price list prices what it holds for the customers it is assigned to, and for a visitor
+        // only when it is assigned to the default group: one that is on moves the order of a
+        // customer, whichever group it is assigned to (it may be the customer's own).
+        if ($activity->hasPriceLists && (null !== $customer || $activity->hasDefaultGroupPriceLists)) {
             return true;
         }
 

@@ -37,6 +37,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\PromotionFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\GtinConstraint;
 use Thelia\Api\State\Processor\ProductSaleElementsStockProcessor;
@@ -104,10 +105,13 @@ use Thelia\Model\ProductSaleElementsQuery;
     filterClass: BooleanFilter::class,
     properties: [
         'isDefault',
-        'promo',
         'newness',
         'visible',
     ],
+)]
+#[ApiFilter(
+    filterClass: PromotionFilter::class,
+    properties: ['promo'],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,

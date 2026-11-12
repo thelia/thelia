@@ -40,6 +40,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\TheliaFilter;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\PromotionFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Bridge\Propel\Validator\BundleSettingsConstraint;
@@ -115,9 +116,12 @@ use Thelia\Model\Tools\UrlRewritingTrait;
         'virtual',
         'productCategories.defaultCategory',
         'productSaleElements.isDefault',
-        'productSaleElements.promo',
         'productSaleElements.newness',
     ],
+)]
+#[ApiFilter(
+    filterClass: PromotionFilter::class,
+    properties: ['productSaleElements.promo'],
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,

@@ -24,10 +24,12 @@ use Thelia\Model\CatalogPriceRule;
 use Thelia\Model\CatalogPriceRuleQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\CustomerGroupQuery;
+use Thelia\Model\PriceListQuery;
 use Thelia\Model\Sale;
 use Thelia\Model\SaleQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
+use Thelia\Tests\Integration\Domain\Pricing\PriceList\PriceListFixtures;
 
 /**
  * Whether any rule, operation or customer group prices the catalog, asked of the
@@ -35,6 +37,7 @@ use Thelia\Test\Trait\RecordsSqlQueries;
  */
 final class PricingActivityCheckerTest extends ActionIntegrationTestCase
 {
+    use PriceListFixtures;
     use RecordsSqlQueries;
 
     private CatalogActivityProbe $probe;
@@ -47,6 +50,7 @@ final class PricingActivityCheckerTest extends ActionIntegrationTestCase
         // every group discount cleared, so each test starts from a shop without any.
         CatalogPriceRuleQuery::create()->update(['Active' => false]);
         SaleQuery::create()->update(['Active' => false]);
+        PriceListQuery::create()->update(['Active' => false]);
         CustomerGroupQuery::create()->update(['Discount' => '0']);
     }
 
@@ -315,6 +319,32 @@ final class PricingActivityCheckerTest extends ActionIntegrationTestCase
 
         self::assertTrue($checker->mayOrderDifferFromThePublicPrice(null), 'A visitor with no account is of the default group.');
         self::assertFalse($checker->mayOrderDifferFromThePublicPrice($this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $other])));
+    }
+
+    public function testAPriceListMovesTheOrderOfTheCustomersAndNotOfTheVisitor(): void
+    {
+        $group = $this->factory->customerGroup();
+        $other = $this->factory->customerGroup();
+        $this->assignToGroup($this->priceList(), $group);
+        $checker = $this->checker();
+
+        self::assertTrue($checker->mayOrderDifferFromThePublicPrice($this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $group])), 'A list prices the sale elements it holds for its customers.');
+        self::assertTrue($checker->mayOrderDifferFromThePublicPrice($this->factory->customer($this->factory->customerTitle(), ['customerGroup' => $other])), 'Whose list it is is not looked at: the cards resolve it.');
+        self::assertFalse($checker->mayOrderDifferFromThePublicPrice(null), 'A list of a group is not owed to a visitor.');
+    }
+
+    public function testAPriceListOfTheDefaultGroupMovesTheOrderOfTheVisitor(): void
+    {
+        $this->assignToGroup($this->priceList(), $this->factory->customerGroup(isDefault: true));
+
+        self::assertTrue($this->checker()->mayOrderDifferFromThePublicPrice(null));
+    }
+
+    public function testATurnedOffPriceListDoesNotMoveTheOrder(): void
+    {
+        $this->assignToGroup($this->priceList(active: false), $this->factory->customerGroup());
+
+        self::assertFalse($this->checker()->mayOrderDifferFromThePublicPrice($this->factory->customer($this->factory->customerTitle())));
     }
 
     public function testADiscountOfTheCustomerAloneDoesNotMoveTheOrder(): void
