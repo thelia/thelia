@@ -39,6 +39,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('env(THELIA_API_RATE_LIMIT_ANONYMOUS)', '200')
         ->set('env(THELIA_API_RATE_LIMIT_FRONT_AUTHENTICATED)', '800')
         ->set('env(THELIA_API_RATE_LIMIT_ADMIN)', '2000')
+        // Captures of an authorized payment through the admin API, per minute and
+        // per administrator account.
+        ->set('env(THELIA_API_RATE_LIMIT_ORDER_CAPTURE)', '10')
         // Addresses and CIDR ranges exempt from the limits that are not about
         // logging in, comma separated. Meant for a synchronisation that
         // legitimately calls faster than a browser does.
