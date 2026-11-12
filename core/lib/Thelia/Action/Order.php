@@ -39,6 +39,7 @@ use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\Exception\OrderStatusChangeConflictException;
+use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
@@ -383,12 +384,6 @@ class Order extends BaseAction implements EventSubscriberInterface
             throw new \LogicException('ORDER_UPDATE_STATUS was dispatched without a target status.');
         }
 
-        // Every entry point (back office, API, payment modules, commands) lands here,
-        // so this is where the transition graph is enforced.
-        $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
-
-        $event->setPreviousStatusId($order->getStatusId());
-
         $con = Propel::getConnection(OrderTableMap::DATABASE_NAME);
 
         // Read before the transaction: what the payment takes from the stock, when the shop reserves
@@ -396,16 +391,25 @@ class Order extends BaseAction implements EventSubscriberInterface
         // (the admin API worked both out already, before its own transaction).
         $stockLock = $this->stockLock();
         $stockPlan = $event->getStockPlan() ?? $stockLock?->planFor($order, $newStatus, $dispatcher);
+        $statusIdAsRead = (int) $order->getStatusId();
         $releaseTheCart = $this->leavesTheUnpaidStatus($order, $newStatus);
 
         // Prevent partial stock update on status change.
         $con->beginTransaction();
+        $expectedStatusId = $event->getExpectedStatusId();
+        $writeWithStatus = $event->getWriteWithStatus();
 
         try {
-            // The locks come in the same order on every path that changes a status (the admin API
-            // takes them so): the row of the order first, then the stock rows in ascending id.
-            // Taken the other way round, two requests on the same order wait for each other.
-            $statusIdUnderLock = null === $order->getId() ? null : OrderQuery::create()->lockStatusIdForUpdate((int) $order->getId(), $con);
+            // The status the order has now, the row held until the commit: two workers
+            // moving the same order decide one after the other, each on what the other
+            // wrote, not on the object it happened to load. The locks come in the same order
+            // on every path that changes a status (the admin API takes them so): the row of
+            // the order first, then the stock rows in ascending id. Taken the other way
+            // round, two requests on the same order wait for each other.
+            $currentStatusId = null === $order->getId()
+                ? $statusIdAsRead
+                : OrderQuery::create()->lockStatusIdForUpdate((int) $order->getId(), $con)
+                    ?? throw new \InvalidArgumentException(\sprintf('Order #%d no longer exists: its status cannot change.', (int) $order->getId()));
 
             // The lines are read again under that lock: an edit of the order may have changed them
             // since they were read, and the stock moves with the lines the order has now.
@@ -416,28 +420,92 @@ class Order extends BaseAction implements EventSubscriberInterface
             // from, so that the reservations of the other carts are read as they stand.
             $stockLock?->lock($stockPlan->rows ?? [], $con);
 
-            // The model of the order was read before the lock. Another request may have moved the
-            // status since (the notification of a payment and the return of the browser confirm
-            // the same payment): it is judged on the status stored, never on the one that was read.
-            if (null !== $statusIdUnderLock && $statusIdUnderLock !== (int) $order->getStatusId()) {
-                $order->reload(false, $con);
-                $event->setPreviousStatusId($order->getStatusId());
+            $alreadyThere = $currentStatusId === $newStatus;
 
-                if ($statusIdUnderLock === $newStatus) {
-                    // Already where the change leads: nothing to take, nothing to tell.
-                    $event->setOrder($order);
-                    $con->commit();
-
-                    return;
+            if (null === $expectedStatusId || $expectedStatusId === $currentStatusId) {
+                if ($currentStatusId !== $statusIdAsRead) {
+                    $order->setStatusId($currentStatusId);
+                    // The status the database already holds: never written back from here.
+                    $order->resetModified(OrderTableMap::COL_STATUS_ID);
+                    $releaseTheCart = $this->leavesTheUnpaidStatus($order, $newStatus);
                 }
 
-                $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
-                $releaseTheCart = $this->leavesTheUnpaidStatus($order, $newStatus);
+                // Every entry point (back office, API, payment modules, commands) lands here,
+                // so this is where the transition graph is enforced.
+                if (!$alreadyThere) {
+                    $this->transitionGuard->assertAllowed($order, $newStatus, $event->isStatusTransitionForced());
+                }
+            }
+        } catch (OrderStatusTransitionRefusedException|\InvalidArgumentException $refusal) {
+            // A refusal writes nothing: the transaction is closed as it is, never rolled
+            // back, so that a caller inside a transaction of its own that catches the
+            // refusal can still commit what it wrote.
+            $con->commit();
+
+            throw $refusal;
+        } catch (\Throwable $failure) {
+            // A failure of the database may have undone the caller's work already: its
+            // transaction must not commit as if nothing happened.
+            $con->rollBack();
+
+            throw $this->conflictOr($failure);
+        }
+
+        if (null !== $expectedStatusId && $expectedStatusId !== $currentStatusId) {
+            $con->commit();
+            $event->stopPropagation();
+
+            Tlog::getInstance()->info(\sprintf(
+                'Order %s left status #%d before the move to status #%d was written: the move is dropped.',
+                (string) $order->getRef(),
+                $expectedStatusId,
+                $newStatus,
+            ));
+
+            return;
+        }
+
+        if ($alreadyThere) {
+            // Another request moved the order to the target status first: nothing to take from
+            // the stock. The work that came with the move is written, and nothing else happens.
+            try {
+                if (null !== $writeWithStatus) {
+                    $writeWithStatus($currentStatusId);
+                }
+
+                $con->commit();
+            } catch (\Throwable $exception) {
+                $con->rollBack();
+
+                throw $this->conflictOr($exception);
             }
 
-            $operation = null === $stockPlan || null === $statusIdUnderLock
+            if (null !== $writeWithStatus) {
+                $order->reload();
+                $event->stopPropagation();
+
+                return;
+            }
+
+            $event->setPreviousStatusId($currentStatusId);
+            $event->setOrder($order);
+
+            return;
+        }
+
+        $event->setPreviousStatusId($currentStatusId);
+
+        try {
+            if (null !== $writeWithStatus) {
+                $writeWithStatus($currentStatusId);
+                // What the work wrote, for the stock and the listeners that follow; the status
+                // is still the one read under the lock.
+                $order->reload(false, $con);
+            }
+
+            $operation = null === $stockPlan || null === $order->getId()
                 ? null
-                : $stockPlan->operationFor($statusIdUnderLock, (int) $order->getStatusId(), $newStatus);
+                : $stockPlan->operationFor($currentStatusId, $statusIdAsRead, $newStatus);
 
             $stockChanges = $this->updateQuantity($order, $newStatus, $dispatcher, $operation);
 
@@ -455,13 +523,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         } catch (\Throwable $exception) {
             $con->rollBack();
 
-            // Another request took a lock this one needed and the database broke the tie: nothing
-            // of this change stands, and asked again it is judged on what the other one left.
-            if (!$exception instanceof OrderStatusChangeConflictException && LockConflictDetector::isLockConflict($exception)) {
-                throw new OrderStatusChangeConflictException($exception);
-            }
-
-            throw $exception;
+            throw $this->conflictOr($exception);
         }
 
         // After the commit, never inside it: a listener meets the stock as the change left it, and
@@ -472,6 +534,19 @@ class Order extends BaseAction implements EventSubscriberInterface
         } else {
             StockLevelAnnouncer::tell($dispatcher, $stockChanges);
         }
+    }
+
+    /**
+     * Another request took a lock this one needed and the database broke the tie: nothing of
+     * this change stands, and asked again it is judged on what the other one left.
+     */
+    private function conflictOr(\Throwable $failure): \Throwable
+    {
+        if (!$failure instanceof OrderStatusChangeConflictException && LockConflictDetector::isLockConflict($failure)) {
+            return new OrderStatusChangeConflictException($failure);
+        }
+
+        return $failure;
     }
 
     /**
@@ -495,6 +570,12 @@ class Order extends BaseAction implements EventSubscriberInterface
         // 1) The order is currently paid, and will become unpaid (get products back in stock unconditionnaly)
         // 2) The order is currently unpaid, and will become paid (remove products from stock, except if was done at order creation $manageStockOnCreation == false)
         // 3) The order is currently NOT PAID, and will become canceled or the like (get products back in stock if it was done at order creation $manageStockOnCreation == true)
+
+        // A move between two statuses that both stand for "not paid" (an authorization
+        // putting the order on hold for capture) leaves the stock as it is.
+        if ($order->isNotPaid(true) && $newStatus->isNotPaid(true)) {
+            return;
+        }
 
         $manageStockOnCreation = $order->isStockStillGovernedByCreation($dispatcher);
 

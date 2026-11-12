@@ -45,11 +45,12 @@ use Thelia\Model\OrderStatusQuery;
  * something to change from here.
  *
  * The status change needs what the order looked like before, which at priority 127 is
- * already gone — the order in the event carries the new status. A second listener on
- * the same event runs at 192, ahead of the core, and keeps the previous status code
- * for the one at 127 to read back. The two are keyed by the event object itself, so
- * concurrent dispatches in the same process never read each other's value. The
- * correction of an address works the same way, with the columns of the address.
+ * already gone — the order in the event carries the new status. Thelia\Action\Order
+ * sets it on the event, as read under the row lock it writes with, which is also the
+ * status the transition was decided on. The correction of an address keeps the
+ * columns it started from in a second listener at 192, ahead of the core, keyed by
+ * the event object itself, so concurrent dispatches in the same process never read
+ * each other's value.
  */
 readonly class RecordOrderHistoryListener
 {
@@ -57,18 +58,11 @@ readonly class RecordOrderHistoryListener
     private const ADDRESS_TYPE_INVOICE = 'invoice';
 
     /**
-     * The status each in-flight event started from.
+     * The columns each in-flight address correction started from.
      *
-     * A WeakMap rather than an SplObjectStorage: nothing guarantees the listener at 127
+     * A WeakMap rather than an SplObjectStorage: nothing guarantees the listener at 64
      * ever runs — a listener in between may stop propagation — and a weak key lets the
      * abandoned entry go with the event instead of holding it for the whole process.
-     *
-     * @var \WeakMap<OrderEvent, string|null>
-     */
-    private \WeakMap $statusCodeBeforeChange;
-
-    /**
-     * The columns each in-flight address correction started from.
      *
      * @var \WeakMap<OrderAddressEvent, array<string, mixed>>
      */
@@ -77,18 +71,7 @@ readonly class RecordOrderHistoryListener
     public function __construct(
         private OrderHistoryRecorder $orderHistoryRecorder,
     ) {
-        $this->statusCodeBeforeChange = new \WeakMap();
         $this->addressBeforeCorrection = new \WeakMap();
-    }
-
-    /**
-     * Runs at 192, ahead of Thelia\Action\Order::updateStatus (128), purely to read the
-     * status the order still has. Writes nothing.
-     */
-    #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 192)]
-    public function rememberStatusBeforeChange(OrderEvent $event): void
-    {
-        $this->statusCodeBeforeChange[$event] = $this->statusCodeOf($event->getOrder()->getStatusId());
     }
 
     #[AsEventListener(event: TheliaEvents::ORDER_UPDATE_STATUS, priority: 127)]
@@ -101,8 +84,9 @@ readonly class RecordOrderHistoryListener
             return;
         }
 
-        $fromStatusCode = $this->statusCodeBeforeChange[$event] ?? null;
-        unset($this->statusCodeBeforeChange[$event]);
+        // The status Thelia\Action\Order::updateStatus read under the row lock, which may
+        // differ from the one the caller's object held when the event was dispatched.
+        $fromStatusCode = $this->statusCodeOf($event->getPreviousStatusId());
 
         $this->orderHistoryRecorder->recordStatusChanged(
             $order->getId(),

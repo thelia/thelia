@@ -2174,6 +2174,11 @@ INSERT INTO `order_status`(`id`, `code`, `color`, `position`, `protected_status`
 INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (7, 'partially_shipped', 'paid', '#20c997', 7, 0, NOW(), NOW());
 
+-- The payment is authorized and not yet taken: a custom status, equivalent to not_paid,
+-- that the core moves an order to when a payment module records an authorization.
+INSERT INTO `order_status`(`id`, `code`, `equivalent_code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
+(8, 'awaiting_capture', 'not_paid', '#ffc107', 8, 0, NOW(), NOW());
+
 INSERT INTO `order_return_status`(`id`, `code`, `color`, `position`, `protected_status`, `created_at`, `updated_at`) VALUES
 (1, 'requested', '#f39922', 1, 1, NOW(), NOW()),
 (2, 'info_awaited', '#5bc0de', 2, 1, NOW(), NOW()),
@@ -2270,7 +2275,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (65, 'admin.configuration.ai', NOW(), NOW()),
 (66, 'admin.configuration.ai-mcp', NOW(), NOW()),
 (67, 'admin.customer.group', NOW(), NOW()),
-(68, 'admin.order.edit', NOW(), NOW())
+(68, 'admin.order.edit', NOW(), NOW()),
+(69, 'admin.order.payment-capture', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -15614,6 +15620,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'cs_CZ', NULL, '', '', ''),
     (6, 'cs_CZ', NULL, '', '', ''),
     (7, 'cs_CZ', 'Částečně odesláno', '', '', ''),
+    (8, 'cs_CZ', 'Čeká na stržení platby', '', '', ''),
     (1, 'de_DE', 'Nicht bezahlt', '', '', ''),
     (2, 'de_DE', 'Bezahlt', '', '', ''),
     (3, 'de_DE', 'Bearbeitung', '', '', ''),
@@ -15621,6 +15628,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'de_DE', 'Storniert', '', '', ''),
     (6, 'de_DE', 'Zrückerstattet', '', '', ''),
     (7, 'de_DE', 'Teilweise versandt', '', '', ''),
+    (8, 'de_DE', 'Warten auf Einzug', '', '', ''),
     (1, 'en_US', 'Not paid', '', '', ''),
     (2, 'en_US', 'Paid', '', '', ''),
     (3, 'en_US', 'Processing', '', '', ''),
@@ -15628,6 +15636,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'en_US', 'Canceled', '', '', ''),
     (6, 'en_US', 'Refunded', '', '', ''),
     (7, 'en_US', 'Partially shipped', '', '', ''),
+    (8, 'en_US', 'Awaiting capture', '', '', ''),
     (1, 'es_ES', 'No pagados', '', '', ''),
     (2, 'es_ES', 'Pagado', '', '', ''),
     (3, 'es_ES', 'Procesando', '', '', ''),
@@ -15635,6 +15644,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'es_ES', 'Cancelado', '', '', ''),
     (6, 'es_ES', 'Reembolsado', '', '', ''),
     (7, 'es_ES', 'Enviado parcialmente', '', '', ''),
+    (8, 'es_ES', 'Pendiente de captura', '', '', ''),
     (1, 'fr_FR', 'Non payée', '', '', ''),
     (2, 'fr_FR', 'Payée', '', '', ''),
     (3, 'fr_FR', 'Traitement', '', '', ''),
@@ -15642,6 +15652,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'fr_FR', 'Annulée', '', '', ''),
     (6, 'fr_FR', 'Remboursé', '', '', ''),
     (7, 'fr_FR', 'Partiellement expédiée', '', '', ''),
+    (8, 'fr_FR', 'En attente de capture', '', '', ''),
     (1, 'it_IT', NULL, '', '', ''),
     (2, 'it_IT', NULL, '', '', ''),
     (3, 'it_IT', NULL, '', '', ''),
@@ -15649,6 +15660,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'it_IT', NULL, '', '', ''),
     (6, 'it_IT', NULL, '', '', ''),
     (7, 'it_IT', 'Parzialmente spedito', '', '', ''),
+    (8, 'it_IT', 'In attesa di cattura', '', '', ''),
     (1, 'nl_NL', 'Niet betaald', '', '', ''),
     (2, 'nl_NL', 'Betaald', '', '', ''),
     (3, 'nl_NL', 'In behandeling', '', '', ''),
@@ -15656,13 +15668,15 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (5, 'nl_NL', 'Geannuleerd', '', '', ''),
     (6, 'nl_NL', 'Terugbetaald', '', '', ''),
     (7, 'nl_NL', 'Gedeeltelijk verzonden', '', '', ''),
+    (8, 'nl_NL', 'Wacht op incasso', '', '', ''),
     (1, 'ru_RU', 'Не оплачен', '', '', ''),
     (2, 'ru_RU', 'Оплачен', '', '', ''),
     (3, 'ru_RU', 'В обработке', '', '', ''),
     (4, 'ru_RU', 'Выслан', '', '', ''),
     (5, 'ru_RU', 'Отменен', '', '', ''),
     (6, 'ru_RU', 'Возвращен', '', '', ''),
-    (7, 'ru_RU', 'Частично отправлен', '', '', '')
+    (7, 'ru_RU', 'Частично отправлен', '', '', ''),
+    (8, 'ru_RU', 'Ожидает списания', '', '', '')
 ;
 
 INSERT INTO `order_return_status_i18n`(`id`, `locale`, `title`) VALUES
@@ -15835,6 +15849,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'cs_CZ', NULL, NULL, NULL, NULL),
     (67, 'cs_CZ', NULL, NULL, NULL, NULL),
     (68, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (69, 'cs_CZ', 'Stržení platby objednávky', NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15902,6 +15917,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'de_DE', NULL, NULL, NULL, NULL),
     (67, 'de_DE', 'Kundengruppen', NULL, NULL, NULL),
     (68, 'de_DE', NULL, NULL, NULL, NULL),
+    (69, 'de_DE', 'Einzug der Bestellzahlung', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -15969,6 +15985,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'en_US', 'Configuration AI MCP tokens', NULL, NULL, NULL),
     (67, 'en_US', 'Customer groups', NULL, NULL, NULL),
     (68, 'en_US', 'Editing the lines of an order', NULL, NULL, NULL),
+    (69, 'en_US', 'Order payment capture', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -16036,6 +16053,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'es_ES', NULL, NULL, NULL, NULL),
     (67, 'es_ES', 'Grupos de clientes', NULL, NULL, NULL),
     (68, 'es_ES', NULL, NULL, NULL, NULL),
+    (69, 'es_ES', 'Captura del pago del pedido', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -16103,6 +16121,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'fr_FR', 'Configuration des jetons MCP de l\'IA', NULL, NULL, NULL),
     (67, 'fr_FR', 'Groupes de clients', NULL, NULL, NULL),
     (68, 'fr_FR', 'Modification des lignes d\'une commande', NULL, NULL, NULL),
+    (69, 'fr_FR', 'Capture du paiement d\'une commande', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -16170,6 +16189,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'it_IT', NULL, NULL, NULL, NULL),
     (67, 'it_IT', 'Gruppi di clienti', NULL, NULL, NULL),
     (68, 'it_IT', NULL, NULL, NULL, NULL),
+    (69, 'it_IT', 'Cattura del pagamento dell\'ordine', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -16237,6 +16257,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (66, 'nl_NL', NULL, NULL, NULL, NULL),
     (67, 'nl_NL', 'Klantgroepen', NULL, NULL, NULL),
     (68, 'nl_NL', NULL, NULL, NULL, NULL),
+    (69, 'nl_NL', 'Incasso van de orderbetaling', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -16303,7 +16324,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (65, 'ru_RU', NULL, NULL, NULL, NULL),
     (66, 'ru_RU', NULL, NULL, NULL, NULL),
     (67, 'ru_RU', 'Группы клиентов', NULL, NULL, NULL),
-    (68, 'ru_RU', NULL, NULL, NULL, NULL)
+    (68, 'ru_RU', NULL, NULL, NULL, NULL),
+    (69, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL)
 ;
 
 
