@@ -294,6 +294,22 @@ final class PaymentCaptureServiceTest extends ActionIntegrationTestCase
         self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
     }
 
+    public function testASecondRefusalNamedLikeTheFirstIsStillARefusal(): void
+    {
+        // A provider naming its refusals after its transaction: nothing was taken either time.
+        [$order] = $this->authorizedOrder(120);
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::failed('05', 'Do not honor', 'TX-'.$order->getId());
+        self::assertTrue($this->service->capture($order)->isFailed());
+
+        DeferredCapturePaymentModule::$nextCaptureAnswer = PaymentOperationResult::failed('05', 'Do not honor', 'TX-'.$order->getId());
+        $second = $this->service->capture($order);
+
+        self::assertTrue($second->isFailed());
+        self::assertSame('05', $second->getErrorCode());
+        self::assertSame('120.000000', $this->totals->forOrder($order->getId())->remainingToCapture);
+        self::assertSame(OrderStatus::CODE_AWAITING_CAPTURE, $this->statusCodeOf($order));
+    }
+
     public function testALineRecordedByHandStaysRecordedWhenAListenerFails(): void
     {
         [$order] = $this->authorizedOrder(120);
