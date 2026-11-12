@@ -29,6 +29,8 @@ use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
+use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Domain\QuickOrder\DTO\Candidate;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderTable;
@@ -40,6 +42,8 @@ use Thelia\Model\AttributeAvI18nQuery;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\AttributeI18n;
 use Thelia\Model\AttributeI18nQuery;
+use Thelia\Model\Cart;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
@@ -84,11 +88,12 @@ final readonly class ReferenceResolver
         private TaxCalculatorFactoryInterface $taxCalculatorFactory,
         private LangService $langService,
         private BundleDisplayedStock $bundleDisplayedStock,
+        private PriceVisibilityResolver $priceVisibilityResolver,
         private QuantityPolicy $quantityPolicy = new QuantityPolicy(),
     ) {
     }
 
-    public function resolve(Customer $customer, ReferenceQuantityLines $lines, Currency $currency): QuickOrderTable
+    public function resolve(Customer $customer, ReferenceQuantityLines $lines, Currency $currency, ?Cart $cart = null): QuickOrderTable
     {
         if (0 === \count($lines)) {
             return new QuickOrderTable([]);
@@ -133,7 +138,7 @@ final readonly class ReferenceResolver
             $locales,
         );
         $attributes = $this->attributesOf(array_keys($ambiguous), $locales);
-        $prices = $this->untaxedUnitPricesOf($chosen, $customer, $currency);
+        $prices = $this->untaxedUnitPricesOf($chosen, $customer, $currency, $this->quantitiesOf($decisions, $cart));
         $bundleStocks = $this->bundleDisplayedStock->forModels($chosen);
         $this->warmTaxRulesOf($chosen);
         // Read once: it goes through the session cart and, for a signed-in customer
@@ -465,27 +470,81 @@ final readonly class ReferenceResolver
     }
 
     /**
+     * The quantity the lines ask of each sale element they settled on, summed, plus what the cart
+     * that receives them already holds of it: the cart merges the lines of one sale element, and
+     * the tier of a price list follows the quantity it holds ({@see \Thelia\Domain\Cart\Service\CartLinePricer}:
+     * the lines it offers are not counted).
+     *
+     * @param list<array{line: ReferenceQuantity, chosen: ProductSaleElements|null, candidates: list<ProductSaleElements>}> $decisions
+     *
+     * @return array<int, int>
+     */
+    private function quantitiesOf(array $decisions, ?Cart $cart): array
+    {
+        $quantities = [];
+
+        foreach ($decisions as $decision) {
+            if (null !== $decision['chosen']) {
+                $saleElementsId = (int) $decision['chosen']->getId();
+                $quantities[$saleElementsId] = ($quantities[$saleElementsId] ?? 0) + $decision['line']->quantity;
+            }
+        }
+
+        if (null === $cart || [] === $quantities) {
+            return $quantities;
+        }
+
+        $held = [];
+
+        foreach (CartItemQuery::create()->filterByCartId($cart->getId())->filterByProductSaleElementsId(array_keys($quantities))->find() as $item) {
+            if (1 !== (int) $item->getIsOffered()) {
+                $saleElementsId = (int) $item->getProductSaleElementsId();
+                $held[$saleElementsId] = ($held[$saleElementsId] ?? 0.0) + (float) $item->getQuantity();
+            }
+        }
+
+        foreach ($held as $saleElementsId => $quantity) {
+            $quantities[$saleElementsId] = (int) floor($quantities[$saleElementsId] + $quantity);
+        }
+
+        return $quantities;
+    }
+
+    /**
      * The unit price each sale element sells at to this customer, before tax, in the
      * given currency, as the customer price context resolves it for the whole batch:
      * the price of the customer group, the discounts, the price rules and the reserved
      * operations are all in it, and the promo price when the sale element is on
-     * promotion. Null for a sale element that has no price at all.
+     * promotion. Null for a sale element that has no price at all, whose price the mode
+     * hides from the customer, or that an exclusive price list does not price.
      *
      * @param array<int, ProductSaleElements> $saleElements
+     * @param array<int, int>                 $quantities   what the lines ask of each sale element, by id: the tier of a price list follows it
      *
      * @return array<int, array{untaxed: float, promo: bool}|null>
      */
-    private function untaxedUnitPricesOf(array $saleElements, Customer $customer, Currency $currency): array
+    private function untaxedUnitPricesOf(array $saleElements, Customer $customer, Currency $currency, array $quantities): array
     {
         if ([] === $saleElements) {
             return [];
         }
 
-        $resolved = $this->customerPriceContext->resolve(array_keys($saleElements), $currency, $customer);
+        $resolved = $this->customerPriceContext->resolve(array_keys($saleElements), $currency, $customer, $quantities);
+        $hiddenProductIds = $this->priceVisibilityResolver->productsWithHiddenPrice(
+            array_values(array_unique(array_map(static fn (ProductSaleElements $row): int => (int) $row->getProductId(), $saleElements))),
+            $customer,
+        );
         $prices = [];
 
-        foreach (array_keys($saleElements) as $id) {
+        foreach ($saleElements as $id => $row) {
             $price = $resolved[$id] ?? null;
+
+            // A price the customer is not shown (the mode of the shop or of the product), or that
+            // an exclusive price list does not give the sale element, is no price: the line cannot
+            // be added, as the cart would refuse it.
+            if ($price instanceof ResolvedPrice && (!$price->purchasable || \in_array((int) $row->getProductId(), $hiddenProductIds, true))) {
+                $price = null;
+            }
 
             $prices[$id] = null === $price ? null : [
                 'untaxed' => $price->chargedPrice(),

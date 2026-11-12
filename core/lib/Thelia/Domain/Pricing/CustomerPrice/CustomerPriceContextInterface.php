@@ -25,18 +25,19 @@ use Thelia\Model\CustomerGroup;
  * (loops, API, cart, order) goes through it instead of reading the discount of
  * the customer by itself.
  *
- * The price of the group a customer belongs to comes first, then the promotions,
- * then the base price less the discount of the group; the discount of the
- * customer always comes last.
+ * The price list that applies to the customer comes first and is final. Otherwise the
+ * price of the group a customer belongs to comes first, then the promotions, then the
+ * base price less the discount of the group; the discount of the customer always comes last.
  */
 interface CustomerPriceContextInterface
 {
     /**
-     * @param list<int> $productSaleElementsIds
+     * @param list<int>       $productSaleElementsIds
+     * @param array<int, int> $quantities             sale element id => quantity bought, 1 when absent: the tier of a price list depends on it
      *
      * @return array<int, ResolvedPrice> indexed by sale element id; a sale element with no price is absent, never an exception
      */
-    public function resolve(array $productSaleElementsIds, Currency $currency, ?Customer $customer): array;
+    public function resolve(array $productSaleElementsIds, Currency $currency, ?Customer $customer, array $quantities = []): array;
 
     /**
      * What a customer pays for bundles priced by the composition each holds (the line of a cart):

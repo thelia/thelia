@@ -22,6 +22,8 @@ use Thelia\Domain\Pricing\CustomerPrice\CustomerPriceContextInterface;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
 use Thelia\Domain\Pricing\EffectivePrice;
 use Thelia\Domain\Pricing\EffectivePriceCatalog;
+use Thelia\Domain\Pricing\PriceList\ApplicablePriceLists;
+use Thelia\Domain\Pricing\PriceList\PriceListResolver;
 use Thelia\Domain\Pricing\Rule\Audience\CustomerAudience;
 use Thelia\Domain\Pricing\Rule\RuleRepricer;
 use Thelia\Domain\Sale\SaleAudienceChecker;
@@ -38,6 +40,7 @@ use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Sale;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Test\Trait\RecordsSqlQueries;
+use Thelia\Tests\Integration\Domain\Pricing\PriceList\PriceListFixtures;
 
 /**
  * The price of a customer against the whole engine: the price of the group facing
@@ -46,6 +49,7 @@ use Thelia\Test\Trait\RecordsSqlQueries;
  */
 final class CustomerPriceContextTest extends ActionIntegrationTestCase
 {
+    use PriceListFixtures;
     use RecordsSqlQueries;
 
     private CustomerPriceContextInterface $context;
@@ -242,6 +246,198 @@ final class CustomerPriceContextTest extends ActionIntegrationTestCase
     }
 
     /**
+     * 100 in the catalog, 80 on the price list, a rule at -30 %, a group at -5 % and a customer
+     * at -5 %: the price list is final, 80.
+     */
+    public function testAPriceListLineIsFinalWhateverTheRuleTheGroupAndTheCustomerSay(): void
+    {
+        $product = $this->product();
+        $pse = $product->getDefaultSaleElements();
+        $this->publicRule($product, 30.0);
+        $group = $this->factory->customerGroup(discount: 5.0);
+        $member = $this->member($group);
+        $member->setDiscount('5')->save();
+        $list = $this->priceList('PRO', $this->currency);
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $pse, '80');
+        $this->resetRequestMemos();
+
+        $price = $this->context->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()];
+
+        self::assertEqualsWithDelta(80.0, $price->untaxedPrice, 0.000001);
+        self::assertEqualsWithDelta(80.0, $price->untaxedPromoPrice, 0.000001);
+        self::assertFalse($price->isPromo);
+        self::assertSame(ResolvedPrice::SOURCE_PRICE_LIST, $price->source);
+        self::assertTrue($price->purchasable);
+
+        $other = $this->context->resolve([$pse->getId()], $this->currency, $this->member($this->factory->customerGroup(discount: 5.0)))[$pse->getId()];
+        self::assertEqualsWithDelta(70.0, $other->untaxedPromoPrice, 0.000001, 'a customer of no list still gets the rule');
+        self::assertNotSame(ResolvedPrice::SOURCE_PRICE_LIST, $other->source);
+    }
+
+    /**
+     * A line in %: 100 in the catalog, -15 % on the price list, a rule at -30 %, a customer at -5 %: 85.
+     */
+    public function testALineInPercentIsFinalToo(): void
+    {
+        $product = $this->product();
+        $pse = $product->getDefaultSaleElements();
+        $this->publicRule($product, 30.0);
+        $group = $this->factory->customerGroup(discount: 5.0);
+        $member = $this->member($group);
+        $member->setDiscount('5')->save();
+        $list = $this->priceList('PRO', $this->currency);
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $pse, null, 1, '15');
+        $this->resetRequestMemos();
+
+        $price = $this->context->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()];
+
+        self::assertEqualsWithDelta(85.0, $price->untaxedPrice, 0.000001);
+        self::assertEqualsWithDelta(85.0, $price->untaxedPromoPrice, 0.000001);
+        self::assertSame(ResolvedPrice::SOURCE_PRICE_LIST, $price->source);
+    }
+
+    /**
+     * An exclusive list that does not price the sale element: the price of the chain, and no sale.
+     */
+    public function testAnExclusiveListThatDoesNotPriceTheSaleElementMakesItNotPurchasable(): void
+    {
+        $product = $this->product();
+        $pse = $product->getDefaultSaleElements();
+        $listed = $this->factory->productSaleElement($product);
+        $this->factory->productPrice($listed, $this->currency, ['price' => '100.000000', 'promoPrice' => '100.000000']);
+        $group = $this->factory->customerGroup(discount: 10.0);
+        $member = $this->member($group);
+        $list = $this->priceList('EXCL', $this->currency, exclusive: true);
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $listed, '60');
+        $this->resetRequestMemos();
+
+        $prices = $this->context->resolve([$pse->getId(), $listed->getId()], $this->currency, $member);
+
+        self::assertFalse($prices[$pse->getId()]->purchasable);
+        self::assertSame((int) $list->getId(), $prices[$pse->getId()]->priceListId);
+        self::assertEqualsWithDelta(90.0, $prices[$pse->getId()]->untaxedPrice, 0.000001, 'the price the chain gives is still shown');
+        self::assertTrue($prices[$listed->getId()]->purchasable);
+        self::assertEqualsWithDelta(60.0, $prices[$listed->getId()]->untaxedPrice, 0.000001);
+    }
+
+    public function testAListThatEndedFallsBackToTheLevelBelowWithoutError(): void
+    {
+        $pse = $this->saleElement();
+        $group = $this->factory->customerGroup(discount: 10.0);
+        $member = $this->member($group);
+        $list = $this->priceList('PRO', $this->currency, endsAt: new \DateTimeImmutable('+1 hour'));
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $pse, '60');
+        $this->resetRequestMemos();
+
+        self::assertEqualsWithDelta(60.0, $this->context->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()]->untaxedPrice, 0.000001);
+
+        $list->setEndsAt(new \DateTimeImmutable('-1 minute'))->save();
+        $this->resetRequestMemos();
+
+        self::assertEqualsWithDelta(90.0, $this->context->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()]->untaxedPrice, 0.000001, 'the discount of the group, as before');
+    }
+
+    public function testAListInAnotherCurrencyIsIgnored(): void
+    {
+        $pse = $this->saleElement();
+        $group = $this->factory->customerGroup();
+        $member = $this->member($group);
+        $list = $this->priceList('USD-LIST', $this->factory->currency(['code' => 'USD', 'symbol' => '$', 'rate' => 1.1]));
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $pse, '60');
+        $this->resetRequestMemos();
+
+        self::assertEqualsWithDelta(100.0, $this->context->resolve([$pse->getId()], $this->currency, $member)[$pse->getId()]->untaxedPrice, 0.000001);
+    }
+
+    /**
+     * Without a price list the price is the one of before, with and without the discount of the customer.
+     */
+    public function testWithoutAPriceListThePriceIsTheOneOfTheChain(): void
+    {
+        $pse = $this->saleElement();
+        $plain = $this->member($this->factory->customerGroup());
+        $discounted = $this->member($this->factory->customerGroup(discount: 15.0));
+        $discounted->setDiscount('10')->save();
+
+        $plainPrice = $this->context->resolve([$pse->getId()], $this->currency, $plain)[$pse->getId()];
+        $discountedPrice = $this->context->resolve([$pse->getId()], $this->currency, $discounted)[$pse->getId()];
+
+        self::assertEqualsWithDelta(100.0, $plainPrice->untaxedPrice, 0.000001);
+        self::assertSame(ResolvedPrice::SOURCE_BASE, $plainPrice->source);
+        self::assertEqualsWithDelta(76.5, $discountedPrice->untaxedPrice, 0.000001);
+        self::assertTrue($discountedPrice->purchasable);
+        self::assertNull($discountedPrice->priceListId);
+        self::assertSame([], $discountedPrice->tiers);
+    }
+
+    /**
+     * Twenty sale elements, no price list: no statement more than before the lists. With a list
+     * pricing all twenty: the lists of the customer and their lines, two statements, and the
+     * statements of the chain are no longer needed for them.
+     */
+    public function testPriceListsCostNothingWithoutAListAndTwoStatementsAtMostWithOne(): void
+    {
+        $group = $this->factory->customerGroup(discount: 5.0);
+        $member = $this->member($group);
+        $saleElements = [];
+
+        for ($i = 0; $i < 20; ++$i) {
+            $saleElements[] = $this->product()->getDefaultSaleElements();
+        }
+
+        $ids = array_map(static fn ($saleElement): int => (int) $saleElement->getId(), $saleElements);
+        $without = $this->statementsToResolve($ids, $member);
+        $list = $this->priceList('PRO', $this->currency);
+        $this->assignToGroup($list, $group);
+
+        foreach ($saleElements as $index => $saleElement) {
+            $this->priceListItem($list, $saleElement, (string) (50 + $index));
+        }
+
+        $with = $this->statementsToResolve($ids, $member);
+
+        self::assertSame(0, $this->priceListStatements($without), 'no price list turned on: not a statement more than before the lists');
+        self::assertSame(2, $this->priceListStatements($with));
+        self::assertLessThanOrEqual(\count($without) + 2, \count($with));
+    }
+
+    /**
+     * @param list<string> $statements
+     */
+    private function priceListStatements(array $statements): int
+    {
+        // The probe of the shop names the table in an existence check: one statement a request, whatever it asks.
+        $own = array_filter($statements, static fn (string $statement): bool => !str_contains($statement, 'AS price_lists'));
+
+        return self::countSqlQueriesSelectingFrom($own, 'price_list') + self::countSqlQueriesSelectingFrom($own, 'price_list_item');
+    }
+
+    public function testAskingAgainWithQuantitiesAndAListReadsNothing(): void
+    {
+        $pse = $this->saleElement();
+        $group = $this->factory->customerGroup();
+        $member = $this->member($group);
+        $list = $this->priceList('PRO', $this->currency);
+        $this->assignToGroup($list, $group);
+        $this->priceListItem($list, $pse, '60', 1);
+        $this->priceListItem($list, $pse, '50', 10);
+        $this->resetRequestMemos();
+        $this->context->resolve([$pse->getId()], $this->currency, $member, [$pse->getId() => 10]);
+
+        $statements = $this->recordSqlQueries(function () use ($pse, $member): void {
+            $this->context->resolve([$pse->getId()], $this->currency, $member, [$pse->getId() => 1]);
+            $this->context->resolve([$pse->getId()], $this->currency, $member, [$pse->getId() => 10]);
+        });
+
+        self::assertSame([], $statements);
+    }
+
+    /**
      * @param list<int> $saleElementIds
      *
      * @return list<string>
@@ -264,6 +460,8 @@ final class CustomerPriceContextTest extends ActionIntegrationTestCase
             CustomerGroupResolver::class,
             CustomerDiscountRate::class,
             CustomerPriceContext::class,
+            ApplicablePriceLists::class,
+            PriceListResolver::class,
             EffectivePriceCatalog::class,
             SaleAudienceChecker::class,
             CustomerAudience::class,

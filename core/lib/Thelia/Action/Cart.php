@@ -56,6 +56,7 @@ use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
+use Thelia\Domain\Pricing\PriceList\ApplicablePriceLists;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\SaleUnit\Cart\CartLineChange;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
@@ -116,6 +117,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?StockReservationService $stockReservation = null,
         protected ?QuantityPolicy $quantityPolicy = null,
         protected ?CartQuantityReconciler $cartQuantityReconciler = null,
+        protected ?ApplicablePriceLists $applicablePriceLists = null,
     ) {
     }
 
@@ -531,8 +533,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $customer = null === $cart->getCustomerId() ? null : $cart->getCustomer();
 
-        if ($this->pricingActivityChecker->mayPriceBeyondCatalogAsideFromBundles($customer)
+        // A quantity that moves a line to another tier of a price list moves its price: the lines
+        // are read again, for the quantity the line holds now and not the one the cart loaded.
+        $pricedByTiers = true === $this->applicablePriceLists?->anyFor($customer, $this->currencyOf($cart));
+
+        if ($pricedByTiers
+            || $this->pricingActivityChecker->mayPriceBeyondCatalogAsideFromBundles($customer)
             || $this->holdsSpecialOffer($cart)) {
+            if ($pricedByTiers) {
+                $cart->clearCartItems();
+            }
+
             $this->refreshCartItemPrices($cart, $this->currencyOf($cart));
 
             return;

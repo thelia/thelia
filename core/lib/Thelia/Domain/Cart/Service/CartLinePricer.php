@@ -152,10 +152,19 @@ final readonly class CartLinePricer
             static fn (CartItem $line, int $index): bool => !\array_key_exists($index, $bundlePrices),
             \ARRAY_FILTER_USE_BOTH,
         );
+        $quantities = [];
+
+        foreach ($otherLines as $line) {
+            // The tier of a price list is the quantity of the line the customer holds.
+            $pseId = (int) $line->getProductSaleElementsId();
+            $quantities[$pseId] = ($quantities[$pseId] ?? 0.0) + (float) $line->getQuantity();
+        }
+
         $prices = $bundleLinesOnly ? [] : $this->customerPriceContext->resolve(
             array_values(array_map(static fn (CartItem $line): int => (int) $line->getProductSaleElementsId(), $otherLines)),
             $currency,
             $customer,
+            array_map(static fn (float $quantity): int => (int) floor($quantity), $quantities),
         );
 
         $resolved = [];
@@ -227,7 +236,8 @@ final readonly class CartLinePricer
         return $line->isNew()
             || round((float) $line->getPrice(), 6) !== round($price->untaxedPrice, 6)
             || round((float) $line->getPromoPrice(), 6) !== round($price->untaxedPromoPrice, 6)
-            || (int) $line->getPromo() !== ($price->isPromo ? 1 : 0);
+            || (int) $line->getPromo() !== ($price->isPromo ? 1 : 0)
+            || $line->getPriceListId() !== $price->pricedByPriceListId();
     }
 
     private function write(CartItem $line, ResolvedPrice $price): void
@@ -235,6 +245,9 @@ final readonly class CartLinePricer
         $line
             ->setPrice(number_format(round($price->untaxedPrice, 6), 6, '.', ''))
             ->setPromoPrice(number_format(round($price->untaxedPromoPrice, 6), 6, '.', ''))
-            ->setPromo($price->isPromo ? 1 : 0);
+            ->setPromo($price->isPromo ? 1 : 0)
+            // The trace of a price list: once the list is turned off or deleted, it is what tells
+            // the cart that its line holds a price nothing else would give it.
+            ->setPriceListId($price->pricedByPriceListId());
     }
 }
