@@ -180,11 +180,11 @@ class ProductPriceCurrencyListener implements EventSubscriberInterface
             return $ownPrice;
         }
 
-        $convertedPrice = $this->currencyConverter->fromDefaultCurrency($defaultCurrencyPrice->getPrice(), $currency);
-        $convertedPromoPrice = $this->currencyConverter->fromDefaultCurrency($defaultCurrencyPrice->getPromoPrice(), $currency);
+        $convertedPrice = $this->convert($defaultCurrencyPrice->getPrice(), $currency);
+        $convertedPromoPrice = $this->convert($defaultCurrencyPrice->getPromoPrice(), $currency);
 
-        // A default currency without a usable rate converts nothing: the sale element
-        // has no price in this currency.
+        // A default currency without a usable rate converts nothing, and neither does a row
+        // that states no amount: the sale element has no price in this currency.
         if (null === $convertedPrice || null === $convertedPromoPrice) {
             return null;
         }
@@ -202,6 +202,14 @@ class ProductPriceCurrencyListener implements EventSubscriberInterface
         }
 
         return $price;
+    }
+
+    /**
+     * An amount a row does not state (the resource allows none) stays none, never a zero.
+     */
+    private function convert(?float $amount, Currency $currency): ?float
+    {
+        return null === $amount ? null : $this->currencyConverter->fromDefaultCurrency($amount, $currency);
     }
 
     /**

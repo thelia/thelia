@@ -27,6 +27,7 @@ use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
 use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
@@ -73,6 +74,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         protected readonly CurrencyConverter $currencyConverter,
         protected readonly ?SaleUnitAvailableStock $saleUnitAvailableStock = null,
         protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
+        protected readonly ?PriceVisibilityResolver $priceVisibilityResolver = null,
     ) {
     }
 
@@ -277,6 +279,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     {
         $taxCountry = $this->taxEngine->getDeliveryCountry();
         $resolvedPrices = $this->resolvedPricesOf($loopResult);
+        $hiddenPriceProductIds = $this->productsWithHiddenPrice($loopResult);
         $saleUnitQuantities = $this->saleUnitQuantitiesOf($loopResult);
         // What the components allow for the bundles of the page: nothing is asked in the back office,
         // which edits the national counter, nor in a shop without a bundle.
@@ -348,6 +351,13 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set('PROMO_PRICE_TAX', $taxedPromoPrice - $promoPrice)
                 ->set('TAXED_PROMO_PRICE', $taxedPromoPrice);
 
+            // A price the visitor is not shown is printed empty, with its taxes.
+            if (isset($hiddenPriceProductIds[(int) $PSEValue->getProductId()])) {
+                foreach (['PRICE', 'PRICE_TAX', 'TAXED_PRICE', 'PROMO_PRICE', 'PROMO_PRICE_TAX', 'TAXED_PROMO_PRICE'] as $field) {
+                    $loopResultRow->set($field, '');
+                }
+            }
+
             // The threshold the shop owner is alerted at is theirs alone: never handed to a front template.
             if ($this->getBackendContext()) {
                 $loopResultRow->set('LOW_STOCK_THRESHOLD', $PSEValue->getLowStockThreshold());
@@ -358,6 +368,32 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         return $loopResult;
+    }
+
+    /**
+     * The products of the sale elements of the page whose price this visitor is not shown (the
+     * mode of the shop, or the one the product states), keyed by product id: one statement for
+     * the whole page, none while every price of the shop is visible, and none in the back office.
+     *
+     * @return array<int, true>
+     */
+    private function productsWithHiddenPrice(LoopResult $loopResult): array
+    {
+        if ($this->getBackendContext() || !$this->priceVisibilityResolver instanceof PriceVisibilityResolver || !$this->priceVisibilityResolver->isActive()) {
+            return [];
+        }
+
+        $productIds = [];
+
+        /** @var \Thelia\Model\ProductSaleElements $PSEValue */
+        foreach ($loopResult->getResultDataCollection() as $PSEValue) {
+            $productIds[] = (int) $PSEValue->getProductId();
+        }
+
+        return array_fill_keys(
+            $this->priceVisibilityResolver->productsWithHiddenPrice($productIds, $this->visitorPriceReader->currentCustomer()),
+            true,
+        );
     }
 
     /**

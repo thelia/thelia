@@ -226,6 +226,53 @@ class ProductSaleElements implements PropelResourceInterface
     ])]
     public ?bool $displayInitialPrice = null;
 
+    /**
+     * Who is shown the prices of the product of this sale element: visible, logged_in (identified
+     * customers only) or on_request (nobody; the theme offers a price request). The mode of the
+     * product, else the one of the shop. Set on a front read; the prices are null when the caller
+     * is not shown them.
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'visible, logged_in or on_request: who is shown the prices of the product. Front reads only.')]
+    public ?string $priceDisplayMode = null;
+
+    /**
+     * Whether the caller may put this sale element in a cart: the mode lets them see the price,
+     * and no exclusive price list leaves the sale element unpriced. A cart refuses the addition
+     * of a sale element for which this is false.
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'Whether the caller may add the sale element to a cart. Front reads only.')]
+    public ?bool $purchasable = null;
+
+    /**
+     * The tiers of the price list that prices this sale element for the caller, the smallest
+     * minimum quantity first: `price` and `promoPrice` are untaxed, `taxedPrice` and
+     * `taxedPromoPrice` carry the taxes, as the prices of the sale element do. A price list line
+     * is final, so the promotional price is the price. Empty when no price list applies, and
+     * when the caller is not shown the prices.
+     *
+     * @var list<array{minQuantity: int, price: float, promoPrice: float, taxedPrice: float|null, taxedPromoPrice: float|null}>
+     */
+    #[Groups([
+        self::GROUP_FRONT_READ,
+        CartItem::GROUP_FRONT_READ,
+        Product::GROUP_FRONT_READ,
+        ProductAssociation::GROUP_FRONT_READ,
+    ])]
+    #[ApiProperty(description: 'The quantity tiers of the price list that prices the sale element for the caller, [{minQuantity, price, promoPrice, taxedPrice, taxedPromoPrice}]. Front reads only.')]
+    public array $priceTiers = [];
+
     #[Groups([
         self::GROUP_ADMIN_READ,
         self::GROUP_FRONT_READ,
@@ -584,6 +631,48 @@ class ProductSaleElements implements PropelResourceInterface
     public function setDisplayInitialPrice(?bool $displayInitialPrice): self
     {
         $this->displayInitialPrice = $displayInitialPrice;
+
+        return $this;
+    }
+
+    public function getPriceDisplayMode(): ?string
+    {
+        return $this->priceDisplayMode;
+    }
+
+    public function setPriceDisplayMode(?string $priceDisplayMode): self
+    {
+        $this->priceDisplayMode = $priceDisplayMode;
+
+        return $this;
+    }
+
+    public function getPurchasable(): ?bool
+    {
+        return $this->purchasable;
+    }
+
+    public function setPurchasable(?bool $purchasable): self
+    {
+        $this->purchasable = $purchasable;
+
+        return $this;
+    }
+
+    /**
+     * @return list<array{minQuantity: int, price: float, promoPrice: float, taxedPrice: float|null, taxedPromoPrice: float|null}>
+     */
+    public function getPriceTiers(): array
+    {
+        return $this->priceTiers;
+    }
+
+    /**
+     * @param list<array{minQuantity: int, price: float, promoPrice: float, taxedPrice: float|null, taxedPromoPrice: float|null}> $priceTiers
+     */
+    public function setPriceTiers(array $priceTiers): self
+    {
+        $this->priceTiers = $priceTiers;
 
         return $this;
     }

@@ -23,6 +23,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Interface\TheliaFilter
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Api\Resource\FilterValue;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
@@ -53,7 +54,8 @@ use Thelia\Model\TaxRule;
  * condition on the product ids and joins nothing: the order the listing is sorted in is left
  * as it was. Only the products the query holds when the filter is applied are priced, not the
  * whole catalogue: the filters applied after this one can only narrow that set further, so a
- * product left out of it could not have been in the listing. What the resolver priced stays
+ * product left out of it could not have been in the listing. A product whose price the visitor is
+ * not shown (see PriceVisibilityResolver) never matches an interval and never draws a bound. What the resolver priced stays
  * known for the request, so the price order of the same listing reads it without pricing again.
  */
 final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilterInterface, ResetInterface
@@ -71,6 +73,7 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
         private readonly TaxEngine $taxEngine,
         private readonly ProductPriceCurrencyListener $currencyResolver,
         private readonly VisitorPriceReader $visitorPriceReader,
+        private readonly PriceVisibilityResolver $priceVisibilityResolver,
     ) {
     }
 
@@ -276,6 +279,12 @@ final class PriceFilter implements TheliaFilterInterface, TheliaAggregatedFilter
             if ($resolvedPrice !== null) {
                 $untaxedByProduct[(int) $row['ProductId']] = $resolvedPrice->chargedPrice();
             }
+        }
+
+        // A product whose price the visitor is not shown has no price to filter on, and none to
+        // draw the bounds of the slider from: it is left out, as a product with no price is.
+        foreach ($this->priceVisibilityResolver->productsWithHiddenPrice(array_keys($untaxedByProduct), $this->visitorPriceReader->currentCustomer()) as $hiddenProductId) {
+            unset($untaxedByProduct[$hiddenProductId]);
         }
 
         $displaysTaxedPrices = $this->visitorPriceReader->displaysTaxedPrices();

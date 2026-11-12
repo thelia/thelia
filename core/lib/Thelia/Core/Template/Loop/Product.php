@@ -30,6 +30,7 @@ use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
 use Thelia\Domain\Pricing\CurrencyConverter;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
@@ -103,6 +104,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     protected $timestampable = true;
     protected $versionable = true;
 
+    /** What a visitor who is not shown a price reads empty in the rows of the loop. */
+    private const PRICE_OUTPUT_FIELDS = ['BEST_PRICE', 'BEST_PRICE_TAX', 'BEST_TAXED_PRICE', 'PRICE', 'PRICE_TAX', 'TAXED_PRICE', 'PROMO_PRICE', 'PROMO_PRICE_TAX', 'TAXED_PROMO_PRICE'];
+
+    private const COMPLEX_PRICE_OUTPUT_FIELDS = ['BEST_PRICE', 'BEST_PRICE_TAX', 'BEST_TAXED_PRICE'];
+
     private ?CurrencyModel $currency = null;
 
     /** @var list<string> aliases of the sale element joins of the complex form, set by buildModelCriteria() */
@@ -115,6 +121,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         protected readonly PricingActivityChecker $pricingActivityChecker,
         protected readonly CurrencyConverter $currencyConverter,
         protected readonly ?BundleDisplayedStock $bundleDisplayedStock = null,
+        protected readonly ?PriceVisibilityResolver $priceVisibilityResolver = null,
     ) {
     }
 
@@ -267,6 +274,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $taxState = $this->taxEngine->getDeliveryState();
 
         $resolvedPrices = $this->resolvedPricesOf($loopResult);
+        $hiddenPriceProductIds = $this->productsWithHiddenPrice($loopResult);
         // What the components allow for the bundles of the page: nothing is asked in the back office,
         // which edits the national counter, nor in a shop without a bundle.
         $bundleStocks = $this->getBackendContext() ? [] : ($this->bundleDisplayedStock?->forModels($loopResult->getResultDataCollection()) ?? []);
@@ -344,6 +352,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set('PRODUCT_SALE_ELEMENT', $product->getVirtualColumn('pse_id'))
                 ->set('PSE_COUNT', $product->getVirtualColumn('pse_count'));
 
+            if (isset($hiddenPriceProductIds[(int) $product->getId()])) {
+                $this->hidePrices($loopResultRow, self::PRICE_OUTPUT_FIELDS);
+            }
+
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
 
             $this->addOutputFields($loopResultRow, $product);
@@ -363,6 +375,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $taxState = $this->taxEngine->getDeliveryState();
 
         $cheapestPrices = $this->cheapestResolvedPricesOf($loopResult);
+        $hiddenPriceProductIds = $this->productsWithHiddenPrice($loopResult);
 
         /** @var ProductModel $product */
         foreach ($loopResult->getResultDataCollection() as $product) {
@@ -399,6 +412,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set('BEST_TAXED_PRICE', $taxedPrice)
                 ->set('IS_PROMO', $isPromo)
                 ->set('IS_NEW', $product->getVirtualColumn('main_product_is_new'));
+
+            if (isset($hiddenPriceProductIds[(int) $product->getId()])) {
+                $this->hidePrices($loopResultRow, self::COMPLEX_PRICE_OUTPUT_FIELDS);
+            }
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
 
@@ -1105,6 +1122,43 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search->withColumn('`CategorySelect`.DEFAULT_CATEGORY', 'is_default_category');
 
         return $manualOrderAllowed;
+    }
+
+    /**
+     * The products of the page whose price this visitor is not shown (the mode of the shop, or
+     * the one the product states), keyed by product id. The modes of the whole page are read in
+     * one statement, and in none while every price of the shop is visible. Empty in the back
+     * office, which reads the catalog.
+     *
+     * @return array<int, true>
+     */
+    private function productsWithHiddenPrice(LoopResult $loopResult): array
+    {
+        if ($this->getBackendContext() || !$this->priceVisibilityResolver instanceof PriceVisibilityResolver || !$this->priceVisibilityResolver->isActive()) {
+            return [];
+        }
+
+        $productIds = [];
+
+        /** @var ProductModel $product */
+        foreach ($loopResult->getResultDataCollection() as $product) {
+            $productIds[] = (int) $product->getId();
+        }
+
+        return array_fill_keys(
+            $this->priceVisibilityResolver->productsWithHiddenPrice($productIds, $this->visitorPriceReader->currentCustomer()),
+            true,
+        );
+    }
+
+    /**
+     * @param list<string> $fields
+     */
+    private function hidePrices(LoopResultRow $loopResultRow, array $fields): void
+    {
+        foreach ($fields as $field) {
+            $loopResultRow->set($field, '');
+        }
     }
 
     /**

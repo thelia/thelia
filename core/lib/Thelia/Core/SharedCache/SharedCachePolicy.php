@@ -152,15 +152,18 @@ final readonly class SharedCachePolicy
      * A request with no cookie and no token is a visitor with no account, who belongs to
      * the default customer group whatever the page: the page that was built for them is
      * the page of every other such visitor, and a customer group that has prices or a
-     * discount of its own changes nothing to it. A page is kept apart only where the
-     * rules and the operations reserved for named customers or groups are running, as
-     * before the groups existed.
+     * discount of its own changes nothing to it. A page is kept apart where the rules and
+     * the operations reserved for named customers or groups are running, as before the
+     * groups existed, and wherever what a visitor is shown is decided by something that
+     * is not the plain catalog: a price list or a catalog restriction assigned to the default
+     * group (the visitors' own), and a price display mode other than visible, on the shop or
+     * on a product (a page built for a visitor holds no price a customer would see).
      */
     private function anonymousPricesMayVary(): bool
     {
         $activity = $this->catalogActivityProbe->read();
 
-        return $activity->hasActiveNamedRule || $activity->hasActiveReservedSale;
+        return $activity->hasActiveNamedRule || $activity->hasActiveReservedSale || $activity->visitorsMayBeShownApart();
     }
 
     private function isSensitivePath(string $path): bool
