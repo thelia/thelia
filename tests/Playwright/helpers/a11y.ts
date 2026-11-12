@@ -70,12 +70,16 @@ export type AuditSummary = {
 /**
  * Runs axe on the current page and fails on any serious or critical violation that is not a
  * documented derogation. Prints how many rules really applied: an audit that checked nothing
- * must not read as a pass.
+ * must not read as a pass. `include` narrows the audit to the regions it names.
  */
-export async function auditPage(page: Page, name: string, testInfo: TestInfo, exclude: string[] = []): Promise<AuditSummary> {
+export async function auditPage(page: Page, name: string, testInfo: TestInfo, exclude: string[] = [], include: string[] = []): Promise<AuditSummary> {
   await waitForSettledPage(page);
 
   let builder = new AxeBuilder({ page }).withTags(WCAG_TAGS);
+  // Limits the audit to a region of the page (a component): the document-level rules do not run then.
+  for (const selector of include) {
+    builder = builder.include(selector);
+  }
   for (const selector of [...EXCLUDED, ...exclude]) {
     builder = builder.exclude(selector);
   }

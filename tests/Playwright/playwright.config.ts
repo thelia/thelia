@@ -29,8 +29,8 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      // The customer-group specs have their own projects below (1440 desktop, 390 mobile).
-      testIgnore: /customer-groups-.*\.spec\.ts/,
+      // The customer-group and price-list specs have their own projects below (1440 desktop, 390 mobile).
+      testIgnore: /(customer-groups|price-lists)-.*\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
@@ -44,6 +44,19 @@ export default defineConfig({
       name: 'customer-groups-mobile-390',
       testMatch: /customer-groups-(prices|catalog)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } },
+    },
+    {
+      // Price lists, reserved assortment and conditional price display, one desktop viewport.
+      name: 'price-lists-desktop-1440',
+      testMatch: /price-lists-.*\.spec\.ts/,
+      testIgnore: /price-lists-mobile-.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // The same displays on a 375 px phone: layout of the price blocks and accessibility scan.
+      name: 'price-lists-mobile-375',
+      testMatch: /price-lists-mobile-.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 812 } },
     },
   ],
 });
