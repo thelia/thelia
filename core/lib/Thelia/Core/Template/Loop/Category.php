@@ -168,9 +168,9 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         $current = $this->getCurrent();
 
         if (true === $current) {
-            $search->filterById($this->getMainRequest()->attributes->get('category_id') ?? $this->getMainRequest()->query->get('category_id'));
+            $search->filterById($this->requestParameter('category_id'));
         } elseif (false === $current) {
-            $search->filterById($this->getMainRequest()->attributes->get('category_id') ?? $this->getMainRequest()->query->get('category_id'), Criteria::NOT_IN);
+            $search->filterById($this->requestParameter('category_id'), Criteria::NOT_IN);
         }
 
         $exclude = $this->getExclude();

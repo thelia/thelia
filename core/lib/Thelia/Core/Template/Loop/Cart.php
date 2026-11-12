@@ -68,8 +68,8 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
      */
     public function buildArray(): array
     {
-        /** @var CartModel $cart */
-        $cart = $this->getMainRequest()->getSession()->getSessionCart($this->getDispatcher());
+        /** @var CartModel|null $cart */
+        $cart = $this->findSession()?->getSessionCart($this->getDispatcher());
 
         if (null === $cart) {
             return [];
@@ -96,7 +96,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function parseResults(LoopResult $loopResult): LoopResult
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
-        $locale = $this->getMainRequest()->getSession()->getLang()->getLocale();
+        $locale = $this->sessionLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = (int) ConfigQuery::read('default-available-stock', 100);
         $sellableLines = $checkAvailability && null !== $this->sessionCart
@@ -116,7 +116,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set('REF', $product->getRef());
             $loopResultRow->set('QUANTITY', $cartItem->getQuantity());
             $loopResultRow->set('PRODUCT_ID', $product->getId());
-            $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->getMainRequest()->getSession()->getLang()->getLocale()));
+            $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->sessionLang()->getLocale()));
 
             if (isset($bundleAvailabilities[(int) $cartItem->getId()])) {
                 // A bundle line is supplied by its components, never by the stock of the sale element that stands for it.

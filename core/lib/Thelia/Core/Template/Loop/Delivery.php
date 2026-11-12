@@ -69,7 +69,12 @@ class Delivery extends BaseSpecificModule
 
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $cart = $this->getMainRequest()->getSession()->getSessionCart($this->dispatcher);
+        $cart = $this->findSession()?->getSessionCart($this->dispatcher);
+
+        if (null === $cart) {
+            return $loopResult;
+        }
+
         $address = $this->getDeliveryAddress();
 
         $country = $this->getCurrentCountry();
@@ -217,7 +222,7 @@ class Delivery extends BaseSpecificModule
         $addressId = $this->getAddress();
 
         if (empty($addressId)) {
-            $addressId = $this->getMainRequest()->getSession()->getOrder()->getChoosenDeliveryAddress();
+            $addressId = $this->findSession()?->getOrder()->getChoosenDeliveryAddress();
         }
 
         if (!empty($addressId)) {

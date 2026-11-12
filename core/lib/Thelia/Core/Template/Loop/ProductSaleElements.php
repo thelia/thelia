@@ -242,7 +242,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
-            $currency = $this->getMainRequest()->getSession()->getCurrency();
+            $currency = $this->sessionCurrency();
         }
 
         // parseResults() prices the rows in the same currency the query selected

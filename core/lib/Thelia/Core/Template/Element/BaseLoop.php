@@ -717,6 +717,50 @@ abstract class BaseLoop implements LoopInterface
         return $this->requestStack->getMainRequest();
     }
 
+    /**
+     * The main request, or null when the loop runs outside HTTP (a worker, a console command, a script).
+     */
+    protected function findMainRequest(): ?\Symfony\Component\HttpFoundation\Request
+    {
+        return $this->requestStack->getMainRequest();
+    }
+
+    /**
+     * The Thelia session of the main request, or null when there is no request or no session.
+     */
+    protected function findSession(): ?\Thelia\Core\HttpFoundation\Session\Session
+    {
+        $request = $this->findMainRequest();
+
+        if (null === $request || !$request->hasSession()) {
+            return null;
+        }
+
+        $session = $request->getSession();
+
+        return $session instanceof \Thelia\Core\HttpFoundation\Session\Session ? $session : null;
+    }
+
+    protected function sessionLang(): \Thelia\Model\Lang
+    {
+        return $this->findSession()?->getLang() ?? \Thelia\Model\Lang::getDefaultLanguage();
+    }
+
+    protected function sessionCurrency(): \Thelia\Model\Currency
+    {
+        return $this->findSession()?->getCurrency() ?? \Thelia\Model\Currency::getDefaultCurrency();
+    }
+
+    /**
+     * A parameter of the current route or of the query string, null outside HTTP.
+     */
+    protected function requestParameter(string $name): mixed
+    {
+        $request = $this->findMainRequest();
+
+        return $request?->attributes->get($name) ?? $request?->query->get($name);
+    }
+
     public function getCurrentRequest(): \Symfony\Component\HttpFoundation\Request
     {
         return $this->requestStack->getCurrentRequest();
