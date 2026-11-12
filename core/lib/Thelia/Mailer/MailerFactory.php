@@ -25,6 +25,7 @@ use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigService;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\EventListener\OrderEmailHistoryListener;
@@ -469,6 +470,9 @@ class MailerFactory
             : null;
 
         $languageHandedToParser = false;
+        $translator = Translator::getInstance();
+        $previousTranslatorLocale = $translator->getLocale();
+        $translatorLocaleChanged = false;
 
         if (null !== $requiredLang = LangQuery::create()->findOneByLocale($locale)) {
             $this->setLanguageSession($session, $requiredLang);
@@ -481,6 +485,11 @@ class MailerFactory
                 $parser->assign('lang_code', $requiredLang->getCode());
                 $parser->assign('lang_id', $requiredLang->getId());
                 $languageHandedToParser = true;
+
+                // The loops and the translator have no session either: they read the translator's
+                // locale, as an export written in a customer's language does.
+                $translator->setLocale($requiredLang->getLocale());
+                $translatorLocaleChanged = true;
             }
         }
 
@@ -504,6 +513,10 @@ class MailerFactory
                 $parser->assign('locale', null);
                 $parser->assign('lang_code', null);
                 $parser->assign('lang_id', null);
+            }
+
+            if ($translatorLocaleChanged) {
+                $translator->setLocale($previousTranslatorLocale);
             }
         }
     }

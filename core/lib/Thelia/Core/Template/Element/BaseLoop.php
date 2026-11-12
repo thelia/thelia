@@ -741,9 +741,22 @@ abstract class BaseLoop implements LoopInterface
         return $session instanceof \Thelia\Core\HttpFoundation\Session\Session ? $session : null;
     }
 
+    /**
+     * The language of the visitor; without a session (a command, a worker), the one the translator was
+     * told to render in (the language of an email being built), then the default language of the shop.
+     */
     protected function sessionLang(): \Thelia\Model\Lang
     {
-        return $this->findSession()?->getLang() ?? \Thelia\Model\Lang::getDefaultLanguage();
+        $session = $this->findSession();
+
+        if (null !== $session) {
+            return $session->getLang();
+        }
+
+        $translatorLocale = $this->translator->getLocale();
+
+        return ('' !== $translatorLocale ? \Thelia\Model\LangQuery::create()->findOneByLocale($translatorLocale) : null)
+            ?? \Thelia\Model\Lang::getDefaultLanguage();
     }
 
     protected function sessionCurrency(): \Thelia\Model\Currency
