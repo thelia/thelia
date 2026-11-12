@@ -20,6 +20,7 @@ use Thelia\Api\Bridge\Propel\Filter\AbstractFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Domain\Pricing\PricingActivityChecker;
 
 /**
@@ -51,6 +52,7 @@ class ProductPriceOrderFilter extends AbstractFilter
         private readonly ProductPriceSortRequests $sortRequests,
         private readonly VisitorPriceReader $visitorPriceReader,
         private readonly PricingActivityChecker $activityChecker,
+        private readonly PriceVisibilityResolver $priceVisibilityResolver,
     ) {
         parent::__construct();
     }
@@ -77,7 +79,10 @@ class ProductPriceOrderFilter extends AbstractFilter
             return;
         }
 
-        if ($this->activityChecker->mayOrderDifferFromThePublicPrice($this->visitorPriceReader->currentCustomer())) {
+        // A price the visitor is not shown must not be told by an order: while the shop or a
+        // product hides a price from anybody, the order is made in PHP, where the products with a
+        // hidden price are ranked as products with no price.
+        if ($this->priceVisibilityResolver->isActive() || $this->activityChecker->mayOrderDifferFromThePublicPrice($this->visitorPriceReader->currentCustomer())) {
             $this->sortRequests->request($query, $direction);
 
             return;

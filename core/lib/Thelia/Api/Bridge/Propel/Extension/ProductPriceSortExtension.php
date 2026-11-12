@@ -25,6 +25,7 @@ use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\State\Pagination\PresortedPropelModelPager;
 use Thelia\Api\EventListener\ProductPriceCurrencyListener;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 
@@ -52,6 +53,7 @@ final readonly class ProductPriceSortExtension implements QueryResultCollectionE
         private ProductPublicPriceOrder $publicPriceOrder,
         private VisitorPriceReader $visitorPriceReader,
         private ProductPriceCurrencyListener $currencyResolver,
+        private PriceVisibilityResolver $priceVisibilityResolver,
         private ?Pagination $pagination = null,
         #[Autowire('%thelia.api.product_price_sort.max_products%')]
         private int $maxProducts = 5000,
@@ -94,8 +96,12 @@ final readonly class ProductPriceSortExtension implements QueryResultCollectionE
 
         if (null === $rankedIds) {
             // Too many products to price one by one: the public prices order the query, the
-            // pagination extension takes it from here.
-            $this->publicPriceOrder->apply($query, $direction);
+            // pagination extension takes it from here. Not while a price may be hidden from the
+            // visitor: an order on the public prices would tell the one that is hidden, and the
+            // listing keeps the order it was asked for otherwise.
+            if (!$this->priceVisibilityResolver->isActive()) {
+                $this->publicPriceOrder->apply($query, $direction);
+            }
 
             return null;
         }
@@ -170,12 +176,16 @@ final readonly class ProductPriceSortExtension implements QueryResultCollectionE
             alsoWithinTheCatalog: true,
         );
 
+        // A product whose price the visitor is not shown has none to rank on: it comes last, with
+        // the products that have no price, and the order does not tell where its price stands.
+        $hiddenProductIds = array_flip($this->priceVisibilityResolver->productsWithHiddenPrice($productIds, $this->visitorPriceReader->currentCustomer()));
+
         // The price of the card is rounded to the cent: two products showing the same price
         // are priced alike, whatever the digits behind.
         $ranked = [];
 
         foreach ($productIds as $productId) {
-            $price = isset($saleElementByProduct[$productId]) ? ($prices[$saleElementByProduct[$productId]] ?? null) : null;
+            $price = isset($hiddenProductIds[$productId]) || !isset($saleElementByProduct[$productId]) ? null : ($prices[$saleElementByProduct[$productId]] ?? null);
             $ranked[] = [$productId, null === $price ? null : round($price->chargedPrice(), 2)];
         }
 

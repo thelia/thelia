@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Propel\Runtime\Map\TableMap;
@@ -88,7 +89,8 @@ class ProductPrice implements PropelResourceInterface
         ProductAssociation::GROUP_FRONT_READ,
     ])]
     #[NotBlank(groups: [Product::GROUP_ADMIN_WRITE])]
-    public float $price;
+    #[ApiProperty(description: 'The untaxed price. Null on a front read when the visitor is not shown the price (the shop or the product shows its prices to identified customers only, or on request).')]
+    public ?float $price;
 
     #[Groups([
         self::GROUP_ADMIN_READ,
@@ -103,7 +105,8 @@ class ProductPrice implements PropelResourceInterface
         ProductAssociation::GROUP_ADMIN_READ,
         ProductAssociation::GROUP_FRONT_READ,
     ])]
-    public float $promoPrice;
+    #[ApiProperty(description: 'The untaxed promotional price. Null on a front read when the visitor is not shown the price, as for `price`.')]
+    public ?float $promoPrice;
 
     /**
      * The price with its taxes, for the country the visitor is delivered to: the figure of the
@@ -169,24 +172,24 @@ class ProductPrice implements PropelResourceInterface
         return $this;
     }
 
-    public function getPrice(): float
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(float $price): self
+    public function setPrice(?float $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getPromoPrice(): float
+    public function getPromoPrice(): ?float
     {
         return $this->promoPrice;
     }
 
-    public function setPromoPrice(float $promoPrice): self
+    public function setPromoPrice(?float $promoPrice): self
     {
         $this->promoPrice = $promoPrice;
 

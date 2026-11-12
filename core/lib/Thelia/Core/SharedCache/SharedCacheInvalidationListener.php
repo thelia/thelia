@@ -46,6 +46,7 @@ use Thelia\Model\Event\FolderDocumentEvent;
 use Thelia\Model\Event\FolderImageEvent;
 use Thelia\Model\Event\ProductBundleItemEvent;
 use Thelia\Model\Event\ProductDocumentEvent;
+use Thelia\Model\Event\ProductEvent;
 use Thelia\Model\Event\ProductImageEvent;
 use Thelia\Model\Event\ProductSaleElementsProductDocumentEvent;
 use Thelia\Model\Event\ProductSaleElementsProductImageEvent;
@@ -53,6 +54,8 @@ use Thelia\Model\Event\ProductSaleElementsProductVideoEvent;
 use Thelia\Model\Event\ProductVideoEvent;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
+use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Product;
 use Thelia\Model\ProductBundleItem;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
@@ -350,10 +353,19 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
     private const CATALOGUE_MODEL = '#^Thelia\\\\Model\\\\(?:Product|Category|Content|Folder|Brand|Feature|Attribute|Tax|Currency|Sale|CatalogPriceRule|Template|Accessory|Country|State|Area|Lang|Config|Hook|Module|MetaData|RewritingUrl)#';
 
+    /**
+     * The products whose price display mode is being written: the column is flagged modified
+     * before the write, and no longer after it.
+     *
+     * @var \WeakMap<Product, true>
+     */
+    private \WeakMap $productsChangingMode;
+
     public function __construct(
         private readonly SharedCacheInvalidator $invalidator,
         private readonly SharedCachePurgeQueue $queue,
     ) {
+        $this->productsChangingMode = new \WeakMap();
     }
 
     public static function getSubscribedEvents(): array
@@ -388,6 +400,18 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
             $subscribed[$eventName] = ['onWholeShopChange', -255];
         }
 
+        // The price lists and the catalog restrictions are written to their own tables with no
+        // catalogue event: they decide what the visitors of the default group are shown.
+        foreach (ResourceCacheInvalidationListener::CATALOG_SCOPE_WRITES as $eventName) {
+            $subscribed[$eventName] = ['onWholeShopChange', -255];
+        }
+
+        // The price display mode a product states changes the pages that list it and every page that
+        // is shared (the mode decides whether a shared page may exist): the write is told apart from
+        // any other write of the product, which is not purged here.
+        $subscribed[ProductEvent::PRE_UPDATE] = ['rememberTheModeChange', -255];
+        $subscribed[ProductEvent::POST_UPDATE] = ['purgeOnModeChange', -255];
+
         $subscribed[ConfigEvent::POST_SAVE] = ['onWholeShopChange', -255];
         $subscribed[ConfigEvent::POST_DELETE] = ['onWholeShopChange', -255];
         $subscribed[ChoiceFilterEvent::POST_SAVE] = ['onChoiceFilterChange', -255];
@@ -408,6 +432,27 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
     public function onWholeShopChange(): void
     {
         $this->invalidator->purge([SharedCacheKey::ALL]);
+    }
+
+    public function rememberTheModeChange(ProductEvent $event): void
+    {
+        /** @var Product $product */
+        $product = $event->getModel();
+
+        if ($product->isColumnModified(ProductTableMap::COL_PRICE_DISPLAY_MODE)) {
+            $this->productsChangingMode[$product] = true;
+        }
+    }
+
+    public function purgeOnModeChange(ProductEvent $event): void
+    {
+        $product = $event->getModel();
+
+        if (isset($this->productsChangingMode[$product])) {
+            unset($this->productsChangingMode[$product]);
+
+            $this->invalidator->purge([SharedCacheKey::ALL]);
+        }
     }
 
     public function onMediumChange(object $event): void
@@ -454,6 +499,13 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         // The deletion of a category cascades on the lists of the customer groups, with no event
         // of their own: what a restricted group sees changes across the shop, not on one page.
         if ($model instanceof Category && $event->isDelete()) {
+            $this->invalidator->purge([SharedCacheKey::ALL]);
+
+            return;
+        }
+
+        // A price list or a restriction written through the API: what the visitors are shown changes.
+        if (ResourceCacheInvalidationListener::isCatalogScopeModel($model)) {
             $this->invalidator->purge([SharedCacheKey::ALL]);
 
             return;

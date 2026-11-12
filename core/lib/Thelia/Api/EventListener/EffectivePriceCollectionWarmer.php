@@ -19,6 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Api\Bridge\Propel\Event\CollectionModelsLoadedEvent;
 use Thelia\Domain\Catalog\Product\ProductTaxedPriceResolver;
 use Thelia\Domain\Catalog\Product\VisitorPriceReader;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Model\Product;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -31,6 +32,10 @@ use Thelia\Model\ProductSaleElementsQuery;
  * sale elements it embeds, read in one statement. Any other collection is left alone:
  * the per-member listener still answers, one lookup at a time.
  *
+ * The mode each product of the page states is read for the whole page as well, for the same reason;
+ * the lines of the price lists are read by the resolution of the page, which the tiers of each sale
+ * element then find in memory.
+ *
  * The products of the page are also loaded with their tax rule, in one statement, for the
  * taxed prices the listener publishes: that is what keeps a listing from costing a query
  * per product, a shop that prices nothing beyond the catalog included.
@@ -41,6 +46,7 @@ class EffectivePriceCollectionWarmer implements EventSubscriberInterface
         private readonly VisitorPriceReader $visitorPriceReader,
         private readonly ProductPriceCurrencyListener $productPriceCurrencyListener,
         private readonly ProductTaxedPriceResolver $productTaxedPriceResolver,
+        private readonly PriceVisibilityResolver $priceVisibilityResolver,
     ) {
     }
 
@@ -71,6 +77,8 @@ class EffectivePriceCollectionWarmer implements EventSubscriberInterface
         }
 
         $this->productTaxedPriceResolver->preload($taxedProductIds);
+        // The mode each product states, for the whole page: nothing is read while every price is visible.
+        $this->priceVisibilityResolver->preload($taxedProductIds);
 
         // Gathering the sale elements of a page of products is one query: not spent in a
         // shop where nothing prices for this visitor beyond the catalog.

@@ -14,23 +14,32 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Cart\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Thelia\Core\Event\ProductSaleElement\StockReservationLine;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
+use Thelia\Domain\Sale\CurrentCustomerProvider;
 use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * What the cart may hold for the visitor who owns it: the products the catalog shows them,
- * and nothing else.
+ * and that they may buy, and nothing else.
+ *
+ * A product the catalog shows but whose price the visitor is not shown (the shop or the product
+ * shows its prices to identified customers only, or on request), and a sale element an exclusive
+ * price list does not price, are held back like a hidden product: "hidden" here means hidden or
+ * not for sale to this visitor, and the same refusal answers both.
  *
  * The catalog reads are narrowed by ProductVisibility (the categories a customer group is
  * restricted to, the rules of the modules, the private drops of the reserved operations); a
@@ -55,6 +64,8 @@ final readonly class CartLineVisibility
         private ProductVisibility $productVisibility,
         private RequestStack $requestStack,
         private CartShippingRules $cartShippingRules,
+        private ?PriceVisibilityResolver $priceVisibilityResolver = null,
+        private ?CurrentCustomerProvider $currentCustomerProvider = null,
         private ?StockReservationService $stockReservation = null,
     ) {
     }
@@ -66,18 +77,18 @@ final readonly class CartLineVisibility
      * Read from the sale element, never from the product id the caller names: the cart
      * writes the line for the sale element, whatever product the request said.
      */
-    public function isSaleElementHidden(int $productSaleElementsId): bool
+    public function isSaleElementHidden(int $productSaleElementsId, ?Currency $currency = null, float $quantity = 1.0): bool
     {
         $clause = $this->productVisibility->visibleProductClause(ProductSaleElementsTableMap::COL_PRODUCT_ID);
 
-        if (null === $clause) {
-            return false;
-        }
-
-        return ProductSaleElementsQuery::create()
+        if (null !== $clause && ProductSaleElementsQuery::create()
             ->filterById($productSaleElementsId)
             ->where(\sprintf('NOT (%s)', $clause))
-            ->exists();
+            ->exists()) {
+            return true;
+        }
+
+        return [] !== $this->unpurchasableAmong([$productSaleElementsId => $quantity], $currency);
     }
 
     /**
@@ -86,7 +97,7 @@ final readonly class CartLineVisibility
      */
     public function isLineHidden(CartItem $line): bool
     {
-        return $this->isSaleElementHidden((int) $line->getProductSaleElementsId());
+        return $this->isSaleElementHidden((int) $line->getProductSaleElementsId(), $line->getCart()->getCurrency(), (float) $line->getQuantity());
     }
 
     /**
@@ -103,20 +114,28 @@ final readonly class CartLineVisibility
             return [];
         }
 
+        $lines = [];
         $clause = $this->productVisibility->visibleProductClause(ProductSaleElementsTableMap::COL_PRODUCT_ID);
 
-        if (null === $clause) {
-            return [];
+        if (null !== $clause) {
+            foreach (CartItemQuery::create()
+                ->joinProductSaleElements()
+                ->filterByCartId($cart->getId())
+                ->filterByIsOffered(0)
+                ->where(\sprintf('NOT (%s)', $clause))
+                ->orderById()
+                ->find() as $line) {
+                $lines[(int) $line->getId()] = $line;
+            }
         }
 
-        return array_values(CartItemQuery::create()
-            ->joinProductSaleElements()
-            ->filterByCartId($cart->getId())
-            ->filterByIsOffered(0)
-            ->where(\sprintf('NOT (%s)', $clause))
-            ->orderById()
-            ->find()
-            ->getData());
+        foreach ($this->unpurchasableLinesOf($cart, array_keys($lines)) as $line) {
+            $lines[(int) $line->getId()] = $line;
+        }
+
+        ksort($lines);
+
+        return array_values($lines);
     }
 
     /**
@@ -158,6 +177,64 @@ final readonly class CartLineVisibility
         $this->tellTheVisitor(array_values($productIds));
 
         return array_values($productIds);
+    }
+
+    /**
+     * The lines of the cart the visitor is not shown the price of, or that an exclusive price
+     * list does not price, among those not already judged hidden.
+     *
+     * @param list<int> $alreadyHiddenLineIds
+     *
+     * @return list<CartItem>
+     */
+    private function unpurchasableLinesOf(Cart $cart, array $alreadyHiddenLineIds): array
+    {
+        if (null === $this->priceVisibilityResolver || !$this->priceVisibilityResolver->mayRefuseAPurchase()) {
+            return [];
+        }
+
+        $query = CartItemQuery::create()
+            ->filterByCartId($cart->getId())
+            ->filterByIsOffered(0)
+            ->orderById();
+
+        if ([] !== $alreadyHiddenLineIds) {
+            $query->filterById($alreadyHiddenLineIds, Criteria::NOT_IN);
+        }
+
+        /** @var list<CartItem> $candidates */
+        $candidates = array_values($query->find()->getData());
+        $quantities = [];
+
+        foreach ($candidates as $line) {
+            $quantities[(int) $line->getProductSaleElementsId()] = ($quantities[(int) $line->getProductSaleElementsId()] ?? 0.0) + (float) $line->getQuantity();
+        }
+
+        $refused = $this->unpurchasableAmong($quantities, $cart->getCurrency());
+
+        return array_values(array_filter(
+            $candidates,
+            static fn (CartItem $line): bool => \in_array((int) $line->getProductSaleElementsId(), $refused, true),
+        ));
+    }
+
+    /**
+     * @param array<int, float> $quantities the quantity wanted of each sale element, by sale element id
+     *
+     * @return list<int> the sale elements the current visitor may not buy
+     */
+    private function unpurchasableAmong(array $quantities, ?Currency $currency): array
+    {
+        if (null === $this->priceVisibilityResolver || [] === $quantities || !$this->priceVisibilityResolver->mayRefuseAPurchase()) {
+            return [];
+        }
+
+        return $this->priceVisibilityResolver->unpurchasableSaleElements(
+            array_keys($quantities),
+            $this->currentCustomerProvider?->getCurrentCustomer(),
+            $currency ?? Currency::getDefaultCurrency(),
+            array_map(static fn (float $quantity): int => max(1, (int) floor($quantity)), $quantities),
+        );
     }
 
     /**

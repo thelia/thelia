@@ -27,6 +27,8 @@ use Thelia\Domain\Catalog\Product\VisitorPriceReader;
 use Thelia\Domain\Catalog\Stock\VisitorSellableStock;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Pricing\CustomerPrice\ResolvedPrice;
+use Thelia\Domain\Pricing\PriceVisibility\PriceTierPublisher;
+use Thelia\Domain\Pricing\PriceVisibility\PriceVisibilityResolver;
 use Thelia\Domain\Sale\ReservedSaleVisibility;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeQuery;
@@ -48,6 +50,8 @@ class ProductSaleElementsAccessService
         private readonly VisitorPriceReader $visitorPriceReader,
         private readonly ProductTaxedPriceResolver $productTaxedPriceResolver,
         private readonly BundleDisplayedStock $bundleDisplayedStock,
+        private readonly PriceVisibilityResolver $priceVisibilityResolver,
+        private readonly PriceTierPublisher $priceTierPublisher,
         private readonly VisitorSellableStock $visitorSellableStock,
     ) {
         $this->request = $requestStack->getMainRequest();
@@ -89,6 +93,14 @@ class ProductSaleElementsAccessService
         // zero, is never the answer (the default composition is the one a page shows).
         $bundleQuantity = $this->bundleDisplayedStock->forProducts([(int) $productId])[(int) $productId] ?? null;
 
+        // Who is shown the price of this product, said once for all its sale elements: a price the
+        // visitor is not shown is in none of the fields that carry it, the promotion included, and
+        // the page is told why (the mode) so that it offers the way to a price instead.
+        $customer = $this->visitorPriceReader->currentCustomer();
+        $mode = $this->priceVisibilityResolver->modeOfProductId((int) $productId);
+        $showsPrice = $mode->showsPrice($customer);
+        $tiers = $showsPrice ? $this->priceTierPublisher->forProduct((int) $productId, $productSaleElementsIds, $currency, $customer) : [];
+
         // What the visitor may buy of every sale element of the product, read together: the reservations
         // are one query whatever the number of combinations.
         $sellable = null === $bundleQuantity ? $this->visitorSellableStock->forMany($pses, false) : [];
@@ -125,8 +137,12 @@ class ProductSaleElementsAccessService
             $result[] = [
                 'id' => $pse->getId(),
                 'isDefault' => $pse->isDefault(),
-                'isPromo' => $resolvedPrice->isPromo,
-                'displayInitialPrice' => $displayInitialPrice,
+                'priceDisplayMode' => $mode->value,
+                // A sale element an exclusive price list does not price is shown, never sold.
+                'purchasable' => $mode->purchasable($customer) && $resolvedPrice->purchasable,
+                'priceTiers' => $tiers[(int) $pse->getId()] ?? [],
+                'isPromo' => $showsPrice && $resolvedPrice->isPromo,
+                'displayInitialPrice' => $showsPrice ? $displayInitialPrice : null,
                 'isNew' => $pse->getNewness() ? true : false,
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),
@@ -139,10 +155,10 @@ class ProductSaleElementsAccessService
                 'weight' => $pse->getWeight(),
                 // Taxed by the service the product cards of the API are, so that a card and
                 // the page it opens print the same figure.
-                'price' => $this->productTaxedPriceResolver->taxedPrice((int) $productId, $pse->getPrice()),
-                'untaxedPrice' => $pse->getPrice(),
-                'promoPrice' => $this->productTaxedPriceResolver->taxedPrice((int) $productId, $pse->getPromoPrice()),
-                'promoUntaxedPrice' => $pse->getPromoPrice(),
+                'price' => $showsPrice ? $this->productTaxedPriceResolver->taxedPrice((int) $productId, $pse->getPrice()) : null,
+                'untaxedPrice' => $showsPrice ? $pse->getPrice() : null,
+                'promoPrice' => $showsPrice ? $this->productTaxedPriceResolver->taxedPrice((int) $productId, $pse->getPromoPrice()) : null,
+                'promoUntaxedPrice' => $showsPrice ? $pse->getPromoPrice() : null,
                 'combination' => $attributes,
             ];
         }

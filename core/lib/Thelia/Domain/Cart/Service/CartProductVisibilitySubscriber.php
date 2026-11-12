@@ -31,7 +31,9 @@ use Thelia\Model\Currency;
  * Keeps the cart to what the catalog shows its visitor, at what that visitor pays, on the
  * moments a line gets into a cart without the catalog being read.
  *
- *  - An addition of a product the visitor may not see is refused, whoever asks: the live
+ *  - An addition of a product the visitor may not see, or may not buy (a price shown to
+ *    identified customers only or on request, a sale element an exclusive price list does not
+ *    price), is refused, whoever asks: the live
  *    components of a theme, CartFacade::addItem(), a module dispatching CART_ADDITEM. Above
  *    Thelia\Action\Cart::addItem (128), so a refused product never reaches the cart, and
  *    above the destination guard (200): a product that does not exist for the visitor is
@@ -83,7 +85,7 @@ final class CartProductVisibilitySubscriber implements EventSubscriberInterface
     {
         $productSaleElementsId = $event->getProductSaleElementsId();
 
-        if (null !== $productSaleElementsId && $this->cartLineVisibility->isSaleElementHidden($productSaleElementsId)) {
+        if (null !== $productSaleElementsId && $this->cartLineVisibility->isSaleElementHidden($productSaleElementsId, $event->getCart()->getCurrency(), (float) ($event->getQuantity() ?? 1))) {
             throw new ProductNotAvailableException();
         }
     }
