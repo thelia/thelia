@@ -26,6 +26,7 @@ use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdateFilePositionEvent;
+use Thelia\Domain\Pricing\PriceVisibility\PriceDisplayModeChanges;
 use Thelia\Model\BrandDocument;
 use Thelia\Model\BrandImage;
 use Thelia\Model\Category;
@@ -54,7 +55,6 @@ use Thelia\Model\Event\ProductSaleElementsProductVideoEvent;
 use Thelia\Model\Event\ProductVideoEvent;
 use Thelia\Model\FolderDocument;
 use Thelia\Model\FolderImage;
-use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductBundleItem;
 use Thelia\Model\ProductDocument;
@@ -353,19 +353,13 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
 
     private const CATALOGUE_MODEL = '#^Thelia\\\\Model\\\\(?:Product|Category|Content|Folder|Brand|Feature|Attribute|Tax|Currency|Sale|CatalogPriceRule|Template|Accessory|Country|State|Area|Lang|Config|Hook|Module|MetaData|RewritingUrl)#';
 
-    /**
-     * The products whose price display mode is being written: the column is flagged modified
-     * before the write, and no longer after it.
-     *
-     * @var \WeakMap<Product, true>
-     */
-    private \WeakMap $productsChangingMode;
+    private readonly PriceDisplayModeChanges $modeChanges;
 
     public function __construct(
         private readonly SharedCacheInvalidator $invalidator,
         private readonly SharedCachePurgeQueue $queue,
     ) {
-        $this->productsChangingMode = new \WeakMap();
+        $this->modeChanges = new PriceDisplayModeChanges();
     }
 
     public static function getSubscribedEvents(): array
@@ -439,18 +433,15 @@ final class SharedCacheInvalidationListener implements EventSubscriberInterface
         /** @var Product $product */
         $product = $event->getModel();
 
-        if ($product->isColumnModified(ProductTableMap::COL_PRICE_DISPLAY_MODE)) {
-            $this->productsChangingMode[$product] = true;
-        }
+        $this->modeChanges->remember($product);
     }
 
     public function purgeOnModeChange(ProductEvent $event): void
     {
+        /** @var Product $product */
         $product = $event->getModel();
 
-        if (isset($this->productsChangingMode[$product])) {
-            unset($this->productsChangingMode[$product]);
-
+        if ($this->modeChanges->wereWritten($product)) {
             $this->invalidator->purge([SharedCacheKey::ALL]);
         }
     }

@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Thelia\Api\Bridge\Propel\Event\ResourcePersistedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Pricing\PriceVisibility\PriceDisplayMode;
+use Thelia\Domain\Pricing\PriceVisibility\PriceDisplayModeChanges;
 use Thelia\Model\CatalogRestriction;
 use Thelia\Model\Category;
 use Thelia\Model\Config;
@@ -39,7 +40,6 @@ use Thelia\Model\Event\PriceListAssignmentEvent;
 use Thelia\Model\Event\PriceListEvent;
 use Thelia\Model\Event\PriceListItemEvent;
 use Thelia\Model\Event\ProductEvent;
-use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\PriceList;
 use Thelia\Model\PriceListAssignment;
 use Thelia\Model\PriceListItem;
@@ -118,17 +118,11 @@ class ResourceCacheInvalidationListener implements EventSubscriberInterface
 
     private bool $flushPending = false;
 
-    /**
-     * The products whose price display mode the write in progress changes: weakly held, so that a
-     * write that fails between the two events leaves nothing behind in a long-running worker.
-     *
-     * @var \WeakMap<object, true>
-     */
-    private \WeakMap $productsChangingMode;
+    private readonly PriceDisplayModeChanges $modeChanges;
 
     public function __construct(private readonly ResourceCache $cache)
     {
-        $this->productsChangingMode = new \WeakMap();
+        $this->modeChanges = new PriceDisplayModeChanges();
     }
 
     public static function getSubscribedEvents(): array
@@ -207,9 +201,7 @@ class ResourceCacheInvalidationListener implements EventSubscriberInterface
         /** @var Product $product */
         $product = $event->getModel();
 
-        if ($product->isColumnModified(ProductTableMap::COL_PRICE_DISPLAY_MODE)) {
-            $this->productsChangingMode[$product] = true;
-        }
+        $this->modeChanges->remember($product);
     }
 
     public function clearOnModeChange(ProductEvent $event): void
@@ -217,8 +209,7 @@ class ResourceCacheInvalidationListener implements EventSubscriberInterface
         /** @var Product $product */
         $product = $event->getModel();
 
-        if (isset($this->productsChangingMode[$product])) {
-            unset($this->productsChangingMode[$product]);
+        if ($this->modeChanges->wereWritten($product)) {
             $this->clear();
         }
     }

@@ -370,7 +370,8 @@ final class ResourceCacheCatalogScopeTest extends IntegrationTestCase
         $product->setPriceDisplayMode(PriceDisplayMode::OnRequest->value);
 
         $listener->rememberTheModeChange(new ProductEvent($product));
-        $remembered = (new \ReflectionProperty($listener, 'productsChangingMode'))->getValue($listener);
+        $changes = (new \ReflectionProperty($listener, 'modeChanges'))->getValue($listener);
+        $remembered = (new \ReflectionProperty($changes, 'products'))->getValue($changes);
         self::assertCount(1, $remembered, 'the change is remembered while the write runs');
 
         unset($product);
