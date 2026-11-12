@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\DataTransfer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -303,6 +304,28 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
 
         self::assertSame(1, preg_match('/(\S+\.txt)/', $tester->getDisplay(), $file));
         self::assertSame(implode("\t", self::FEC_FIELDS)."\r\n", (string) file_get_contents($file[1]));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function accountingExports(): iterable
+    {
+        yield 'sales journal' => ['thelia.export.sales_journal'];
+        yield 'tax summary' => ['thelia.export.tax_summary'];
+    }
+
+    #[DataProvider('accountingExports')]
+    public function testAnEmptyPeriodWrittenAsCsvGivesAnEmptyFile(string $exportRef): void
+    {
+        $this->chart('411000', '708500', '20:706200:445720');
+
+        $tester = new CommandTester((new Application(self::$kernel))->find('export'));
+        $tester->execute(['ref' => $exportRef, 'serializer' => 'thelia.csv', '--start' => '1990-01-01', '--end' => '1990-01-31']);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertSame(1, preg_match('/(\S+\.csv)/', $tester->getDisplay(), $file));
+        self::assertSame('', (string) file_get_contents($file[1]));
     }
 
     public function testTheFecFormatIsOfferedToTheAccountingExportsOnly(): void
