@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\Pricing\PriceList\Import;
 
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Pricing\PriceList\Export\PriceListLineExport;
+use Thelia\Domain\Pricing\PriceList\Import\PriceListImportLineError;
 use Thelia\Domain\Pricing\PriceList\Import\PriceListLineImport;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\PriceListItemQuery;
@@ -71,6 +72,51 @@ final class PriceListExportRoundTripTest extends PriceListImportTestCase
         $lines = PriceListItemQuery::create()->filterByPriceListId($target->getId())->orderByMinQuantity()->find();
         self::assertSame(['10.250000', null], [$lines[0]->getPrice(), $lines[1]->getPrice()]);
         self::assertSame([null, '7.000000'], [$lines[0]->getDiscountPercent(), $lines[1]->getDiscountPercent()]);
+    }
+
+    public function testWhatIsExportedIsImportedBackWhenTheReferenceIsSharedBySaleElements(): void
+    {
+        $source = $this->priceList();
+        $target = $this->priceList();
+        $first = $this->saleElement();
+        $second = $this->saleElement();
+        $second->setRef($first->getRef())->save();
+        $this->item($source, $second, 1, '10.000000');
+
+        $path = $this->file('')->getPathname();
+        $stream = fopen($path, 'w');
+        $this->getService(PriceListLineExport::class)->write($source, $stream);
+        fclose($stream);
+
+        $report = $this->getService(PriceListLineImport::class)->apply($target, new \SplFileInfo($path));
+
+        self::assertFalse($report->hasErrors(), 'the identifier tells the sale element the reference does not');
+        self::assertSame(1, $report->created);
+        $lines = PriceListItemQuery::create()->filterByPriceListId($target->getId())->find();
+        self::assertCount(1, $lines);
+        self::assertSame($second->getId(), $lines[0]->getProductSaleElementsId());
+    }
+
+    public function testASharedReferenceAloneIsStillAmbiguousAndAnIdentifierOutsideItsMatchesDisagrees(): void
+    {
+        $target = $this->priceList();
+        $first = $this->saleElement();
+        $second = $this->saleElement();
+        $second->setRef($first->getRef())->save();
+        $other = $this->saleElement();
+
+        $report = $this->getService(PriceListLineImport::class)->preview($target, $this->file([
+            'pse_ref;pse_id;price',
+            $first->getRef().';;5',
+            $first->getRef().';'.$other->getId().';5',
+            $first->getRef().';'.$first->getId().';5',
+        ]));
+
+        self::assertSame(
+            [2 => PriceListImportLineError::AMBIGUOUS_REFERENCE, 3 => PriceListImportLineError::REFERENCE_AND_ID_DISAGREE],
+            $this->reasons($report),
+        );
+        self::assertSame(1, $report->created);
     }
 
     public function testAnExportOfMoreThanOneBatchLosesNoLine(): void
