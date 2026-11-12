@@ -19,19 +19,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mime\Email;
 use Thelia\Action\Order as OrderAction;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\LoopExecutor;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Domain\Order\Service\GuestOrderAccessService;
 use Thelia\Domain\Order\Service\OrderStatusTransitionGuard;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\Currency;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Test\RecordingMailerFactory;
 use Thelia\Tools\URL;
@@ -132,6 +136,67 @@ final class MailRenderedWithoutRequestTest extends IntegrationTestCase
 
         self::assertNotSame([], $rows);
         self::assertInstanceOf(Lang::class, Lang::getDefaultLanguage());
+    }
+
+    public function testAMailRenderedWithoutRequestReadsItsLoopsInTheLanguageOfTheMail(): void
+    {
+        $factory = $this->createFixtureFactory();
+        [$mailLang, $currency] = $this->aCurrencyNamedInTwoLanguages();
+        $this->dropTheRequests();
+        $translatorLocale = Translator::getInstance()->getLocale();
+
+        $mailerFactory = new class($this->getService(TemplateHelperInterface::class), $this->getService(ParserResolver::class), $this->getService(MailerInterface::class), new NullTransport()) extends MailerFactory {
+            public ?string $currencyNameSeenByLoops = null;
+            public int $currencyId = 0;
+            public ?LoopExecutor $loops = null;
+
+            protected function setupMessageHeaders(Email $email, array $from, array $to, array $cc = [], array $bcc = [], array $replyTo = []): void
+            {
+                foreach ($this->loops->execute('currency', ['id' => $this->currencyId]) as $row) {
+                    $this->currencyNameSeenByLoops = $row->get('NAME');
+                }
+
+                parent::setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
+            }
+        };
+        $mailerFactory->loops = $this->getService(LoopExecutor::class);
+        $mailerFactory->currencyId = $currency->getId();
+
+        $mailerFactory->createEmailMessage(
+            'customer_confirmation',
+            ['sender@example.com' => 'Sender'],
+            ['recipient@example.com' => 'Recipient'],
+            ['customer_id' => $factory->customer($factory->customerTitle())->getId()],
+            $mailLang->getLocale(),
+        );
+
+        self::assertSame(
+            'name in '.$mailLang->getLocale(),
+            $mailerFactory->currencyNameSeenByLoops,
+            'The loops of a mail rendered without request read the language of the mail, not the default one.',
+        );
+        self::assertSame($translatorLocale, Translator::getInstance()->getLocale(), 'The language of the mail is withdrawn after the render.');
+
+        $rows = iterator_to_array($this->getService(LoopExecutor::class)->execute('currency', ['id' => $currency->getId()]));
+        self::assertSame('name in '.Lang::getDefaultLanguage()->getLocale(), $rows[0]->get('NAME'));
+    }
+
+    /**
+     * @return array{Lang, Currency} a language that is not the default one, and a currency named in it and in the default language
+     */
+    private function aCurrencyNamedInTwoLanguages(): array
+    {
+        $default = Lang::getDefaultLanguage();
+        $other = LangQuery::create()->filterById($default->getId(), \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)->findOne();
+        $other ??= $this->createFixtureFactory()->lang(['locale' => 'fr_FR', 'code' => 'fr', 'title' => 'Francais']);
+
+        $currency = $this->createFixtureFactory()->currency(['code' => 'XTS']);
+        foreach ([$default, $other] as $lang) {
+            $currency->setLocale($lang->getLocale())->setName('name in '.$lang->getLocale());
+        }
+        $currency->save();
+
+        return [$other, $currency];
     }
 
     private function dropTheRequests(): void
