@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Reporting\Mailing;
 
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -31,6 +30,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatus;
+use Thelia\Tests\Support\Filesystem\TestVarCleaner;
 
 final class ReportMailerTest extends ReportMailingTestCase
 {
@@ -245,7 +245,8 @@ final class ReportMailerTest extends ReportMailingTestCase
         ConfigQuery::resetCache();
         $before = $this->filesLeftBehind();
         // A file where the folder of the stored files should be: the file cannot be moved there.
-        (new Filesystem())->remove(ReportMailStorage::directory());
+        self::assertSame(THELIA_ROOT.'var/report-mail', ReportMailStorage::directory());
+        TestVarCleaner::remove(THELIA_ROOT.'var/report-mail');
         file_put_contents(ReportMailStorage::directory(), 'not a folder');
 
         try {

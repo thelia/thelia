@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Reporting\Mailing;
 
 use Symfony\Bundle\FrameworkBundle\Test\MailerAssertionsTrait;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -27,6 +26,7 @@ use Thelia\Model\OrderStatus;
 use Thelia\Model\ReportMailing;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Filesystem\TestVarCleaner;
 use Thelia\Tests\Support\Mailer\CapturingMailerFactory;
 
 /**
@@ -57,7 +57,9 @@ abstract class ReportMailingTestCase extends IntegrationTestCase
     protected function tearDown(): void
     {
         ConfigQuery::resetCache();
-        (new Filesystem())->remove(ReportMailStorage::directory());
+        // Never clean a path the code under test renders: a mutation of it would point at the project root.
+        self::assertSame(THELIA_ROOT.'var/report-mail', ReportMailStorage::directory());
+        TestVarCleaner::remove(THELIA_ROOT.'var/report-mail');
 
         parent::tearDown();
     }
