@@ -22,13 +22,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\PaymentAmount;
 use Thelia\Domain\Payment\Service\PaymentTransactionTotalsReader;
 use Thelia\Domain\Pricing\MoneyRounding;
+use Thelia\Domain\Pricing\OrderLineRounding;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\Sequence\GaplessSequenceGenerator;
 use Thelia\Domain\Taxation\TaxEngine\TaxCalculatorResolverTrait;
@@ -316,10 +316,8 @@ class Order extends BaseOrder
     }
 
     /**
-     * A line excluding tax and its tax, rounded as getTotalAmount() rounds them: each unit
-     * amount to the cent before the quantity under the sum of roundings, the line total under
-     * the rounding of sums, nothing for an order older than both. buildTotalAmountQuery() applies
-     * the same rule in SQL to the lines of the whole order.
+     * A line excluding tax and its tax, rounded as getTotalAmount() rounds the lines of the
+     * order: see OrderLineRounding.
      *
      * @param list<float> $unitTaxes
      *
@@ -327,96 +325,25 @@ class Order extends BaseOrder
      */
     public function getLineAmounts(float $quantity, float $unitPrice, array $unitTaxes): array
     {
-        $orderId = (int) $this->getId();
-
-        if (ConfigQuery::isOrderWithLegacyRounding($orderId)) {
-            return [$quantity * $unitPrice, $quantity * array_sum($unitTaxes)];
-        }
-
-        if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === ConfigQuery::getOrderRoundingMode($orderId)) {
-            $amount = round($quantity * $unitPrice, 2);
-
-            return [$amount, round($quantity * ($unitPrice + array_sum($unitTaxes)), 2) - $amount];
-        }
-
-        return [
-            $quantity * round($unitPrice, 2),
-            $quantity * array_sum(array_map(static fn (float $tax): float => round($tax, 2), $unitTaxes)),
-        ];
+        return OrderLineRounding::ofOrder((int) $this->getId())->lineAmounts($quantity, $unitPrice, $unitTaxes);
     }
 
     /**
      * Totals the order lines the way CartItem::getTotalPrice() and
      * CartItem::getTotalTaxedPrice() total the cart lines, so that the amount
      * charged matches the amount the customer saw in the cart.
-     *
-     * With ROUNDING_MODE_SUM_OF_ROUNDINGS every unit amount is rounded to the
-     * cent before being multiplied by the quantity. With
-     * ROUNDING_MODE_ROUNDING_OF_SUMS the multiplication happens at the
-     * precision the prices are stored with, and only the line total is rounded.
-     *
-     * With $textPromoPrice the promotional price is read as a text, the way it was
-     * read while order_product.promo_price was a VARCHAR. The type of IF() is the
-     * one of its operands, so a text promotional price makes the whole unit price a
-     * text, the price of a line that is not on promotion included, and ROUND() then
-     * reads it as a floating point number.
      */
     private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice, bool $floatLineRounding): string
     {
-        $roundingOfSums = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode;
-
-        $unitPrice = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.$this->promoPriceOperand($textPromoPrice).', '.OrderProductTableMap::COL_PRICE.')';
-        $unitTax = 'IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTaxTableMap::COL_PROMO_AMOUNT.', '.OrderProductTaxTableMap::COL_AMOUNT.')';
-
-        if (!$roundingOfSums) {
-            $unitPrice = 'ROUND('.$unitPrice.', 2)';
-            $unitTax = 'ROUND('.$unitTax.', 2)';
-        }
-
-        $unitTaxes = '(
-            SELECT COALESCE(SUM('.$unitTax.'), 0)
-            FROM '.OrderProductTaxTableMap::TABLE_NAME.'
-            WHERE '.OrderProductTaxTableMap::COL_ORDER_PRODUCT_ID.' = '.OrderProductTableMap::COL_ID.'
-        )';
-
-        $taxedLineTotal = self::storedQuantity().' * ('.$unitPrice.' + '.$unitTaxes.')';
-        $untaxedLineTotal = self::storedQuantity().' * '.$unitPrice;
-
-        // The quantity is a DOUBLE, and so is the line total: 1.25 x 14.82 is 18.524999…,
-        // which ROUND() would bring down to 18.52 where the cart, rounding in PHP, charges
-        // 18.53. The line is brought back to a decimal at six places before it is rounded.
-        // An order read with a text promotional price, or placed before the line totals
-        // were rounded so (ConfigQuery::isOrderWithFloatLineRounding()), was invoiced on the
-        // floating point figure, and keeps it.
-        if ($roundingOfSums) {
-            $taxedLineTotal = 'ROUND('.self::asDecimalUnless($taxedLineTotal, $textPromoPrice || $floatLineRounding).', 2)';
-            $untaxedLineTotal = 'ROUND('.self::asDecimalUnless($untaxedLineTotal, $textPromoPrice || $floatLineRounding).', 2)';
-        }
+        $rounding = OrderLineRounding::inMode($roundingMode, $textPromoPrice, $floatLineRounding);
 
         return '
             SELECT
-                SUM('.$taxedLineTotal.') as total_taxed_price,
-                SUM('.$untaxedLineTotal.') as total_untaxed_price
+                SUM('.$rounding->lineTotalSql(true).') as total_taxed_price,
+                SUM('.$rounding->lineTotalSql(false).') as total_untaxed_price
             FROM '.OrderProductTableMap::TABLE_NAME.'
             WHERE '.OrderProductTableMap::COL_ORDER_ID.' = :order_id
         ';
-    }
-
-    /**
-     * The quantity of a line as it was sold. The column is a binary floating point number:
-     * a quantity written with an error past the thousandth (a single precision FLOAT kept
-     * 0.7 kg as 0.69999998) would make a line of 0.7 at 0.75 come to 0.52499998 and be
-     * rounded down where the cart rounded 0.525 up. A quantity carries three decimals at
-     * most, so rounding it there gives back the quantity sold.
-     */
-    private static function storedQuantity(): string
-    {
-        return 'ROUND('.OrderProductTableMap::COL_QUANTITY.', '.QuantityScale::MAXIMUM_DECIMALS.')';
-    }
-
-    private static function asDecimalUnless(string $lineTotal, bool $invoicedOnTheFloatingPointFigure): string
-    {
-        return $invoicedOnTheFloatingPointFigure ? $lineTotal : 'CAST('.$lineTotal.' AS DECIMAL(20,6))';
     }
 
     private function promoPriceOperand(bool $textPromoPrice): string
