@@ -129,6 +129,36 @@ final class ProductLoopPriceDisplayTest extends IntegrationTestCase
         $this->assertShown($this->rows('product_sale_elements', ['product' => $shown->getId()])[0], self::SALE_ELEMENT_FIELDS, 25.0);
     }
 
+    public function testARangeOnThePriceListsOnlyTheProductsWhosePriceTheVisitorIsShown(): void
+    {
+        $hidden = $this->product(40.0);
+        $shown = $this->product(25.0);
+        $this->productShows($hidden, PriceDisplayMode::OnRequest);
+        $both = $hidden->getId().','.$shown->getId();
+
+        foreach ([['min_price' => 10], ['max_price' => 50], ['min_price' => 10, 'complex' => 1], ['max_price' => 50, 'complex' => 1]] as $range) {
+            self::assertSame([$shown->getId()], $this->ids(['id' => $both] + $range), 'a range on the price tells the price it hides: '.json_encode($range));
+        }
+
+        self::assertEqualsCanonicalizing([$hidden->getId(), $shown->getId()], $this->ids(['id' => $both]), 'a page that names no price keeps every product');
+        self::assertEqualsCanonicalizing([$hidden->getId(), $shown->getId()], $this->ids(['id' => $both, 'min_price' => 10, 'backend_context' => 1]), 'the back office filters on the catalog');
+    }
+
+    public function testARangeOnThePriceListsTheProductsAnIdentifiedCustomerIsShown(): void
+    {
+        $this->shopShows(PriceDisplayMode::LoggedIn);
+        $first = $this->product(40.0);
+        $second = $this->product(25.0);
+        $both = $first->getId().','.$second->getId();
+
+        self::assertSame([], $this->ids(['id' => $both, 'min_price' => 10]));
+
+        $this->loginAsCustomerInSession($this->customer());
+        $this->forgetEverything();
+
+        self::assertEqualsCanonicalizing([$first->getId(), $second->getId()], $this->ids(['id' => $both, 'min_price' => 10]));
+    }
+
     public function testTheBackOfficeReadsTheCatalogWhateverTheMode(): void
     {
         $this->shopShows(PriceDisplayMode::OnRequest);
@@ -233,6 +263,16 @@ final class ProductLoopPriceDisplayTest extends IntegrationTestCase
         self::assertNotSame([], $rows);
 
         return $rows[0];
+    }
+
+    /**
+     * @param array<string, mixed> $arguments
+     *
+     * @return list<int>
+     */
+    private function ids(array $arguments): array
+    {
+        return array_map(static fn (array $row): int => (int) $row['ID'], $this->rows('product', $arguments));
     }
 
     /**

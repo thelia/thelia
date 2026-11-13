@@ -769,6 +769,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $min_price = $this->getMinPrice();
         $max_price = $this->getMaxPrice();
 
+        // A price the visitor is not shown is not told by a range on it either: two calls would
+        // bracket it. A page narrowed on the price holds only the products whose price this
+        // visitor is shown, as the front API does.
+        if (null !== $min_price || null !== $max_price) {
+            $this->keepProductsWithAShownPrice($search);
+        }
+
         if ($complex) {
             if (true === $new) {
                 $isPSELeftJoinList[] = 'is_new';
@@ -1149,6 +1156,32 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $this->priceVisibilityResolver->productsWithHiddenPrice($productIds, $this->visitorPriceReader->currentCustomer()),
             true,
         );
+    }
+
+    /**
+     * Narrows the query to the products whose price this visitor is shown. Nothing changes in the
+     * back office, which reads the catalog, nor while every price of the shop is visible.
+     */
+    private function keepProductsWithAShownPrice(ProductQuery $search): void
+    {
+        $shownPriceClause = $this->shownPriceClause();
+
+        if (null !== $shownPriceClause) {
+            $search->where($shownPriceClause);
+        }
+    }
+
+    /**
+     * The condition that keeps the products whose price this visitor is shown, null in the back
+     * office and while every price of the shop is visible.
+     */
+    private function shownPriceClause(): ?string
+    {
+        if ($this->getBackendContext() || !$this->priceVisibilityResolver instanceof PriceVisibilityResolver) {
+            return null;
+        }
+
+        return $this->priceVisibilityResolver->shownPriceClause(ProductTableMap::COL_ID, $this->visitorPriceReader->currentCustomer());
     }
 
     /**
