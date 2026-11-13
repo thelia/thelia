@@ -193,9 +193,11 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     $search->orderByQuantity(Criteria::DESC);
                     break;
                 case 'min_price':
+                    $this->rankHiddenPricesLast($search);
                     $search->addAscendingOrderByColumn('price_FINAL_PRICE');
                     break;
                 case 'max_price':
+                    $this->rankHiddenPricesLast($search);
                     $search->addDescendingOrderByColumn('price_FINAL_PRICE');
                     break;
                 case 'promo':
@@ -379,9 +381,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
      */
     private function filterByPromotion(ProductSaleElementsQuery $search, bool $promo): void
     {
-        $shownPriceClause = $this->getBackendContext() || !$this->priceVisibilityResolver instanceof PriceVisibilityResolver
-            ? null
-            : $this->priceVisibilityResolver->shownPriceClause(ProductSaleElementsTableMap::COL_PRODUCT_ID, $this->visitorPriceReader->currentCustomer());
+        $shownPriceClause = $this->shownPriceClause();
 
         if (null === $shownPriceClause) {
             $search->filterByPromo($promo);
@@ -396,6 +396,35 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         $search->where('('.ProductSaleElementsTableMap::COL_PROMO.Criteria::EQUAL.'0 OR NOT ('.$shownPriceClause.'))');
+    }
+
+    /**
+     * A price the visitor is not shown has none to rank on: an order on the price puts it last,
+     * in both directions, as the front API does, so where it stands among the others tells
+     * nothing of it.
+     */
+    private function rankHiddenPricesLast(ProductSaleElementsQuery $search): void
+    {
+        $shownPriceClause = $this->shownPriceClause();
+
+        if (null !== $shownPriceClause) {
+            $search
+                ->withColumn('CASE WHEN '.$shownPriceClause.' THEN 0 ELSE 1 END', 'price_hidden_rank')
+                ->addAscendingOrderByColumn('price_hidden_rank');
+        }
+    }
+
+    /**
+     * The condition that keeps the sale elements whose price this visitor is shown, null in the
+     * back office and while every price of the shop is visible.
+     */
+    private function shownPriceClause(): ?string
+    {
+        if ($this->getBackendContext() || !$this->priceVisibilityResolver instanceof PriceVisibilityResolver) {
+            return null;
+        }
+
+        return $this->priceVisibilityResolver->shownPriceClause(ProductSaleElementsTableMap::COL_PRODUCT_ID, $this->visitorPriceReader->currentCustomer());
     }
 
     /**

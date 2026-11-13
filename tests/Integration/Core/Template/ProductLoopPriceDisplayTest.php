@@ -159,6 +159,33 @@ final class ProductLoopPriceDisplayTest extends IntegrationTestCase
         self::assertEqualsCanonicalizing([$first->getId(), $second->getId()], $this->ids(['id' => $both, 'min_price' => 10]));
     }
 
+    public function testAnOrderOnThePriceRanksAPriceTheVisitorIsNotShownLastInBothDirections(): void
+    {
+        $this->shopShows(PriceDisplayMode::LoggedIn);
+        $cheap = $this->product(40.0);
+        $hidden = $this->product(50.0);
+        $dear = $this->product(70.0);
+        $this->productShows($cheap, PriceDisplayMode::Visible);
+        $this->productShows($dear, PriceDisplayMode::Visible);
+        $this->forgetEverything();
+
+        $products = $cheap->getId().','.$hidden->getId().','.$dear->getId();
+        $saleElementOf = static fn (Product $product): int => $product->getDefaultSaleElements()->getId();
+        $saleElements = implode(',', array_map($saleElementOf, [$cheap, $hidden, $dear]));
+        $saleElementIds = fn (array $arguments): array => array_map(static fn (array $row): int => (int) $row['ID'], $this->rows('product_sale_elements', $arguments));
+
+        foreach ([[], ['complex' => 1]] as $form) {
+            self::assertSame([$cheap->getId(), $dear->getId(), $hidden->getId()], $this->ids(['id' => $products, 'order' => 'min_price'] + $form), 'min_price: '.json_encode($form));
+            self::assertSame([$dear->getId(), $cheap->getId(), $hidden->getId()], $this->ids(['id' => $products, 'order' => 'max_price'] + $form), 'max_price: '.json_encode($form));
+        }
+
+        self::assertSame(array_map($saleElementOf, [$cheap, $dear, $hidden]), $saleElementIds(['id' => $saleElements, 'order' => 'min_price']));
+        self::assertSame(array_map($saleElementOf, [$dear, $cheap, $hidden]), $saleElementIds(['id' => $saleElements, 'order' => 'max_price']));
+
+        self::assertSame([$cheap->getId(), $hidden->getId(), $dear->getId()], $this->ids(['id' => $products, 'order' => 'min_price', 'backend_context' => 1]), 'the back office orders on the catalog');
+        self::assertSame(array_map($saleElementOf, [$cheap, $hidden, $dear]), $saleElementIds(['id' => $saleElements, 'order' => 'min_price', 'backend_context' => 1]), 'the back office orders on the catalog');
+    }
+
     public function testAPromotionOfAPriceTheVisitorIsNotShownIsToldByNoLoop(): void
     {
         $hidden = $this->promotedProduct(40.0);
