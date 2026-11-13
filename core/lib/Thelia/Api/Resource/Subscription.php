@@ -38,7 +38,7 @@ use Thelia\Model\SubscriptionOrderQuery;
  * The front reads and acts on its own subscriptions only: SubscriptionOwnershipExtension
  * scopes every front operation to the customer of the token, so another customer's id
  * answers 404 like a missing one. The actions are POSTs on the subscription
- * (cancel, pause, resume, payment-method); each goes through SubscriptionManager, which
+ * (cancel, pause, resume, payment-method); each goes through SubscriptionLifecycle, which
  * refuses what the state of the subscription does not allow with a 409. The payment method
  * is only ever shown as its label, never its token. The administration reads every
  * subscription, filtered by status; what it does to one is done in the back office.

@@ -20,7 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\EventListener\SubscriptionNotificationListener;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\LangQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -146,8 +146,8 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
         [$byTheCustomer] = $this->aSubscription();
         [$byTheSystem] = $this->aSubscription();
 
-        $this->getService(SubscriptionManager::class)->cancel($byTheCustomer, ActorType::Customer, (int) $byTheCustomer->getCustomerId());
-        $this->getService(SubscriptionManager::class)->cancel($byTheSystem, ActorType::System);
+        $this->getService(SubscriptionLifecycle::class)->cancel($byTheCustomer, ActorType::Customer, (int) $byTheCustomer->getCustomerId());
+        $this->getService(SubscriptionLifecycle::class)->cancel($byTheSystem, ActorType::System);
 
         self::assertSame(['subscription_cancelled'], array_column($this->recorder->log, 'code'));
         self::assertSame('customer', $this->recorder->log[0]['variables']['actor_type']);
@@ -167,7 +167,7 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
         $this->moveTo('2028-02-29 10:00:00');
         $this->biller()->bill((int) $subscription->getId());
         $subscription->reload();
-        $this->getService(SubscriptionManager::class)->cancel($subscription, ActorType::Customer, (int) $subscription->getCustomerId());
+        $this->getService(SubscriptionLifecycle::class)->cancel($subscription, ActorType::Customer, (int) $subscription->getCustomerId());
 
         self::assertSame(['subscription_payment_failed', 'subscription_cancelled'], array_column($this->recorder->log, 'code'));
         [$failed, $cancelled] = array_column($this->recorder->log, 'variables');

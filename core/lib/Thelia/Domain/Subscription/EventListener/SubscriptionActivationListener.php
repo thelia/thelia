@@ -45,7 +45,7 @@ use Thelia\Model\SubscriptionQuery;
  *     while it takes the first payment, or the registration at 0 of a trial, is not told
  *     to the cart, and its method is the one the order created;
  *  3. otherwise none: the subscription exists, its first charge fails and the customer is
- *     asked to give a method (SubscriptionManager::changePaymentMethod()).
+ *     asked to give a method (SubscriptionLifecycle::changePaymentMethod()).
  *
  * Idempotent: an order that already is the initial order of a subscription, or that is an
  * installment order (its cart carries the plan too), creates nothing, so a second paid

@@ -26,7 +26,7 @@ use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
@@ -564,7 +564,7 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
     public function testAnonymizeEndsASubscriptionThatIsAlreadyCancelledAndLeavesAnEndedOneAlone(): void
     {
         [$cancelled] = $this->aSubscription();
-        $this->getService(SubscriptionManager::class)->cancel($cancelled, ActorType::Customer, (int) $cancelled->getCustomerId());
+        $this->getService(SubscriptionLifecycle::class)->cancel($cancelled, ActorType::Customer, (int) $cancelled->getCustomerId());
         $customer = $cancelled->getCustomer();
 
         $this->anonymize($customer);

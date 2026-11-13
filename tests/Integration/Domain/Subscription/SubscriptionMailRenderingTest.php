@@ -25,7 +25,7 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\EventListener\SubscriptionNotificationListener;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\LangQuery;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -122,7 +122,7 @@ final class SubscriptionMailRenderingTest extends ActionIntegrationTestCase
 
         [$cancelled, $otherProduct] = $this->aSubscription();
         $otherProduct->setLocale($this->localeOf($cancelled))->setTitle($title)->save();
-        $this->getService(SubscriptionManager::class)->cancel($cancelled, ActorType::Customer, (int) $cancelled->getCustomerId());
+        $this->getService(SubscriptionLifecycle::class)->cancel($cancelled, ActorType::Customer, (int) $cancelled->getCustomerId());
 
         self::assertSame(
             ['subscription_payment_failed', 'subscription_payment_failed', 'subscription_suspended', 'subscription_suspended', 'subscription_cancelled'],

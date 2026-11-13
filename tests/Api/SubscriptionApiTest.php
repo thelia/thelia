@@ -18,13 +18,16 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
+use Thelia\Model\Map\SubscriptionTableMap;
 use Thelia\Model\Sale;
 use Thelia\Model\SubscriptionPlanPriceQuery;
 use Thelia\Model\SubscriptionPlanQuery;
+use Thelia\Model\SubscriptionQuery;
 use Thelia\Test\ApiTestCase;
 use Thelia\Test\FixtureFactory;
 use Thelia\Tests\Integration\Domain\Subscription\SubscriptionScenario;
+use Thelia\Tests\Support\Payment\RecurringTestPaymentModule;
 
 /**
  * The subscriptions of the account (read, cancel, pause, resume, change of payment method),
@@ -135,6 +138,30 @@ final class SubscriptionApiTest extends ApiTestCase
         self::assertSame(409, $this->jsonRequest('POST', $uri.'/cancel', token: $token)->getStatusCode());
     }
 
+    /**
+     * Resuming undoes a pause, nothing else: a suspended subscription is brought back by paying
+     * what is due, and a trial ends with its first charge.
+     */
+    public function testACustomerResumesOnlyAPausedSubscription(): void
+    {
+        [$subscription] = $this->aSubscription(['Pausable' => 1]);
+        $token = $this->authenticateAsCustomer($subscription->getCustomer());
+        $uri = '/api/front/account/subscriptions/'.$subscription->getId().'/resume';
+
+        foreach ([SubscriptionStatus::Active, SubscriptionStatus::Trial, SubscriptionStatus::PaymentFailed, SubscriptionStatus::Suspended] as $status) {
+            SubscriptionQuery::create()->filterById($subscription->getId())->update(['Status' => $status->value, 'NextBillingAt' => new \DateTime('2028-02-29 10:00:00')], $this->getPropelConnection());
+            SubscriptionTableMap::clearInstancePool();
+
+            self::assertSame(409, $this->jsonRequest('POST', $uri, token: $token)->getStatusCode(), 'A subscription that is '.$status->value.' is not resumed.');
+            SubscriptionTableMap::clearInstancePool();
+            $reloaded = $this->reloaded($subscription);
+            self::assertSame($status->value, $reloaded->getStatus());
+            self::assertSame('2028-02-29 10:00:00', $reloaded->getNextBillingAt('Y-m-d H:i:s'), 'Its schedule is left as it was.');
+        }
+
+        self::assertSame([], RecurringTestPaymentModule::$charges, 'Nothing is charged by a refused resume.');
+    }
+
     public function testACustomerPausesOnlyWhatThePlanLetsThemPause(): void
     {
         [$subscription] = $this->aSubscription();
@@ -164,7 +191,7 @@ final class SubscriptionApiTest extends ApiTestCase
     {
         [$active] = $this->aSubscription();
         [$cancelled] = $this->aSubscription();
-        $this->getService(SubscriptionManager::class)->cancel($cancelled, ActorType::Admin, 1);
+        $this->getService(SubscriptionLifecycle::class)->cancel($cancelled, ActorType::Admin, 1);
         $token = $this->authenticateAsAdmin();
 
         $response = $this->jsonRequest('GET', '/api/admin/subscriptions?status=cancelled', token: $token);
