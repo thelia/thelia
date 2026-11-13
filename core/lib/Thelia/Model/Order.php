@@ -50,8 +50,18 @@ class Order extends BaseOrder
     /** @var array{untaxed: float, taxed: float}|null */
     private ?array $serviceLinesTotals = null;
 
-    /** @var array<string, \stdClass|false|null> */
-    private static array $totalsCache = [];
+    /**
+     * The totals query of the order, by rounding rule, held by the instance so that it goes away with the order:
+     * a process reading thousands of orders (an export, a worker) keeps none of them.
+     *
+     * @var array<string, \stdClass|false>
+     */
+    private array $totalsCache = [];
+
+    private int $totalsCacheGeneration = 0;
+
+    /** Moved by forgetCachedTotals(): the totals an instance read before are read again. */
+    private static int $totalsGeneration = 0;
 
     protected ?int $choosenDeliveryAddress = null;
 
@@ -155,13 +165,13 @@ class Order extends BaseOrder
         return self::$writeGeneration;
     }
 
+    /**
+     * The lines of the order moved without going through this instance: every instance of every order reads its
+     * totals again, as no instance is kept to forget them one by one.
+     */
     public static function forgetCachedTotals(int $orderId): void
     {
-        foreach (array_keys(self::$totalsCache) as $key) {
-            if (str_starts_with((string) $key, $orderId.'-')) {
-                unset(self::$totalsCache[$key]);
-            }
-        }
+        ++self::$totalsGeneration;
     }
 
     /**
@@ -269,15 +279,18 @@ class Order extends BaseOrder
             return $this->getTotalAmountLegacy($tax, $includePostage, $includeDiscount);
         }
 
-        // Cache the query result. Wa have to une and array indexed on the order ID, as the cache ios static
-        // and may cache results for several orders, for example in the order list in the back-office.
-        // The rounding mode and the reading of the promotional price are part of the key: they decide what the query computes.
+        // The order list asks each order for its total more than once. The rounding mode and the reading of the
+        // promotional price are part of the key: they decide what the query computes.
         $roundingMode = ConfigQuery::getOrderRoundingMode((int) $this->getId());
         $textPromoPrice = ConfigQuery::isOrderWithTextPromoPrice((int) $this->getId());
         $floatLineRounding = ConfigQuery::isOrderWithFloatLineRounding((int) $this->getId());
         $id = $this->getId().'-'.$roundingMode.'-'.(int) $textPromoPrice.'-'.(int) $floatLineRounding;
 
-        if (!isset(self::$totalsCache[$id]) || null === self::$totalsCache[$id]) {
+        if ($this->totalsCacheGeneration !== self::$totalsGeneration) {
+            $this->forgetTotals();
+        }
+
+        if (!isset($this->totalsCache[$id])) {
             $con = Propel::getConnection();
             $stmt = $con->prepare($this->buildTotalAmountQuery($roundingMode, $textPromoPrice, $floatLineRounding));
 
@@ -285,14 +298,14 @@ class Order extends BaseOrder
                 throw new TheliaProcessException(\sprintf('Failed to get order total and order tax: %s (%s)', implode(', ', $stmt->errorInfo()), $stmt->errorCode()));
             }
 
-            self::$totalsCache[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
+            $this->totalsCache[$id] = $stmt->fetch(\PDO::FETCH_OBJ);
         }
 
         // The order is charged in cents, as Cart::getTaxedAmount() and Cart::getTotalAmount()
         // round the cart. A line sold by measure is where it shows: 1.25 kg at 14.82 is a
         // line of 18.525, charged 18.53, and the tax is the gap between the two rounded totals.
-        $total = MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_taxed_price);
-        $tax = MoneyRounding::toTheCent($total - MoneyRounding::toTheCent((float) self::$totalsCache[$id]->total_untaxed_price));
+        $total = MoneyRounding::toTheCent((float) $this->totalsCache[$id]->total_taxed_price);
+        $tax = MoneyRounding::toTheCent($total - MoneyRounding::toTheCent((float) $this->totalsCache[$id]->total_untaxed_price));
 
         if (true === $includeDiscount) {
             $total -= $this->getDiscount();
@@ -617,8 +630,25 @@ class Order extends BaseOrder
         return $this->serviceLinesTotals[$kind];
     }
 
+    private function forgetTotals(): void
+    {
+        $this->totalsCache = [];
+        $this->totalsCacheGeneration = self::$totalsGeneration;
+    }
+
+    /**
+     * Also run before the order is serialized: a total read in one process means nothing to the next one.
+     */
+    public function clearAllReferences(bool $deep = false): static
+    {
+        $this->forgetTotals();
+
+        return parent::clearAllReferences($deep);
+    }
+
     public function reload(bool $deep = false, ?ConnectionInterface $con = null): void
     {
+        $this->forgetTotals();
         $this->serviceLinesTotals = null;
 
         parent::reload($deep, $con);
@@ -626,6 +656,7 @@ class Order extends BaseOrder
 
     public function addOrderProduct(OrderProduct $l): static
     {
+        $this->forgetTotals();
         $this->serviceLinesTotals = null;
 
         return parent::addOrderProduct($l);
@@ -633,6 +664,7 @@ class Order extends BaseOrder
 
     public function clearOrderProducts(): static
     {
+        $this->forgetTotals();
         $this->serviceLinesTotals = null;
 
         return parent::clearOrderProducts();
