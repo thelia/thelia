@@ -20,6 +20,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderShipmentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Order\Service\OrderStatusCatalog;
 use Thelia\Domain\Shipping\DTO\ShipmentLine;
 use Thelia\Domain\Shipping\Exception\ShipmentNotAllowedException;
@@ -120,7 +121,7 @@ final readonly class OrderShipmentManager
     public function ship(OrderShipment $shipment, ?string $deliveryRef = null, bool $settleOrderStatus = true): OrderShipment
     {
         if (!$shipment->isDraft()) {
-            throw new ShipmentNotAllowedException(\sprintf('Shipment %s already left or was cancelled.', $shipment->getRef()));
+            throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Shipment %ref already left or was cancelled.', ['%ref' => $shipment->getRef()]));
         }
 
         $order = $shipment->getOrder();
@@ -136,7 +137,7 @@ final readonly class OrderShipmentManager
             $shipment->reload(false, $connection);
 
             if (!$shipment->isDraft()) {
-                throw new ShipmentNotAllowedException(\sprintf('Shipment %s already left or was cancelled.', $shipment->getRef()));
+                throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Shipment %ref already left or was cancelled.', ['%ref' => $shipment->getRef()]));
             }
 
             // A draft opened before the order was cancelled or refunded stays a draft.
@@ -185,7 +186,7 @@ final readonly class OrderShipmentManager
     public function cancel(OrderShipment $shipment): OrderShipment
     {
         if (!$shipment->isDraft()) {
-            throw new ShipmentNotAllowedException(\sprintf('Shipment %s already left or was cancelled.', $shipment->getRef()));
+            throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Shipment %ref already left or was cancelled.', ['%ref' => $shipment->getRef()]));
         }
 
         $connection = Propel::getWriteConnection(OrderShipmentTableMap::DATABASE_NAME);
@@ -196,7 +197,7 @@ final readonly class OrderShipmentManager
             $shipment->reload(false, $connection);
 
             if (!$shipment->isDraft()) {
-                throw new ShipmentNotAllowedException(\sprintf('Shipment %s already left or was cancelled.', $shipment->getRef()));
+                throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Shipment %ref already left or was cancelled.', ['%ref' => $shipment->getRef()]));
             }
 
             $shipment->setStatus(OrderShipment::STATUS_CANCELLED)->save($connection);
@@ -310,11 +311,11 @@ final readonly class OrderShipmentManager
 
         foreach ($wanted as $orderProductId => $quantity) {
             if (!\array_key_exists($orderProductId, $remaining)) {
-                throw new ShipmentNotAllowedException(\sprintf('Line %d is not a line of order %s that ships.', $orderProductId, $order->getRef()));
+                throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Line %line is not a line of order %ref that ships.', ['%line' => $orderProductId, '%ref' => $order->getRef()]));
             }
 
             if ($quantity > $remaining[$orderProductId] + ShippedQuantityCalculator::TOLERANCE) {
-                throw new ShipmentNotAllowedException(\sprintf('Only %s left to ship on line %d of order %s, %s asked.', self::formatQuantity($remaining[$orderProductId]), $orderProductId, $order->getRef(), self::formatQuantity($quantity)));
+                throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Only %left left to ship on line %line of order %ref, %asked asked.', ['%left' => self::formatQuantity($remaining[$orderProductId]), '%line' => $orderProductId, '%ref' => $order->getRef(), '%asked' => self::formatQuantity($quantity)]));
             }
         }
     }
@@ -335,14 +336,14 @@ final readonly class OrderShipmentManager
 
         foreach ($lines as $line) {
             if ($line->quantity <= 0.0) {
-                throw new ShipmentNotAllowedException(\sprintf('A shipment line carries a positive quantity, %s given for line %d.', self::formatQuantity($line->quantity), $line->orderProductId));
+                throw new ShipmentNotAllowedException(Translator::getInstance()->trans('A shipment line carries a positive quantity, %quantity given for line %line.', ['%quantity' => self::formatQuantity($line->quantity), '%line' => $line->orderProductId]));
             }
 
             $wanted[$line->orderProductId] = ($wanted[$line->orderProductId] ?? 0.0) + $line->quantity;
         }
 
         if ([] === $wanted) {
-            throw new ShipmentNotAllowedException('A shipment carries at least one line.');
+            throw new ShipmentNotAllowedException(Translator::getInstance()->trans('A shipment carries at least one line.'));
         }
 
         return $wanted;
@@ -370,7 +371,11 @@ final readonly class OrderShipmentManager
         $code = null === $statusId ? null : $this->statusCatalog->get($statusId)?->getEffectiveCode();
 
         if (\in_array($code, [OrderStatus::CODE_CANCELED, OrderStatus::CODE_REFUNDED], true)) {
-            throw new ShipmentNotAllowedException(\sprintf('Order %s is %s: nothing of it ships.', $order->getRef(), $code));
+            $message = OrderStatus::CODE_CANCELED === $code
+                ? Translator::getInstance()->trans('Order %ref is canceled: nothing of it ships.', ['%ref' => $order->getRef()])
+                : Translator::getInstance()->trans('Order %ref is refunded: nothing of it ships.', ['%ref' => $order->getRef()]);
+
+            throw new ShipmentNotAllowedException($message);
         }
     }
 
@@ -404,7 +409,7 @@ final readonly class OrderShipmentManager
         $module = ModuleQuery::create()->findPk($moduleId);
 
         if (null === $module) {
-            throw new ShipmentNotAllowedException(\sprintf('Delivery module %d does not exist.', $moduleId));
+            throw new ShipmentNotAllowedException(Translator::getInstance()->trans('Delivery module %id does not exist.', ['%id' => $moduleId]));
         }
 
         $locale = LangQuery::create()->findOneByByDefault(1)?->getLocale() ?? 'en_US';

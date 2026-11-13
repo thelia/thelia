@@ -15661,7 +15661,7 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
     (3, 'fr_FR', 'Traitement', '', '', ''),
     (4, 'fr_FR', 'Envoyée', '', '', ''),
     (5, 'fr_FR', 'Annulée', '', '', ''),
-    (6, 'fr_FR', 'Remboursé', '', '', ''),
+    (6, 'fr_FR', 'Remboursée', '', '', ''),
     (7, 'fr_FR', 'Partiellement expédiée', '', '', ''),
     (8, 'fr_FR', 'En attente de capture', '', '', ''),
     (1, 'it_IT', NULL, '', '', ''),
