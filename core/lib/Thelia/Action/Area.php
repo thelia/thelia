@@ -45,20 +45,14 @@ class Area extends BaseAction implements EventSubscriberInterface
         foreach ($countryIds as $countryId) {
             $countryArea = new CountryArea();
 
-            $country = explode('-', (string) $countryId);
-
-            if (1 === \count($country)) {
-                $country[1] = null;
-            }
-
-            if (0 === $country[1]) {
-                $country[1] = null;
-            }
+            // "<country>" or "<country>-<state>": a state of 0 or none stands for the country as a whole.
+            [$countryPart, $statePart] = [...explode('-', (string) $countryId, 2), null];
+            $stateId = (int) $statePart > 0 ? (int) $statePart : null;
 
             $countryArea
                 ->setAreaId($area->getId())
-                ->setCountryId((int) $country[0])
-                ->setStateId(null !== $country[1] ? (int) $country[1] : null)
+                ->setCountryId((int) $countryPart)
+                ->setStateId($stateId)
                 ->save();
         }
     }

@@ -1521,4 +1521,19 @@ DEALLOCATE PREPARE quantity_to_double_statement;
 INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`)
 SELECT 'last_float_line_rounding_order_id', COALESCE(MAX(`id`), 0), 1, 1, NOW(), NOW() FROM `order`;
 
+-- ---------------------------------------------------------------------
+-- Countries of a shipping zone stored with state 0
+-- ---------------------------------------------------------------------
+-- The back office wrote "no state" as 0 instead of NULL: delivery modules found no zone
+-- for such a country and the row could not be removed. The row of a country already in the
+-- zone as a whole, and the repeats of a 0 row, are dropped before the rest read as NULL.
+-- ---------------------------------------------------------------------
+
+DELETE `ca` FROM `country_area` `ca`
+INNER JOIN `country_area` `other` ON `other`.`country_id` = `ca`.`country_id` AND `other`.`area_id` = `ca`.`area_id`
+  AND (`other`.`state_id` IS NULL OR (`other`.`state_id` = 0 AND `other`.`id` < `ca`.`id`))
+WHERE `ca`.`state_id` = 0;
+
+UPDATE `country_area` SET `state_id` = NULL WHERE `state_id` = 0;
+
 SET FOREIGN_KEY_CHECKS = 1;

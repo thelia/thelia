@@ -61,6 +61,37 @@ final class AreaActionTest extends ActionIntegrationTestCase
         self::assertSame(1, $linked);
     }
 
+    public function testACountryAddedWithNoStateIsStoredAsAWholeCountry(): void
+    {
+        $area = $this->persistArea('Whole country');
+        $country = $this->factory->country(['isoalpha2' => 'XG', 'isoalpha3' => 'XGX', 'isocode' => '988']);
+
+        // The back office posts "<country>-0" for a country taken as a whole.
+        $this->dispatch(new AreaAddCountryEvent($area, [$country->getId().'-0']), TheliaEvents::AREA_ADD_COUNTRY);
+
+        $row = CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->findOne();
+        self::assertNotNull($row);
+        self::assertNull($row->getStateId(), 'A country taken as a whole has no state, not state 0.');
+
+        $this->dispatch(new AreaRemoveCountryEvent($area, [(int) $country->getId()]), TheliaEvents::AREA_REMOVE_COUNTRY);
+
+        self::assertSame(0, CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->count(), 'The country can leave the zone.');
+    }
+
+    public function testACountryAddedWithAStateKeepsItsState(): void
+    {
+        $area = $this->persistArea('One state');
+        $country = $this->factory->country(['isoalpha2' => 'XH', 'isoalpha3' => 'XHX', 'isocode' => '989']);
+        $state = (new State())->setCountryId($country->getId())->setIsocode('XH1')->setVisible(1);
+        $state->save();
+
+        $this->dispatch(new AreaAddCountryEvent($area, [$country->getId().'-'.$state->getId()]), TheliaEvents::AREA_ADD_COUNTRY);
+
+        $row = CountryAreaQuery::create()->filterByAreaId($area->getId())->filterByCountryId($country->getId())->findOne();
+        self::assertNotNull($row);
+        self::assertSame($state->getId(), $row->getStateId());
+    }
+
     public function testRemoveCountryDetachesCountryFromArea(): void
     {
         $area = $this->persistArea('France');
