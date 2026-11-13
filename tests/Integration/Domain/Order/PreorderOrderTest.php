@@ -218,6 +218,35 @@ final class PreorderOrderTest extends ActionIntegrationTestCase
         self::assertSame(0, $line->getIsPreorder());
     }
 
+    /**
+     * The payment takes the lines one after the other on the same sale element: the second goes
+     * below zero where the first did not. Told at placement the same way.
+     */
+    public function testTwoLinesOfTheSameSaleElementAreToldAsAPreorderFromTheOneThatGoesBelowZero(): void
+    {
+        $service = $this->getService(BundleCompositionService::class);
+        $shared = $this->component($this->factory, '10', 5);
+        $this->setMode($shared, OutOfStockPolicy::Limited, 10.0, '2027-04-01');
+        $bundle = $this->bundleProduct($this->factory, $service, BundlePriceMode::Fixed, '0', \Thelia\Domain\Catalog\Bundle\BundleDiscountType::Percent, 25.0);
+        $item = $service->addItem((int) $bundle->getId(), $this->saleElementsIdOf($shared), '1');
+
+        [$customer, $currency, $lang] = $this->aBuyer();
+        $cart = $this->aCart($customer, $currency);
+        $this->addSimpleLine($cart, $shared, 3.0);
+        $this->addBundleLine($cart, $bundle, [(int) $item->getId() => '1'], 3.0);
+        $order = $this->placeOrder($cart, $customer, $currency, $lang);
+
+        self::assertSame(5.0, $this->stockOfProduct($shared), 'Not taken yet: the payment module takes it at payment.');
+        $placed = $this->preordersOf($order);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(-1.0, $this->stockOfProduct($shared));
+        $paid = $this->preordersOf($order);
+        self::assertSame([0, 1, 1], array_values($paid), 'The payment: the first line is covered, the second goes below zero, and so does its pack.');
+        self::assertSame($paid, $placed, 'Told at placement as the payment will take them.');
+    }
+
     public function testAPackWithAComponentSoldBelowZeroIsAPreorderWithTheDateOfThatComponent(): void
     {
         $this->manageTheStockWhenTheOrderIsPlaced();
@@ -354,6 +383,20 @@ final class PreorderOrderTest extends ActionIntegrationTestCase
 
         self::assertNotNull($order->getId());
         self::assertSame(1.0, $this->stockOfProduct($product));
+    }
+
+    /**
+     * @return array<int, int> the preorder flag of each line of the order, by line id
+     */
+    private function preordersOf(\Thelia\Model\Order $order): array
+    {
+        $flags = [];
+
+        foreach (OrderProductQuery::create()->filterByOrderId($order->getId())->orderById()->find() as $line) {
+            $flags[(int) $line->getId()] = (int) $line->getIsPreorder();
+        }
+
+        return $flags;
     }
 
     private function product(int $quantity, OutOfStockPolicy $policy, ?float $limit, ?string $restockDate = null): Product
