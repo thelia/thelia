@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Subscription\Exception;
 
+use Thelia\Domain\Subscription\Enum\SubscriptionAction;
+use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
+
 /**
  * An action on a subscription its plan or its state does not allow.
  */
@@ -24,9 +27,15 @@ final class SubscriptionActionRefusedException extends SubscriptionException
         return new self('This subscription cannot be paused.');
     }
 
-    public static function notInState(string $action, string $status): self
+    public static function notInState(SubscriptionAction $action, SubscriptionStatus $status): self
     {
-        return new self(\sprintf('A subscription that is "%s" cannot be %s.', $status, $action));
+        return new self(\sprintf('A subscription that is "%s" cannot be %s.', $status->value, match ($action) {
+            SubscriptionAction::Pause => 'paused',
+            SubscriptionAction::Resume => 'resumed',
+            SubscriptionAction::Reactivate => 'reactivated',
+            SubscriptionAction::Cancel => 'cancelled',
+            SubscriptionAction::ChangePaymentMethod => 'given another payment method',
+        }));
     }
 
     public static function methodOfAnotherModule(): self

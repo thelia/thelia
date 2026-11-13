@@ -25,7 +25,7 @@ use Thelia\Domain\Subscription\Enum\SubscriptionOrderState;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
 use Thelia\Domain\Subscription\SubscriptionBillingLock;
 use Thelia\Domain\Subscription\SubscriptionInstallmentBiller;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Subscription;
@@ -284,7 +284,7 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
 
         $this->moveTo('2028-03-10 15:00:00');
         RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Paid;
-        $this->getService(SubscriptionManager::class)->reactivate($subscription, ActorType::Admin, 1);
+        $this->getService(SubscriptionLifecycle::class)->reactivate($subscription, ActorType::Admin, 1);
 
         $subscription = $this->reloaded($subscription);
         self::assertSame(SubscriptionStatus::Active->value, $subscription->getStatus(), 'Charged at once, without a worker.');
@@ -316,7 +316,7 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
 
         $this->moveTo('2028-07-10 09:00:00');
         RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Paid;
-        $this->getService(SubscriptionManager::class)->reactivate($this->reloaded($subscription), ActorType::Customer, (int) $subscription->getCustomerId());
+        $this->getService(SubscriptionLifecycle::class)->reactivate($this->reloaded($subscription), ActorType::Customer, (int) $subscription->getCustomerId());
 
         $subscription = $this->reloaded($subscription);
         self::assertSame(SubscriptionStatus::Active->value, $subscription->getStatus());
@@ -362,7 +362,7 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
         [$subscription] = $this->aSubscription();
 
         $this->moveTo('2028-02-10 09:00:00');
-        $subscription = $this->getService(SubscriptionManager::class)->cancel($subscription, ActorType::Customer, (int) $subscription->getCustomerId());
+        $subscription = $this->getService(SubscriptionLifecycle::class)->cancel($subscription, ActorType::Customer, (int) $subscription->getCustomerId());
 
         self::assertSame(SubscriptionStatus::Cancelled->value, $subscription->getStatus());
         self::assertSame('2028-02-29 10:00:00', $subscription->getCancelAt('Y-m-d H:i:s'));
@@ -384,7 +384,7 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
         [$subscription] = $this->aSubscription(['CommitmentCount' => 3]);
 
         $this->moveTo('2028-02-10 09:00:00');
-        $subscription = $this->getService(SubscriptionManager::class)->cancel($subscription, ActorType::Customer);
+        $subscription = $this->getService(SubscriptionLifecycle::class)->cancel($subscription, ActorType::Customer);
         self::assertSame('2028-04-30 10:00:00', $subscription->getCancelAt('Y-m-d H:i:s'), 'Three periods from the first one.');
 
         foreach (['2028-02-29 10:00:00', '2028-03-31 10:00:00'] as $moment) {

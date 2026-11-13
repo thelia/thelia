@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Model\SubscriptionQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Payment\RecurringTestPaymentModule;
@@ -66,8 +66,8 @@ final class SubscriptionBillDueCommandTest extends ActionIntegrationTestCase
 
         $this->moveTo('2028-02-15 10:00:00');
         SubscriptionQuery::create()->filterById($notYet->getId())->update(['NextBillingAt' => new \DateTime('2028-03-15 10:00:00')]);
-        $this->getService(SubscriptionManager::class)->cancel($cancelled, ActorType::Customer);
-        $this->getService(SubscriptionManager::class)->pause($paused, ActorType::Customer);
+        $this->getService(SubscriptionLifecycle::class)->cancel($cancelled, ActorType::Customer);
+        $this->getService(SubscriptionLifecycle::class)->pause($paused, ActorType::Customer);
         // Nothing left to bill on it: found by its cancellation date alone.
         SubscriptionQuery::create()->filterById($cancelled->getId())->update(['NextBillingAt' => null]);
 

@@ -27,7 +27,7 @@ use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Exception\SubscriptionActionRefusedException;
 use Thelia\Domain\Subscription\Exception\SubscriptionTransitionRefusedException;
-use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerPaymentMethod;
 use Thelia\Model\Subscription as SubscriptionModel;
@@ -38,7 +38,7 @@ use Thelia\Model\Subscription as SubscriptionModel;
  *
  * The subscription was read by the provider, scoped to the caller by
  * SubscriptionOwnershipExtension (404 for another customer's), and the action is told by the
- * operation. Every change goes through SubscriptionManager, which records the customer as the
+ * operation. Every change goes through SubscriptionLifecycle, which records the customer as the
  * author; what the state of the subscription does not allow is a 409 (the exceptions are mapped
  * in the API configuration). The payment method is named by the IRI of one of the customer's
  * methods (`{"paymentMethod": "/api/front/account/payment_methods/12"}`), and a method that
@@ -52,7 +52,7 @@ final readonly class SubscriptionActionProcessor implements ProcessorInterface
     public const PAYMENT_METHOD = 'payment_method';
 
     public function __construct(
-        private SubscriptionManager $manager,
+        private SubscriptionLifecycle $lifecycle,
         private TokenStorageInterface $tokenStorage,
         private ApiResourcePropelTransformerService $transformer,
         private RequestStack $requestStack,
@@ -83,10 +83,10 @@ final readonly class SubscriptionActionProcessor implements ProcessorInterface
         $actorId = (int) $customer->getId();
 
         $updated = match ($operation->getExtraProperties()['subscription_action'] ?? null) {
-            self::CANCEL => $this->manager->cancel($model, ActorType::Customer, $actorId),
-            self::PAUSE => $this->manager->pause($model, ActorType::Customer, $actorId),
-            self::RESUME => $this->manager->resume($model, ActorType::Customer, $actorId),
-            self::PAYMENT_METHOD => $this->manager->changePaymentMethod($model, $this->methodOf($customer), ActorType::Customer, $actorId),
+            self::CANCEL => $this->lifecycle->cancel($model, ActorType::Customer, $actorId),
+            self::PAUSE => $this->lifecycle->pause($model, ActorType::Customer, $actorId),
+            self::RESUME => $this->lifecycle->resume($model, ActorType::Customer, $actorId),
+            self::PAYMENT_METHOD => $this->lifecycle->changePaymentMethod($model, $this->methodOf($customer), ActorType::Customer, $actorId),
             default => throw new UnprocessableEntityHttpException('Unknown subscription action.'),
         };
 

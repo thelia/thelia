@@ -20,6 +20,7 @@ use Thelia\Domain\CMS\Publication\PublicationMoment;
 use Thelia\Domain\Payment\StoredPaymentMethodSelection;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\PeriodUnit;
+use Thelia\Domain\Subscription\Enum\SubscriptionAction;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
 use Thelia\Domain\Subscription\Exception\SubscriptionActionRefusedException;
 use Thelia\Domain\Subscription\Message\BillSubscriptionInstallment;
@@ -30,10 +31,10 @@ use Thelia\Model\SubscriptionQuery;
 
 /**
  * What a customer or an administrator does to a subscription, with who did it recorded in
- * its history. Every change of status goes through SubscriptionStateMachine: an action the
- * map does not allow is refused there.
+ * its history. A gesture the state does not allow (SubscriptionAction) is refused before
+ * anything is written, and every change of status goes through SubscriptionStateMachine.
  */
-final readonly class SubscriptionManager
+final readonly class SubscriptionLifecycle
 {
     public function __construct(
         private SubscriptionStateMachine $stateMachine,
@@ -50,6 +51,8 @@ final readonly class SubscriptionManager
      */
     public function cancel(Subscription $subscription, ActorType $actorType, ?int $actorId = null, ?string $note = null): Subscription
     {
+        $this->assertAllowed(SubscriptionAction::Cancel, $subscription);
+
         return $this->stateMachine->transition($subscription, SubscriptionStatus::Cancelled, $actorType, $actorId, $note ?? 'Cancelled.', [
             'CancelAt' => \DateTime::createFromImmutable($this->cancellationDateOf($subscription)),
         ]);
@@ -61,9 +64,7 @@ final readonly class SubscriptionManager
             throw SubscriptionActionRefusedException::notPausable();
         }
 
-        if (SubscriptionStatus::Active->value !== $subscription->getStatus()) {
-            throw SubscriptionActionRefusedException::notInState('paused', (string) $subscription->getStatus());
-        }
+        $this->assertAllowed(SubscriptionAction::Pause, $subscription);
 
         return $this->stateMachine->transition($subscription, SubscriptionStatus::Paused, $actorType, $actorId, $note ?? 'Paused.', [
             'PausedAt' => $this->now(),
@@ -72,10 +73,13 @@ final readonly class SubscriptionManager
 
     /**
      * Billed again at the end of the period it was paused in. When that end is past, a new
-     * period starts now, anchored on today: the paused weeks are not charged.
+     * period starts now, anchored on today: the paused weeks are not charged. Only a paused
+     * subscription is resumed.
      */
     public function resume(Subscription $subscription, ActorType $actorType, ?int $actorId = null, ?string $note = null): Subscription
     {
+        $this->assertAllowed(SubscriptionAction::Resume, $subscription);
+
         $now = $this->now();
         $periodEnd = $subscription->getCurrentPeriodEnd();
         $changes = ['PausedAt' => null];
@@ -99,11 +103,7 @@ final readonly class SubscriptionManager
      */
     public function reactivate(Subscription $subscription, ActorType $actorType, ?int $actorId = null, ?string $note = null): Subscription
     {
-        $status = SubscriptionStatus::from((string) $subscription->getStatus());
-
-        if (SubscriptionStatus::Suspended !== $status && SubscriptionStatus::PaymentFailed !== $status) {
-            throw SubscriptionActionRefusedException::notInState('reactivated', $status->value);
-        }
+        $this->assertAllowed(SubscriptionAction::Reactivate, $subscription);
 
         $subscription = $this->retryNow($subscription);
         $this->stateMachine->recordNote($subscription, $actorType, $actorId, $note ?? 'Retry asked.');
@@ -119,6 +119,8 @@ final readonly class SubscriptionManager
      */
     public function changePaymentMethod(Subscription $subscription, CustomerPaymentMethod $method, ActorType $actorType, ?int $actorId = null): Subscription
     {
+        $this->assertAllowed(SubscriptionAction::ChangePaymentMethod, $subscription);
+
         if ((int) $method->getPaymentModuleId() !== (int) $subscription->getPaymentModuleId()) {
             throw SubscriptionActionRefusedException::methodOfAnotherModule();
         }
@@ -143,6 +145,30 @@ final readonly class SubscriptionManager
         }
 
         return $subscription;
+    }
+
+    /**
+     * The gestures the subscription allows as it stands, in the order a screen offers them.
+     *
+     * @return list<SubscriptionAction>
+     */
+    public function allowedActions(Subscription $subscription): array
+    {
+        return SubscriptionAction::allowedIn(self::statusOf($subscription), 1 === (int) $subscription->getPausable());
+    }
+
+    private function assertAllowed(SubscriptionAction $action, Subscription $subscription): void
+    {
+        $status = self::statusOf($subscription);
+
+        if (!$action->isAllowedIn($status, 1 === (int) $subscription->getPausable())) {
+            throw SubscriptionActionRefusedException::notInState($action, $status);
+        }
+    }
+
+    private static function statusOf(Subscription $subscription): SubscriptionStatus
+    {
+        return SubscriptionStatus::from((string) $subscription->getStatus());
     }
 
     private function cancellationDateOf(Subscription $subscription): \DateTimeImmutable
