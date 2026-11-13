@@ -68,11 +68,14 @@ final class SubscriptionActivationTest extends ActionIntegrationTestCase
         $cart = $this->aSubscriptionCart($customer, $product, $plan);
         $cart->setCustomerPaymentMethodId($method->getId())->save($this->getPropelConnection());
         $order = $this->anUnpaidOrderOf($cart, $customer);
+        $announced = $this->getService(SubscriptionFactory::class)->firstBillingDateOf($plan);
 
         $this->turnPaid($order);
 
         $subscription = $this->onlySubscriptionOf($order);
         self::assertSame(SubscriptionStatus::Active->value, $subscription->getStatus());
+        self::assertSame('2028-02-29 10:00:00', $announced->format('Y-m-d H:i:s'), 'Taken on the 31st, the next installment falls on the last day of February.');
+        self::assertSame($announced->format('Y-m-d H:i:s'), $subscription->getNextBillingAt('Y-m-d H:i:s'), 'The date told before the payment is the one billing writes.');
         self::assertSame((int) $method->getId(), (int) $subscription->getCustomerPaymentMethodId());
         self::assertSame((int) $plan->getId(), (int) $subscription->getSubscriptionPlanId());
         self::assertSame(1, (int) $subscription->getInstallmentsBilled(), 'The order is the first installment.');
@@ -168,6 +171,7 @@ final class SubscriptionActivationTest extends ActionIntegrationTestCase
             ->setPostageTax('0')
             ->save($this->getPropelConnection());
         $cart = CartQuery::create()->findPk($cart->getId(), $this->getPropelConnection());
+        $announced = $this->getService(SubscriptionFactory::class)->firstBillingDateOf($plan);
 
         $outcome = $this->getService(CheckoutPaymentService::class)->payAndReturnOutcome(new OrderPaymentRequest(
             $cart,
@@ -188,6 +192,8 @@ final class SubscriptionActivationTest extends ActionIntegrationTestCase
         self::assertSame(SubscriptionStatus::Trial->value, $subscription->getStatus());
         self::assertSame((int) $method->getId(), (int) $subscription->getCustomerPaymentMethodId());
         self::assertSame(0, (int) $subscription->getInstallmentsBilled());
+        self::assertSame('2028-02-07 10:00:00', $announced->format('Y-m-d H:i:s'));
+        self::assertSame($announced->format('Y-m-d H:i:s'), $subscription->getNextBillingAt('Y-m-d H:i:s'), 'The first charge falls on the date told before the payment.');
     }
 
     /**
