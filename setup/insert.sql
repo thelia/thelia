@@ -2413,6 +2413,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (125, 'cs_CZ', NULL, NULL, NULL, NULL),
     (126, 'cs_CZ', NULL, NULL, NULL, NULL),
     (128, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (129, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (130, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
