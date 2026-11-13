@@ -20,3 +20,18 @@ if (null === $code) {
 ```
 
 To only know whether a code is in a zone, call `ZipCodePattern::matches()`, which judges such a code itself.
+
+## Translations
+
+### `Customer title` translation key
+
+The title field (Mr, Mrs) of the registration, address and customer update forms (`CustomerCreateForm`, `CustomerUpdateForm`, `AddressCreateForm`) is now labelled with the key `Customer title` instead of `Title`. `Title` keeps labelling the heading of a product, a category or a content. The core catalogs that translated `Title` ship `Customer title` with the same value, so a shop that does not override anything sees no change.
+
+A shop that overrides `Title` in `local/I18n/{locale}.php` to change the label of the customer title must now declare `Customer title` as well, otherwise the forms fall back to the catalog value.
+
+```php
+return [
+    'Title' => 'Salutation',
+    'Customer title' => 'Salutation',
+];
+```
