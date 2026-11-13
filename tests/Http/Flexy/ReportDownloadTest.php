@@ -16,7 +16,6 @@ namespace Thelia\Tests\Http\Flexy;
 
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Thelia\Core\File\FolderFile;
@@ -24,6 +23,7 @@ use Thelia\Domain\Reporting\Mailing\ReportDownloadLinkGenerator;
 use Thelia\Domain\Reporting\Mailing\ReportMailingSettings;
 use Thelia\Domain\Reporting\Mailing\ReportMailStorage;
 use Thelia\Test\WebIntegrationTestCase;
+use Thelia\Tests\Support\Filesystem\TestVarCleaner;
 
 /**
  * The file of a report too big to be attached is served to whoever holds the signed link
@@ -53,7 +53,9 @@ final class ReportDownloadTest extends WebIntegrationTestCase
 
     protected function tearDown(): void
     {
-        (new Filesystem())->remove(ReportMailStorage::directory());
+        // Never clean a path the code under test renders: a mutation of it would point at the project root.
+        self::assertSame(THELIA_ROOT.'var/report-mail', ReportMailStorage::directory());
+        TestVarCleaner::remove(THELIA_ROOT.'var/report-mail');
 
         parent::tearDown();
     }

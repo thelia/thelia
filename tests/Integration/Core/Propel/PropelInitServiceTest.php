@@ -27,6 +27,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Test\TestToken;
+use Thelia\Tests\Support\Filesystem\TestVarCleaner;
 
 final class PropelInitServiceTest extends IntegrationTestCase
 {
@@ -54,7 +55,7 @@ final class PropelInitServiceTest extends IntegrationTestCase
 
     protected function tearDown(): void
     {
-        (new Filesystem())->remove($this->service->getPropelCacheDir());
+        TestVarCleaner::remove(rtrim($this->service->getPropelCacheDir(), '/'));
 
         parent::tearDown();
     }
@@ -108,7 +109,7 @@ final class PropelInitServiceTest extends IntegrationTestCase
             // cleanup that follows, or later tests in this process inherit
             // the mess.
             foreach ([
-                static fn () => (new Filesystem())->remove($service->getPropelCacheDir()),
+                static fn () => TestVarCleaner::remove(rtrim($service->getPropelCacheDir(), '/')),
                 fn () => $this->removeProbeModule(),
                 fn () => $this->removeProbeModuleRow(),
                 fn () => $this->restoreTheRealDatabaseMap(),
