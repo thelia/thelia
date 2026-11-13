@@ -136,7 +136,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (125, 'accounting_rate_accounts', '', 0, 0, NOW(), NOW()),
 (126, 'accounting_commercial_credit_account', '', 0, 0, NOW(), NOW()),
 (127, 'last_float_line_rounding_order_id', '0', 1, 1, NOW(), NOW()),
-(128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW())
+(128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW()),
+(129, 'subscription_retry_attempts', '3', 0, 0, NOW(), NOW()),
+(130, 'subscription_retry_interval_days', '2', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2279,7 +2281,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (67, 'admin.customer.group', NOW(), NOW()),
 (68, 'admin.order.edit', NOW(), NOW()),
 (69, 'admin.order.payment-capture', NOW(), NOW()),
-(70, 'admin.pricing', NOW(), NOW())
+(70, 'admin.pricing', NOW(), NOW()),
+(71, 'admin.subscription', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2295,7 +2298,10 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (10, 'order_return_status_changed', NULL, NULL, 'order_return_status_changed.txt', NULL, 'order_return_status_changed.html', NOW(), NOW()),
 (11, 'order_shipped', NULL, NULL, 'order_shipped.txt', NULL, 'order_shipped.html', NOW(), NOW()),
 (12, 'report_mail', NULL, NULL, 'report_mail.txt', NULL, 'report_mail.html', NOW(), NOW()),
-(13, 'low_stock_alert', NULL, NULL, 'low_stock_alert.txt', NULL, 'low_stock_alert.html', NOW(), NOW())
+(13, 'low_stock_alert', NULL, NULL, 'low_stock_alert.txt', NULL, 'low_stock_alert.html', NOW(), NOW()),
+(14, 'subscription_payment_failed', NULL, NULL, 'subscription_payment_failed.txt', NULL, 'subscription_payment_failed.html', NOW(), NOW()),
+(15, 'subscription_suspended', NULL, NULL, 'subscription_suspended.txt', NULL, 'subscription_suspended.html', NOW(), NOW()),
+(16, 'subscription_cancelled', NULL, NULL, 'subscription_cancelled.txt', NULL, 'subscription_cancelled.html', NOW(), NOW())
 ;
 
 /**
@@ -2407,7 +2413,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (124, '{{ locale }}', {{ intl('Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
     (125, '{{ locale }}', {{ intl('Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)', locale) }}, NULL, NULL, NULL),
     (126, '{{ locale }}', {{ intl('Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)', locale) }}, NULL, NULL, NULL),
-    (128, '{{ locale }}', {{ intl('Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (128, '{{ locale }}', {{ intl('Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)', locale) }}, NULL, NULL, NULL),
+    (129, '{{ locale }}', {{ intl('Number of declined charges of an installment after which a subscription is suspended (3 when invalid)', locale) }}, NULL, NULL, NULL),
+    (130, '{{ locale }}', {{ intl('Days between two charges of a declined installment of a subscription (2 when invalid)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4147,7 +4155,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (67, '{{ locale }}', {{ intl('Customer groups', locale) }}, NULL, NULL, NULL),
     (68, '{{ locale }}', {{ intl('Editing the lines of an order', locale) }}, NULL, NULL, NULL),
     (69, '{{ locale }}', {{ intl('Order payment capture', locale) }}, NULL, NULL, NULL),
-    (70, '{{ locale }}', {{ intl('Pricing', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (70, '{{ locale }}', {{ intl('Pricing', locale) }}, NULL, NULL, NULL),
+    (71, '{{ locale }}', {{ intl('Subscriptions', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4167,7 +4176,10 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (10, '{{ locale }}', {{ intl('Return status update sent to the customer', locale) }}, {{ intl('Update on your return {{ return_ref }}', locale) }}, NULL, NULL),
     (11, '{{ locale }}', {{ intl('Shipping notice sent to the customer', locale) }}, {{ intl('Your order {{ order_ref }} has been shipped', locale) }}, NULL, NULL),
     (12, '{{ locale }}', {{ intl('Report sent by e-mail', locale) }}, {{ intl('{{ report_title }}: {{ period_start }} to {{ period_end }}', locale) }}, {{ intl('Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}', locale) }}, {{ intl('<p>Hello,</p><p><strong>{{ report_title }}</strong></p><p>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}</p>{% if is_empty %}<p>Nothing to report for this period: no data, so no file is attached.</p>{% else %}{% if summary %}<ul>{% for line in summary %}<li>{{ line.label }}: <strong>{{ line.value }}</strong></li>{% endfor %}</ul>{% endif %}{% if attachment_name %}<p>The complete file is attached: {{ attachment_name }}</p>{% elseif download_url %}<p><a href="{{ download_url }}">Download the report</a><br>This link expires on {{ download_expires_at }}.</p>{% endif %}{% endif %}', locale) }}),
-    (13, '{{ locale }}', {{ intl('Message sent to the shop owner when the stock of a sale element runs low', locale) }}, {{ intl('Low stock on {{ config("store_name") }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (13, '{{ locale }}', {{ intl('Message sent to the shop owner when the stock of a sale element runs low', locale) }}, {{ intl('Low stock on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (14, '{{ locale }}', {{ intl('Message sent to the customer when the charge of an installment of its subscription fails', locale) }}, {{ intl('Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (15, '{{ locale }}', {{ intl('Message sent to the customer, and to the shop, when a subscription is suspended', locale) }}, {{ intl('{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}', locale) }}, NULL, NULL),
+    (16, '{{ locale }}', {{ intl('Message sent to the customer when a subscription is cancelled', locale) }}, {{ intl('Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

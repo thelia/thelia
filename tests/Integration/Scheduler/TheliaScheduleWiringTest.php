@@ -51,6 +51,7 @@ final class TheliaScheduleWiringTest extends IntegrationTestCase
             'content:publish-scheduled' => '* * * * *',
             'stock:reservation:purge' => '*/10 * * * *',
             'report:send-due' => '*/15 * * * *',
+            'subscription:bill-due' => '*/15 * * * *',
         ];
         // An active module may add its own tasks to this schedule: only the tasks of the core are compared.
         $commands = self::commands($schedule->getRecurringMessages());

@@ -52,6 +52,13 @@ final class TheliaScheduleTest extends TestCase
         self::assertSame(['report:send-due' => '*/15 * * * *'], self::commands($schedule->getRecurringMessages()));
     }
 
+    public function testTheInstallmentsOfTheSubscriptionsAreBilledWhenTheirExpressionSays(): void
+    {
+        $schedule = $this->schedule(saleCheck: '', maintenancePurge: '', failedJobsPurge: '', currencyRates: '', contentPublication: '', subscriptionBilling: '*/15 * * * *');
+
+        self::assertSame(['subscription:bill-due' => '*/15 * * * *'], self::commands($schedule->getRecurringMessages()));
+    }
+
     public function testAnEmptyExpressionLeavesTheTaskOut(): void
     {
         $schedule = $this->schedule(saleCheck: '  ', maintenancePurge: '', failedJobsPurge: '', currencyRates: '', contentPublication: '');
@@ -88,9 +95,9 @@ final class TheliaScheduleTest extends TestCase
         self::assertTrue($schedule->shouldProcessOnlyLastMissedRun());
     }
 
-    private function schedule(string $saleCheck, string $maintenancePurge, string $failedJobsPurge, string $currencyRates, string $contentPublication, string $stockReservationPurge = '', string $reportMails = ''): \Symfony\Component\Scheduler\Schedule
+    private function schedule(string $saleCheck, string $maintenancePurge, string $failedJobsPurge, string $currencyRates, string $contentPublication, string $stockReservationPurge = '', string $reportMails = '', string $subscriptionBilling = ''): \Symfony\Component\Scheduler\Schedule
     {
-        return (new TheliaSchedule(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $saleCheck, $maintenancePurge, $failedJobsPurge, $currencyRates, $contentPublication, $stockReservationPurge, $reportMails))->getSchedule();
+        return (new TheliaSchedule(new ArrayAdapter(), new LockFactory(new InMemoryStore()), $saleCheck, $maintenancePurge, $failedJobsPurge, $currencyRates, $contentPublication, $stockReservationPurge, $reportMails, $subscriptionBilling))->getSchedule();
     }
 
     /**

@@ -105,6 +105,8 @@ use Thelia\Api\Resource\SaleUnitModuleConfig;
 use Thelia\Api\Resource\SaleUnitProductPrice;
 use Thelia\Api\Resource\SaleUnitProductSaleElements;
 use Thelia\Api\Resource\State;
+use Thelia\Api\Resource\Subscription;
+use Thelia\Api\Resource\SubscriptionPlan;
 use Thelia\Api\Resource\Tag;
 use Thelia\Api\Resource\TagElement;
 use Thelia\Api\Resource\Tax;
@@ -153,6 +155,8 @@ final readonly class AdminApiResourcePermissions
         CustomerGroup::class => AdminResources::CUSTOMER_GROUP,
         CustomerGroupProductPrice::class => AdminResources::CUSTOMER_GROUP,
         CustomerPaymentMethod::class => AdminResources::CUSTOMER_PAYMENT_METHOD,
+        Subscription::class => AdminResources::SUBSCRIPTION,
+        SubscriptionPlan::class => AdminResources::SUBSCRIPTION,
         CustomerTitle::class => AdminResources::TITLE,
         Feature::class => AdminResources::FEATURE,
         FeatureAv::class => AdminResources::FEATURE,

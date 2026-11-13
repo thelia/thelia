@@ -1212,4 +1212,13 @@ return [
     'Account the sales journal credits with the shipping, e.g. 708500 (required by the accounting exports)' => 'Cuenta que abona el diario de ventas con el envío, p. ej. 708500 (obligatoria para las exportaciones contables)',
     'Sales account and tax collected account per tax rate, e.g. 20:706200:445720,5.5:706055:445705,0:706000 (required by the accounting exports)' => 'Cuenta de ventas y cuenta del impuesto repercutido por tipo, p. ej. 20:706200:445720,5.5:706055:445705,0:706000 (obligatoria para las exportaciones contables)',
     'Account debited of commercial credit notes (rebate, discount, refund of a difference), e.g. 709000 (sales account of their rate when empty)' => 'Cuenta que carga los abonos comerciales (rebaja, descuento, reembolso de una diferencia), p. ej. 709000 (cuenta de ventas de su tipo si está vacía)',
+    'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)' => 'Número de cobros rechazados de una cuota tras el cual se suspende una suscripción (3 si no es válido)',
+    'Days between two charges of a declined installment of a subscription (2 when invalid)' => 'Días entre dos cobros de una cuota rechazada de una suscripción (2 si no es válido)',
+    'Subscriptions' => 'Suscripciones',
+    'Message sent to the customer when the charge of an installment of its subscription fails' => 'Mensaje enviado al cliente cuando falla el cobro de una cuota de su suscripción',
+    'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Fallo en el pago de su suscripción {{ subscription_ref }} en {{ config("store_name") }}',
+    'Message sent to the customer, and to the shop, when a subscription is suspended' => 'Mensaje enviado al cliente y a la tienda cuando se suspende una suscripción',
+    '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Suscripción {{ subscription_ref }} suspendida tras {{ failure_count }} cobros fallidos{% else %}Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está suspendida{% endif %}',
+    'Message sent to the customer when a subscription is cancelled' => 'Mensaje enviado al cliente cuando se cancela una suscripción',
+    'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está cancelada',
 ];

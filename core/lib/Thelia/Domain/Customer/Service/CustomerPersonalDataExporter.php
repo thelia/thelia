@@ -17,6 +17,7 @@ namespace Thelia\Domain\Customer\Service;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Model\Address;
 use Thelia\Model\Cart;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerListItemQuery;
 use Thelia\Model\CustomerListQuery;
@@ -30,6 +31,9 @@ use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderReturn;
 use Thelia\Model\OrderReturnQuery;
+use Thelia\Model\SubscriptionHistoryQuery;
+use Thelia\Model\SubscriptionOrderQuery;
+use Thelia\Model\SubscriptionQuery;
 
 /**
  * Collects everything the shop knows about one person, as a nested array
@@ -41,7 +45,7 @@ use Thelia\Model\OrderReturnQuery;
  */
 final readonly class CustomerPersonalDataExporter
 {
-    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter', 'customer_lists', 'payment_methods'];
+    public const CORE_SECTION_NAMES = ['customer', 'addresses', 'orders', 'order_returns', 'carts', 'newsletter', 'customer_lists', 'payment_methods', 'subscriptions'];
 
     /**
      * @param iterable<CustomerPersonalDataProviderInterface> $personalDataProviders
@@ -66,6 +70,7 @@ final readonly class CustomerPersonalDataExporter
             'newsletter' => $this->exportNewsletterSubscription($customer),
             'customer_lists' => $this->exportCustomerLists($customer),
             'payment_methods' => $this->exportPaymentMethods($customer),
+            'subscriptions' => $this->exportSubscriptions($customer),
         ];
 
         foreach ($this->personalDataProviders as $provider) {
@@ -531,6 +536,69 @@ final readonly class CustomerPersonalDataExporter
             'is_default' => (bool) $method->getIsDefault(),
             'created_at' => $this->formatDate($method->getCreatedAt()),
         ];
+    }
+
+    /**
+     * What the customer subscribed to and how each subscription went: the frozen plan values,
+     * the status, the dates, the label of the payment method (never its token), and one line per
+     * installment with the reference of its order and the history of the status. Read from the
+     * subscription itself, not from the plan: a plan deleted since leaves the values the customer
+     * agreed to.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function exportSubscriptions(Customer $customer): array
+    {
+        $subscriptions = [];
+
+        foreach (SubscriptionQuery::create()->filterByCustomerId($customer->getId())->orderById()->find() as $subscription) {
+            $installments = [];
+
+            foreach (SubscriptionOrderQuery::create()->filterBySubscriptionId($subscription->getId())->orderByInstallmentNumber()->find() as $installment) {
+                $installments[] = [
+                    'number' => (int) $installment->getInstallmentNumber(),
+                    'state' => $installment->getState(),
+                    'order_reference' => $installment->getOrder()?->getRef(),
+                    'attempts' => (int) $installment->getAttemptCount(),
+                ];
+            }
+
+            $history = [];
+
+            foreach (SubscriptionHistoryQuery::create()->filterBySubscriptionId($subscription->getId())->orderById()->find() as $entry) {
+                $history[] = [
+                    'from' => $entry->getFromStatus(),
+                    'to' => $entry->getToStatus(),
+                    'by' => $entry->getActorType(),
+                    'date' => $this->formatDate($entry->getCreatedAt()),
+                ];
+            }
+
+            $subscriptions[] = [
+                'reference' => $subscription->getRef(),
+                'status' => $subscription->getStatus(),
+                'product_reference' => $subscription->getProductSaleElements()?->getProduct()?->getRef(),
+                'quantity' => (int) $subscription->getQuantity(),
+                'period_unit' => $subscription->getPeriodUnit(),
+                'period_count' => (int) $subscription->getPeriodCount(),
+                'installment_count' => $subscription->getInstallmentCount(),
+                'commitment_count' => $subscription->getCommitmentCount(),
+                'unit_price' => $subscription->getUnitPrice(),
+                'currency' => CurrencyQuery::create()->findPk($subscription->getCurrencyId())?->getCode(),
+                'initial_order_reference' => $subscription->getInitialOrder()?->getRef(),
+                'payment_method_label' => $subscription->getCustomerPaymentMethod()?->getLabel(),
+                'current_period_start' => $this->formatDate($subscription->getCurrentPeriodStart()),
+                'current_period_end' => $this->formatDate($subscription->getCurrentPeriodEnd()),
+                'next_billing_at' => $this->formatDate($subscription->getNextBillingAt()),
+                'cancel_at' => $this->formatDate($subscription->getCancelAt()),
+                'paused_at' => $this->formatDate($subscription->getPausedAt()),
+                'created_at' => $this->formatDate($subscription->getCreatedAt()),
+                'installments' => $installments,
+                'history' => $history,
+            ];
+        }
+
+        return $subscriptions;
     }
 
     private function formatDate(mixed $date): ?string

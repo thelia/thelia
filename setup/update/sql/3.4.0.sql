@@ -1522,6 +1522,320 @@ INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`,
 SELECT 'last_float_line_rounding_order_id', COALESCE(MAX(`id`), 0), 1, 1, NOW(), NOW() FROM `order`;
 
 -- ---------------------------------------------------------------------
+-- Subscriptions with recurring billing
+--
+-- A plan says how a product is sold by subscription and what an installment
+-- costs per currency; a subscription copies the plan when it is taken, so
+-- editing a plan never changes a running subscription. Each installment is
+-- one order at most: `subscription_order` holds one row per installment, and
+-- its unique key on (subscription, installment number) is what keeps a second
+-- order from being placed for the same installment.
+-- `cart_item.subscription_plan_id` names the plan a line is bought on; NULL
+-- is a one-off purchase, which is every line an existing shop has.
+--
+-- Replayable: each table is created only when missing, the column, its index
+-- and its foreign key are added only when missing, and the two settings are
+-- seeded by INSERT IGNORE, which leaves a value the merchant already set.
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `subscription_plan`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `period_unit` VARCHAR(8) DEFAULT 'month' NOT NULL COMMENT 'one of PeriodUnit: week, month, quarter or year',
+    `period_count` INTEGER DEFAULT 1 NOT NULL COMMENT 'how many period units an installment pays for',
+    `trial_days` INTEGER DEFAULT 0 NOT NULL COMMENT 'days served before the first charge; 0: no trial',
+    `installment_count` INTEGER COMMENT 'how many installments the subscription is billed in total; NULL: until it is cancelled',
+    `commitment_count` INTEGER COMMENT 'how many installments the customer commits to before a cancellation takes effect; NULL: no commitment',
+    `pausable` TINYINT DEFAULT 0 NOT NULL COMMENT 'whether the customer may pause a subscription to this plan',
+    `visible` TINYINT DEFAULT 1 NOT NULL,
+    `position` INTEGER DEFAULT 0 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_subscription_plan_product_id_position` (`product_id`, `position`),
+    CONSTRAINT `fk_subscription_plan_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `subscription_plan_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `subscription_plan_i18n_fk_357957`
+        FOREIGN KEY (`id`)
+        REFERENCES `subscription_plan` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `subscription_plan_price`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `subscription_plan_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the price without taxes of one installment of one unit',
+    `from_default_currency` TINYINT DEFAULT 0 NOT NULL COMMENT 'the price is converted from the price in the default currency rather than typed',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `subscription_plan_price_plan_currency_unique` (`subscription_plan_id`, `currency_id`),
+    INDEX `idx_subscription_plan_price_currency_id` (`currency_id`),
+    CONSTRAINT `fk_subscription_plan_price_subscription_plan_id`
+        FOREIGN KEY (`subscription_plan_id`)
+        REFERENCES `subscription_plan` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_subscription_plan_price_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `subscription`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(45) NOT NULL,
+    `customer_id` INTEGER NOT NULL,
+    `subscription_plan_id` INTEGER COMMENT 'the plan the subscription was taken on; its values are copied below, NULL once the plan is deleted',
+    `product_sale_elements_id` INTEGER COMMENT 'the sale element delivered at each installment; NULL once it is deleted, and the subscription can no longer be billed',
+    `quantity` INTEGER DEFAULT 1 NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `lang_id` INTEGER NOT NULL,
+    `period_unit` VARCHAR(8) NOT NULL COMMENT 'copied from the plan: week, month, quarter or year',
+    `period_count` INTEGER DEFAULT 1 NOT NULL COMMENT 'copied from the plan',
+    `installment_count` INTEGER COMMENT 'copied from the plan; NULL: until it is cancelled',
+    `commitment_count` INTEGER COMMENT 'copied from the plan; NULL: no commitment',
+    `pausable` TINYINT DEFAULT 0 NOT NULL COMMENT 'copied from the plan',
+    `unit_price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the price without taxes of one unit, frozen from the plan in the currency of the subscription',
+    `initial_order_id` INTEGER COMMENT 'the order the subscription was taken with',
+    `delivery_module_id` INTEGER NOT NULL,
+    `payment_module_id` INTEGER NOT NULL,
+    `customer_payment_method_id` INTEGER COMMENT 'the stored method the installments are charged to; NULL once it is forgotten, and a charge is then declined',
+    `status` VARCHAR(16) DEFAULT 'active' NOT NULL COMMENT 'one of SubscriptionStatus, written by SubscriptionStateMachine alone',
+    `billing_anchor_day` TINYINT DEFAULT 1 NOT NULL COMMENT 'the day of the month the periods end on, kept when a month is shorter',
+    `current_period_start` DATETIME,
+    `current_period_end` DATETIME,
+    `next_billing_at` DATETIME COMMENT 'when the next installment is due; NULL once nothing is due any more',
+    `next_retry_at` DATETIME COMMENT 'when a failed installment is tried again; NULL when none waits',
+    `failure_count` INTEGER DEFAULT 0 NOT NULL COMMENT 'how many charges of the current installment were declined in a row',
+    `installments_billed` INTEGER DEFAULT 0 NOT NULL COMMENT 'how many installments were paid, the initial order included when there is no trial',
+    `cancel_at` DATETIME COMMENT 'when a cancelled subscription ends',
+    `paused_at` DATETIME,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `subscription_ref_unique` (`ref`),
+    INDEX `idx_subscription_status_next_billing_at` (`status`, `next_billing_at`),
+    INDEX `idx_subscription_status_next_retry_at` (`status`, `next_retry_at`),
+    INDEX `idx_subscription_customer_id_status` (`customer_id`, `status`),
+    INDEX `fk_subscription_subscription_plan_id_idx` (`subscription_plan_id`),
+    INDEX `fk_subscription_product_sale_elements_id_idx` (`product_sale_elements_id`),
+    INDEX `fk_subscription_initial_order_id_idx` (`initial_order_id`),
+    INDEX `fk_subscription_customer_payment_method_id_idx` (`customer_payment_method_id`),
+    CONSTRAINT `fk_subscription_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_subscription_subscription_plan_id`
+        FOREIGN KEY (`subscription_plan_id`)
+        REFERENCES `subscription_plan` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_subscription_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_subscription_initial_order_id`
+        FOREIGN KEY (`initial_order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_subscription_customer_payment_method_id`
+        FOREIGN KEY (`customer_payment_method_id`)
+        REFERENCES `customer_payment_method` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `subscription_order`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `subscription_id` INTEGER NOT NULL,
+    `installment_number` INTEGER NOT NULL COMMENT '1 for the first installment',
+    `order_id` INTEGER COMMENT 'the order of the installment, charged again on a retry; NULL until it is placed',
+    `state` VARCHAR(16) DEFAULT 'pending' NOT NULL COMMENT 'one of SubscriptionOrderState: pending, paid or failed',
+    `attempt_count` INTEGER DEFAULT 0 NOT NULL COMMENT 'how many charges of the installment were tried',
+    `last_error` VARCHAR(255) COMMENT 'what the payment module answered to the last failed charge, never a token',
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `subscription_order_installment_unique` (`subscription_id`, `installment_number`),
+    INDEX `fk_subscription_order_order_id_idx` (`order_id`),
+    CONSTRAINT `fk_subscription_order_subscription_id`
+        FOREIGN KEY (`subscription_id`)
+        REFERENCES `subscription` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_subscription_order_order_id`
+        FOREIGN KEY (`order_id`)
+        REFERENCES `order` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `subscription_history`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `subscription_id` INTEGER NOT NULL,
+    `from_status` VARCHAR(16) COMMENT 'NULL for the creation',
+    `to_status` VARCHAR(16) NOT NULL,
+    `actor_type` VARCHAR(16) NOT NULL COMMENT 'customer, admin or system',
+    `actor_id` INTEGER,
+    `note` VARCHAR(255),
+    `created_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_subscription_history_subscription_id` (`subscription_id`),
+    CONSTRAINT `fk_subscription_history_subscription_id`
+        FOREIGN KEY (`subscription_id`)
+        REFERENCES `subscription` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'subscription_plan_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD `subscription_plan_id` INTEGER COMMENT \'the subscription plan the line is bought on; NULL: a one-off purchase\' AFTER `price_list_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'fk_cart_item_subscription_plan_id_idx');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `fk_cart_item_subscription_plan_id_idx` (`subscription_plan_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `CONSTRAINT_NAME` = 'fk_cart_item_subscription_plan_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `cart_item` ADD CONSTRAINT `fk_cart_item_subscription_plan_id` FOREIGN KEY (`subscription_plan_id`) REFERENCES `subscription_plan` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+-- The retry policy of a declined installment: three declined charges suspend
+-- the subscription, two days apart.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('subscription_retry_attempts', '3', 0, 0, NOW(), NOW()),
+    ('subscription_retry_interval_days', '2', 0, 0, NOW(), NOW());
+
+DROP TEMPORARY TABLE IF EXISTS `config_title_seed`;
+
+CREATE TEMPORARY TABLE `config_title_seed` (
+    `name` VARCHAR(255) NOT NULL,
+    `locale` CHAR(5) NOT NULL,
+    `title` VARCHAR(255) NOT NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+INSERT IGNORE INTO `config_title_seed` (`name`, `locale`, `title`) VALUES
+    ('subscription_retry_attempts', 'en_US', 'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)'),
+    ('subscription_retry_attempts', 'fr_FR', 'Nombre de prélèvements refusés d''une échéance au-delà duquel un abonnement est suspendu (3 si invalide)'),
+    ('subscription_retry_attempts', 'de_DE', 'Anzahl abgelehnter Abbuchungen einer Rate, nach der ein Abonnement ausgesetzt wird (3 bei ungültigem Wert)'),
+    ('subscription_retry_attempts', 'es_ES', 'Número de cobros rechazados de una cuota tras el cual se suspende una suscripción (3 si no es válido)'),
+    ('subscription_retry_attempts', 'nl_NL', 'Aantal geweigerde afschrijvingen van een termijn waarna een abonnement wordt opgeschort (3 bij een ongeldige waarde)'),
+    ('subscription_retry_attempts', 'ru_RU', 'Число отклонённых списаний платежа, после которого подписка приостанавливается (3 при неверном значении)'),
+    ('subscription_retry_interval_days', 'en_US', 'Days between two charges of a declined installment of a subscription (2 when invalid)'),
+    ('subscription_retry_interval_days', 'fr_FR', 'Jours entre deux prélèvements d''une échéance refusée d''un abonnement (2 si invalide)'),
+    ('subscription_retry_interval_days', 'de_DE', 'Tage zwischen zwei Abbuchungen einer abgelehnten Rate eines Abonnements (2 bei ungültigem Wert)'),
+    ('subscription_retry_interval_days', 'es_ES', 'Días entre dos cobros de una cuota rechazada de una suscripción (2 si no es válido)'),
+    ('subscription_retry_interval_days', 'nl_NL', 'Dagen tussen twee afschrijvingen van een geweigerde termijn van een abonnement (2 bij een ongeldige waarde)'),
+    ('subscription_retry_interval_days', 'ru_RU', 'Дней между двумя списаниями отклонённого платежа подписки (2 при неверном значении)');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, `config_title_seed`.`locale`, `config_title_seed`.`title`, NULL, NULL, NULL
+FROM `config`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name`;
+
+UPDATE `config_i18n`
+INNER JOIN `config` ON `config`.`id` = `config_i18n`.`id`
+INNER JOIN `config_title_seed` ON `config_title_seed`.`name` = `config`.`name` AND `config_title_seed`.`locale` = `config_i18n`.`locale`
+SET `config_i18n`.`title` = `config_title_seed`.`title`
+WHERE `config_i18n`.`title` IS NULL OR `config_i18n`.`title` = '';
+
+DROP TEMPORARY TABLE `config_title_seed`;
+
+-- ---------------------------------------------------------------------
+-- Subscriptions: the back-office resource and the three messages
+--
+-- The back office needs the resource to exist before a profile can be
+-- granted it; INSERT IGNORE keeps a replay, and a grant already made, as
+-- they are. The messages are read back by name (a replay ignores the insert
+-- and hands back no id) and each gets its titles in a statement of its own.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.subscription', NOW(), NOW());
+
+SET @subscription_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.subscription');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@subscription_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@subscription_resource_id, 'de_DE', 'Abonnements', NULL, NULL, NULL),
+    (@subscription_resource_id, 'en_US', 'Subscriptions', NULL, NULL, NULL),
+    (@subscription_resource_id, 'es_ES', 'Suscripciones', NULL, NULL, NULL),
+    (@subscription_resource_id, 'fr_FR', 'Abonnements', NULL, NULL, NULL),
+    (@subscription_resource_id, 'it_IT', NULL, NULL, NULL, NULL),
+    (@subscription_resource_id, 'nl_NL', 'Abonnementen', NULL, NULL, NULL),
+    (@subscription_resource_id, 'ru_RU', 'Подписки', NULL, NULL, NULL);
+
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('subscription_payment_failed', NULL, 'subscription_payment_failed.txt', 'subscription_payment_failed.html', NOW(), NOW()),
+    ('subscription_suspended', NULL, 'subscription_suspended.txt', 'subscription_suspended.html', NOW(), NOW()),
+    ('subscription_cancelled', NULL, 'subscription_cancelled.txt', 'subscription_cancelled.html', NOW(), NOW());
+
+SET @subscription_payment_failed_message_id := (SELECT `id` FROM `message` WHERE `name` = 'subscription_payment_failed');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@subscription_payment_failed_message_id, 'cs_CZ', NULL, 'Platba za vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} se nezdařila'),
+    (@subscription_payment_failed_message_id, 'de_DE', 'Nachricht an den Kunden, wenn die Abbuchung einer Rate seines Abonnements fehlschlägt', 'Zahlung für Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} fehlgeschlagen'),
+    (@subscription_payment_failed_message_id, 'en_US', 'Message sent to the customer when the charge of an installment of its subscription fails', 'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'es_ES', 'Mensaje enviado al cliente cuando falla el cobro de una cuota de su suscripción', 'Fallo en el pago de su suscripción {{ subscription_ref }} en {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'fr_FR', 'Message envoyé au client quand le prélèvement d''une échéance de son abonnement échoue', 'Échec du paiement de votre abonnement {{ subscription_ref }} sur {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'it_IT', NULL, 'Pagamento non riuscito per il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }}'),
+    (@subscription_payment_failed_message_id, 'nl_NL', 'Bericht aan de klant wanneer de afschrijving van een termijn van zijn abonnement mislukt', 'Betaling voor uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} mislukt'),
+    (@subscription_payment_failed_message_id, 'ru_RU', 'Сообщение клиенту, когда списание очередного платежа по подписке не удалось', 'Не удалось списать платёж по вашей подписке {{ subscription_ref }} в {{ config("store_name") }}');
+
+SET @subscription_suspended_message_id := (SELECT `id` FROM `message` WHERE `name` = 'subscription_suspended');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@subscription_suspended_message_id, 'cs_CZ', NULL, '{% if recipient == "shop" %}Předplatné {{ subscription_ref }} pozastaveno po {{ failure_count }} neúspěšných platbách{% else %}Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} je pozastaveno{% endif %}'),
+    (@subscription_suspended_message_id, 'de_DE', 'Nachricht an den Kunden und an den Shop, wenn ein Abonnement ausgesetzt wird', '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} nach {{ failure_count }} fehlgeschlagenen Abbuchungen ausgesetzt{% else %}Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde ausgesetzt{% endif %}'),
+    (@subscription_suspended_message_id, 'en_US', 'Message sent to the customer, and to the shop, when a subscription is suspended', '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}'),
+    (@subscription_suspended_message_id, 'es_ES', 'Mensaje enviado al cliente y a la tienda cuando se suspende una suscripción', '{% if recipient == "shop" %}Suscripción {{ subscription_ref }} suspendida tras {{ failure_count }} cobros fallidos{% else %}Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está suspendida{% endif %}'),
+    (@subscription_suspended_message_id, 'fr_FR', 'Message envoyé au client, et à la boutique, quand un abonnement est suspendu', '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} suspendu après {{ failure_count }} prélèvements échoués{% else %}Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est suspendu{% endif %}'),
+    (@subscription_suspended_message_id, 'it_IT', NULL, '{% if recipient == "shop" %}Abbonamento {{ subscription_ref }} sospeso dopo {{ failure_count }} addebiti non riusciti{% else %}Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è sospeso{% endif %}'),
+    (@subscription_suspended_message_id, 'nl_NL', 'Bericht aan de klant en aan de winkel wanneer een abonnement wordt opgeschort', '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} opgeschort na {{ failure_count }} mislukte afschrijvingen{% else %}Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgeschort{% endif %}'),
+    (@subscription_suspended_message_id, 'ru_RU', 'Сообщение клиенту и магазину при приостановке подписки', '{% if recipient == "shop" %}Подписка {{ subscription_ref }} приостановлена после {{ failure_count }} неудачных списаний{% else %}Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} приостановлена{% endif %}');
+
+SET @subscription_cancelled_message_id := (SELECT `id` FROM `message` WHERE `name` = 'subscription_cancelled');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@subscription_cancelled_message_id, 'cs_CZ', NULL, 'Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} bylo zrušeno'),
+    (@subscription_cancelled_message_id, 'de_DE', 'Nachricht an den Kunden, wenn ein Abonnement gekündigt wird', 'Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde gekündigt'),
+    (@subscription_cancelled_message_id, 'en_US', 'Message sent to the customer when a subscription is cancelled', 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled'),
+    (@subscription_cancelled_message_id, 'es_ES', 'Mensaje enviado al cliente cuando se cancela una suscripción', 'Su suscripción {{ subscription_ref }} en {{ config("store_name") }} está cancelada'),
+    (@subscription_cancelled_message_id, 'fr_FR', 'Message envoyé au client quand un abonnement est résilié', 'Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est résilié'),
+    (@subscription_cancelled_message_id, 'it_IT', NULL, 'Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è annullato'),
+    (@subscription_cancelled_message_id, 'nl_NL', 'Bericht aan de klant wanneer een abonnement wordt opgezegd', 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgezegd'),
+    (@subscription_cancelled_message_id, 'ru_RU', 'Сообщение клиенту при отмене подписки', 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} отменена');
+
+-- ---------------------------------------------------------------------
 -- Countries of a shipping zone stored with state 0
 -- ---------------------------------------------------------------------
 -- The back office wrote "no state" as 0 instead of NULL: delivery modules found no zone

@@ -17,6 +17,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Thelia\Domain\DataTransfer\Job\RunExportJob;
 use Thelia\Domain\DataTransfer\Job\RunImportJob;
+use Thelia\Domain\Subscription\Message\BillSubscriptionInstallment;
 use Thelia\Domain\Webhook\Message\DeliverWebhook;
 use Thelia\Messenger\Middleware\ReplayedJobMiddleware;
 use Thelia\Messenger\Serializer\AllowedClassesSerializer;
@@ -343,6 +344,9 @@ return static function (ContainerConfigurator $container): void {
                 RunExportJob::class => 'async_heavy',
                 RunImportJob::class => 'async_heavy',
                 DeliverWebhook::class => 'async',
+                // One installment of one subscription: the job takes a lock on the
+                // subscription and reads it again, so a job delivered twice bills nothing twice.
+                BillSubscriptionInstallment::class => 'async',
             ],
         ],
     ], prepend: true);

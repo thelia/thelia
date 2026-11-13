@@ -366,7 +366,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if ($appends) {
             $cartItem->addQuantity($quantity, $saleUnitQuantity)->save();
         } else {
-            $cartItem = $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $this->catalogPricesOf($productSaleElements, $cart), $bundleComposition);
+            // The signature of doAddItem() is the one the classes extending this one override: a
+            // line bought on a plan is written beside it.
+            $cartItem = null === $event->getSubscriptionPlanId()
+                ? $this->doAddItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $this->catalogPricesOf($productSaleElements, $cart), $bundleComposition)
+                : $this->doAddPlanItem($dispatcher, $cart, $productId, $productSaleElements, $quantity, $event->getSubscriptionPlanId());
         }
 
         $this->settlePrices($cart);
@@ -809,6 +813,39 @@ class Cart extends BaseAction implements EventSubscriberInterface
             // Nothing prices this sale element (no price in the default currency): there is no
             // price to write on a line, so there is no line. Refused, not answered with an event
             // that holds no line: a module dispatching CART_ADDITEM reads the line it asked for.
+            throw new ProductWithoutPriceException();
+        }
+
+        $cartItem->save();
+
+        return $cartItem;
+    }
+
+    /**
+     * Writes the line of a subscription: priced by its plan (the cart line pricer reads the plan
+     * off the line), never by the catalog.
+     *
+     * @throws ProductWithoutPriceException when the plan has no price in the currency of the cart nor in the default one
+     */
+    private function doAddPlanItem(
+        EventDispatcherInterface $dispatcher,
+        CartModel $cart,
+        int $productId,
+        ProductSaleElements $productSaleElements,
+        float $quantity,
+        int $subscriptionPlanId,
+    ): CartItem {
+        $cartItem = new CartItem();
+        $cartItem->setDispatcher($dispatcher);
+        $cartItem
+            ->setCart($cart)
+            ->setProductId($productId)
+            ->setProductSaleElementsId($productSaleElements->getId())
+            ->setQuantity($quantity)
+            ->setSubscriptionPlanId($subscriptionPlanId)
+            ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30));
+
+        if ([] === $this->cartLinePricer->price([$cartItem], $this->currencyOf($cart), $cart->getCustomer())) {
             throw new ProductWithoutPriceException();
         }
 

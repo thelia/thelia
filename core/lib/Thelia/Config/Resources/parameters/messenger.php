@@ -44,11 +44,13 @@ return static function (ContainerConfigurator $container): void {
         // publication of contents and folders runs every minute, as the sale check:
         // a date is honoured within the minute. The expired stock reservations are
         // cleared every ten minutes: housekeeping, an expired one is never counted.
+        // The installments of the subscriptions are billed every fifteen minutes.
         ->set('env(THELIA_SCHEDULE_SALE_CHECK)', '* * * * *')
         ->set('env(THELIA_SCHEDULE_MAINTENANCE_PURGE)', '30 3 * * *')
         ->set('env(THELIA_SCHEDULE_FAILED_JOBS_PURGE)', '0 4 * * *')
         ->set('env(THELIA_SCHEDULE_CURRENCY_RATES)', '')
         ->set('env(THELIA_SCHEDULE_CONTENT_PUBLICATION)', '* * * * *')
         ->set('env(THELIA_SCHEDULE_STOCK_RESERVATION_PURGE)', '*/10 * * * *')
-        ->set('env(THELIA_SCHEDULE_REPORT_MAILS)', '*/15 * * * *');
+        ->set('env(THELIA_SCHEDULE_REPORT_MAILS)', '*/15 * * * *')
+        ->set('env(THELIA_SCHEDULE_SUBSCRIPTION_BILLING)', '*/15 * * * *');
 };

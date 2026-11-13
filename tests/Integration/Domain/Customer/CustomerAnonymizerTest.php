@@ -24,6 +24,9 @@ use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
+use Thelia\Domain\Subscription\Enum\ActorType;
+use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
+use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
@@ -45,17 +48,22 @@ use Thelia\Model\OrderConsentQuery;
 use Thelia\Model\OrderHistory;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\SubscriptionHistoryQuery;
+use Thelia\Model\SubscriptionQuery;
 use Thelia\Model\TagElement;
 use Thelia\Model\TagElementQuery;
 use Thelia\Model\TagQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Integration\Domain\Subscription\SubscriptionScenario;
 use Thelia\Tests\Support\Payment\RefusingStoredMethodsPaymentModule;
 use Thelia\Tests\Support\Payment\StoredMethodsPaymentModule;
 
 final class CustomerAnonymizerTest extends IntegrationTestCase
 {
+    use SubscriptionScenario;
+
     private FixtureFactory $factory;
 
     protected function setUp(): void
@@ -64,10 +72,12 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
         $this->factory = $this->createFixtureFactory();
         StoredMethodsPaymentModule::reset();
         RefusingStoredMethodsPaymentModule::reset();
+        $this->setUpTheSubscriptionShop();
     }
 
     protected function tearDown(): void
     {
+        $this->tearDownTheSubscriptionShop();
         StoredMethodsPaymentModule::reset();
         RefusingStoredMethodsPaymentModule::reset();
 
@@ -520,6 +530,50 @@ final class CustomerAnonymizerTest extends IntegrationTestCase
             StoredMethodsPaymentModule::$forgottenMethodIds,
             'The provider is told once the erasure transaction has committed.',
         );
+    }
+
+    /**
+     * The subscriptions are charged to a person who no longer is one: every running one is
+     * cancelled and ended by the system, with a line of history, whatever its state, and the
+     * orders it emitted stay as the accounting record they are.
+     */
+    public function testAnonymizeEndsTheRunningSubscriptionsAndKeepsTheirOrders(): void
+    {
+        [$active] = $this->aSubscription(['Pausable' => 1]);
+        $customer = $active->getCustomer();
+        $this->moveTo('2028-03-01 10:00:00');
+        $this->biller()->bill((int) $active->getId());
+        $installmentOrders = $this->installmentOrdersOf($this->reloaded($active));
+        self::assertCount(1, $installmentOrders);
+
+        $this->anonymize($customer);
+
+        $ended = $this->reloaded($active);
+        self::assertSame(SubscriptionStatus::Ended->value, $ended->getStatus());
+        self::assertNull($ended->getNextBillingAt(), 'Nothing is left to bill.');
+        self::assertNull($ended->getCustomerPaymentMethodId(), 'The method went with the stored methods.');
+        self::assertSame(
+            ['cancelled', 'ended'],
+            \array_slice(SubscriptionHistoryQuery::create()->filterBySubscriptionId($active->getId())->orderById()->select('ToStatus')->find()->toArray(), -2),
+        );
+        self::assertSame('system', SubscriptionHistoryQuery::create()->filterBySubscriptionId($active->getId())->orderById('DESC')->findOne()->getActorType());
+        self::assertSame(2, OrderQuery::create()->filterByCustomerId($customer->getId())->count(), 'The initial order and the installment are kept.');
+        self::assertCount(0, $this->getMailerMessages(), 'Nobody is told of the cancellation of an erased customer.');
+    }
+
+    public function testAnonymizeEndsASubscriptionThatIsAlreadyCancelledAndLeavesAnEndedOneAlone(): void
+    {
+        [$cancelled] = $this->aSubscription();
+        $this->getService(SubscriptionLifecycle::class)->cancel($cancelled, ActorType::Customer, (int) $cancelled->getCustomerId());
+        $customer = $cancelled->getCustomer();
+
+        $this->anonymize($customer);
+        $historyAfterTheFirstErasure = SubscriptionHistoryQuery::create()->filterBySubscriptionId($cancelled->getId())->count();
+        $this->anonymize($customer);
+
+        self::assertSame(SubscriptionStatus::Ended->value, $this->reloaded($cancelled)->getStatus());
+        self::assertSame($historyAfterTheFirstErasure, SubscriptionHistoryQuery::create()->filterBySubscriptionId($cancelled->getId())->count(), 'An ended subscription is not ended again.');
+        self::assertSame(1, SubscriptionQuery::create()->filterByCustomerId($customer->getId())->count(), 'The record of the subscription is kept.');
     }
 
     /**
