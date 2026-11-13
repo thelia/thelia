@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Reporting\Mailing;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Maintenance\MaintenancePurgeEvent;
 use Thelia\Core\File\FolderFile;
 use Thelia\Domain\Reporting\Mailing\EventListener\PurgeReportMailFilesListener;
@@ -22,6 +21,7 @@ use Thelia\Domain\Reporting\Mailing\ReportMailingSettings;
 use Thelia\Domain\Reporting\Mailing\ReportMailStorage;
 use Thelia\Model\ConfigQuery;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Filesystem\TestVarCleaner;
 
 /**
  * The file of a report outlives its link by nothing: the maintenance purge removes what is
@@ -39,7 +39,9 @@ final class PurgeReportMailFilesListenerTest extends IntegrationTestCase
     protected function tearDown(): void
     {
         ConfigQuery::resetCache();
-        (new Filesystem())->remove(ReportMailStorage::directory());
+        // Never clean a path the code under test renders: a mutation of it would point at the project root.
+        self::assertSame(THELIA_ROOT.'var/report-mail', ReportMailStorage::directory());
+        TestVarCleaner::remove(THELIA_ROOT.'var/report-mail');
 
         parent::tearDown();
     }
