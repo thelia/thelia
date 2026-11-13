@@ -14,13 +14,16 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Shipping;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Shipping\DTO\ShipmentLine;
 use Thelia\Domain\Shipping\Exception\ShipmentNotAllowedException;
 use Thelia\Domain\Shipping\Service\OrderShipmentManager;
 use Thelia\Domain\Shipping\Service\ShippedQuantityCalculator;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct;
@@ -74,6 +77,36 @@ final class OrderShipmentManagerTest extends ActionIntegrationTestCase
         $this->expectExceptionMessage('Only 1 left to ship');
 
         $this->manager->open($order, [new ShipmentLine((int) $first->getId(), 2.0)]);
+    }
+
+    public function testTheRefusalsAreWrittenInTheLanguageOfTheBackOffice(): void
+    {
+        [$order, $first] = $this->paidOrderOfTwoLines(3.0, 2.0);
+        $this->manager->open($order, [new ShipmentLine((int) $first->getId(), 2.0)]);
+        $shipped = $this->manager->ship($this->manager->open($order, [new ShipmentLine((int) $first->getId(), 1.0)]));
+        $cancelledOrder = $this->factory->order(null, ['statusCode' => OrderStatus::CODE_CANCELED]);
+        $cancelledLine = $this->factory->orderProduct($cancelledOrder, ['quantity' => 2.0]);
+
+        $messages = $this->inFrench(fn (): array => [
+            $this->refusalOf(fn () => $this->manager->open($order, [new ShipmentLine((int) $first->getId(), 2.0)])),
+            $this->refusalOf(fn () => $this->manager->open($order, [new ShipmentLine((int) $first->getId(), 0.0)])),
+            $this->refusalOf(fn () => $this->manager->open($order, [])),
+            $this->refusalOf(fn () => $this->manager->open($order, [new ShipmentLine(0, 1.0)])),
+            $this->refusalOf(fn () => $this->manager->cancel($shipped)),
+            $this->refusalOf(fn () => $this->manager->open($cancelledOrder, [new ShipmentLine((int) $cancelledLine->getId(), 1.0)])),
+        ]);
+
+        self::assertSame(
+            [
+                'Il ne reste que 0 à expédier sur la ligne '.$first->getId().' de la commande '.$order->getRef().' ; quantité demandée : 2.',
+                'Une ligne d\'expédition porte une quantité positive ; quantité donnée pour la ligne '.$first->getId().' : 0.',
+                'Une expédition porte au moins une ligne.',
+                'La ligne 0 n\'est pas une ligne expédiable de la commande '.$order->getRef().'.',
+                'L\'expédition '.$shipped->getRef().' est déjà partie ou a été annulée.',
+                'La commande '.$cancelledOrder->getRef().' est annulée : plus rien ne s\'expédie.',
+            ],
+            $messages,
+        );
     }
 
     public function testTheSameLineAskedTwiceInOneShipmentIsBoundedBySum(): void
@@ -278,6 +311,41 @@ final class OrderShipmentManagerTest extends ActionIntegrationTestCase
 
         $shipped = OrderHistoryQuery::create()->filterByOrderId($order->getId())->filterByEventType(OrderHistoryEventType::SHIPMENT_SHIPPED->value)->findOne();
         self::assertStringContainsString('"delivery_ref":"TRACK"', (string) $shipped?->getPayload());
+    }
+
+    private function refusalOf(callable $gesture): string
+    {
+        try {
+            $gesture();
+        } catch (ShipmentNotAllowedException $refusal) {
+            return $refusal->getMessage();
+        }
+
+        self::fail('The gesture was not refused.');
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(): T $run
+     *
+     * @return T
+     */
+    private function inFrench(callable $run): mixed
+    {
+        // The translator reads the language of the shop session before its own locale.
+        $session = $this->getService(RequestStack::class)->getMainRequest()?->getSession();
+        self::assertInstanceOf(Session::class, $session);
+        $previousLang = $session->getLang();
+        $lang = LangQuery::create()->findOneByLocale('fr_FR');
+        self::assertNotNull($lang);
+        $session->setLang($lang);
+
+        try {
+            return $run();
+        } finally {
+            $session->setLang($previousLang);
+        }
     }
 
     /**

@@ -1202,4 +1202,12 @@ return [
     'Quantities of your cart were adjusted to what the products are sold in. Check your cart before ordering.' => 'Quantities of your cart were adjusted to what the products are sold in. Check your cart before ordering.',
     'This product is sold by measure: order it from its product page.' => 'This product is sold by measure: order it from its product page.',
     'The stock %stock of the product sale element id %id cannot be kept: %reason' => 'The stock %stock of the product sale element id %id cannot be kept: %reason',
+    'Shipment %ref already left or was cancelled.' => 'Shipment %ref already left or was cancelled.',
+    'Line %line is not a line of order %ref that ships.' => 'Line %line is not a line of order %ref that ships.',
+    'Only %left left to ship on line %line of order %ref, %asked asked.' => 'Only %left left to ship on line %line of order %ref, %asked asked.',
+    'A shipment line carries a positive quantity, %quantity given for line %line.' => 'A shipment line carries a positive quantity, %quantity given for line %line.',
+    'A shipment carries at least one line.' => 'A shipment carries at least one line.',
+    'Order %ref is canceled: nothing of it ships.' => 'Order %ref is canceled: nothing of it ships.',
+    'Order %ref is refunded: nothing of it ships.' => 'Order %ref is refunded: nothing of it ships.',
+    'Delivery module %id does not exist.' => 'Delivery module %id does not exist.',
 ];

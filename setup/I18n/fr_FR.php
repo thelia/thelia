@@ -1182,7 +1182,7 @@ return [
     'Ragusa' => 'Ragusa',
     'Ravenna' => 'Ravenne',
     'Real' => 'Real',
-    'Refunded' => 'Remboursé',
+    'Refunded' => 'Remboursée',
     'Reggio Calabria' => 'Reggio de Calabre',
     'Reggio Emilia' => 'Reggio d\'Émilie',
     'Register - CSS stylesheet' => 'Création de compte - feuille de style CSS',

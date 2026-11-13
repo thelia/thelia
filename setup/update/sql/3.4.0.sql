@@ -1536,4 +1536,16 @@ WHERE `ca`.`state_id` = 0;
 
 UPDATE `country_area` SET `state_id` = NULL WHERE `state_id` = 0;
 
+-- ---------------------------------------------------------------------
+-- French title of the refunded order status
+-- ---------------------------------------------------------------------
+-- "Remboursé" was masculine next to "Commande" and the other statuses. Only the title the
+-- install wrote is changed: a shop that renamed the status keeps its own.
+-- ---------------------------------------------------------------------
+
+UPDATE `order_status_i18n` `i18n`
+INNER JOIN `order_status` `status` ON `status`.`id` = `i18n`.`id`
+SET `i18n`.`title` = 'Remboursée'
+WHERE `status`.`code` = 'refunded' AND `i18n`.`locale` = 'fr_FR' AND `i18n`.`title` = 'Remboursé';
+
 SET FOREIGN_KEY_CHECKS = 1;
