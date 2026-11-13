@@ -186,7 +186,8 @@ final class PreorderOrderTest extends ActionIntegrationTestCase
 
         self::assertSame(3.0, $this->stockOfProduct($product), 'Not taken yet: the payment module takes it at payment.');
         [$line] = $this->linesOf($order);
-        self::assertSame(0, $line->getIsPreorder());
+        self::assertSame(1, $line->getIsPreorder(), 'The confirmation e-mail goes out before the payment: the line says it is a preorder already.');
+        self::assertSame('2027-02-01', $line->getRestockDate()->format('Y-m-d'));
 
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
 
@@ -194,6 +195,27 @@ final class PreorderOrderTest extends ActionIntegrationTestCase
         $line = OrderProductQuery::create()->findPk($line->getId());
         self::assertSame(1, $line->getIsPreorder());
         self::assertSame('2027-02-01', $line->getRestockDate()->format('Y-m-d'));
+    }
+
+    public function testALineTheStockCoversIsNotAPreorderWhenTheStockIsTakenAtPayment(): void
+    {
+        $product = $this->product(3, OutOfStockPolicy::Limited, 10.0, '2027-02-01');
+
+        [$line] = $this->linesOf($this->orderOf($product, 3.0));
+
+        self::assertSame(0, $line->getIsPreorder());
+        self::assertNull($line->getRestockDate());
+    }
+
+    public function testNothingIsToldAsAPreorderAtPaymentWhenTheShopDoesNotCheckTheStock(): void
+    {
+        ConfigQuery::write('check-available-stock', '0');
+        ConfigQuery::resetCache();
+        $product = $this->product(0, OutOfStockPolicy::Limited, 10.0, '2027-02-01');
+
+        [$line] = $this->linesOf($this->orderOf($product, 2.0));
+
+        self::assertSame(0, $line->getIsPreorder());
     }
 
     public function testAPackWithAComponentSoldBelowZeroIsAPreorderWithTheDateOfThatComponent(): void
@@ -246,6 +268,9 @@ final class PreorderOrderTest extends ActionIntegrationTestCase
         $this->addBundleLine($cart, $bundle, [(int) $items[0]->getId() => '1', (int) $items[1]->getId() => '1'], 1.0);
         $order = $this->placeOrder($cart, $customer, $currency, $lang);
         self::assertSame(0.0, $this->stockOfProduct($first), 'Not taken yet: the payment module takes it at payment.');
+        [$bundleLine, $firstLine, $secondLine] = $this->linesOf($order);
+        self::assertSame([1, 1, 1], [$bundleLine->getIsPreorder(), $firstLine->getIsPreorder(), $secondLine->getIsPreorder()], 'Told as preorders before the payment.');
+        self::assertSame('2027-06-01', $bundleLine->getRestockDate()->format('Y-m-d'));
 
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
 

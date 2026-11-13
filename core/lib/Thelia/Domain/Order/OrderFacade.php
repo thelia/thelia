@@ -24,6 +24,8 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Catalog\Bundle\BundleComponentReader;
 use Thelia\Domain\Catalog\Bundle\BundleDecimal;
 use Thelia\Domain\Catalog\Stock\NoReservedQuantity;
+use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
+use Thelia\Domain\Catalog\Stock\PreorderRule;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
@@ -283,6 +285,14 @@ readonly class OrderFacade
 
             $movementOfLine = $this->takeEverythingFromStock($stockTakes, $manageStockOnCreation, $reservedByOtherCarts, $saleUnitId, $connection);
             $stockMovements = array_values(array_filter($movementOfLine));
+
+            // A stock left for the payment moves nothing now, but the confirmation e-mail goes out
+            // before it: what is a preorder at this moment is frozen on the line all the same.
+            if (!$manageStockOnCreation) {
+                foreach ($this->preordersOfUntakenStock($stockTakes, $reservedByOtherCarts, $saleUnitId) as $lineKey => $preorder) {
+                    $movementOfLine[$lineKey] ??= $preorder;
+                }
+            }
 
             // What the cart held is now sold: the cart no longer holds it, so its units are not
             // counted twice. A stock left for the payment stays held by the cart until the order is
@@ -981,6 +991,41 @@ readonly class OrderFacade
         }
 
         return $movements;
+    }
+
+    /**
+     * The preorders among the takes of a stock managed later (at the payment), by the key of the
+     * line: the rule the movement of the payment applies ({@see PreorderRule}), on the stock and the
+     * reservations the advisory check of the order reads. The stock is not touched, and these are
+     * not movements to announce: they only say what to freeze on the line.
+     *
+     * @param list<array{0: Product, 1: ProductSaleElements, 2: float, 3: VirtualProductContext, 4: string}> $stockTakes
+     * @param array<int, float>                                                                              $reservedByOtherCarts
+     *
+     * @return array<int|string, StockMovement>
+     */
+    private function preordersOfUntakenStock(array $stockTakes, array $reservedByOtherCarts, ?int $saleUnitId): array
+    {
+        if (!ConfigQuery::checkAvailableStock()) {
+            return [];
+        }
+
+        $preorders = [];
+
+        foreach ($stockTakes as [, $productSaleElements, $quantity, $virtualContext, $lineKey]) {
+            if (!$virtualContext->useStock) {
+                continue;
+            }
+
+            $physical = $this->saleUnitStockResolver->availableQuantity($saleUnitId, (int) $productSaleElements->getId(), (float) $productSaleElements->getQuantity());
+            $policy = OutOfStockPolicy::fromStored($productSaleElements->getOutOfStockPolicy());
+
+            if (PreorderRule::isPreorder($quantity, $physical, $reservedByOtherCarts[(int) $productSaleElements->getId()] ?? 0.0, $policy)) {
+                $preorders[$lineKey] = new StockMovement((int) $productSaleElements->getId(), null, $physical, $physical, true, $productSaleElements->getRestockDate('Y-m-d'));
+            }
+        }
+
+        return $preorders;
     }
 
     /**
