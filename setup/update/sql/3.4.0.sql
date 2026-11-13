@@ -1522,33 +1522,6 @@ INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`,
 SELECT 'last_float_line_rounding_order_id', COALESCE(MAX(`id`), 0), 1, 1, NOW(), NOW() FROM `order`;
 
 -- ---------------------------------------------------------------------
--- Countries of a shipping zone stored with state 0
--- ---------------------------------------------------------------------
--- The back office wrote "no state" as 0 instead of NULL: delivery modules found no zone
--- for such a country and the row could not be removed. The row of a country already in the
--- zone as a whole, and the repeats of a 0 row, are dropped before the rest read as NULL.
--- ---------------------------------------------------------------------
-
-DELETE `ca` FROM `country_area` `ca`
-INNER JOIN `country_area` `other` ON `other`.`country_id` = `ca`.`country_id` AND `other`.`area_id` = `ca`.`area_id`
-  AND (`other`.`state_id` IS NULL OR (`other`.`state_id` = 0 AND `other`.`id` < `ca`.`id`))
-WHERE `ca`.`state_id` = 0;
-
-UPDATE `country_area` SET `state_id` = NULL WHERE `state_id` = 0;
-
--- ---------------------------------------------------------------------
--- French title of the refunded order status
--- ---------------------------------------------------------------------
--- "Remboursé" was masculine next to "Commande" and the other statuses. Only the title the
--- install wrote is changed: a shop that renamed the status keeps its own.
--- ---------------------------------------------------------------------
-
-UPDATE `order_status_i18n` `i18n`
-INNER JOIN `order_status` `status` ON `status`.`id` = `i18n`.`id`
-SET `i18n`.`title` = 'Remboursée'
-WHERE `status`.`code` = 'refunded' AND `i18n`.`locale` = 'fr_FR' AND `i18n`.`title` = 'Remboursé';
-
--- ---------------------------------------------------------------------
 -- Subscriptions with recurring billing
 --
 -- A plan says how a product is sold by subscription and what an installment
@@ -1861,5 +1834,32 @@ INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
     (@subscription_cancelled_message_id, 'it_IT', NULL, 'Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è annullato'),
     (@subscription_cancelled_message_id, 'nl_NL', 'Bericht aan de klant wanneer een abonnement wordt opgezegd', 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgezegd'),
     (@subscription_cancelled_message_id, 'ru_RU', 'Сообщение клиенту при отмене подписки', 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} отменена');
+
+-- ---------------------------------------------------------------------
+-- Countries of a shipping zone stored with state 0
+-- ---------------------------------------------------------------------
+-- The back office wrote "no state" as 0 instead of NULL: delivery modules found no zone
+-- for such a country and the row could not be removed. The row of a country already in the
+-- zone as a whole, and the repeats of a 0 row, are dropped before the rest read as NULL.
+-- ---------------------------------------------------------------------
+
+DELETE `ca` FROM `country_area` `ca`
+INNER JOIN `country_area` `other` ON `other`.`country_id` = `ca`.`country_id` AND `other`.`area_id` = `ca`.`area_id`
+  AND (`other`.`state_id` IS NULL OR (`other`.`state_id` = 0 AND `other`.`id` < `ca`.`id`))
+WHERE `ca`.`state_id` = 0;
+
+UPDATE `country_area` SET `state_id` = NULL WHERE `state_id` = 0;
+
+-- ---------------------------------------------------------------------
+-- French title of the refunded order status
+-- ---------------------------------------------------------------------
+-- "Remboursé" was masculine next to "Commande" and the other statuses. Only the title the
+-- install wrote is changed: a shop that renamed the status keeps its own.
+-- ---------------------------------------------------------------------
+
+UPDATE `order_status_i18n` `i18n`
+INNER JOIN `order_status` `status` ON `status`.`id` = `i18n`.`id`
+SET `i18n`.`title` = 'Remboursée'
+WHERE `status`.`code` = 'refunded' AND `i18n`.`locale` = 'fr_FR' AND `i18n`.`title` = 'Remboursé';
 
 SET FOREIGN_KEY_CHECKS = 1;
