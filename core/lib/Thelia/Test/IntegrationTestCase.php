@@ -82,6 +82,10 @@ abstract class IntegrationTestCase extends KernelTestCase
             );
         }
 
+        // What a test that was not an integration test, or one that died before its tearDown(), left
+        // in memory: in a random order, any test can come first.
+        $this->forgetWhatTheTestLeftInMemory();
+
         $container = static::getContainer();
 
         // Initialize singletons that business code accesses statically
