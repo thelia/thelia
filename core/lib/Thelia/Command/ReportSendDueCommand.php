@@ -22,6 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Domain\Reporting\Mailing\ReportDueResolver;
 use Thelia\Domain\Reporting\Mailing\ReportMailer;
 use Thelia\Domain\Reporting\Mailing\ReportMailingLock;
+use Thelia\Exception\UserFacingFailure;
 use Thelia\Log\Tlog;
 use Thelia\Model\ReportMailingQuery;
 
@@ -162,7 +163,8 @@ class ReportSendDueCommand extends ContainerAwareCommand
                 }
             } catch (\Throwable $notSent) {
                 ++$failures;
-                $output->writeln(\sprintf('<error>Mailing #%d could not be sent (%s).</error>', $id, $notSent::class));
+                // The message of an exception meant for the administrator says what to fix; any other one may quote SQL, values or addresses, so only its type is printed.
+                $output->writeln(\sprintf('<error>Mailing #%d could not be sent (%s).</error>', $id, $notSent instanceof UserFacingFailure ? $notSent->getMessage() : $notSent::class));
             }
         }
 

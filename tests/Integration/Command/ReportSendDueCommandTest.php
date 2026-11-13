@@ -23,6 +23,7 @@ use Thelia\Command\ReportSendDueCommand;
 use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Domain\Accounting\InvalidAccountingChartException;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\Reporting\Mailing\ImmediateReportSender;
 use Thelia\Domain\Reporting\Mailing\ReportDownloadLinkGenerator;
@@ -307,6 +308,28 @@ final class ReportSendDueCommandTest extends ReportMailingTestCase
         self::assertSame(0, $fourth->getStatusCode());
         self::assertSame('', trim($fourth->getDisplay()), 'the fourth run sends nothing');
         self::assertEmailCount(0);
+    }
+
+    public function testAFailureMeantForTheAdministratorIsExplainedAndAnyOtherIsNamedByItsTypeOnly(): void
+    {
+        $this->orderYesterday();
+        $journal = $this->mailing(['one@example.com'], 'thelia.export.sales_journal');
+        $run = $this->runSendDue();
+
+        self::assertSame(1, $run->getStatusCode());
+        self::assertStringContainsString(
+            \sprintf('Mailing #%d could not be sent (The chart of accounts is incomplete: set ', $journal->getId()),
+            $run->getDisplay(),
+            'the message names the settings to fill',
+        );
+        self::assertStringNotContainsString(InvalidAccountingChartException::class, $run->getDisplay());
+        ReportMailingQuery::create()->filterById($journal->getId())->delete();
+
+        $technical = $this->mailing(['one@example.com']);
+        ConfigQuery::write('store_email', '');
+        $run = $this->runSendDue();
+
+        self::assertMatchesRegularExpression(\sprintf('/^Mailing #%d could not be sent \\([A-Za-z\\\\]+\\)\\.$/m', $technical->getId()), $run->getDisplay());
     }
 
     public function testReportMailRefusesAMailingAnotherRunIsSending(): void
