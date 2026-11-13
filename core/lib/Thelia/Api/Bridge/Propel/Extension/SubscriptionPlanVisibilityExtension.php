@@ -18,15 +18,25 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\FrontOperation;
 use Thelia\Api\Resource\SubscriptionPlan;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
+use Thelia\Model\Map\SubscriptionPlanTableMap;
 use Thelia\Model\SubscriptionPlanQuery;
 
 /**
  * Keeps the front endpoints of the plans to the plans the merchant shows, on a product the
- * shop shows: whatever the query string says, the collection and the item read never serve a
- * plan turned off or a plan of an offline product. The admin endpoints are left alone.
+ * visitor may see: whatever the query string says, the collection and the item read never serve
+ * a plan turned off, a plan of an offline product, nor one of a product the catalog hides from
+ * this visitor (a private drop they are not part of, a category closed to their group, a rule of
+ * a module). Such a plan answers 404 by id, as its product does. The admin endpoints are left
+ * alone.
  */
 final readonly class SubscriptionPlanVisibilityExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    public function __construct(
+        private ProductVisibility $productVisibility,
+    ) {
+    }
+
     public function applyToCollection(ModelCriteria $query, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $this->scopeToVisiblePlans($query, $resourceClass, $operation);
@@ -44,5 +54,6 @@ final readonly class SubscriptionPlanVisibilityExtension implements QueryCollect
         }
 
         $query->filterByVisible(1)->useProductQuery()->filterByVisible(1)->endUse();
+        $this->productVisibility->applyTo($query, SubscriptionPlanTableMap::COL_PRODUCT_ID);
     }
 }

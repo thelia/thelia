@@ -19,6 +19,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
 use Thelia\Domain\Subscription\SubscriptionManager;
+use Thelia\Model\Sale;
 use Thelia\Model\SubscriptionPlanPriceQuery;
 use Thelia\Model\SubscriptionPlanQuery;
 use Thelia\Test\ApiTestCase;
@@ -247,5 +248,70 @@ final class SubscriptionApiTest extends ApiTestCase
         $product->setVisible(0)->save($this->getPropelConnection());
 
         self::assertSame(404, $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId())->getStatusCode());
+    }
+
+    public function testTheFrontServesThePlansOfAProductOfAPrivateDropToItsGuestsOnly(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product);
+        $guest = $this->aCustomer();
+        $sale = $this->factory->sale([
+            'active' => true,
+            'startDate' => new \DateTime('-1 day'),
+            'endDate' => new \DateTime('+1 day'),
+            'audienceMode' => Sale::AUDIENCE_MODE_CUSTOMERS,
+            'hideProducts' => true,
+        ]);
+        $this->factory->saleProduct($sale, $product);
+        $this->factory->saleCustomer($sale, $guest);
+
+        self::assertSame(404, $this->jsonRequest('GET', '/api/front/products/'.$product->getId())->getStatusCode(), 'The product itself is hidden.');
+        self::assertSame(404, $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId())->getStatusCode(), 'An anonymous visitor does not read the plan.');
+        self::assertSame([], $this->planIdsOf('/api/front/subscription_plans?product.id='.$product->getId()), 'Nor finds it in the list.');
+
+        $token = $this->authenticateAsCustomer($guest);
+        self::assertSame(200, $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId(), token: $token)->getStatusCode(), 'A guest of the drop reads it.');
+        self::assertSame([(int) $plan->getId()], $this->planIdsOf('/api/front/subscription_plans?product.id='.$product->getId(), $token));
+    }
+
+    public function testTheFrontDoesNotServeThePlansOfAProductOfACategoryClosedToTheGroup(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product);
+        $group = $this->factory->customerGroup('pro', categoryIds: [(int) $this->factory->category()->getId()]);
+        $this->getService('services_resetter')->reset();
+        $token = $this->authenticateAsCustomer($this->factory->customer($this->factory->customerTitle(), ['password' => 'password', 'customerGroup' => $group]));
+
+        self::assertSame(404, $this->jsonRequest('GET', '/api/front/products/'.$product->getId(), token: $token)->getStatusCode(), 'The product itself is hidden from the group.');
+        self::assertSame(404, $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId(), token: $token)->getStatusCode());
+        self::assertSame([], $this->planIdsOf('/api/front/subscription_plans?product.id='.$product->getId(), $token));
+        self::assertSame([(int) $plan->getId()], $this->planIdsOf('/api/front/subscription_plans?product.id='.$product->getId()), 'The default group still reads it.');
+    }
+
+    public function testTheFrontGivesThePriceOfAPlanToWhoeverIsShownThePriceOfItsProduct(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product);
+        $product->setPriceDisplayMode('logged_in')->save($this->getPropelConnection());
+        $this->getService('services_resetter')->reset();
+
+        $anonymous = json_decode((string) $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId())->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertSame((int) $plan->getId(), $anonymous['id'], 'The plan is still described.');
+        self::assertArrayNotHasKey('price', $anonymous, 'Without its price, as the product shows none to an anonymous visitor.');
+
+        $token = $this->authenticateAsCustomer($this->aCustomer());
+        $signedIn = json_decode((string) $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId(), token: $token)->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertSame(9.9, $signedIn['price'] ?? null);
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function planIdsOf(string $uri, ?string $token = null): array
+    {
+        $response = $this->jsonRequest('GET', $uri, token: $token);
+        self::assertJsonResponseSuccessful($response);
+
+        return array_map('intval', array_column(json_decode((string) $response->getContent(), true, flags: \JSON_THROW_ON_ERROR)['hydra:member'] ?? [], 'id'));
     }
 }
