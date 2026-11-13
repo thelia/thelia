@@ -212,6 +212,31 @@ final class ProductLoopPriceDisplayTest extends IntegrationTestCase
         self::assertEqualsCanonicalizing([$hidden->getId(), $shown->getId()], $this->ids(['id' => $both, 'promo' => 1, 'backend_context' => 1]), 'the back office filters on the catalog');
     }
 
+    public function testAnOrderOnThePromotionRanksAPromotionOfAPriceTheVisitorIsNotShownAsNoPromotion(): void
+    {
+        $this->shopShows(PriceDisplayMode::LoggedIn);
+        $plain = $this->product(40.0);
+        $hidden = $this->promotedProduct(50.0);
+        $promoted = $this->promotedProduct(70.0);
+        $this->productShows($plain, PriceDisplayMode::Visible);
+        $this->productShows($promoted, PriceDisplayMode::Visible);
+        $this->forgetEverything();
+
+        $products = $plain->getId().','.$hidden->getId().','.$promoted->getId();
+        $saleElementOf = static fn (Product $product): int => $product->getDefaultSaleElements()->getId();
+        $saleElements = implode(',', array_map($saleElementOf, [$plain, $hidden, $promoted]));
+        $saleElementIds = fn (array $arguments): array => array_map(static fn (array $row): int => (int) $row['ID'], $this->rows('product_sale_elements', $arguments));
+
+        foreach ([[], ['complex' => 1]] as $form) {
+            self::assertSame([$promoted->getId(), $plain->getId(), $hidden->getId()], $this->ids(['id' => $products, 'order' => 'promo,id'] + $form), 'promo: '.json_encode($form));
+        }
+
+        self::assertSame(array_map($saleElementOf, [$promoted, $plain, $hidden]), $saleElementIds(['id' => $saleElements, 'order' => 'promo,id']));
+
+        self::assertSame([$hidden->getId(), $promoted->getId(), $plain->getId()], $this->ids(['id' => $products, 'order' => 'promo,id', 'backend_context' => 1]), 'the back office orders on the catalog');
+        self::assertSame(array_map($saleElementOf, [$hidden, $promoted, $plain]), $saleElementIds(['id' => $saleElements, 'order' => 'promo,id', 'backend_context' => 1]), 'the back office orders on the catalog');
+    }
+
     public function testTheBackOfficeReadsTheCatalogWhateverTheMode(): void
     {
         $this->shopShows(PriceDisplayMode::OnRequest);

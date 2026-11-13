@@ -201,7 +201,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     $search->addDescendingOrderByColumn('price_FINAL_PRICE');
                     break;
                 case 'promo':
-                    $search->orderByPromo(Criteria::DESC);
+                    $this->orderByShownPromotion($search);
                     break;
                 case 'new':
                     $search->orderByNewness(Criteria::DESC);
@@ -412,6 +412,25 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->withColumn('CASE WHEN '.$shownPriceClause.' THEN 0 ELSE 1 END', 'price_hidden_rank')
                 ->addAscendingOrderByColumn('price_hidden_rank');
         }
+    }
+
+    /**
+     * An order on the promotion ranks a sale element whose price the visitor is not shown as one
+     * in no promotion, as its row and the promo filter tell it.
+     */
+    private function orderByShownPromotion(ProductSaleElementsQuery $search): void
+    {
+        $shownPriceClause = $this->shownPriceClause();
+
+        if (null === $shownPriceClause) {
+            $search->orderByPromo(Criteria::DESC);
+
+            return;
+        }
+
+        $search
+            ->withColumn('CASE WHEN '.$shownPriceClause.' THEN '.ProductSaleElementsTableMap::COL_PROMO.' ELSE 0 END', 'shown_promo')
+            ->addDescendingOrderByColumn('shown_promo');
     }
 
     /**
