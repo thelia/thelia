@@ -49,9 +49,9 @@
         "thelia/config": "*"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "3.95.27",
+        "friendsofphp/php-cs-fixer": "3.95.29",
         "infection/infection": "^0.35",
-        "phpstan/phpstan": "2.3.4",
+        "phpstan/phpstan": "2.3.5",
         "phpstan/extension-installer": "1.*",
         "phpunit/phpunit": "11.5.*",
         "rector/rector": "^2.0",
