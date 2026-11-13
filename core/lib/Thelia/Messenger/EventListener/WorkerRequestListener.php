@@ -16,23 +16,19 @@ namespace Thelia\Messenger\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
-use Symfony\Component\Routing\RequestContext;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Messenger\ShopRequestFactory;
 
 /**
  * Gives each job a request of its own, on the address of the shop.
  *
  * A worker serves no page, but the templates a job renders do as a page does: their
  * loops read the request and its session, and a mail of a module rendered in a job
- * failed on the first loop. The request is built from DEFAULT_URI (the request
- * context of the router), with an empty session, so the job sees no visitor, no
- * cart and the default language; it goes when the job is over, so the next one
- * starts without it.
+ * failed on the first loop. The request is the one ShopRequestFactory builds on
+ * DEFAULT_URI, with an empty session, so the job sees no visitor, no cart and the
+ * default language; it goes when the job is over, so the next one starts without it.
  */
 final readonly class WorkerRequestListener
 {
@@ -40,7 +36,7 @@ final readonly class WorkerRequestListener
 
     public function __construct(
         private RequestStack $requestStack,
-        private RequestContext $requestContext,
+        private ShopRequestFactory $shopRequestFactory,
     ) {
     }
 
@@ -55,18 +51,7 @@ final readonly class WorkerRequestListener
             return;
         }
 
-        // Created without a script, a request has no base path: the folder of a shop
-        // installed below the root of its site would be lost from every link.
-        $basePath = rtrim($this->requestContext->getBaseUrl(), '/');
-        $request = Request::create($this->shopAddress(), 'GET', [], [], [], [
-            'SCRIPT_NAME' => $basePath.'/index.php',
-            'SCRIPT_FILENAME' => 'index.php',
-        ]);
-        $session = new Session(new MockArraySessionStorage());
-        // The cart a session makes before it is saved is held in a static: the job
-        // starts without the one a previous job made.
-        $session->setSessionCart(null);
-        $request->setSession($session);
+        $request = $this->shopRequestFactory->create();
         $request->attributes->set(self::WORKER_REQUEST, true);
 
         $this->requestStack->push($request);
@@ -94,20 +79,5 @@ final readonly class WorkerRequestListener
 
         while (null !== $this->requestStack->pop()) {
         }
-    }
-
-    private function shopAddress(): string
-    {
-        $context = $this->requestContext;
-        $port = 'https' === $context->getScheme() ? $context->getHttpsPort() : $context->getHttpPort();
-        $defaultPort = 'https' === $context->getScheme() ? 443 : 80;
-
-        return \sprintf(
-            '%s://%s%s%s/',
-            $context->getScheme(),
-            $context->getHost(),
-            $port === $defaultPort ? '' : ':'.$port,
-            rtrim($context->getBaseUrl(), '/'),
-        );
     }
 }

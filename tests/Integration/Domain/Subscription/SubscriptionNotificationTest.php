@@ -22,6 +22,7 @@ use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\EventListener\SubscriptionNotificationListener;
 use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Messenger\ShopRequestFactory;
 use Thelia\Model\LangQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Payment\RecurringTestPaymentModule;
@@ -50,6 +51,11 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
             /** @var list<array{code: string, to: string, locale: ?string, variables: array<string, mixed>}> */
             public array $log = [];
 
+            /** @var list<?string> the address of the request each mail was rendered with */
+            public array $addresses = [];
+
+            public ?RequestStack $requestStack = null;
+
             public function __construct()
             {
             }
@@ -57,6 +63,8 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
             public function sendEmailMessageOrFail(string $messageCode, array $from, array $to, array $messageParameters = [], ?string $locale = null, array $cc = [], array $bcc = [], array $replyTo = []): void
             {
                 $this->log[] = ['code' => $messageCode, 'to' => (string) array_key_first($to), 'locale' => $locale, 'variables' => $messageParameters];
+                $request = $this->requestStack?->getMainRequest();
+                $this->addresses[] = null === $request ? null : $request->getSchemeAndHttpHost().$request->getBaseUrl();
             }
 
             public function sendEmailToShopManagersOrFail(string $messageCode, array $messageParameters = [], array $replyTo = []): void
@@ -64,8 +72,9 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
                 $this->log[] = ['code' => $messageCode, 'to' => 'shop', 'locale' => null, 'variables' => $messageParameters];
             }
         };
+        $recorder->requestStack = $this->getService(RequestStack::class);
         $this->recorder = $recorder;
-        $listener = new SubscriptionNotificationListener($recorder, $this->getService(RequestStack::class));
+        $listener = new SubscriptionNotificationListener($recorder, $this->getService(RequestStack::class), $this->getService(ShopRequestFactory::class));
         $dispatcher = $this->getService(EventDispatcherInterface::class);
 
         foreach ([
@@ -108,6 +117,43 @@ final class SubscriptionNotificationTest extends ActionIntegrationTestCase
         self::assertSame('2028-03-02', $messages[0]['variables']['retry_date']);
         self::assertSame('Visa ending 4242', $messages[0]['variables']['payment_method_label']);
         self::assertArrayHasKey('order_ref', $messages[0]['variables']);
+    }
+
+    /**
+     * Billed by the scheduled command, outside any page and any worker: the mail is rendered with
+     * a request on the address of the shop, folder included, so that its links lead to the shop
+     * installed below the root of its site; the request goes once the mail is sent.
+     */
+    public function testAMailSentWithoutARequestIsRenderedOnTheAddressOfTheShopWithItsFolder(): void
+    {
+        [$subscription] = $this->aSubscription();
+        RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Declined;
+        $this->moveTo('2028-02-29 10:00:00');
+
+        $requestStack = $this->getService(RequestStack::class);
+        $context = $this->getService('router')->getContext();
+        $previousContext = [$context->getBaseUrl(), $context->getHost(), $context->getScheme()];
+        $taken = [];
+
+        while (null !== $request = $requestStack->pop()) {
+            $taken[] = $request;
+        }
+
+        $context->setBaseUrl('/shop')->setHost('shop.test')->setScheme('https');
+
+        try {
+            $this->biller()->bill((int) $subscription->getId());
+
+            self::assertSame(['https://shop.test/shop'], $this->recorder->addresses);
+            self::assertNull($requestStack->getMainRequest(), 'The request lives for the time of the send.');
+        } finally {
+            [$baseUrl, $host, $scheme] = $previousContext;
+            $context->setBaseUrl($baseUrl)->setHost($host)->setScheme($scheme);
+
+            foreach (array_reverse($taken) as $request) {
+                $requestStack->push($request);
+            }
+        }
     }
 
     public function testAProviderThatDoesNotAnswerTellsNobody(): void

@@ -27,6 +27,7 @@ use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\EventListener\SubscriptionNotificationListener;
 use Thelia\Domain\Subscription\SubscriptionLifecycle;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Messenger\ShopRequestFactory;
 use Thelia\Model\LangQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Payment\RecurringTestPaymentModule;
@@ -82,7 +83,7 @@ final class SubscriptionMailRenderingTest extends ActionIntegrationTestCase
             }
         };
 
-        $listener = new SubscriptionNotificationListener($this->mailer, $this->getService(RequestStack::class));
+        $listener = new SubscriptionNotificationListener($this->mailer, $this->getService(RequestStack::class), $this->getService(ShopRequestFactory::class));
         $dispatcher = $this->getService(EventDispatcherInterface::class);
 
         foreach ([
