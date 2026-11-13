@@ -190,6 +190,7 @@
 - A country added to a shipping zone from the back office is stored as a whole country (`country_area.state_id` NULL) instead of state 0, so delivery modules find the zone and the country can be removed again. `Action\Area::addCountry()` reads a state of `0` or none as no state. `3.4.0.sql` repairs the rows already stored with state 0.
 - German catalog: the salutation of a customer reads `Anrede` (`Customer title`), not `Titel`, and the refusal of an administrator with an e-mail address already in use reads « mit dieser E-Mail-Adresse ». `Title` stays `Titel`.
 - The refusals of a shipment (`ShipmentNotAllowedException`: quantity beyond what is left, line not shippable, shipment already left, order cancelled or refunded, unknown delivery module) are translated into the language of the back office or of the request, with French wording in the core catalog, and the French title of the refunded order status is « Remboursée ». `3.4.0.sql` changes the title only where the install wrote « Remboursé ».
+- An order placed with a payment module that takes the stock at payment (such as Cheque) freezes the preorder state of its lines when it is placed, with the same rule as the stock movement (`PreorderRule`), so the confirmation e-mail carries the preorder mention and its restock date. Before, the line was only marked once the order was paid, after the e-mail had gone.
 
 ## Performance
 
