@@ -387,13 +387,16 @@ final class StockReservationLimiterTest extends ActionIntegrationTestCase
         [$cart, $first] = $this->cartWith($this->product(5), 1);
         $service->holdAfterCartChange($cart);
         self::assertTrue($this->isHeld($first));
+        // Set back so that the date a hold writes cannot equal it, whatever the second the test runs in.
+        $this->connection()->exec('UPDATE cart_item SET reserved_until = NOW() + INTERVAL 1 MINUTE WHERE id = '.(int) $first->getId());
         $date = $this->reservedUntil($first);
         $second = $this->factory->cartItem($cart, $this->product(5), null, ['quantity' => 1.0]);
 
         $service->holdAfterCartChange($cart);
 
         self::assertFalse($this->isHeld($second), 'The line stays in the cart, unheld.');
-        self::assertSame($date, $this->reservedUntil($first), 'What was held keeps its date.');
+        self::assertTrue($this->isHeld($first), 'What was held goes on.');
+        self::assertGreaterThan($date, $this->reservedUntil($first), 'What was held has its date pushed back, as at the checkout.');
     }
 
     public function testTheAddressIsSpentFirstAndAnAddressOverItsBudgetSpendsNothingOfTheCart(): void
