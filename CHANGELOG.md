@@ -191,6 +191,7 @@
 - German catalog: the salutation of a customer reads `Anrede` (`Customer title`), not `Titel`, and the refusal of an administrator with an e-mail address already in use reads « mit dieser E-Mail-Adresse ». `Title` stays `Titel`.
 - The refusals of a shipment (`ShipmentNotAllowedException`: quantity beyond what is left, line not shippable, shipment already left, order cancelled or refunded, unknown delivery module) are translated into the language of the back office or of the request, with French wording in the core catalog, and the French title of the refunded order status is « Remboursée ». `3.4.0.sql` changes the title only where the install wrote « Remboursé ».
 - An order placed with a payment module that takes the stock at payment (such as Cheque) freezes the preorder state of its lines when it is placed, with the same rule as the stock movement (`PreorderRule`), so the confirmation e-mail carries the preorder mention and its restock date. Before, the line was only marked once the order was paid, after the e-mail had gone.
+- `IntegrationTestCase::setUp()` forgets what an earlier test left in memory (default currency, language and country, session cart, order statuses, configuration), as `tearDown()` already did, so the unit and integration suites pass in a random order (`--order-by=random`) whatever test comes first.
 
 ## Performance
 
