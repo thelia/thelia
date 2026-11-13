@@ -19,6 +19,7 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\BillingOutcome;
+use Thelia\Domain\Subscription\Enum\PeriodUnit;
 use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\Enum\SubscriptionOrderState;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
@@ -289,7 +290,9 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
         self::assertSame(SubscriptionStatus::Active->value, $subscription->getStatus(), 'Charged at once, without a worker.');
         self::assertSame(0, $subscription->getFailureCount());
         self::assertSame(2, $subscription->getInstallmentsBilled());
-        self::assertSame('2028-03-31 10:00:00', $subscription->getNextBillingAt('Y-m-d H:i:s'), 'The period paid is the one that was due.');
+        self::assertSame('2028-03-10 15:00:00', $subscription->getCurrentPeriodStart('Y-m-d H:i:s'), 'The period paid starts with the payment: the weeks of the suspension are not charged.');
+        self::assertSame('2028-04-10 15:00:00', $subscription->getNextBillingAt('Y-m-d H:i:s'));
+        self::assertSame(10, $subscription->getBillingAnchorDay(), 'The periods are anchored on the day it was paid.');
 
         $installment = SubscriptionOrderQuery::create()->filterBySubscriptionId($subscription->getId())->filterByInstallmentNumber(2)->findOne();
         self::assertNotNull($installment);
@@ -297,6 +300,61 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
         self::assertNotSame($cancelledOrderId, $installment->getOrderId(), 'A cancelled order is never paid: the retry gets an order of its own.');
         self::assertTrue(OrderQuery::create()->findPk($installment->getOrderId())?->isPaid(false));
         self::assertSame(2, $this->ordersPlacedFor($subscription), 'The cancelled order and the paid one, nothing else.');
+    }
+
+    public function testASubscriptionReactivatedMonthsAfterItsSuspensionIsChargedOnceThenWaitsForItsNextPeriod(): void
+    {
+        [$subscription] = $this->aSubscription();
+        RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Declined;
+
+        foreach (['2028-02-29 10:00:00', '2028-03-02 10:00:00', '2028-03-04 10:00:00'] as $moment) {
+            $this->moveTo($moment);
+            $this->biller()->bill((int) $subscription->getId());
+        }
+
+        self::assertSame(SubscriptionStatus::Suspended->value, $this->reloaded($subscription)->getStatus());
+
+        $this->moveTo('2028-07-10 09:00:00');
+        RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Paid;
+        $this->getService(SubscriptionManager::class)->reactivate($this->reloaded($subscription), ActorType::Customer, (int) $subscription->getCustomerId());
+
+        $subscription = $this->reloaded($subscription);
+        self::assertSame(SubscriptionStatus::Active->value, $subscription->getStatus());
+        self::assertSame('2028-08-10 09:00:00', $subscription->getNextBillingAt('Y-m-d H:i:s'), 'The next installment comes a period after the payment, not on the date due before the suspension.');
+        $charges = \count(RecurringTestPaymentModule::$charges);
+        $orders = $this->ordersPlacedFor($subscription);
+
+        foreach (['2028-07-10 09:15:00', '2028-07-11 09:00:00', '2028-08-01 09:00:00'] as $moment) {
+            $this->moveTo($moment);
+            self::assertSame(BillingOutcome::NothingDue, $this->biller()->bill((int) $subscription->getId()), 'No missed month is charged at '.$moment.'.');
+        }
+
+        self::assertCount($charges, RecurringTestPaymentModule::$charges);
+        self::assertSame($orders, $this->ordersPlacedFor($subscription), 'No order is placed for the months of the suspension.');
+
+        $this->moveTo('2028-08-10 09:00:00');
+        self::assertSame(BillingOutcome::Paid, $this->biller()->bill((int) $subscription->getId()));
+        self::assertSame('2028-09-10 09:00:00', $this->reloaded($subscription)->getNextBillingAt('Y-m-d H:i:s'));
+    }
+
+    public function testAnInstallmentPaidOnceItsPeriodIsOverStartsANewPeriodWithThePayment(): void
+    {
+        [$subscription] = $this->aSubscription(['PeriodUnit' => PeriodUnit::Week->value]);
+        self::assertSame('2028-02-07 10:00:00', $subscription->getNextBillingAt('Y-m-d H:i:s'));
+
+        $this->moveTo('2028-02-07 10:00:00');
+        RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Retryable;
+        self::assertSame(BillingOutcome::Retryable, $this->biller()->bill((int) $subscription->getId()));
+
+        // The provider stays out of reach for more than a week.
+        $this->moveTo('2028-02-15 12:00:00');
+        RecurringTestPaymentModule::$outcome = RecurringChargeOutcome::Paid;
+        self::assertSame(BillingOutcome::Paid, $this->biller()->bill((int) $subscription->getId()));
+
+        $subscription = $this->reloaded($subscription);
+        self::assertSame('2028-02-22 12:00:00', $subscription->getNextBillingAt('Y-m-d H:i:s'), 'Never a next installment in the past, due again at once.');
+        $this->moveTo('2028-02-15 12:15:00');
+        self::assertSame(BillingOutcome::NothingDue, $this->biller()->bill((int) $subscription->getId()));
     }
 
     public function testACancelledSubscriptionIsServedUntilTheEndOfItsPeriodThenEndsWithoutACharge(): void

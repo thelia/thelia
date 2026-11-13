@@ -324,24 +324,32 @@ final readonly class SubscriptionInstallmentBiller
             ->setLastError(self::shortened($statusError))
             ->save();
 
-        $periodStart = PublicationMoment::atTheSecondOrNull($subscription->getCurrentPeriodEnd()) ?? $this->now();
-        $periodEnd = $this->calendar->periodEnd(
-            $periodStart,
-            PeriodUnit::from((string) $subscription->getPeriodUnit()),
-            max(1, (int) $subscription->getPeriodCount()),
-            (int) $subscription->getBillingAnchorDay(),
-        );
+        $now = $this->now();
+        $status = SubscriptionStatus::from((string) $subscription->getStatus());
+        $unit = PeriodUnit::from((string) $subscription->getPeriodUnit());
+        $periodCount = max(1, (int) $subscription->getPeriodCount());
+        $anchorDay = (int) $subscription->getBillingAnchorDay();
+        $periodStart = PublicationMoment::atTheSecondOrNull($subscription->getCurrentPeriodEnd()) ?? $now;
+        $periodEnd = $this->calendar->periodEnd($periodStart, $unit, $periodCount, $anchorDay);
+
+        // Paid after a suspension, or so late that the period it was due for is over already:
+        // the service starts again with the payment, and the periods are anchored on that day.
+        // Kept on the old calendar, every later billing run would charge one more missed period.
+        if (SubscriptionStatus::Suspended === $status || $periodEnd <= $now) {
+            $periodStart = $now;
+            $anchorDay = $this->calendar->anchorDayOf($now);
+            $periodEnd = $this->calendar->periodEnd($periodStart, $unit, $periodCount, $anchorDay);
+        }
 
         $changes = [
             'InstallmentsBilled' => (int) $subscription->getInstallmentsBilled() + 1,
+            'BillingAnchorDay' => $anchorDay,
             'CurrentPeriodStart' => self::mutable($periodStart),
             'CurrentPeriodEnd' => self::mutable($periodEnd),
             'NextBillingAt' => self::mutable($periodEnd),
             'FailureCount' => 0,
             'NextRetryAt' => null,
         ];
-
-        $status = SubscriptionStatus::from((string) $subscription->getStatus());
 
         if (\in_array($status, [SubscriptionStatus::Trial, SubscriptionStatus::PaymentFailed, SubscriptionStatus::Suspended], true)) {
             $subscription = $this->stateMachine->transition($subscription, SubscriptionStatus::Active, ActorType::System, null, \sprintf('Installment %d paid.', (int) $installment->getInstallmentNumber()), $changes);
