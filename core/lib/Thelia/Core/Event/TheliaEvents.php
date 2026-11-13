@@ -362,6 +362,13 @@ final class TheliaEvents
     public const ORDER_SET_PAYMENT_MODULE = 'action.order.setPaymentModule';
     public const ORDER_PAY = 'action.order.pay';
     public const ORDER_PAY_GET_TOTAL = 'action.order.pay.getTotal';
+    /**
+     * Asked before the core pays an order the discount leaves nothing to pay, in place of its
+     * payment module: a module with a reason to have the payment module charge it all the same
+     * (a card authorised for nothing, a subscription) refuses it. Carries an
+     * {@see Order\OrderNothingToPayEvent}.
+     */
+    public const ORDER_NOTHING_TO_PAY = 'action.order.pay.nothingToPay';
     public const ORDER_BEFORE_PAYMENT = 'action.order.beforePayment';
     public const ORDER_CART_CLEAR = 'action.order.cartClear';
     public const ORDER_CREATE_MANUAL = 'action.order.createManual';
