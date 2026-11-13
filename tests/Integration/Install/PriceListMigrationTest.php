@@ -274,7 +274,11 @@ final class PriceListMigrationTest extends IntegrationTestCase
 
         foreach ($all as $index => $statement) {
             foreach (['price_display_mode', 'price_list_id'] as $column) {
-                if (str_starts_with($statement, 'SET @statement') && str_contains($statement, '`'.$column.'`') && str_contains($statement, 'ALTER TABLE')) {
+                // What adds the column or its index, not a statement that only names it (a column
+                // placed after it by a later release).
+                $addsIt = str_contains($statement, 'ADD `'.$column.'`') || (str_contains($statement, 'ADD INDEX') && str_contains($statement, '(`'.$column.'`)'));
+
+                if (str_starts_with($statement, 'SET @statement') && $addsIt && str_contains($statement, 'ALTER TABLE')) {
                     // SET @add_column (or @add_index), SET @statement, PREPARE, EXECUTE, DEALLOCATE.
                     array_push($statements, ...\array_slice($all, $index - 1, 5));
                     $kind = str_contains($statement, 'ADD INDEX') ? 'index' : 'column';
