@@ -32,8 +32,8 @@ use Thelia\Model\Map\PriceListTableMap;
  * currency: the sale elements it holds are the ones its customer may buy, whatever currency
  * they browse in, and it prices them only in its own. The group is the one
  * {@see CustomerGroupResolver} reads back from the database: a visitor, a console command
- * and a guest account belong to the default group. A list assigned to a guest account applies
- * to it, as a catalog restriction assigned to the same guest does.
+ * and a guest account belong to the default group, and a guest has no list of their own
+ * either, a guest row being reusable by e-mail.
  *
  * The rank is the priority, the smallest first; a tie goes to the list assigned to the
  * customer rather than to their group, then to the oldest list.
@@ -82,7 +82,7 @@ final class ApplicablePriceLists implements ResetInterface
 
     private function assignableCustomerId(?Customer $customer): int
     {
-        if (null === $customer || $customer->isNew()) {
+        if (null === $customer || $customer->isNew() || 1 === (int) $customer->getIsGuest()) {
             return 0;
         }
 

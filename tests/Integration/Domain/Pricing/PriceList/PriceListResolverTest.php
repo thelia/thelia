@@ -333,11 +333,10 @@ final class PriceListResolverTest extends ActionIntegrationTestCase
         self::assertSame([], $this->resolver->resolve([$pse->getId()], $this->currency, null));
     }
 
-    public function testAVisitorAndAGuestAreInTheDefaultGroupAndAListOfTheGuestAppliesToThemOnly(): void
+    public function testAVisitorAndAGuestAreInTheDefaultGroupAndAGuestHasNoListOfTheirOwn(): void
     {
         $pse = $this->pricedProduct()->getDefaultSaleElements();
         $guest = $this->factory->guestCustomer($this->factory->customerTitle());
-        $otherGuest = $this->factory->guestCustomer($this->factory->customerTitle());
         $list = $this->priceList('DEFAULT');
         $this->assignToGroup($list, CustomerGroupQuery::findDefault());
         $this->priceListItem($list, $pse, '90');
@@ -346,8 +345,7 @@ final class PriceListResolverTest extends ActionIntegrationTestCase
         $this->priceListItem($ownList, $pse, '10');
 
         self::assertSame('DEFAULT', $this->resolver->resolve([$pse->getId()], $this->currency, null)[$pse->getId()]->priceListCode);
-        self::assertSame('DEFAULT', $this->resolver->resolve([$pse->getId()], $this->currency, $otherGuest)[$pse->getId()]->priceListCode);
-        self::assertSame('OWN', $this->resolver->resolve([$pse->getId()], $this->currency, $guest)[$pse->getId()]->priceListCode, 'as a catalog restriction assigned to the same guest does');
+        self::assertSame('DEFAULT', $this->resolver->resolve([$pse->getId()], $this->currency, $guest)[$pse->getId()]->priceListCode);
     }
 
     /**
