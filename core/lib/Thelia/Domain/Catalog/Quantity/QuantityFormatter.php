@@ -16,8 +16,8 @@ namespace Thelia\Domain\Catalog\Quantity;
 
 /**
  * Writes a quantity the way the language reads it, with the decimals of its combination:
- * "1,25 kg" in French, "1.25 kg" in English, "6" for six pieces. The themes call it from
- * their own `format_quantity` Twig filter.
+ * "1,25 kg" in French, "1.25 kg" in English, "6" for six pieces. Templates call it from the
+ * `format_quantity` Twig filter, which the core declares (`Twig\QuantityExtension`).
  */
 final readonly class QuantityFormatter
 {
