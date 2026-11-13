@@ -30,6 +30,13 @@ final class GermanCatalogWordingTest extends TestCase
         }
     }
 
+    public function testTheCompoundOfAnEmailAddressStartsWithACapital(): void
+    {
+        foreach (self::catalog() as $key => $value) {
+            self::assertDoesNotMatchRegularExpression('/\be-[Mm]ail-Adress/', (string) $value, (string) $key);
+        }
+    }
+
     #[DataProvider('addressEntries')]
     public function testTheAddressFormReadsAsAGermanForm(string $key, string $expected): void
     {
@@ -44,6 +51,8 @@ final class GermanCatalogWordingTest extends TestCase
         yield 'second address line' => ['Address Line 2', 'Adresszusatz'];
         yield 'additional address' => ['Additional address', 'Adresszusatz'];
         yield 'name of an address' => ['Address label', 'Bezeichnung'];
+        yield 'salutation of a customer' => ['Customer title', 'Anrede'];
+        yield 'title of a product, a category or a content' => ['Title', 'Titel'];
     }
 
     /**
