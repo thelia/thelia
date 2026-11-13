@@ -1180,6 +1180,22 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
+     * A price the visitor is not shown has none to rank on: an order on the price puts it last,
+     * in both directions, as the front API does, so where it stands among the others tells
+     * nothing of it.
+     */
+    private function rankHiddenPricesLast(ProductQuery $search): void
+    {
+        $shownPriceClause = $this->shownPriceClause();
+
+        if (null !== $shownPriceClause) {
+            $search
+                ->withColumn('CASE WHEN '.$shownPriceClause.' THEN 0 ELSE 1 END', 'price_hidden_rank')
+                ->addAscendingOrderByColumn('price_hidden_rank');
+        }
+    }
+
+    /**
      * "Not in promotion" on a promotion flag: a product whose price the visitor is not shown is
      * never in promotion for them.
      */
@@ -1465,6 +1481,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case 'min_price':
+                    $this->rankHiddenPricesLast($search);
+
                     if ($complex) {
                         $search->addAscendingOrderByColumn('real_lowest_price');
                     } else {
@@ -1473,6 +1491,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                     break;
                 case 'max_price':
+                    $this->rankHiddenPricesLast($search);
+
                     if ($complex) {
                         $search->addDescendingOrderByColumn('real_lowest_price');
                     } else {
