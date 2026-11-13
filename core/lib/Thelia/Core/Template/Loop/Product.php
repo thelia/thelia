@@ -971,7 +971,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $booleanMatchedNewnessList[] = '`'.$isPSELeftJoin.'`.NEWNESS';
             }
 
-            $search->withColumn('('.implode(' OR ', $booleanMatchedPromoList).')', 'main_product_is_promo');
+            $promoAsSql = '('.implode(' OR ', $booleanMatchedPromoList).')';
+            $search->withColumn($promoAsSql, 'main_product_is_promo');
             $search->withColumn('('.implode(' OR ', $booleanMatchedNewnessList).')', 'main_product_is_new');
 
             $booleanMatchedPrice =
@@ -995,6 +996,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('MAX('.$priceToCompareAsSQL.')', 'real_highest_price');
             $search->withColumn('MIN('.$priceToCompareAsSQL.')', 'real_lowest_price');
         } else {
+            $promoAsSql = '`pse`.PROMO';
+
             if (true === $new) {
                 $search->where('`pse`.NEWNESS'.Criteria::EQUAL.'1');
             } elseif (false === $new) {
@@ -1093,7 +1096,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('COUNT(distinct(`pse_count`.ID))', 'pse_count');
         }
 
-        $this->applyOrder($search, $complex, $manualOrderAllowed, $id);
+        $this->applyOrder($search, $complex, $manualOrderAllowed, $id, $promoAsSql);
 
         return $search;
     }
@@ -1462,7 +1465,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return $priceToCompareAsSQL;
     }
 
-    private function applyOrder(ProductQuery $search, bool $complex, bool $manualOrderAllowed, ?array $id): void
+    private function applyOrder(ProductQuery $search, bool $complex, bool $manualOrderAllowed, ?array $id, string $promoAsSql): void
     {
         $orders = $this->getOrder();
 
@@ -1527,7 +1530,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->orderByVisible(Criteria::DESC);
                     break;
                 case 'promo':
-                    if ($complex) {
+                    $shownPriceClause = $this->shownPriceClause();
+
+                    if (null !== $shownPriceClause) {
+                        // A product whose price the visitor is not shown ranks as one in no
+                        // promotion, as its row and the promo filter tell it.
+                        $search
+                            ->withColumn('CASE WHEN '.$shownPriceClause.' THEN '.$promoAsSql.' ELSE 0 END', 'shown_promo')
+                            ->addDescendingOrderByColumn('shown_promo');
+                    } elseif ($complex) {
                         $search->addDescendingOrderByColumn('main_product_is_promo');
                     } else {
                         $search->addDescendingOrderByColumn('is_promo');
