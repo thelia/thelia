@@ -149,7 +149,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $promo = $this->getPromo();
 
         if (null !== $promo) {
-            $search->filterByPromo($promo);
+            $this->filterByPromotion($search, $promo);
         }
 
         $new = $this->getNew();
@@ -351,11 +351,13 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set('PROMO_PRICE_TAX', $taxedPromoPrice - $promoPrice)
                 ->set('TAXED_PROMO_PRICE', $taxedPromoPrice);
 
-            // A price the visitor is not shown is printed empty, with its taxes.
+            // A price the visitor is not shown is printed empty, with its taxes, and is in no promotion.
             if (isset($hiddenPriceProductIds[(int) $PSEValue->getProductId()])) {
                 foreach (['PRICE', 'PRICE_TAX', 'TAXED_PRICE', 'PROMO_PRICE', 'PROMO_PRICE_TAX', 'TAXED_PROMO_PRICE'] as $field) {
                     $loopResultRow->set($field, '');
                 }
+
+                $loopResultRow->set('IS_PROMO', 0);
             }
 
             // The threshold the shop owner is alerted at is theirs alone: never handed to a front template.
@@ -368,6 +370,32 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         }
 
         return $loopResult;
+    }
+
+    /**
+     * A promotion of a price the visitor is not shown is not told by the filter either: "in
+     * promotion" holds only the sale elements whose price this visitor is shown, and "not in
+     * promotion" every other one, as the front API answers. The back office reads the catalog.
+     */
+    private function filterByPromotion(ProductSaleElementsQuery $search, bool $promo): void
+    {
+        $shownPriceClause = $this->getBackendContext() || !$this->priceVisibilityResolver instanceof PriceVisibilityResolver
+            ? null
+            : $this->priceVisibilityResolver->shownPriceClause(ProductSaleElementsTableMap::COL_PRODUCT_ID, $this->visitorPriceReader->currentCustomer());
+
+        if (null === $shownPriceClause) {
+            $search->filterByPromo($promo);
+
+            return;
+        }
+
+        if ($promo) {
+            $search->filterByPromo(true)->where($shownPriceClause);
+
+            return;
+        }
+
+        $search->where('('.ProductSaleElementsTableMap::COL_PROMO.Criteria::EQUAL.'0 OR NOT ('.$shownPriceClause.'))');
     }
 
     /**

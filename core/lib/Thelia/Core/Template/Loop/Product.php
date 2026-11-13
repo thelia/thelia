@@ -354,6 +354,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if (isset($hiddenPriceProductIds[(int) $product->getId()])) {
                 $this->hidePrices($loopResultRow, self::PRICE_OUTPUT_FIELDS);
+                $loopResultRow->set('IS_PROMO', 0);
             }
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
@@ -415,6 +416,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if (isset($hiddenPriceProductIds[(int) $product->getId()])) {
                 $this->hidePrices($loopResultRow, self::COMPLEX_PRICE_OUTPUT_FIELDS);
+                $loopResultRow->set('IS_PROMO', 0);
             }
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
@@ -776,6 +778,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $this->keepProductsWithAShownPrice($search);
         }
 
+        // Nor is its promotion: "in promotion" holds only the products whose price this visitor
+        // is shown, and "not in promotion" every other one, as the front API answers.
+        $shownPriceClause = null !== $promo ? $this->shownPriceClause() : null;
+
         if ($complex) {
             if (true === $new) {
                 $isPSELeftJoinList[] = 'is_new';
@@ -794,10 +800,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
                     ->where('`is_promo`.PROMO'.Criteria::EQUAL.'1')
                     ->where('NOT ISNULL(`is_promo`.ID)');
+                $this->keepProductsWithAShownPrice($search);
             } elseif (false === $promo) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO'.Criteria::EQUAL.'0')
+                    ->where($this->notInPromotionClause('`is_promo`.PROMO', $shownPriceClause))
                     ->where('NOT ISNULL(`is_promo`.ID)');
             }
 
@@ -996,8 +1003,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if (true === $promo) {
                 $search->where('`pse`.PROMO'.Criteria::EQUAL.'1');
+                $this->keepProductsWithAShownPrice($search);
             } elseif (false === $promo) {
-                $search->where('`pse`.PROMO'.Criteria::EQUAL.'0');
+                $search->where($this->notInPromotionClause('`pse`.PROMO', $shownPriceClause));
             }
 
             if (null !== $min_stock) {
@@ -1169,6 +1177,19 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null !== $shownPriceClause) {
             $search->where($shownPriceClause);
         }
+    }
+
+    /**
+     * "Not in promotion" on a promotion flag: a product whose price the visitor is not shown is
+     * never in promotion for them.
+     */
+    private function notInPromotionClause(string $promoColumn, ?string $shownPriceClause): string
+    {
+        if (null === $shownPriceClause) {
+            return $promoColumn.Criteria::EQUAL.'0';
+        }
+
+        return '('.$promoColumn.Criteria::EQUAL.'0 OR NOT ('.$shownPriceClause.'))';
     }
 
     /**

@@ -159,6 +159,32 @@ final class ProductLoopPriceDisplayTest extends IntegrationTestCase
         self::assertEqualsCanonicalizing([$first->getId(), $second->getId()], $this->ids(['id' => $both, 'min_price' => 10]));
     }
 
+    public function testAPromotionOfAPriceTheVisitorIsNotShownIsToldByNoLoop(): void
+    {
+        $hidden = $this->promotedProduct(40.0);
+        $shown = $this->promotedProduct(25.0);
+        $this->productShows($hidden, PriceDisplayMode::OnRequest);
+        $both = $hidden->getId().','.$shown->getId();
+        $hiddenSaleElement = $hidden->getDefaultSaleElements()->getId();
+        $saleElements = $hiddenSaleElement.','.$shown->getDefaultSaleElements()->getId();
+
+        self::assertSame(0, $this->row('product', ['id' => $hidden->getId()])['IS_PROMO']);
+        self::assertSame(0, $this->row('product', ['id' => $hidden->getId(), 'complex' => 1])['IS_PROMO']);
+        self::assertSame(0, $this->row('product_sale_elements', ['id' => $hiddenSaleElement])['IS_PROMO']);
+        self::assertSame(1, (int) $this->row('product', ['id' => $shown->getId()])['IS_PROMO']);
+
+        foreach ([[], ['complex' => 1]] as $form) {
+            self::assertSame([$shown->getId()], $this->ids(['id' => $both, 'promo' => 1] + $form), 'in promotion: '.json_encode($form));
+            self::assertSame([$hidden->getId()], $this->ids(['id' => $both, 'promo' => 0] + $form), 'not in promotion: '.json_encode($form));
+        }
+
+        $saleElementIds = static fn (array $rows): array => array_map(static fn (array $row): int => (int) $row['ID'], $rows);
+        self::assertSame([$shown->getDefaultSaleElements()->getId()], $saleElementIds($this->rows('product_sale_elements', ['id' => $saleElements, 'promo' => 1])));
+        self::assertSame([$hiddenSaleElement], $saleElementIds($this->rows('product_sale_elements', ['id' => $saleElements, 'promo' => 0])));
+
+        self::assertEqualsCanonicalizing([$hidden->getId(), $shown->getId()], $this->ids(['id' => $both, 'promo' => 1, 'backend_context' => 1]), 'the back office filters on the catalog');
+    }
+
     public function testTheBackOfficeReadsTheCatalogWhateverTheMode(): void
     {
         $this->shopShows(PriceDisplayMode::OnRequest);
@@ -239,6 +265,14 @@ final class ProductLoopPriceDisplayTest extends IntegrationTestCase
             Currency::getDefaultCurrency(),
             ['basePrice' => $price, 'baseQuantity' => 100, 'title' => 'Price display product'],
         );
+    }
+
+    private function promotedProduct(float $price): Product
+    {
+        $product = $this->product($price);
+        $product->getDefaultSaleElements()->setPromo(1)->save($this->getPropelConnection());
+
+        return $product;
     }
 
     private function customer(): Customer
