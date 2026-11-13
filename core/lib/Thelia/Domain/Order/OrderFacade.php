@@ -1011,17 +1011,24 @@ readonly class OrderFacade
         }
 
         $preorders = [];
+        // What the lines before took of a sale element: the payment takes them one after the other
+        // (Action\Order::updateQuantity()), ascending sale element id, lines in order within one.
+        $taken = [];
+
+        usort($stockTakes, static fn (array $first, array $second): int => (int) $first[1]->getId() <=> (int) $second[1]->getId());
 
         foreach ($stockTakes as [, $productSaleElements, $quantity, $virtualContext, $lineKey]) {
             if (!$virtualContext->useStock) {
                 continue;
             }
 
-            $physical = $this->saleUnitStockResolver->availableQuantity($saleUnitId, (int) $productSaleElements->getId(), (float) $productSaleElements->getQuantity());
+            $id = (int) $productSaleElements->getId();
+            $physical = $this->saleUnitStockResolver->availableQuantity($saleUnitId, $id, (float) $productSaleElements->getQuantity()) - ($taken[$id] ?? 0.0);
+            $taken[$id] = ($taken[$id] ?? 0.0) + $quantity;
             $policy = OutOfStockPolicy::fromStored($productSaleElements->getOutOfStockPolicy());
 
-            if (PreorderRule::isPreorder($quantity, $physical, $reservedByOtherCarts[(int) $productSaleElements->getId()] ?? 0.0, $policy)) {
-                $preorders[$lineKey] = new StockMovement((int) $productSaleElements->getId(), null, $physical, $physical, true, $productSaleElements->getRestockDate('Y-m-d'));
+            if (PreorderRule::isPreorder($quantity, $physical, $reservedByOtherCarts[$id] ?? 0.0, $policy)) {
+                $preorders[$lineKey] = new StockMovement($id, null, $physical, $physical - $quantity, true, $productSaleElements->getRestockDate('Y-m-d'));
             }
         }
 
