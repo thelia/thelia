@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Catalog\Quantity;
 use Thelia\Domain\Catalog\Quantity\Twig\QuantityExtension;
 use Thelia\Test\IntegrationTestCase;
 use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 /**
  * The e-mail and PDF templates depend on the core only: the core declares `format_quantity` itself,
@@ -24,17 +25,14 @@ use Twig\Environment;
  */
 final class QuantityExtensionTest extends IntegrationTestCase
 {
-    public function testTheCoreDeclaresTheFilter(): void
+    public function testTheCoreRegistersTheExtension(): void
     {
-        $callable = $this->twig()->getFilter('format_quantity')?->getCallable();
-
-        self::assertIsArray($callable);
-        self::assertInstanceOf(QuantityExtension::class, $callable[0]);
+        self::assertInstanceOf(QuantityExtension::class, $this->coreExtension());
     }
 
     public function testAMeasureIsWrittenWithItsUnitInTheLanguageGiven(): void
     {
-        self::assertSame("4,25\u{a0}kg", $this->render("{{ 4.25|format_quantity(2, 'kg', 'fr_FR') }}"));
+        self::assertSame('4,25 kg', $this->render("{{ 4.25|format_quantity(2, 'kg', 'fr_FR') }}"));
         self::assertSame('4.25 kg', $this->render("{{ 4.25|format_quantity(2, 'kg', 'en_US') }}"));
     }
 
@@ -46,11 +44,18 @@ final class QuantityExtensionTest extends IntegrationTestCase
 
     private function render(string $template): string
     {
-        return $this->twig()->createTemplate($template)->render();
+        // A theme may declare the same filter, and Twig keeps the last one: render with the core's alone.
+        $twig = new Environment(new ArrayLoader());
+        $twig->addExtension($this->coreExtension());
+
+        return $twig->createTemplate($template)->render();
     }
 
-    private function twig(): Environment
+    private function coreExtension(): QuantityExtension
     {
-        return static::getContainer()->get('twig');
+        /** @var Environment $twig */
+        $twig = static::getContainer()->get('twig');
+
+        return $twig->getExtension(QuantityExtension::class);
     }
 }
