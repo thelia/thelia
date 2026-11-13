@@ -16,17 +16,15 @@ namespace Thelia\Domain\Subscription\EventListener;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\Event\Subscription\SubscriptionInstallmentEvent;
 use Thelia\Core\Event\Subscription\SubscriptionStatusChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\RecurringChargeOutcome;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Messenger\ShopRequestFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\LangQuery;
@@ -77,6 +75,7 @@ final readonly class SubscriptionNotificationListener
     public function __construct(
         private MailerFactory $mailer,
         private RequestStack $requestStack,
+        private ShopRequestFactory $shopRequestFactory,
     ) {
     }
 
@@ -180,8 +179,9 @@ final readonly class SubscriptionNotificationListener
     }
 
     /**
-     * A command or a job has no request, and the layout of a mail reads one: a request on the
-     * address of the shop, with an empty session, lives for the time of the send.
+     * A command or a job has no request, and the layout of a mail and its links read one: the
+     * request of the shop (its address and its folder, an empty session) lives for the time
+     * of the send. Within a worker, WorkerRequestListener has given one already.
      */
     private function giveTheJobARequest(): bool
     {
@@ -189,10 +189,7 @@ final readonly class SubscriptionNotificationListener
             return false;
         }
 
-        $address = rtrim((string) (ConfigQuery::read('url_site') ?: 'http://localhost'), '/').'/';
-        $request = Request::create($address);
-        $request->setSession(new Session(new MockArraySessionStorage()));
-        $this->requestStack->push($request);
+        $this->requestStack->push($this->shopRequestFactory->create());
 
         return true;
     }
