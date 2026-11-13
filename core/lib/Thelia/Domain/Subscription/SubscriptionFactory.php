@@ -68,16 +68,8 @@ final readonly class SubscriptionFactory
         $now = PublicationMoment::atTheSecond($this->clock->now());
         $unit = PeriodUnit::from((string) $plan->getPeriodUnit());
         $periodCount = max(1, (int) $plan->getPeriodCount());
-        $trialDays = max(0, (int) $plan->getTrialDays());
-        $hasTrial = $trialDays > 0;
-
-        if ($hasTrial) {
-            $periodEnd = $this->calendar->trialEnd($now, $trialDays);
-            $anchorDay = $this->calendar->anchorDayOf($periodEnd);
-        } else {
-            $anchorDay = $this->calendar->anchorDayOf($now);
-            $periodEnd = $this->calendar->periodEnd($now, $unit, $periodCount, $anchorDay);
-        }
+        $hasTrial = (int) $plan->getTrialDays() > 0;
+        [$anchorDay, $periodEnd] = $this->firstPeriodOf($plan, $now);
 
         $subscription = (new Subscription())
             ->setRef(self::newRef())
@@ -133,6 +125,35 @@ final readonly class SubscriptionFactory
         $this->dispatcher->dispatch(new SubscriptionEvent($subscription), TheliaEvents::SUBSCRIPTION_CREATE);
 
         return $subscription;
+    }
+
+    /**
+     * The date the first installment the shop charges is due, for the plan taken at the given
+     * moment (now by default): the end of the trial, or the end of the first period when the
+     * order pays the first installment. The date fromInitialOrder() writes, for a theme to tell
+     * the buyer before they pay.
+     */
+    public function firstBillingDateOf(SubscriptionPlan $plan, ?\DateTimeInterface $takenAt = null): \DateTimeImmutable
+    {
+        return $this->firstPeriodOf($plan, PublicationMoment::atTheSecond($takenAt ?? $this->clock->now()))[1];
+    }
+
+    /**
+     * @return array{int, \DateTimeImmutable} the anchor day of the periods, and the end of the first one
+     */
+    private function firstPeriodOf(SubscriptionPlan $plan, \DateTimeImmutable $takenAt): array
+    {
+        $trialDays = max(0, (int) $plan->getTrialDays());
+
+        if ($trialDays > 0) {
+            $trialEnd = $this->calendar->trialEnd($takenAt, $trialDays);
+
+            return [$this->calendar->anchorDayOf($trialEnd), $trialEnd];
+        }
+
+        $anchorDay = $this->calendar->anchorDayOf($takenAt);
+
+        return [$anchorDay, $this->calendar->periodEnd($takenAt, PeriodUnit::from((string) $plan->getPeriodUnit()), max(1, (int) $plan->getPeriodCount()), $anchorDay)];
     }
 
     private static function newRef(): string
