@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\OrderReturn\Service;
 
 use Thelia\Domain\Pricing\MoneyRounding;
-use Thelia\Model\ConfigQuery;
+use Thelia\Domain\Pricing\OrderLineRounding;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderReturn;
@@ -25,10 +25,10 @@ use Thelia\Model\OrderReturnLine;
  * Computes the refundable amount of a return from the prices actually paid on
  * the returned lines, discounts and taxes included.
  *
- * The per-unit taxed price is built the same way Order::getTotalAmount() builds
- * the order total (Order::buildTotalAmountQuery): the promo price and promo tax
- * are used when the line was bought in promo, and the rounding follows the
- * order rounding mode, so a refund never drifts from what the customer paid.
+ * A line is totalled by the rounding rule of its order (OrderLineRounding), the
+ * one Order::getTotalAmount() totals the order with: the promo price and promo
+ * tax are used when the line was bought in promo, so a refund never drifts from
+ * what the customer paid.
  *
  * The discount carried by the order is shared over the lines in proportion to
  * what each one weighs, so that returning a whole order refunds what was
@@ -37,26 +37,13 @@ use Thelia\Model\OrderReturnLine;
 final readonly class RefundAmountCalculator
 {
     /**
-     * The taxed unit price paid for an order product line.
+     * The taxed unit price paid for an order product line, rounded as its order rounds a unit.
      */
     public function unitTaxedPrice(OrderProduct $orderProduct): float
     {
-        $wasInPromo = (bool) $orderProduct->getWasInPromo();
+        [$unitPrice, $unitTaxes] = $this->unitAmountsOf($orderProduct);
 
-        $unitPrice = (float) ($wasInPromo ? $orderProduct->getPromoPrice() : $orderProduct->getPrice());
-
-        $unitTax = 0.0;
-        foreach ($orderProduct->getOrderProductTaxes() as $tax) {
-            $unitTax += (float) ($wasInPromo ? $tax->getPromoAmount() : $tax->getAmount());
-        }
-
-        if (!$this->isRoundingOfSums($orderProduct)) {
-            // Sum of roundings: each unit amount is charged rounded to the cent.
-            $unitPrice = MoneyRounding::toTheCent($unitPrice);
-            $unitTax = MoneyRounding::toTheCent($unitTax);
-        }
-
-        return $unitPrice + $unitTax;
+        return $this->roundingOf($orderProduct)->unitAmount($unitPrice, $unitTaxes);
     }
 
     /**
@@ -139,32 +126,27 @@ final readonly class RefundAmountCalculator
 
     /**
      * The taxed total of the given quantity of a line, before the discount, in
-     * the rounding mode of its order.
+     * the rounding rule of its order.
      */
     private function lineTotal(OrderProduct $orderProduct, float $quantity): float
     {
-        $lineTotal = $this->unitTaxedPrice($orderProduct) * $quantity;
+        [$unitPrice, $unitTaxes] = $this->unitAmountsOf($orderProduct);
 
-        if ($this->isRoundingOfSums($orderProduct)) {
-            // Rounding of sums: only the line total is rounded.
-            $lineTotal = MoneyRounding::toTheCent($lineTotal);
-        }
-
-        return $lineTotal;
+        return $this->roundingOf($orderProduct)->lineTotal($quantity, $unitPrice, $unitTaxes);
     }
 
     /**
-     * Rounds an amount to the cent, as Order::getTotalAmount() rounds the lines
-     * it charges. An order frozen by the 2.4 upgrade was totalled without any
-     * rounding (Order::getTotalAmountLegacy()), and keeps its amounts as they are.
+     * Rounds an amount as Order::getTotalAmount() rounds the lines it charges: to
+     * the cent, except for an order frozen by the 2.4 upgrade, totalled without any
+     * rounding (Order::getTotalAmountLegacy()).
      */
     private function roundedLikeTheOrder(?Order $order, float $amount): float
     {
-        if (null !== $order && ConfigQuery::isOrderWithLegacyRounding((int) $order->getId())) {
-            return $amount;
+        if (null === $order) {
+            return MoneyRounding::toTheCent($amount);
         }
 
-        return MoneyRounding::toTheCent($amount);
+        return OrderLineRounding::ofOrder((int) $order->getId())->orderTotal($amount);
     }
 
     /**
@@ -222,8 +204,25 @@ final readonly class RefundAmountCalculator
         return (float) $order->getTotalAmount($tax, includePostage: false, includeDiscount: false);
     }
 
-    private function isRoundingOfSums(OrderProduct $orderProduct): bool
+    /**
+     * The unit price and the unit taxes paid: the promotional ones when the line was bought in promo.
+     *
+     * @return array{float, list<float>}
+     */
+    private function unitAmountsOf(OrderProduct $orderProduct): array
     {
-        return ConfigQuery::isRoundingModeRoundingOfSums((int) $orderProduct->getOrderId());
+        $wasInPromo = (bool) $orderProduct->getWasInPromo();
+        $unitTaxes = [];
+
+        foreach ($orderProduct->getOrderProductTaxes() as $tax) {
+            $unitTaxes[] = (float) ($wasInPromo ? $tax->getPromoAmount() : $tax->getAmount());
+        }
+
+        return [(float) ($wasInPromo ? $orderProduct->getPromoPrice() : $orderProduct->getPrice()), $unitTaxes];
+    }
+
+    private function roundingOf(OrderProduct $orderProduct): OrderLineRounding
+    {
+        return OrderLineRounding::ofOrder((int) $orderProduct->getOrderId());
     }
 }

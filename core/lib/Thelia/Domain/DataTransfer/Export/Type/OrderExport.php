@@ -18,10 +18,10 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
 use Thelia\Core\Translation\Translator;
-use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\DataTransfer\Export\JsonFileAbstractExport;
 use Thelia\Domain\DataTransfer\Export\MailableReportInterface;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
+use Thelia\Domain\Pricing\OrderLineRounding;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\OrderStatusQuery;
 
@@ -35,24 +35,6 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
 {
     public const FILE_NAME = 'order';
     public const USE_RANGE_DATE = true;
-
-    /**
-     * Orders placed before Thelia 2.4 were totalled without any rounding at all.
-     * ConfigQuery has no constant for it: it is not a mode a shop can be set to,
-     * only a state some rows are frozen in.
-     */
-    private const ROUNDING_MODE_LEGACY = 0;
-
-    private const UNIT_PRICE = 'IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)';
-
-    /**
-     * The same unit price with the promotional price read as a text, the way it was read
-     * while order_product.promo_price was a VARCHAR: the type of IF() is the one of its
-     * operands, so the price of a line that is not on promotion is read as text too.
-     */
-    private const UNIT_PRICE_AS_TEXT = 'IF(order_product.was_in_promo = 1, COALESCE(CAST(order_product.promo_price AS CHAR), \'\'), order_product.price)';
-
-    private const UNIT_TAX = 'IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)';
 
     protected array $orderAndAliases = [
         'order_ref' => 'ref',
@@ -287,7 +269,7 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
     {
         return '
                     CAST(CASE
-                        WHEN `order`.id <= :legacy_rounding_pivot THEN SUM('.$this->lineTotalOfOrder(self::ROUNDING_MODE_LEGACY, $taxed).')
+                        WHEN `order`.id <= :legacy_rounding_pivot THEN SUM('.$this->lineTotalOfOrder(null, $taxed).')
                         ELSE ROUND(CAST(SUM(
                             CASE
                                 WHEN `order`.id <= :sum_of_roundings_pivot THEN '.$this->lineTotalOfOrder(ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS, $taxed).'
@@ -298,59 +280,23 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
     }
 
     /**
-     * Chooses, line by line, how the promotional price is read. The choice is made on the line and not on the
-     * price operand: an IF takes the type of its operands, so a text read for the frozen orders would make the
-     * unit price of every order a text. The frozen line is a floating point number once rounded, and so is the
-     * quantity (a DOUBLE) times a decimal: the cast to a DECIMAL is made on the SUM of the order, not on the line,
-     * because a CASE takes the type of its widest branch and would turn the cast line back into a DOUBLE.
+     * Chooses, line by line, the rounding rule of the order (OrderLineRounding) from the pivots
+     * it was placed before; a null mode is an order frozen by the 2.4 upgrade. The choice is
+     * made on the line and not on the price operand: an IF takes the type of its operands, so a
+     * text read for the frozen orders would make the unit price of every order a text. The cast
+     * to a DECIMAL is made on the SUM of the order, not on the line, because a CASE takes the
+     * type of its widest branch and would turn a cast line back into a DOUBLE.
      */
-    private function lineTotalOfOrder(int $roundingMode, bool $taxed): string
+    private function lineTotalOfOrder(?int $roundingMode, bool $taxed): string
     {
-        return 'CASE
-                                WHEN `order`.id <= :text_promo_price_pivot THEN '.$this->lineTotal($roundingMode, $taxed, self::UNIT_PRICE_AS_TEXT).'
-                                ELSE '.$this->lineTotal($roundingMode, $taxed, self::UNIT_PRICE).'
-                            END';
-    }
-
-    /**
-     * One line total, rounded where the given mode says to round: on the unit
-     * amounts under sum of roundings, on the line total under rounding of sums,
-     * nowhere at all for an order frozen by the 2.4 upgrade.
-     */
-    private function lineTotal(int $roundingMode, bool $taxed, string $unitPrice): string
-    {
-        $roundUnitAmounts = ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS === $roundingMode;
-
-        $unitAmount = $roundUnitAmounts ? 'ROUND('.$unitPrice.', 2)' : $unitPrice;
-
-        if ($taxed) {
-            $unitTax = $roundUnitAmounts ? 'ROUND('.self::UNIT_TAX.', 2)' : self::UNIT_TAX;
-
-            $unitAmount = '('.$unitAmount.' + (
-                                SELECT COALESCE(SUM('.$unitTax.'), 0)
-                                FROM order_product_tax
-                                WHERE order_product_tax.order_product_id = order_product.id
-                            ))';
-        }
-
-        // The quantity read back as sold: see Order::storedQuantity().
-        $lineTotal = 'ROUND(order_product.quantity, '.QuantityScale::MAXIMUM_DECIMALS.') * '.$unitAmount;
-
-        if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS !== $roundingMode) {
-            return $lineTotal;
-        }
-
-        // A DOUBLE line total is rounded as a decimal (18.524999… is 18.53), as
-        // Order::getTotalAmount() rounds it, except on a frozen line or on an order placed
-        // before the line totals were rounded so: their order was invoiced on the floating
-        // point figure.
-        if (self::UNIT_PRICE_AS_TEXT === $unitPrice) {
-            return 'ROUND('.$lineTotal.', 2)';
-        }
+        $rounding = static fn (bool $textPromoPrice, bool $floatLineRounding): OrderLineRounding => null === $roundingMode
+            ? OrderLineRounding::legacy($textPromoPrice)
+            : OrderLineRounding::inMode($roundingMode, $textPromoPrice, $floatLineRounding);
 
         return 'CASE
-                                WHEN `order`.id <= :float_line_rounding_pivot THEN ROUND('.$lineTotal.', 2)
-                                ELSE ROUND(CAST('.$lineTotal.' AS DECIMAL(20,6)), 2)
+                                WHEN `order`.id <= :text_promo_price_pivot THEN '.$rounding(true, true)->lineTotalSql($taxed).'
+                                WHEN `order`.id <= :float_line_rounding_pivot THEN '.$rounding(false, true)->lineTotalSql($taxed).'
+                                ELSE '.$rounding(false, false)->lineTotalSql($taxed).'
                             END';
     }
 
