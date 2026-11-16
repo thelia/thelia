@@ -46,7 +46,10 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
-          ini-values: post_max_size=20M
+          # The built-in server runs every request in one process: with the default opcache sizes (128M,
+          # 8M of interned strings, 10000 files) the shop's code fills it, and the restart that follows crashes
+          # php -S in opcache.so (general protection fault) with no line in its log.
+          ini-values: post_max_size=20M, opcache.memory_consumption=256, opcache.interned_strings_buffer=32, opcache.max_accelerated_files=50000
           coverage: none
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
@@ -112,6 +115,10 @@ jobs:
       - name: Run the accessibility suite
         working-directory: tests/Playwright
         run: npx playwright test specs/accessibility.spec.ts
+
+      - name: Show the server log
+        if: failure()
+        run: tail -n 50 "$RUNNER_TEMP/server.log"; sudo dmesg | grep -iE 'php|segfault|protection fault|oom' | tail -n 10 || true
 
       - name: Keep the report
         if: failure()
