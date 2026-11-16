@@ -671,9 +671,7 @@ final readonly class SalesReportCalculator
         $statement->bindValue('from', $criteria->from->format(self::SQL_DATE_FORMAT));
         $statement->bindValue('to', $criteria->to->format(self::SQL_DATE_FORMAT));
 
-        if (str_contains($sql, ':'.OrderAmountSql::LEGACY_ROUNDING_PIVOT)) {
-            OrderAmountSql::bindRoundingPivots($statement);
-        }
+        OrderAmountSql::bindRoundingPivots($statement, $sql);
     }
 
     /**

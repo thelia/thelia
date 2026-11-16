@@ -131,12 +131,38 @@ final class OrderAmountSql
         return '('.$itemsTaxedTotal.' - '.self::appliedDiscount($orderAlias, $itemsTaxedTotal).' + '.$orderAlias.'.postage)';
     }
 
-    public static function bindRoundingPivots(StatementInterface $statement): void
+    /**
+     * The unit price of a line excluding taxes, to the cent, as it was invoiced: the
+     * promotional price when the line was on promotion, read as a text for an order placed
+     * while the column was one.
+     */
+    public static function unitPriceExcludingTaxes(string $orderProductAlias, string $orderIdColumn): string
     {
-        $statement->bindValue(self::LEGACY_ROUNDING_PIVOT, (int) ConfigQuery::read('last_legacy_rounding_order_id', 0), \PDO::PARAM_INT);
-        $statement->bindValue(self::SUM_OF_ROUNDINGS_PIVOT, (int) ConfigQuery::read('last_sum_of_roundings_order_id', 0), \PDO::PARAM_INT);
-        $statement->bindValue(self::TEXT_PROMO_PRICE_PIVOT, (int) ConfigQuery::read('last_text_promo_price_order_id', 0), \PDO::PARAM_INT);
-        $statement->bindValue(self::FLOAT_LINE_ROUNDING_PIVOT, (int) ConfigQuery::read('last_float_line_rounding_order_id', 0), \PDO::PARAM_INT);
+        return 'CASE
+                    WHEN '.$orderIdColumn.' <= :'.self::TEXT_PROMO_PRICE_PIVOT.' THEN CAST(ROUND('.self::unitPriceAsText($orderProductAlias).', 2) AS DECIMAL(16,2))
+                    ELSE ROUND('.self::unitPrice($orderProductAlias).', 2)
+                END';
+    }
+
+    /**
+     * Binds the order ids the rules turn on, the ones the statement names: which of them an
+     * expression holds depends on the rounding mode of the shop, and a statement given a
+     * parameter it does not name fails.
+     */
+    public static function bindRoundingPivots(StatementInterface $statement, string $sql): void
+    {
+        $pivots = [
+            self::LEGACY_ROUNDING_PIVOT => 'last_legacy_rounding_order_id',
+            self::SUM_OF_ROUNDINGS_PIVOT => 'last_sum_of_roundings_order_id',
+            self::TEXT_PROMO_PRICE_PIVOT => 'last_text_promo_price_order_id',
+            self::FLOAT_LINE_ROUNDING_PIVOT => 'last_float_line_rounding_order_id',
+        ];
+
+        foreach ($pivots as $parameter => $configName) {
+            if (1 === preg_match('/:'.$parameter.'\b/', $sql)) {
+                $statement->bindValue($parameter, (int) ConfigQuery::read($configName, 0), \PDO::PARAM_INT);
+            }
+        }
     }
 
     /**
