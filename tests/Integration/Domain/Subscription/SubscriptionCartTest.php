@@ -16,8 +16,11 @@ namespace Thelia\Tests\Integration\Domain\Subscription;
 
 use FreeOrder\FreeOrder;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
@@ -29,10 +32,13 @@ use Thelia\Model\Cart;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
+use Thelia\Model\Currency;
 use Thelia\Model\Map\CartTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Product;
 use Thelia\Model\SubscriptionPlan;
+use Thelia\Model\SubscriptionPlanPrice;
+use Thelia\Model\SubscriptionPlanPriceQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
 use Thelia\Test\ActionIntegrationTestCase;
@@ -71,6 +77,58 @@ final class SubscriptionCartTest extends ActionIntegrationTestCase
         self::assertSame((int) $plan->getId(), (int) $line->getSubscriptionPlanId());
         self::assertSame('9.900000', (string) $line->getPrice(), 'Not the 10.0 of the catalog.');
         self::assertSame(2.0, (float) $line->getQuantity());
+    }
+
+    public function testChangingTheCurrencyOfTheCartPricesAPlanLineAtThePriceOfThePlanInThatCurrency(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product, [], '9.900000');
+        $other = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0 * (float) Currency::getDefaultCurrency()->getRate()]);
+        (new SubscriptionPlanPrice())
+            ->setSubscriptionPlanId($plan->getId())
+            ->setCurrencyId($other->getId())
+            ->setPrice('21.500000')
+            ->setFromDefaultCurrency(0)
+            ->save($this->getPropelConnection());
+        $cart = $this->factory->cart($this->aCustomer());
+        $line = $this->addPlanLine($cart, $product, $plan);
+        self::assertSame('9.900000', (string) $line->getPrice());
+
+        $this->changeTheCurrencyOfTheVisitor($cart, $other);
+
+        $line->reload();
+        self::assertSame('21.500000', (string) $line->getPrice(), 'The price typed for the plan in that currency, not the 10.0 of the catalog nor the conversion.');
+        $cart->reload();
+        self::assertSame((int) $other->getId(), (int) $cart->getCurrencyId());
+    }
+
+    public function testAPlanWithNoPriceInTheNewCurrencyIsConvertedFromItsPriceInTheDefaultCurrency(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product, [], '9.900000');
+        $other = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0 * (float) Currency::getDefaultCurrency()->getRate()]);
+        $cart = $this->factory->cart($this->aCustomer());
+        $line = $this->addPlanLine($cart, $product, $plan);
+
+        $this->changeTheCurrencyOfTheVisitor($cart, $other);
+
+        $line->reload();
+        self::assertSame('19.800000', (string) $line->getPrice(), 'The rule of the plan: 9.9 in the default currency, at the rate of the currency.');
+    }
+
+    public function testAPlanNothingPricesInTheNewCurrencyKeepsThePriceOfItsLine(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product, [], '9.900000');
+        $other = $this->factory->currency(['code' => 'XTS', 'rate' => 2.0 * (float) Currency::getDefaultCurrency()->getRate()]);
+        $cart = $this->factory->cart($this->aCustomer());
+        $line = $this->addPlanLine($cart, $product, $plan);
+        SubscriptionPlanPriceQuery::create()->filterBySubscriptionPlanId($plan->getId())->delete($this->getPropelConnection());
+
+        $this->changeTheCurrencyOfTheVisitor($cart, $other);
+
+        $line->reload();
+        self::assertSame('9.900000', (string) $line->getPrice(), 'As a sale element nothing prices: the line keeps the price it holds, and nothing is raised.');
     }
 
     public function testAPlanWithATrialIsPricedAtNothing(): void
@@ -216,6 +274,26 @@ final class SubscriptionCartTest extends ActionIntegrationTestCase
             $quantity,
             subscriptionPlanId: (int) $plan->getId(),
         ));
+    }
+
+    /**
+     * The visitor picks another currency: what the request listener dispatches, on the cart of the session.
+     */
+    private function changeTheCurrencyOfTheVisitor(Cart $cart, Currency $currency): void
+    {
+        $request = $this->getService(RequestStack::class)->getCurrentRequest();
+        self::assertNotNull($request);
+        $session = $request->getSession();
+        self::assertInstanceOf(Session::class, $session);
+        $session->setCustomerUser($cart->getCustomer());
+        $session->setSessionCart($cart);
+
+        try {
+            $this->getService('event_dispatcher')->dispatch(new CurrencyChangeEvent($currency, $request), TheliaEvents::CHANGE_DEFAULT_CURRENCY);
+        } finally {
+            $session->setSessionCart(null);
+            $session->setCustomerUser(null);
+        }
     }
 
     private function isValid(PaymentModuleInterface $module, Cart $cart): bool
