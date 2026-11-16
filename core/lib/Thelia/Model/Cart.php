@@ -161,6 +161,8 @@ class Cart extends BaseCart
                 $item->setProductSaleElements($productSaleElements);
                 // The composition the customer chose is part of the line.
                 $item->setBundleComposition($cartItem->getBundleComposition());
+                // So is the plan it is bought on: without it the copy sells the product once, at its catalog price.
+                $item->setSubscriptionPlanId($cartItem->getSubscriptionPlanId());
 
                 // Priced below, in one resolution: until then the line keeps the price it copies.
                 $item
@@ -210,6 +212,11 @@ class Cart extends BaseCart
         $discount = null !== $customer && $customer->getDiscount() > 0 ? (float) $customer->getDiscount() : 0.0;
 
         foreach ($copies as [$item]) {
+            if (null !== $item->getSubscriptionPlanId()) {
+                // A plan line is priced by its plan, never by the catalog: it keeps the price it copies.
+                continue;
+            }
+
             $productSaleElements = $item->getProductSaleElements();
             $prices = $productSaleElements->getPricesByCurrency($currency, $discount);
 
