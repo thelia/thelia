@@ -350,6 +350,38 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
         self::assertEqualsWithDelta($charged, $this->productRow($this->calculator->byProduct($this->june(), 'en_US')->rows, 'LEEKS')->revenue, 0.000001);
     }
 
+    /**
+     * An order of 1.25 kg of leeks at 14.82 and of a loaf at 2.00 is charged 20.53: the loaf was charged 2.00, the
+     * half cent the rounding of the order adds belongs to the leeks, whatever the order of the lines.
+     */
+    public function testTheRoundingOfAnOrderStaysOnItsWeighedLine(): void
+    {
+        $vegetables = $this->category('Vegetables');
+        $bakery = $this->category('Bakery');
+        $this->product($vegetables, 'LEEKS');
+        $this->product($bakery, 'LOAF');
+
+        foreach ([1, 2] as $ignored) {
+            $order = $this->paidOrder();
+            $this->line($order, 'LEEKS', '14.820000', 1.25);
+            $this->line($order, 'LOAF', '2.000000', 1);
+        }
+
+        $categories = [];
+
+        foreach ($this->calculator->byCategory($this->june(), 'en_US') as $row) {
+            $categories[$row->categoryId] = $row->revenue;
+        }
+
+        $products = $this->calculator->byProduct($this->june(), 'en_US')->rows;
+
+        self::assertEqualsWithDelta(41.06, $this->calculator->reconciliation($this->june())->linesTotal, 0.000001);
+        self::assertEqualsWithDelta(4.00, $this->productRow($products, 'LOAF')->revenue, 0.000001, 'Two loaves at 2.00 show a revenue they were never charged.');
+        self::assertEqualsWithDelta(4.00, $categories[$bakery->getId()] ?? null, 0.000001, 'The bakery shows a revenue its loaves were never charged.');
+        self::assertEqualsWithDelta(37.06, $this->productRow($products, 'LEEKS')->revenue, 0.000001);
+        self::assertEqualsWithDelta(37.06, $categories[$vegetables->getId()] ?? null, 0.000001);
+    }
+
     public function testADiscountLargerThanTheGoodsLeavesThePostage(): void
     {
         $this->product($this->category('Cheap'), 'CHEAP');
