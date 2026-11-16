@@ -418,12 +418,38 @@ final readonly class SalesReportCalculator
                     CASE WHEN op.line_type = '.$service.' THEN \''.CategoryRowKind::Services->value.'\' ELSE \''.CategoryRowKind::Uncategorized->value.'\' END AS kind,
                     CASE WHEN op.line_type = '.$component.' THEN 0 ELSE '.OrderAmountSql::soldQuantity('op').' END AS counted_quantity,
                     CASE WHEN op.line_type = '.$component.' THEN NULL ELSE op.order_id END AS counted_order_id,
-                    '.OrderAmountSql::lineTaxedTotal('op', 'op.order_id').' AS line_total
+                    '.self::lineTotalSql().' AS line_total
                 FROM order_product AS op
                 INNER JOIN `order` AS o ON o.id = op.order_id
                 LEFT JOIN product ON product.ref = op.product_ref
                 WHERE '.$this->orderCondition($criteria).$extraCondition.'
             )';
+    }
+
+    /**
+     * The taxed total of the line `op`, such that the lines of an order add up to its goods. An
+     * order is charged the sum of its lines rounded to the cent, and a line sold by weight is not
+     * rounded on its own: two orders of 1.25 kg at 14.82 are charged 18.53 each, their lines are
+     * 18.525 each. What the rounding of its sum adds to an order goes to its last priced line,
+     * so that the categories and the products add up to what the orders were charged. The lines
+     * of the order are read again whatever the statement keeps of them.
+     */
+    private static function lineTotalSql(): string
+    {
+        $component = "'".OrderProduct::LINE_TYPE_BUNDLE_COMPONENT."'";
+
+        return '('.OrderAmountSql::lineTaxedTotal('op', 'op.order_id').' + CASE
+                        WHEN op.id = (
+                            SELECT MAX(last_line.id)
+                            FROM order_product AS last_line
+                            WHERE last_line.order_id = op.order_id AND last_line.line_type <> '.$component.'
+                        ) THEN (
+                            SELECT '.OrderAmountSql::orderLinesTotal('order_line', 'op.order_id', true).' - SUM('.OrderAmountSql::lineTaxedTotal('order_line', 'op.order_id').')
+                            FROM order_product AS order_line
+                            WHERE order_line.order_id = op.order_id
+                        )
+                        ELSE 0
+                    END)';
     }
 
     /**
