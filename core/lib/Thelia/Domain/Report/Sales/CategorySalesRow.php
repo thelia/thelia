@@ -29,7 +29,7 @@ final readonly class CategorySalesRow
         public int $depth,
         public float $revenue,
         public float $ownRevenue,
-        public int $quantity,
+        public float $quantity,
         public int $orderCount,
         public float $share,
         public float $previousRevenue,

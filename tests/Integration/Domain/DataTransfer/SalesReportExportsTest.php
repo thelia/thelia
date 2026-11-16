@@ -341,6 +341,15 @@ final class SalesReportExportsTest extends IntegrationTestCase
         self::assertCount(1, $this->csvRows(SalesByCustomerPaidExport::class, $this->june()));
     }
 
+    public function testAQuantitySoldByWeightIsWrittenWithItsDecimals(): void
+    {
+        $this->product($this->category('Vegetables'), 'CARROTS');
+        $this->line($this->paidOrder(), 'CARROTS', '20.000000', 0.4);
+
+        self::assertSame(['0.4'], array_column($this->csvRows(SalesByProductExport::class, $this->june()), 'Quantity'));
+        self::assertSame('0.4', $this->csvRows(SalesByCategoryExport::class, $this->june())[0]['Quantity']);
+    }
+
     public function testAPeriodWithoutSalesHasNoData(): void
     {
         $this->expectException(DataTransferNoDataFoundException::class);

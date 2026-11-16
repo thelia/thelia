@@ -24,7 +24,7 @@ final readonly class ProductSalesRow
         public ?int $productId,
         public string $ref,
         public string $title,
-        public int $quantity,
+        public float $quantity,
         public float $revenue,
         public float $share,
         public float $previousRevenue,
