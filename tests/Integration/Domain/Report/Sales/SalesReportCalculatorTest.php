@@ -328,6 +328,28 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
         self::assertEqualsWithDelta(7.22, $this->productRow($this->calculator->byProduct($this->june(), 'en_US')->rows, 'SIX')->revenue, 0.000001);
     }
 
+    /**
+     * 1.25 kg at 14.82 is 18.525, and an order holding it is charged 18.53: two of them make 37.06, in the
+     * categories and the products as in the lines total of the reconciliation.
+     */
+    public function testTheCategoriesAndProductsOfWeighedLinesAddUpToWhatTheOrdersWereCharged(): void
+    {
+        $this->product($this->category('Vegetables'), 'LEEKS');
+
+        $charged = 0.0;
+
+        foreach ([1, 2] as $ignored) {
+            $order = $this->paidOrder();
+            $this->line($order, 'LEEKS', '14.820000', 1.25);
+            $charged += $this->goodsOf($order);
+        }
+
+        self::assertEqualsWithDelta(37.06, $charged, 0.000001, 'The fixture is not the case it stands for.');
+        self::assertEqualsWithDelta($charged, $this->calculator->reconciliation($this->june())->linesTotal, 0.000001);
+        self::assertEqualsWithDelta($charged, $this->calculator->byCategory($this->june(), 'en_US')[0]->revenue, 0.000001);
+        self::assertEqualsWithDelta($charged, $this->productRow($this->calculator->byProduct($this->june(), 'en_US')->rows, 'LEEKS')->revenue, 0.000001);
+    }
+
     public function testADiscountLargerThanTheGoodsLeavesThePostage(): void
     {
         $this->product($this->category('Cheap'), 'CHEAP');
