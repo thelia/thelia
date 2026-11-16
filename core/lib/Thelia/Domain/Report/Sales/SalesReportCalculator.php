@@ -430,20 +430,27 @@ final readonly class SalesReportCalculator
      * The taxed total of the line `op`, such that the lines of an order add up to its goods. An
      * order is charged the sum of its lines rounded to the cent, and a line sold by weight is not
      * rounded on its own: two orders of 1.25 kg at 14.82 are charged 18.53 each, their lines are
-     * 18.525 each. What the rounding of its sum adds to an order goes to its last priced line,
-     * so that the categories and the products add up to what the orders were charged. The lines
-     * of the order are read again whatever the statement keeps of them.
+     * 18.525 each. What the rounding of its sum adds to an order goes to the line that was not a
+     * whole number of cents, its last one when there are several: a loaf at 2.00 bought with
+     * those leeks keeps its 2.00. The categories and the products then add up to what the orders
+     * were charged. The lines of the order are read again whatever the statement keeps of them.
      */
     private static function lineTotalSql(): string
     {
         $component = "'".OrderProduct::LINE_TYPE_BUNDLE_COMPONENT."'";
+        $splitLineTotal = OrderAmountSql::lineTaxedTotal('split_line', 'op.order_id');
 
         return '('.OrderAmountSql::lineTaxedTotal('op', 'op.order_id').' + CASE
-                        WHEN op.id = (
+                        WHEN op.id = COALESCE((
+                            SELECT MAX(split_line.id)
+                            FROM order_product AS split_line
+                            WHERE split_line.order_id = op.order_id AND split_line.line_type <> '.$component.'
+                                AND ROUND(CAST('.$splitLineTotal.' AS DECIMAL(20,6)), 2) <> CAST('.$splitLineTotal.' AS DECIMAL(20,6))
+                        ), (
                             SELECT MAX(last_line.id)
                             FROM order_product AS last_line
                             WHERE last_line.order_id = op.order_id AND last_line.line_type <> '.$component.'
-                        ) THEN (
+                        )) THEN (
                             SELECT '.OrderAmountSql::orderLinesTotal('order_line', 'op.order_id', true).' - SUM('.OrderAmountSql::lineTaxedTotal('order_line', 'op.order_id').')
                             FROM order_product AS order_line
                             WHERE order_line.order_id = op.order_id
