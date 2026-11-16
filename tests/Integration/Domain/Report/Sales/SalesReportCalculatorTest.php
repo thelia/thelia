@@ -127,6 +127,44 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
         self::assertNotNull($hat->getId());
     }
 
+    public function testACategoryInAParentLoopCountsALineOnce(): void
+    {
+        // The core saves any parent: two categories, each the parent of the other.
+        $first = $this->category('First');
+        $second = $this->category('Second', $first);
+        $first->setParent((int) $second->getId())->save($this->getPropelConnection());
+        $this->product($second, 'IN-A-LOOP');
+
+        $this->line($this->paidOrder(), 'IN-A-LOOP', '10.000000', 1);
+
+        $rows = $this->calculator->byCategory($this->june(), 'en_US');
+
+        self::assertEqualsCanonicalizing(
+            [[$first->getId(), 10.0, 1.0, 1], [$second->getId(), 10.0, 1.0, 1]],
+            array_map(static fn (CategorySalesRow $row): array => [$row->categoryId, $row->revenue, round($row->share, 6), $row->orderCount], $rows),
+        );
+    }
+
+    public function testACategoryUnderAParentLoopCountsALineOnceInEachAncestor(): void
+    {
+        // The loop is above the category sold: the walk up the tree never comes back to it.
+        $top = $this->category('Top');
+        $middle = $this->category('Middle', $top);
+        $top->setParent((int) $middle->getId())->save($this->getPropelConnection());
+        $leaf = $this->category('Leaf', $middle);
+        $this->product($leaf, 'UNDER-A-LOOP');
+
+        $this->line($this->paidOrder(), 'UNDER-A-LOOP', '10.000000', 1);
+
+        $rows = $this->calculator->byCategory($this->june(), 'en_US');
+
+        self::assertEqualsCanonicalizing(
+            [[$top->getId(), 10.0], [$middle->getId(), 10.0], [$leaf->getId(), 10.0]],
+            array_map(static fn (CategorySalesRow $row): array => [$row->categoryId, $row->revenue], $rows),
+        );
+        self::assertSame(10.0, $this->calculator->reconciliation($this->june())->linesTotal);
+    }
+
     public function testAProductFiledInSeveralCategoriesIsCountedInItsDefaultOneOnly(): void
     {
         $first = $this->category('First filed');
