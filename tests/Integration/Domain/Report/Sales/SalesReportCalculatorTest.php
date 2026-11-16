@@ -116,7 +116,7 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
         $rows = $this->calculator->byCategory($this->june(), 'en_US');
 
         self::assertSame(
-            [[$parent->getId(), null, 0, 128.0, 0.0, 5, 2], [$shirts->getId(), $parent->getId(), 1, 108.0, 108.0, 3, 2], [$hats->getId(), $parent->getId(), 1, 20.0, 20.0, 2, 1]],
+            [[$parent->getId(), null, 0, 128.0, 0.0, 5.0, 2], [$shirts->getId(), $parent->getId(), 1, 108.0, 108.0, 3.0, 2], [$hats->getId(), $parent->getId(), 1, 20.0, 20.0, 2.0, 1]],
             array_map(static fn (CategorySalesRow $row): array => [$row->categoryId, $row->parentId, $row->depth, $row->revenue, $row->ownRevenue, $row->quantity, $row->orderCount], $rows),
             'The parent first, then its children by revenue; an order touching both children is one order of the parent.',
         );
@@ -163,6 +163,24 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
             array_map(static fn (CategorySalesRow $row): array => [$row->categoryId, $row->revenue], $rows),
         );
         self::assertSame(10.0, $this->calculator->reconciliation($this->june())->linesTotal);
+    }
+
+    public function testAQuantitySoldByWeightKeepsItsDecimals(): void
+    {
+        $vegetables = $this->category('Vegetables');
+        $this->product($vegetables, 'CARROTS');
+        $this->product($vegetables, 'LEEKS');
+
+        $order = $this->paidOrder();
+        $this->line($order, 'CARROTS', '20.000000', 0.4);
+        $this->line($order, 'LEEKS', '4.000000', 2.5);
+
+        $products = $this->calculator->byProduct($this->june(), 'en_US')->rows;
+        $categories = $this->calculator->byCategory($this->june(), 'en_US');
+
+        self::assertSame([0.4, 8.0], $this->figures($this->productRow($products, 'CARROTS'), 'quantity', 'revenue'));
+        self::assertSame([2.5, 10.0], $this->figures($this->productRow($products, 'LEEKS'), 'quantity', 'revenue'));
+        self::assertSame([2.9, 18.0], $this->figures($categories[0], 'quantity', 'revenue'));
     }
 
     public function testAProductFiledInSeveralCategoriesIsCountedInItsDefaultOneOnly(): void
@@ -244,12 +262,12 @@ final class SalesReportCalculatorTest extends IntegrationTestCase
         $rows = $this->calculator->byCategory($this->june(), 'en_US');
 
         self::assertSame(
-            [[$packs->getId(), 120.0, 2, 1], [$parts->getId(), 5.0, 1, 1]],
+            [[$packs->getId(), 120.0, 2.0, 1], [$parts->getId(), 5.0, 1.0, 1]],
             array_map(static fn (CategorySalesRow $row): array => [$row->categoryId, $row->revenue, $row->quantity, $row->orderCount], $rows),
             'The pack is sold, its components are what it is made of: only the part sold on its own counts.',
         );
         self::assertSame(
-            [['PACK', 2], ['PART', 1]],
+            [['PACK', 2.0], ['PART', 1.0]],
             array_map(static fn (ProductSalesRow $row): array => [$row->ref, $row->quantity], $this->calculator->byProduct($this->june(), 'en_US')->rows),
         );
     }

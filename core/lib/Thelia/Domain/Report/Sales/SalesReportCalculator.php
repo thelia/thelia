@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Order\Sql\OrderAmountSql;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatusQuery;
@@ -218,7 +219,7 @@ final readonly class SalesReportCalculator
                 $productId,
                 $ref,
                 (null !== $productId ? $titles[$productId] ?? null : null) ?? (string) $row['line_title'],
-                (int) round((float) $row['quantity']),
+                self::quantity($row['quantity']),
                 $revenue,
                 self::share($revenue, (float) $row['lines_total']),
                 $previous[$ref] ?? 0.0,
@@ -325,7 +326,7 @@ final readonly class SalesReportCalculator
      * and of the services, keyed `category:<id>`, `uncategorized` and `services`, plus the
      * total of the lines of the period under `total`.
      *
-     * @return array<string, array{revenue: float, ownRevenue: float, quantity: int, orderCount: int}>
+     * @return array<string, array{revenue: float, ownRevenue: float, quantity: float, orderCount: int}>
      */
     private function categoryFigures(SalesReportCriteria $criteria): array
     {
@@ -378,7 +379,7 @@ final readonly class SalesReportCalculator
             $figures[(string) $row['figure_key']] = [
                 'revenue' => (float) $row['revenue'],
                 'ownRevenue' => (float) $row['own_revenue'],
-                'quantity' => (int) round((float) $row['quantity']),
+                'quantity' => self::quantity($row['quantity']),
                 'orderCount' => (int) $row['order_count'],
             ];
         }
@@ -415,7 +416,7 @@ final readonly class SalesReportCalculator
                         WHERE product_category.product_id = product.id AND product_category.default_category = 1
                     ) END AS category_id,
                     CASE WHEN op.line_type = '.$service.' THEN \''.CategoryRowKind::Services->value.'\' ELSE \''.CategoryRowKind::Uncategorized->value.'\' END AS kind,
-                    CASE WHEN op.line_type = '.$component.' THEN 0 ELSE op.quantity END AS counted_quantity,
+                    CASE WHEN op.line_type = '.$component.' THEN 0 ELSE '.OrderAmountSql::soldQuantity('op').' END AS counted_quantity,
                     CASE WHEN op.line_type = '.$component.' THEN NULL ELSE op.order_id END AS counted_order_id,
                     '.OrderAmountSql::lineTaxedTotal('op', 'op.order_id').' AS line_total
                 FROM order_product AS op
@@ -681,6 +682,15 @@ final readonly class SalesReportCalculator
     private static function boundPage(int $page, int $perPage): array
     {
         return [min(self::MAX_PAGE, max(1, $page)), min(self::MAX_PER_PAGE, max(1, $perPage))];
+    }
+
+    /**
+     * A quantity summed as sold, goods sold by weight or volume included (0.4 kg): the sum
+     * of floating point numbers is brought back to the decimals a quantity carries.
+     */
+    private static function quantity(mixed $summed): float
+    {
+        return round((float) $summed, QuantityScale::MAXIMUM_DECIMALS) + 0.0;
     }
 
     private static function share(float $amount, float $total): float
