@@ -19,8 +19,11 @@ use Thelia\Core\Serializer\SerializerManager;
 use Thelia\Domain\DataTransfer\Exception\DataTransferNoDataFoundException;
 use Thelia\Domain\DataTransfer\Export\AbstractExport;
 use Thelia\Domain\DataTransfer\Export\Type\SalesByCategoryExport;
+use Thelia\Domain\DataTransfer\Export\Type\SalesByCategoryPaidExport;
 use Thelia\Domain\DataTransfer\Export\Type\SalesByCustomerExport;
+use Thelia\Domain\DataTransfer\Export\Type\SalesByCustomerPaidExport;
 use Thelia\Domain\DataTransfer\Export\Type\SalesByProductExport;
+use Thelia\Domain\DataTransfer\Export\Type\SalesByProductPaidExport;
 use Thelia\Domain\DataTransfer\ExportHandler;
 use Thelia\Domain\Report\Sales\CustomerSort;
 use Thelia\Domain\Report\Sales\SalesReportCalculator;
@@ -117,6 +120,9 @@ final class SalesReportExportsTest extends IntegrationTestCase
         yield 'by category' => ['thelia.export.sales_by_category', SalesByCategoryExport::class];
         yield 'by product' => ['thelia.export.sales_by_product', SalesByProductExport::class];
         yield 'by customer' => ['thelia.export.sales_by_customer', SalesByCustomerExport::class];
+        yield 'by category, paid orders' => ['thelia.export.sales_by_category_paid', SalesByCategoryPaidExport::class];
+        yield 'by product, paid orders' => ['thelia.export.sales_by_product_paid', SalesByProductPaidExport::class];
+        yield 'by customer, paid orders' => ['thelia.export.sales_by_customer_paid', SalesByCustomerPaidExport::class];
     }
 
     /**
@@ -319,13 +325,20 @@ final class SalesReportExportsTest extends IntegrationTestCase
         self::assertContains('VERY-OLD', array_column($file, 'Product reference'));
     }
 
-    public function testOnlyThePaidOrdersAreExported(): void
+    public function testTheExportCountsEveryOrderAndItsPaidVariantThePaidOnes(): void
     {
         $this->forgetTheStatusLists();
         $this->line($this->paidOrder(), 'PAID', '10.000000', 1);
         $this->line($this->paidOrder(['status' => OrderStatus::CODE_NOT_PAID]), 'UNPAID', '10.000000', 1);
 
-        self::assertSame(['PAID'], array_column($this->csvRows(SalesByProductExport::class, $this->june()), 'Product reference'));
+        self::assertSame(['PAID', 'UNPAID'], array_column($this->csvRows(SalesByProductExport::class, $this->june()), 'Product reference'));
+        self::assertSame(['PAID'], array_column($this->csvRows(SalesByProductPaidExport::class, $this->june()), 'Product reference'));
+        self::assertSame([20.0, 10.0], array_map(
+            fn (string $class): float => (float) array_column($this->csvRows($class, $this->june()), 'Revenue incl. tax', 'Category')['Total'],
+            [SalesByCategoryExport::class, SalesByCategoryPaidExport::class],
+        ));
+        self::assertCount(2, $this->csvRows(SalesByCustomerExport::class, $this->june()));
+        self::assertCount(1, $this->csvRows(SalesByCustomerPaidExport::class, $this->june()));
     }
 
     public function testAPeriodWithoutSalesHasNoData(): void
@@ -419,7 +432,7 @@ final class SalesReportExportsTest extends IntegrationTestCase
 
     private function criteria(): SalesReportCriteria
     {
-        return new SalesReportCriteria(new \DateTimeImmutable('2001-06-01 00:00:00'), new \DateTimeImmutable('2001-06-30 23:59:59'), StatusScope::Paid);
+        return new SalesReportCriteria(new \DateTimeImmutable('2001-06-01 00:00:00'), new \DateTimeImmutable('2001-06-30 23:59:59'), StatusScope::All);
     }
 
     private function category(string $title, ?Category $parent = null): Category

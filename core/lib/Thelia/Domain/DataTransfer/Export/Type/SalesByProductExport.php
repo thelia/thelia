@@ -18,7 +18,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 
 /**
- * The paid sales of the period by product, best seller first: every product sold, the pages
+ * The sales of the period by product, best seller first: every product sold, the pages
  * of the back-office screen put end to end.
  */
 class SalesByProductExport extends AbstractSalesReportExport
