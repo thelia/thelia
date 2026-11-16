@@ -133,7 +133,7 @@ class OrderExport extends JsonFileAbstractExport implements MailableReportInterf
     {
         $stmt = Propel::getConnection()->prepare($query);
         $stmt->bindValue('locale', $this->language->getLocale());
-        OrderAmountSql::bindRoundingPivots($stmt);
+        OrderAmountSql::bindRoundingPivots($stmt, $query);
 
         foreach ($this->getDateRangeBounds() as $bound => $date) {
             $stmt->bindValue($bound, $date->format('Y-m-d H:i:s'));
