@@ -331,6 +331,9 @@ final readonly class SalesReportCalculator
     {
         // Each line is counted twice, once under its category and the ancestors of it (or its
         // kind, without one) and once under the total: its amount is computed once beforehand.
+        // The core saves any parent, a loop included: the walk up the tree stops when it comes
+        // back to the category it started from, and an ancestor met at several depths of a
+        // loop it entered higher up is kept once, so that a line counts once in each category.
         $sql = 'WITH RECURSIVE '.$this->soldLineSql($criteria, computedOnce: true).',
             category_ancestor (category_id, ancestor_id, depth) AS (
                 SELECT category.id, category.id, 0
@@ -341,10 +344,12 @@ final readonly class SalesReportCalculator
                 INNER JOIN category ON category.id = category_ancestor.ancestor_id
                 INNER JOIN category AS parent_category ON parent_category.id = category.parent
                 WHERE category_ancestor.depth < '.self::MAX_CATEGORY_DEPTH.'
+                    AND parent_category.id <> category_ancestor.category_id
             ),
             figure_target (target, figure_key, depth) AS (
-                SELECT CONCAT(\'category:\', category_ancestor.category_id), CONCAT(\'category:\', category_ancestor.ancestor_id), category_ancestor.depth
+                SELECT CONCAT(\'category:\', category_ancestor.category_id), CONCAT(\'category:\', category_ancestor.ancestor_id), MIN(category_ancestor.depth)
                 FROM category_ancestor
+                GROUP BY category_ancestor.category_id, category_ancestor.ancestor_id
                 UNION ALL
                 SELECT \''.CategoryRowKind::Uncategorized->value.'\', \''.CategoryRowKind::Uncategorized->value.'\', 0
                 UNION ALL
