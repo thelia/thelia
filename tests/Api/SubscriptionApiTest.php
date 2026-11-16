@@ -19,6 +19,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
 use Thelia\Domain\Subscription\SubscriptionLifecycle;
+use Thelia\Model\Currency;
 use Thelia\Model\Map\SubscriptionTableMap;
 use Thelia\Model\Sale;
 use Thelia\Model\SubscriptionPlanPriceQuery;
@@ -313,6 +314,22 @@ final class SubscriptionApiTest extends ApiTestCase
         self::assertSame(404, $this->jsonRequest('GET', '/api/front/subscription_plans/'.$plan->getId(), token: $token)->getStatusCode());
         self::assertSame([], $this->planIdsOf('/api/front/subscription_plans?product.id='.$product->getId(), $token));
         self::assertSame([(int) $plan->getId()], $this->planIdsOf('/api/front/subscription_plans?product.id='.$product->getId()), 'The default group still reads it.');
+    }
+
+    public function testAnEmptySetOfPricesIsRefusedAndThePriceInTheDefaultCurrencyStays(): void
+    {
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product, [], '9.900000', Currency::getDefaultCurrency());
+        $token = $this->authenticateAsAdmin();
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/subscription_plans/'.$plan->getId(), ['prices' => []], $token, 'merge-patch+json');
+
+        self::assertSame(422, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            1,
+            SubscriptionPlanPriceQuery::create()->filterBySubscriptionPlanId($plan->getId())->filterByCurrencyId(Currency::getDefaultCurrency()->getId())->count(),
+            'A visible plan must keep a price no cart can lack.',
+        );
     }
 
     public function testTheFrontGivesThePriceOfAPlanToWhoeverIsShownThePriceOfItsProduct(): void

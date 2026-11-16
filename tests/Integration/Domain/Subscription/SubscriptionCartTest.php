@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\DTO\CartItemAddDTO;
+use Thelia\Domain\Cart\Service\CartLinePricer;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
@@ -129,6 +130,39 @@ final class SubscriptionCartTest extends ActionIntegrationTestCase
 
         $line->reload();
         self::assertSame('9.900000', (string) $line->getPrice(), 'As a sale element nothing prices: the line keeps the price it holds, and nothing is raised.');
+    }
+
+    /**
+     * A cart is copied when its customer signs in again or signs out: a plan line must not come out of the
+     * copy as a one-time purchase of the product at its catalog price.
+     */
+    public function testACopiedCartKeepsItsPlanLineAtThePriceOfThePlan(): void
+    {
+        $customer = $this->aCustomer();
+        $product = $this->aProduct();
+        $plan = $this->aPlan($product, [], '9.900000');
+        $cart = $this->factory->cart($customer);
+        $this->addPlanLine($cart, $product, $plan);
+
+        $cart->reload();
+        $copy = $cart->duplicate(
+            'copy-'.bin2hex(random_bytes(4)),
+            $customer,
+            null,
+            $this->getService('event_dispatcher'),
+            null,
+            null,
+            $this->getService(CartLinePricer::class),
+        );
+
+        self::assertInstanceOf(Cart::class, $copy);
+        $lines = CartItemQuery::create()->filterByCartId($copy->getId())->find();
+        self::assertCount(1, $lines);
+
+        foreach ($lines as $line) {
+            self::assertSame((int) $plan->getId(), (int) $line->getSubscriptionPlanId());
+            self::assertSame('9.900000', (string) $line->getPrice(), 'Not the 10.0 of the catalog.');
+        }
     }
 
     public function testAPlanWithATrialIsPricedAtNothing(): void
