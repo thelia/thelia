@@ -20,7 +20,7 @@ use Thelia\Domain\Report\Sales\CategoryRowKind;
 use Thelia\Domain\Report\Sales\CategorySalesRow;
 
 /**
- * The paid sales of the period by category, the rows of the back-office screen in the same
+ * The sales of the period by category, the rows of the back-office screen in the same
  * order: a category, then its subcategories, each summing its own. The file ends with the
  * lines that bring the categories back to the revenue: the discounts, the shipping costs and
  * the total, so that the roots of the tree, the discounts and the shipping add up to it.

@@ -68,7 +68,7 @@ final class SalesReportCriteriaTest extends TestCase
         $previous = (new SalesReportCriteria($moment, $moment))->previous();
 
         self::assertSame(['2025-12-31 23:59:59', '2025-12-31 23:59:59'], [$previous->from->format('Y-m-d H:i:s'), $previous->to->format('Y-m-d H:i:s')]);
-        self::assertSame(StatusScope::Paid, $previous->scope);
+        self::assertSame(StatusScope::All, $previous->scope, 'Every order is counted unless told otherwise, as the dashboard counts them.');
         self::assertNull($previous->saleUnitIds);
     }
 

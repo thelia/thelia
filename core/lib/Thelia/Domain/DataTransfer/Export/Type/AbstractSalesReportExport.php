@@ -29,8 +29,9 @@ use Thelia\Model\Currency;
 use Thelia\Model\OrderQuery;
 
 /**
- * What the three sales exports share: the period of the job, the paid orders, and the
- * calculation the back-office screen reads, so that a file holds the very rows of the screen.
+ * What the sales exports share: the period of the job, the orders it counts (every order
+ * created in the period, or the paid ones for the *PaidExport variants), and the calculation
+ * the back-office screen reads, so that a file holds the very rows of the screen.
  *
  * Without a start the period opens on the first order of the shop (today when there is none),
  * without an end it runs up to today; a start after the end is an empty export, not a file. The
@@ -65,7 +66,16 @@ abstract class AbstractSalesReportExport extends ArrayAbstractExport implements 
             throw self::noData();
         }
 
-        return new SalesReportCriteria($from, $to, StatusScope::Paid, $this->saleUnitIds);
+        return new SalesReportCriteria($from, $to, $this->scope(), $this->saleUnitIds);
+    }
+
+    /**
+     * The orders the file counts: every order created in the period, as the screen counts them
+     * by default and as the dashboard does.
+     */
+    protected function scope(): StatusScope
+    {
+        return StatusScope::All;
     }
 
     protected static function noData(): DataTransferNoDataFoundException

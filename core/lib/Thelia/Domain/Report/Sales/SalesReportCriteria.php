@@ -27,7 +27,7 @@ final readonly class SalesReportCriteria
     public function __construct(
         public \DateTimeImmutable $from,
         public \DateTimeImmutable $to,
-        public StatusScope $scope = StatusScope::Paid,
+        public StatusScope $scope = StatusScope::All,
         public ?array $saleUnitIds = null,
     ) {
         if ($from > $to) {

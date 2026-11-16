@@ -19,7 +19,7 @@ use Thelia\Domain\DataTransfer\Export\ReportSummaryLine;
 use Thelia\Domain\Report\Sales\CustomerSort;
 
 /**
- * The paid sales of the period by customer, the biggest total first: every customer who
+ * The sales of the period by customer, the biggest total first: every customer who
  * ordered, the pages of the back-office screen put end to end.
  */
 class SalesByCustomerExport extends AbstractSalesReportExport
