@@ -73,6 +73,15 @@ final readonly class SubscriptionPlanProcessor implements ProcessorInterface
      */
     private function replacePrices(int $planId, array $prices): void
     {
+        if ([] === $prices) {
+            // An empty list keeps a plan without price as it is, and never strips a plan of its prices.
+            if (SubscriptionPlanPriceQuery::create()->filterBySubscriptionPlanId($planId)->exists()) {
+                throw new UnprocessableEntityHttpException('A plan needs a price in the default currency.');
+            }
+
+            return;
+        }
+
         $kept = [];
 
         foreach ($prices as $entry) {
@@ -104,7 +113,7 @@ final readonly class SubscriptionPlanProcessor implements ProcessorInterface
 
         $defaultCurrencyId = (int) Currency::getDefaultCurrency()->getId();
 
-        if ([] !== $prices && !\in_array($defaultCurrencyId, $kept, true)) {
+        if (!\in_array($defaultCurrencyId, $kept, true)) {
             throw new UnprocessableEntityHttpException('A plan needs a price in the default currency.');
         }
     }
