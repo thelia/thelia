@@ -1627,4 +1627,5 @@ return [
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} suspendu après {{ failure_count }} prélèvements échoués{% else %}Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est suspendu{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Message envoyé au client quand un abonnement est résilié',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est résilié',
+    'Days without an order after which a customer is dormant in the customer reports (180 when invalid)' => 'Jours sans commande après lesquels un client est dormant dans les rapports clients (180 si invalide)',
 ];
