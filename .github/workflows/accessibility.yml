@@ -20,7 +20,8 @@ permissions:
 jobs:
   storefront:
     name: Storefront accessibility (axe, WCAG 2.1 AA)
-    runs-on: ubuntu-latest
+    # Pinned: Playwright installs no Chromium on ubuntu-latest since it moved to 26.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
