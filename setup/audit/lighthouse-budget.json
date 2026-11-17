@@ -1,16 +1,340 @@
 {
-  "about": "Performance budget of the storefront audit (setup/audit/lighthouse.mjs). Each page fails the lighthouse workflow when the median of its runs is worse than its reference value moved by the tolerance of the metric: lower for a score, higher for a time, a shift, a weight or a request count. The reference is a measure of the workflow itself, written here by hand with its date and commit: it is raised when an improvement is acquired, never rewritten from the last run.",
+  "about": "Performance budget of the storefront audit (setup/audit/lighthouse.mjs). Each page fails the lighthouse workflow when the median of its runs is worse than its reference value moved by the tolerance of the metric and preset: lower for a score, higher for a time, a shift, a weight or a request count. The reference is a measure of the workflow itself, written here by hand with its date and commit: it is raised when an improvement is acquired, never rewritten from the last run.",
+  "toleranceBasis": "2026-11-17, two measures of the same code (core 155cbe071 and af9ed4f3b, which differ only in the labels of the workflow, Flexy dev-main bf04b3b4d) on GitHub runners. Desktop medians moved by 2 points of performance and 19 % of FCP and LCP at most. Mobile, simulated by Lighthouse on a slow 4G, moved by steps: up to 15 points of performance and 72 % of LCP, so its times only catch a gross regression. Accessibility, best practices, SEO, CLS, TBT, weight (under 0.2 %) and requests did not move on either preset: they hold the tight thresholds.",
   "tolerance": {
-    "performance": { "absolute": 5 },
-    "accessibility": { "absolute": 2 },
-    "best-practices": { "absolute": 5 },
-    "seo": { "absolute": 2 },
-    "first-contentful-paint": { "relative": 0.2, "absolute": 100 },
-    "largest-contentful-paint": { "relative": 0.2, "absolute": 100 },
-    "cumulative-layout-shift": { "absolute": 0.05 },
-    "total-blocking-time": { "relative": 0.2, "absolute": 50 },
-    "total-byte-weight": { "relative": 0.1 },
-    "requests": { "absolute": 3 }
+    "desktop": {
+      "performance": {
+        "absolute": 5
+      },
+      "accessibility": {
+        "absolute": 2
+      },
+      "best-practices": {
+        "absolute": 5
+      },
+      "seo": {
+        "absolute": 2
+      },
+      "first-contentful-paint": {
+        "relative": 0.25,
+        "absolute": 100
+      },
+      "largest-contentful-paint": {
+        "relative": 0.25,
+        "absolute": 100
+      },
+      "cumulative-layout-shift": {
+        "absolute": 0.05
+      },
+      "total-blocking-time": {
+        "relative": 0.2,
+        "absolute": 50
+      },
+      "total-byte-weight": {
+        "relative": 0.1
+      },
+      "requests": {
+        "absolute": 3
+      }
+    },
+    "mobile": {
+      "performance": {
+        "absolute": 20
+      },
+      "accessibility": {
+        "absolute": 2
+      },
+      "best-practices": {
+        "absolute": 5
+      },
+      "seo": {
+        "absolute": 2
+      },
+      "first-contentful-paint": {
+        "relative": 1.0
+      },
+      "largest-contentful-paint": {
+        "relative": 1.0
+      },
+      "cumulative-layout-shift": {
+        "absolute": 0.05
+      },
+      "total-blocking-time": {
+        "relative": 0.5,
+        "absolute": 200
+      },
+      "total-byte-weight": {
+        "relative": 0.1
+      },
+      "requests": {
+        "absolute": 3
+      }
+    }
   },
-  "reference": {}
+  "reference": {
+    "desktop": {
+      "measured": {
+        "date": "2026-11-17",
+        "commit": "af9ed4f3b",
+        "theme": "flexy 1.4.x-dev dev-main bf04b3b4d",
+        "machine": "4 vCPU Intel(R) Xeon(R) 6975P-C, 15 GB, Linux X64 GitHub-hosted runner",
+        "lighthouse": "12.6.1",
+        "runs": 3
+      },
+      "pages": {
+        "/": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 835,
+          "largest-contentful-paint": 835,
+          "cumulative-layout-shift": 0.004,
+          "total-blocking-time": 0,
+          "total-byte-weight": 225383,
+          "requests": 30
+        },
+        "/contact": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 796,
+          "largest-contentful-paint": 796,
+          "cumulative-layout-shift": 0.0,
+          "total-blocking-time": 0,
+          "total-byte-weight": 218174,
+          "requests": 29
+        },
+        "/a-propos.html": {
+          "performance": 100,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 681,
+          "largest-contentful-paint": 681,
+          "cumulative-layout-shift": 0.002,
+          "total-blocking-time": 0,
+          "total-byte-weight": 228687,
+          "requests": 32
+        },
+        "/search?query=t": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 66,
+          "first-contentful-paint": 834,
+          "largest-contentful-paint": 834,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 236694,
+          "requests": 35
+        },
+        "/chairs.html": {
+          "performance": 98,
+          "accessibility": 98,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 836,
+          "largest-contentful-paint": 836,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 281742,
+          "requests": 49
+        },
+        "/barbara-1.html": {
+          "performance": 78,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 833,
+          "largest-contentful-paint": 839,
+          "cumulative-layout-shift": 0.455,
+          "total-blocking-time": 0,
+          "total-byte-weight": 1131135,
+          "requests": 53
+        },
+        "/account": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 832,
+          "largest-contentful-paint": 832,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 226326,
+          "requests": 32
+        },
+        "/account/addresses": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 795,
+          "largest-contentful-paint": 795,
+          "cumulative-layout-shift": 0.002,
+          "total-blocking-time": 0,
+          "total-byte-weight": 218096,
+          "requests": 31
+        },
+        "/account/orders": {
+          "performance": 99,
+          "accessibility": 96,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 796,
+          "largest-contentful-paint": 796,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 219934,
+          "requests": 32
+        },
+        "/account/purchase-lists": {
+          "performance": 98,
+          "accessibility": 98,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 873,
+          "largest-contentful-paint": 873,
+          "cumulative-layout-shift": 0.002,
+          "total-blocking-time": 0,
+          "total-byte-weight": 261006,
+          "requests": 30
+        }
+      }
+    },
+    "mobile": {
+      "measured": {
+        "date": "2026-11-17",
+        "commit": "af9ed4f3b",
+        "theme": "flexy 1.4.x-dev dev-main bf04b3b4d",
+        "machine": "4 vCPU Intel(R) Xeon(R) 6975P-C, 15 GB, Linux X64 GitHub-hosted runner",
+        "lighthouse": "12.6.1",
+        "runs": 3
+      },
+      "pages": {
+        "/": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 1676,
+          "largest-contentful-paint": 1676,
+          "cumulative-layout-shift": 0.004,
+          "total-blocking-time": 0,
+          "total-byte-weight": 225383,
+          "requests": 30
+        },
+        "/contact": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 1677,
+          "largest-contentful-paint": 1677,
+          "cumulative-layout-shift": 0.0,
+          "total-blocking-time": 0,
+          "total-byte-weight": 218197,
+          "requests": 29
+        },
+        "/a-propos.html": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 1679,
+          "largest-contentful-paint": 1680,
+          "cumulative-layout-shift": 0.0,
+          "total-blocking-time": 0,
+          "total-byte-weight": 229034,
+          "requests": 32
+        },
+        "/search?query=t": {
+          "performance": 91,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 66,
+          "first-contentful-paint": 1699,
+          "largest-contentful-paint": 3343,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 235843,
+          "requests": 35
+        },
+        "/chairs.html": {
+          "performance": 87,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 2590,
+          "largest-contentful-paint": 3490,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 273021,
+          "requests": 48
+        },
+        "/barbara-1.html": {
+          "performance": 60,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 3191,
+          "largest-contentful-paint": 4295,
+          "cumulative-layout-shift": 0.928,
+          "total-blocking-time": 0,
+          "total-byte-weight": 1048802,
+          "requests": 46
+        },
+        "/account": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 1676,
+          "largest-contentful-paint": 1708,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 226317,
+          "requests": 32
+        },
+        "/account/addresses": {
+          "performance": 99,
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 1691,
+          "largest-contentful-paint": 1858,
+          "cumulative-layout-shift": 0.007,
+          "total-blocking-time": 0,
+          "total-byte-weight": 225989,
+          "requests": 32
+        },
+        "/account/orders": {
+          "performance": 88,
+          "accessibility": 96,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 2965,
+          "largest-contentful-paint": 3189,
+          "cumulative-layout-shift": 0.002,
+          "total-blocking-time": 0,
+          "total-byte-weight": 227838,
+          "requests": 33
+        },
+        "/account/purchase-lists": {
+          "performance": 83,
+          "accessibility": 98,
+          "best-practices": 100,
+          "seo": 100,
+          "first-contentful-paint": 3413,
+          "largest-contentful-paint": 3638,
+          "cumulative-layout-shift": 0.001,
+          "total-blocking-time": 0,
+          "total-byte-weight": 260938,
+          "requests": 30
+        }
+      }
+    }
+  }
 }
