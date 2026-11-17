@@ -120,7 +120,7 @@ function readBudget(file = BUDGET) {
 
 /** Threshold of a metric: the reference value moved by the tolerance, in the direction of a regression. */
 export function threshold(metric, reference, tolerance) {
-  const { relative: share = 0, absolute = 0 } = tolerance ?? {};
+  const { relative: share = 0, absolute = 0 } = tolerance;
   const margin = Math.abs(reference) * share + absolute;
 
   return 'higher' === metric.better ? reference - margin : reference + margin;
@@ -142,7 +142,9 @@ export function assertionsFor(budget, preset) {
     for (const metric of METRICS) {
       const value = reference.pages[path][metric.key];
       if (typeof value !== 'number') fail(`no ${preset} reference of ${metric.key} for ${path} in ${budget.file}`);
-      const limit = threshold(metric, value, budget.tolerance[metric.key]);
+      const tolerance = budget.tolerance?.[preset]?.[metric.key];
+      if (!tolerance) fail(`no ${preset} tolerance of ${metric.key} in ${budget.file}`);
+      const limit = threshold(metric, value, tolerance);
       assertions[metric.assertion] = 'score' === metric.unit
         ? ['error', { minScore: Math.max(0, Math.min(1, limit / 100)), aggregationMethod: 'median' }]
         : ['error', { maxNumericValue: limit, aggregationMethod: 'median' }];
