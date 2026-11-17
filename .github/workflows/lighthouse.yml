@@ -57,6 +57,8 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.3'
+          # bin/install refuses a post_max_size under 20M.
+          ini-values: post_max_size=20M
           coverage: none
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
 
@@ -116,7 +118,7 @@ jobs:
           sudo sed -i -e 's/^user = .*/user = runner/' -e 's/^group = .*/group = runner/' \
             -e 's/^listen.owner = .*/listen.owner = runner/' -e 's/^listen.group = .*/listen.group = runner/' \
             /etc/php/8.3/fpm/pool.d/www.conf
-          echo 'php_admin_value[memory_limit] = 512M' | sudo tee -a /etc/php/8.3/fpm/pool.d/www.conf > /dev/null
+          printf 'php_admin_value[memory_limit] = 512M\nphp_admin_value[post_max_size] = 20M\n' | sudo tee -a /etc/php/8.3/fpm/pool.d/www.conf > /dev/null
           sudo sed -i -e 's/^export APACHE_RUN_USER=.*/export APACHE_RUN_USER=runner/' \
             -e 's/^export APACHE_RUN_GROUP=.*/export APACHE_RUN_GROUP=runner/' /etc/apache2/envvars
 
