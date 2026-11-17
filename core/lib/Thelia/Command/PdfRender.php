@@ -112,6 +112,13 @@ class PdfRender extends ContainerAwareCommand
         $locale = $input->getOption('locale');
         $lang = null !== $locale ? LangQuery::create()->findOneByLocale($locale) : null;
 
+        // A locale no language has would print the document in the default language, and say nothing.
+        if (null !== $locale && null === $lang) {
+            $output->writeln(\sprintf('<error>No language has the locale %s.</error>', $locale));
+
+            return Command::FAILURE;
+        }
+
         // A PDF is generated outside an HTTP request; push a request with a session so the
         // parser and the formatting helpers have a locale and a currency to work with.
         $this->initRequest($lang);
@@ -150,7 +157,11 @@ class PdfRender extends ContainerAwareCommand
         $out = $input->getOption('out') ?? (null !== $shipment
             ? \sprintf('%s-%s.pdf', $document, $shipment->getRef())
             : \sprintf('%s-%s.pdf', $document, $order->getRef()));
-        file_put_contents($out, $pdfEvent->getPdf());
+        if (false === @file_put_contents($out, $pdfEvent->getPdf())) {
+            $output->writeln(\sprintf('<error>Could not write %s.</error>', $out));
+
+            return Command::FAILURE;
+        }
 
         $output->writeln(\sprintf('<info>Wrote %s (%d bytes).</info>', $out, \strlen((string) $pdfEvent->getPdf())));
 
@@ -177,6 +188,13 @@ class PdfRender extends ContainerAwareCommand
         $locale = $input->getOption('locale');
         $lang = null !== $locale ? LangQuery::create()->findOneByLocale($locale) : null;
 
+        // A locale no language has would print the document in the default language, and say nothing.
+        if (null !== $locale && null === $lang) {
+            $output->writeln(\sprintf('<error>No language has the locale %s.</error>', $locale));
+
+            return Command::FAILURE;
+        }
+
         $this->initRequest($lang);
 
         try {
@@ -188,7 +206,11 @@ class PdfRender extends ContainerAwareCommand
         }
 
         $out = $input->getOption('out') ?? $slip->fileName;
-        file_put_contents($out, $slip->content);
+        if (false === @file_put_contents($out, $slip->content)) {
+            $output->writeln(\sprintf('<error>Could not write %s.</error>', $out));
+
+            return Command::FAILURE;
+        }
 
         $output->writeln(\sprintf('<info>Wrote %s (%d bytes, %d orders).</info>', $out, \strlen($slip->content), $slip->orderCount));
 
