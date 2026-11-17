@@ -163,7 +163,9 @@ jobs:
 
           headers=$(curl -sk -D - -o /dev/null -H 'Accept-Encoding: br, gzip' "$ORIGIN/")
           ! grep -qi '^x-debug-token' <<<"$headers" || { echo "::error::the shop answers with the debug toolbar: not in production"; exit 1; }
-          grep -qi '^content-encoding: br' <<<"$headers" || { echo "::error::the HTML is not compressed"; exit 1; }
+          encoding=$(sed -n 's/^content-encoding: *//Ip' <<<"$headers" | tr -d '\r')
+          echo "/ -> Content-Encoding: ${encoding:-none}"
+          [[ "$encoding" =~ ^(br|gzip)$ ]] || { echo "::error::the HTML is not compressed"; echo "$headers"; exit 1; }
 
           test -f public/assets/frontOffice/flexy/manifest.json || { echo "::error::the Flexy assets are not compiled"; exit 1; }
           stylesheet=$(ls public/assets/frontOffice/flexy/styles/app-*.css | head -n 1)
