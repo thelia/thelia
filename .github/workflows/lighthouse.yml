@@ -1,0 +1,258 @@
+name: lighthouse
+
+# Measures the storefront of a demo shop served as in production (APP_ENV=prod, compiled and
+# precompressed assets, Apache with the shipped public/.htaccess, HTTP/2 over TLS) with Lighthouse
+# CI, on the pages of setup/audit/lighthouserc.default.yaml, desktop and mobile, three runs per page.
+# The medians fail the job when they are worse than setup/audit/lighthouse-budget.json allows.
+# Not on every pull request: a shared runner makes the measure slow and noisy. The nightly run
+# catches a regression of the themes, which are taken from their development branch.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'setup/audit/**'
+      - '.github/workflows/lighthouse.yml'
+  schedule:
+    - cron: '17 3 * * *'
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    name: Storefront performance (Lighthouse)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+      COMPOSER_NO_INTERACTION: '1'
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: '3306'
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: thelia
+      ORIGIN: https://127.0.0.1:8443
+      # The demo customer of `bin/install --with-demo`, on a database thrown away with the runner.
+      LIGHTHOUSE_CUSTOMER_EMAIL: test@thelia.net
+      LIGHTHOUSE_CUSTOMER_PASSWORD: thelia
+      LHCI_VERSION: 0.15.1
+      PUPPETEER_VERSION: 25.16.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Start MySQL
+        run: sudo systemctl start mysql.service
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, gd, zip
+
+      - name: Install Apache, PHP-FPM and the compressors
+        # brotli and zstd let asset-map:compile write the .br and .zst copies next to the assets.
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q apache2 php8.3-fpm brotli zstd
+          # The extensions setup-php installed are enabled for the CLI; FPM was installed after them.
+          sudo phpenmod -v 8.3 -s fpm mbstring xml ctype iconv intl pdo_sqlite mysqlnd pdo_mysql mysqli gd zip opcache || true
+          for extension in intl pdo_mysql gd mbstring; do
+            php-fpm8.3 -m | grep -qx "$extension" || { echo "::error::PHP-FPM lacks $extension"; php-fpm8.3 -m; exit 1; }
+          done
+
+      - name: Resolve the themes from their development branch
+        # Same contract as test.yml: the tip of the core against the tip of the themes. A release is
+        # measured with the theme versions its composer.json requires.
+        if: github.event_name != 'release'
+        run: |
+          composer require --no-update --no-scripts --no-audit \
+            "thelia/flexy:dev-main as 1.99.0" \
+            "thelia/backoffice-default-twig-template:dev-main as 1.99.0" \
+            "thelia/email-default-template:dev-main as 1.99.0" \
+            "thelia/pdf-default-template:dev-main as 1.99.0"
+
+      - name: Install Composer dependencies
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Drop the files the official recipes write
+        # See test.yml: goes once thelia/thelia-recipes#14 is merged.
+        run: rm -f src/Schedule.php config/packages/messenger.yaml
+
+      - name: Install the demo shop
+        run: >-
+          php bin/install
+          --frontoffice_theme=flexy --backoffice_theme=default-twig
+          --pdf_theme=default --email_theme=default
+          --with-demo --with-admin
+          --admin_login=thelia --admin_password=thelia
+          --admin_first_name=Admin --admin_last_name=User
+          --admin_email=admin@example.com
+
+      - name: Switch the shop to production and compile its assets
+        run: |
+          printf '\nAPP_ENV=prod\nAPP_DEBUG=0\n' >> .env.local
+          php bin/console cache:warmup --env=prod
+          php bin/console importmap:install --env=prod
+          php bin/console asset-map:compile --env=prod
+
+      - name: Serve the shop with Apache and PHP-FPM
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes -days 2 -subj "/CN=127.0.0.1" \
+            -addext "subjectAltName=IP:127.0.0.1" \
+            -keyout "$RUNNER_TEMP/shop.key" -out "$RUNNER_TEMP/shop.crt" 2>/dev/null
+
+          # Both run as the runner user, who owns the checkout and var/.
+          sudo sed -i -e 's/^user = .*/user = runner/' -e 's/^group = .*/group = runner/' \
+            -e 's/^listen.owner = .*/listen.owner = runner/' -e 's/^listen.group = .*/listen.group = runner/' \
+            /etc/php/8.3/fpm/pool.d/www.conf
+          echo 'php_admin_value[memory_limit] = 512M' | sudo tee -a /etc/php/8.3/fpm/pool.d/www.conf > /dev/null
+          sudo sed -i -e 's/^export APACHE_RUN_USER=.*/export APACHE_RUN_USER=runner/' \
+            -e 's/^export APACHE_RUN_GROUP=.*/export APACHE_RUN_GROUP=runner/' /etc/apache2/envvars
+
+          sudo tee /etc/apache2/sites-available/shop.conf > /dev/null <<APACHE
+          Listen 8443
+          <VirtualHost 127.0.0.1:8443>
+              Protocols h2 http/1.1
+              SSLEngine on
+              SSLCertificateFile $RUNNER_TEMP/shop.crt
+              SSLCertificateKeyFile $RUNNER_TEMP/shop.key
+              DocumentRoot $GITHUB_WORKSPACE/public
+              DirectoryIndex index.php
+              <Directory $GITHUB_WORKSPACE/public>
+                  AllowOverride All
+                  Require all granted
+              </Directory>
+              <FilesMatch "\.php$">
+                  SetHandler "proxy:unix:/run/php/php8.3-fpm.sock|fcgi://localhost"
+              </FilesMatch>
+              ErrorLog $RUNNER_TEMP/apache-error.log
+          </VirtualHost>
+          APACHE
+
+          # HTTP/2 needs the event MPM; the modules are those public/.htaccess relies on.
+          sudo a2dismod -q mpm_prefork || true
+          sudo a2enmod -q mpm_event ssl http2 rewrite headers expires deflate brotli setenvif proxy_fcgi
+          sudo a2ensite -q shop
+          sudo systemctl restart php8.3-fpm
+          sudo systemctl restart apache2
+
+      - name: Check what is about to be measured
+        # A measure of a broken page, of the development build or of another theme would pass for a result.
+        run: |
+          set -o pipefail
+          front=$(mysql -h127.0.0.1 -uroot -proot -N -e "SELECT value FROM config WHERE name = 'active-front-template'" thelia)
+          [ "$front" = "flexy" ] || { echo "::error::the active front theme is '$front', not flexy"; exit 1; }
+
+          read -r code version < <(curl -sk -o /dev/null -w '%{http_code} %{http_version}\n' "$ORIGIN/")
+          echo "/ -> HTTP $code over HTTP/$version"
+          [ "$code" = "200" ] || { echo "::error::the storefront answered $code"; sudo tail -n 50 "$RUNNER_TEMP/apache-error.log"; tail -n 50 var/log/*.log 2>/dev/null; exit 1; }
+          [ "$version" = "2" ] || { echo "::error::the storefront is not served over HTTP/2"; exit 1; }
+
+          headers=$(curl -sk -D - -o /dev/null -H 'Accept-Encoding: br, gzip' "$ORIGIN/")
+          ! grep -qi '^x-debug-token' <<<"$headers" || { echo "::error::the shop answers with the debug toolbar: not in production"; exit 1; }
+          grep -qi '^content-encoding: br' <<<"$headers" || { echo "::error::the HTML is not compressed"; exit 1; }
+
+          test -f public/assets/frontOffice/flexy/manifest.json || { echo "::error::the Flexy assets are not compiled"; exit 1; }
+          stylesheet=$(ls public/assets/frontOffice/flexy/styles/app-*.css | head -n 1)
+          test -f "$stylesheet.br" || { echo "::error::no precompressed copy of $stylesheet"; exit 1; }
+          curl -sk -D - -o /dev/null -H 'Accept-Encoding: br' "$ORIGIN/${stylesheet#public/}" | grep -qi '^content-encoding: br' \
+            || { echo "::error::$stylesheet is not served from its .br copy"; exit 1; }
+          echo "Flexy is active, served in production over HTTP/2, with its precompressed assets."
+
+      - name: Install Lighthouse CI
+        # Pinned: the Chrome of this Puppeteer version is the browser that measures, part of the method.
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lhci" --no-audit --no-fund "@lhci/cli@$LHCI_VERSION" "puppeteer@$PUPPETEER_VERSION"
+          echo "$RUNNER_TEMP/lhci/node_modules/.bin" >> "$GITHUB_PATH"
+
+      - name: Measure
+        run: |
+          # The sign-in form of the demo customer must not be refused by the form firewall or a limiter.
+          mysql -h127.0.0.1 -uroot -proot -e "DELETE FROM form_firewall" thelia
+          php bin/console cache:pool:clear cache.rate_limiter --env=prod
+
+          case "${{ github.event_name }}" in
+            release) version="${{ github.event.release.tag_name }}" ;;
+            pull_request) version="pull request #${{ github.event.pull_request.number }}" ;;
+            *) version="main" ;;
+          esac
+          machine="$(nproc) vCPU $(lscpu | sed -n 's/^Model name: *//p'), $(free -g | awk '/^Mem:/ {print $2}') GB, ${{ runner.os }} ${{ runner.arch }} GitHub-hosted runner"
+
+          for preset in desktop mobile; do
+            directory="$RUNNER_TEMP/lighthouse/$preset"
+            mkdir -p "$directory"
+            node setup/audit/lighthouse.mjs config --origin "$ORIGIN" --preset "$preset" --output "$directory/lighthouserc.yaml"
+            (cd "$directory" && lhci collect --config=lighthouserc.yaml)
+            node setup/audit/lighthouse.mjs summary --preset "$preset" --results "$directory/.lighthouseci" \
+              --markdown "$RUNNER_TEMP/lighthouse/summary-$preset.md" --json "$RUNNER_TEMP/lighthouse/summary-$preset.json" \
+              --date "$(date -u +%F)" --version "$version" --commit "${GITHUB_SHA::9}" --machine "$machine"
+          done
+
+      - name: Compare with the budget
+        run: |
+          status=0
+          for preset in desktop mobile; do
+            directory="$RUNNER_TEMP/lighthouse/$preset"
+            echo "::group::$preset"
+            node setup/audit/lighthouse.mjs assertions --preset "$preset" --output "$directory/assertions.json" \
+              && (cd "$directory" && lhci assert --config=assertions.json) || status=1
+            echo "::endgroup::"
+          done
+          exit $status
+
+      - name: Write the job summary
+        if: always()
+        run: cat "$RUNNER_TEMP"/lighthouse/summary-*.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+
+      - name: Show the server logs
+        if: failure()
+        run: sudo tail -n 50 "$RUNNER_TEMP/apache-error.log" /var/log/php8.3-fpm.log var/log/*.log 2>/dev/null || true
+
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse
+          path: |
+            ${{ runner.temp }}/lighthouse/summary-*
+            ${{ runner.temp }}/lighthouse/*/.lighthouseci/lhr-*.json
+            ${{ runner.temp }}/lighthouse/*/.lighthouseci/lhr-*.html
+          # Lighthouse CI writes its results in .lighthouseci, a hidden folder.
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
+
+  publish:
+    name: Attach the figures to the release
+    needs: measure
+    if: github.event_name == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download the results
+        uses: actions/download-artifact@v5
+        with:
+          name: lighthouse
+          path: lighthouse
+
+      - name: Attach the summaries to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd lighthouse
+          cat summary-desktop.md summary-mobile.md > lighthouse.md
+          gh release upload "${{ github.event.release.tag_name }}" lighthouse.md summary-desktop.json summary-mobile.json \
+            --repo "${{ github.repository }}" --clobber
