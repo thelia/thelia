@@ -1,0 +1,16 @@
+{
+  "about": "Performance budget of the storefront audit (setup/audit/lighthouse.mjs). Each page fails the lighthouse workflow when the median of its runs is worse than its reference value moved by the tolerance of the metric: lower for a score, higher for a time, a shift, a weight or a request count. The reference is a measure of the workflow itself, written here by hand with its date and commit: it is raised when an improvement is acquired, never rewritten from the last run.",
+  "tolerance": {
+    "performance": { "absolute": 5 },
+    "accessibility": { "absolute": 2 },
+    "best-practices": { "absolute": 5 },
+    "seo": { "absolute": 2 },
+    "first-contentful-paint": { "relative": 0.2, "absolute": 100 },
+    "largest-contentful-paint": { "relative": 0.2, "absolute": 100 },
+    "cumulative-layout-shift": { "absolute": 0.05 },
+    "total-blocking-time": { "relative": 0.2, "absolute": 50 },
+    "total-byte-weight": { "relative": 0.1 },
+    "requests": { "absolute": 3 }
+  },
+  "reference": {}
+}

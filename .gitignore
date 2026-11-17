@@ -60,6 +60,7 @@ translations/
 .husky/
 .lighthouseci
 setup/audit/lighthouserc.yaml
+setup/audit/lighthouse-assert.*.json
 setup/audit/greenit.yaml
 ###> phpunit/phpunit ###
 /phpunit.xml

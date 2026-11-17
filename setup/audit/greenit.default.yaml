@@ -1,3 +1,5 @@
+# Pages of the eco-design audit (GreenIT-Analysis CLI). Same list as lighthouserc.default.yaml:
+# keep the two aligned. The account pages need a signed-in customer.
 - name: "home"
   url: "http://__DOMAIN__/"
 - name: "contact"
@@ -12,11 +14,9 @@
   url: "http://__DOMAIN__/barbara-1.html"
 - name: "account"
   url: "http://__DOMAIN__/account"
-- name: "account-update"
-  url: "http://__DOMAIN__/account/update"
+- name: "account-addresses"
+  url: "http://__DOMAIN__/account/addresses"
 - name: "account-orders"
-  url: "http://__DOMAIN__/account-orders"
-- name: "account-address"
-  url: "http://__DOMAIN__/account-address"
-- name: "address-update"
-  url: "http://__DOMAIN__/address/update"
+  url: "http://__DOMAIN__/account/orders"
+- name: "account-purchase-lists"
+  url: "http://__DOMAIN__/account/purchase-lists"
