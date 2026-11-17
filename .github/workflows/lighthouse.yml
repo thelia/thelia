@@ -101,6 +101,11 @@ jobs:
           --admin_first_name=Admin --admin_last_name=User
           --admin_email=admin@example.com
 
+      - name: TEMPORARY degrade the home page to prove the budget fails
+        run: |
+          sed -i 's#<h1 class="sr-only">{{ store_name.label() }}</h1>#&<img src="/media/cache/product_gallery/product/PROD022-2.jpg" alt="">#' templates/frontOffice/flexy/index.html.twig
+          grep -c 'PROD022-2.jpg' templates/frontOffice/flexy/index.html.twig
+
       - name: Switch the shop to production and compile its assets
         run: |
           printf '\nAPP_ENV=prod\nAPP_DEBUG=0\n' >> .env.local
