@@ -181,17 +181,23 @@ jobs:
           echo "$RUNNER_TEMP/lhci/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Measure
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+          MEASURED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           # The sign-in form of the demo customer must not be refused by the form firewall or a limiter.
           mysql -h127.0.0.1 -uroot -proot -e "DELETE FROM form_firewall" thelia
           php bin/console cache:pool:clear cache.rate_limiter --env=prod
 
-          case "${{ github.event_name }}" in
-            release) version="${{ github.event.release.tag_name }}" ;;
-            pull_request) version="pull request #${{ github.event.pull_request.number }}" ;;
+          case "$EVENT_NAME" in
+            release) version="$RELEASE_TAG" ;;
+            pull_request) version="pull request #$PULL_REQUEST" ;;
             *) version="main" ;;
           esac
-          machine="$(nproc) vCPU $(lscpu | sed -n 's/^Model name: *//p'), $(free -g | awk '/^Mem:/ {print $2}') GB, ${{ runner.os }} ${{ runner.arch }} GitHub-hosted runner"
+          theme="flexy $(composer show thelia/flexy --format=json | php -r '$p = json_decode(stream_get_contents(STDIN), true); echo implode(" ", $p["versions"]), " ", substr($p["source"]["reference"] ?? "", 0, 9);')"
+          machine="$(nproc) vCPU $(lscpu | sed -n 's/^Model name: *//p'), $(free -g | awk '/^Mem:/ {print $2}') GB, $RUNNER_OS $RUNNER_ARCH GitHub-hosted runner"
 
           for preset in desktop mobile; do
             directory="$RUNNER_TEMP/lighthouse/$preset"
@@ -200,7 +206,7 @@ jobs:
             (cd "$directory" && lhci collect --config=lighthouserc.yaml)
             node setup/audit/lighthouse.mjs summary --preset "$preset" --results "$directory/.lighthouseci" \
               --markdown "$RUNNER_TEMP/lighthouse/summary-$preset.md" --json "$RUNNER_TEMP/lighthouse/summary-$preset.json" \
-              --date "$(date -u +%F)" --version "$version" --commit "${GITHUB_SHA::9}" --machine "$machine"
+              --date "$(date -u +%F)" --version "$version" --commit "${MEASURED_COMMIT::9}" --theme "$theme" --machine "$machine"
           done
 
       - name: Compare with the budget
@@ -255,8 +261,9 @@ jobs:
       - name: Attach the summaries to the release
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           cd lighthouse
           cat summary-desktop.md summary-mobile.md > lighthouse.md
-          gh release upload "${{ github.event.release.tag_name }}" lighthouse.md summary-desktop.json summary-mobile.json \
-            --repo "${{ github.repository }}" --clobber
+          gh release upload "$RELEASE_TAG" lighthouse.md summary-desktop.json summary-mobile.json \
+            --repo "$GITHUB_REPOSITORY" --clobber
