@@ -142,7 +142,8 @@ export function assertionsFor(budget, preset) {
     for (const metric of METRICS) {
       const value = reference.pages[path][metric.key];
       if (typeof value !== 'number') fail(`no ${preset} reference of ${metric.key} for ${path} in ${budget.file}`);
-      const tolerance = budget.tolerance?.[preset]?.[metric.key];
+      // A page can carry its own tolerance for a metric, with the reason written next to it.
+      const tolerance = budget.pageTolerance?.[preset]?.[path]?.[metric.key] ?? budget.tolerance?.[preset]?.[metric.key];
       if (!tolerance) fail(`no ${preset} tolerance of ${metric.key} in ${budget.file}`);
       const limit = threshold(metric, value, tolerance);
       assertions[metric.assertion] = 'score' === metric.unit
