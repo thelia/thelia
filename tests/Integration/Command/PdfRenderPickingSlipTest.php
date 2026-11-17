@@ -91,6 +91,54 @@ final class PdfRenderPickingSlipTest extends IntegrationTestCase
         self::assertSame(Command::FAILURE, $tester->getStatusCode());
     }
 
+    public function testAnUnknownLocaleIsRefusedInsteadOfFallingBackToTheDefaultLanguage(): void
+    {
+        $this->installPickingSlipTheme();
+        $order = $this->createFixtureFactory()->order();
+        $this->outputFile = sys_get_temp_dir().'/pdfrender_slip_'.uniqid('', true).'.pdf';
+
+        $tester = $this->commandTester();
+        $tester->execute([
+            'document' => 'preparation',
+            '--order' => [(string) $order->getId()],
+            '--locale' => 'xx_XX',
+            '--out' => $this->outputFile,
+        ]);
+
+        self::assertSame(Command::FAILURE, $tester->getStatusCode());
+        self::assertStringContainsString('No language has the locale xx_XX', $tester->getDisplay());
+        self::assertFileDoesNotExist($this->outputFile);
+    }
+
+    public function testTheInvoiceRefusesAnUnknownLocaleToo(): void
+    {
+        $order = $this->createFixtureFactory()->order();
+        // Written by the command only if it went past the locale: never in the working directory.
+        $this->outputFile = sys_get_temp_dir().'/pdfrender_invoice_'.uniqid('', true).'.pdf';
+
+        $tester = $this->commandTester();
+        $tester->execute(['document' => 'invoice', '--order' => [(string) $order->getId()], '--locale' => 'xx_XX', '--out' => $this->outputFile]);
+
+        self::assertSame(Command::FAILURE, $tester->getStatusCode());
+        self::assertStringContainsString('No language has the locale xx_XX', $tester->getDisplay());
+    }
+
+    public function testAnOutputFileThatCannotBeWrittenIsAFailure(): void
+    {
+        $this->installPickingSlipTheme();
+        $order = $this->createFixtureFactory()->order();
+
+        $tester = $this->commandTester();
+        $tester->execute([
+            'document' => 'preparation',
+            '--order' => [(string) $order->getId()],
+            '--out' => sys_get_temp_dir().'/no-such-directory-'.uniqid('', true).'/slip.pdf',
+        ]);
+
+        self::assertSame(Command::FAILURE, $tester->getStatusCode());
+        self::assertStringContainsString('Could not write', $tester->getDisplay());
+    }
+
     private function commandTester(): CommandTester
     {
         $application = new Application(self::$kernel);
