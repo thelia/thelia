@@ -101,12 +101,10 @@ jobs:
           --admin_first_name=Admin --admin_last_name=User
           --admin_email=admin@example.com
 
-      - name: TEMPORARY degrade the home page to prove the budget fails
+      - name: TEMPORARY degrade the category page to prove the budget fails
         run: |
-          sed -i 's#<h1 class="sr-only">{{ store_name.label() }}</h1>#&<img src="/media/cache/product_gallery/product/PROD022-2.jpg" alt="">#' templates/frontOffice/flexy/index.html.twig
-          grep -c 'PROD022-2.jpg' templates/frontOffice/flexy/index.html.twig
-          grep -n 'sr-only' templates/frontOffice/flexy/index.html.twig
-          ls -d var/cache/*/ || true
+          sed -i 's#{% block body %}#&<img src="/media/cache/product_gallery/product/PROD022-2.jpg" alt="">#' templates/frontOffice/flexy/category.html.twig
+          grep -c 'PROD022-2.jpg' templates/frontOffice/flexy/category.html.twig
 
       - name: Switch the shop to production and compile its assets
         run: |
@@ -181,15 +179,9 @@ jobs:
             || { echo "::error::$stylesheet is not served from its .br copy"; exit 1; }
           echo "Flexy is active, served in production over HTTP/2, with its precompressed assets."
 
-      - name: TEMPORARY show whether the degraded home page is served
+      - name: TEMPORARY show that the degraded category page is served
         run: |
-          curl -sk "$ORIGIN/" -o "$RUNNER_TEMP/home.html"
-          echo "served home: $(grep -c 'PROD022-2' "$RUNNER_TEMP/home.html") line(s) with the image"
-          grep -o '<h1[^>]*>[^<]*</h1>[^>]*>' "$RUNNER_TEMP/home.html" | head -3
-          curl -skI "$ORIGIN/" | grep -iE '^(cache-control|age|x-symfony-cache|x-cache|x-debug)' || true
-          grep -rl 'PROD022-2' var/cache/prod 2>/dev/null | head -3 || true
-          grep -rl 'class=\"sr-only\"' var/cache/prod/twig 2>/dev/null | head -3 || true
-          ls var/cache/prod | head -20
+          echo "served category: $(curl -sk "$ORIGIN/chairs.html" | grep -c 'PROD022-2') line(s) with the image"
 
       - name: Install Lighthouse CI
         # Pinned: the Chrome of this Puppeteer version is the browser that measures, part of the method.
