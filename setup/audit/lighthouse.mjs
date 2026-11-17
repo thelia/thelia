@@ -6,6 +6,7 @@
 //   node setup/audit/lighthouse.mjs assertions --preset desktop [--budget file] [--output file]
 //       Writes the Lighthouse CI assertions of a preset from setup/audit/lighthouse-budget.json.
 //   node setup/audit/lighthouse.mjs summary --preset desktop --results .lighthouseci [--markdown file] [--json file]
+//       [--date d] [--version v] [--commit c] [--theme t] [--machine m]: what the figures are of, for the record
 //       Checks that every page of the template was measured as itself, and prints the medians.
 //
 // Run `lhci collect` and `lhci assert` from the directory that holds the generated files: Lighthouse CI
@@ -222,7 +223,9 @@ function markdown(preset, environment, pages) {
   const lines = [
     `### ${preset}`,
     '',
-    `Median of ${environment.runs} runs per page, Lighthouse ${environment.lighthouse}, ${environment.date}, ${environment.version}, commit ${environment.commit}.`,
+    `Median of ${environment.runs} runs per page, Lighthouse ${environment.lighthouse}, ${environment.date}, ${environment.version}, commit ${environment.commit}, theme ${environment.theme}.`,
+    '',
+    `Machine: ${environment.machine}.`,
     '',
     `| ${header.join(' | ')} |`,
     `| ${header.map(() => '---').join(' | ')} |`,
@@ -253,6 +256,7 @@ function summary(options) {
     version: options.version ?? 'unreleased',
     commit: options.commit ?? 'unknown',
     machine: options.machine ?? 'unknown',
+    theme: options.theme ?? 'unknown',
     lighthouse: first.lighthouseVersion,
     browser: first.environment?.hostUserAgent ?? 'unknown',
     benchmarkIndex: median(lhrs.map((lhr) => lhr.environment?.benchmarkIndex)),
@@ -263,7 +267,7 @@ function summary(options) {
   if (options.markdown) write(options.markdown, markdown(preset, environment, pages));
   console.log(markdown(preset, environment, pages));
   // The block to paste in lighthouse-budget.json when a better result is accepted as the new reference.
-  console.log(`Reference values of this run (${preset}):\n${JSON.stringify({ measured: { date: environment.date, commit: environment.commit, machine: environment.machine, lighthouse: environment.lighthouse, runs }, pages }, null, 2)}`);
+  console.log(`Reference values of this run (${preset}):\n${JSON.stringify({ measured: { date: environment.date, commit: environment.commit, theme: environment.theme, machine: environment.machine, lighthouse: environment.lighthouse, runs }, pages }, null, 2)}`);
 
   if (problems.length) fail(`the ${preset} measure is not usable:\n- ${[...new Set(problems)].join('\n- ')}`);
 }
