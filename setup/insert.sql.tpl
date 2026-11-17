@@ -960,7 +960,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2037, 'delivery.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2038, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2038, 'invoice.product-list', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2039, 'preparation.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2040, 'preparation.after-information', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2041, 'preparation.product-location', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert email hooks
@@ -3244,7 +3247,10 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2035, '{{ locale }}', {{ intl('Invoice - additional product information', locale) }}, NULL, NULL),
     (2036, '{{ locale }}', {{ intl('Delivery - additional product information', locale) }}, NULL, NULL),
     (2037, '{{ locale }}', {{ intl('Delivery - after product information', locale) }}, NULL, NULL),
-    (2038, '{{ locale }}', {{ intl('Invoice - after product information', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (2038, '{{ locale }}', {{ intl('Invoice - after product information', locale) }}, NULL, NULL),
+    (2039, '{{ locale }}', {{ intl('Picking slip - CSS', locale) }}, NULL, NULL),
+    (2040, '{{ locale }}', {{ intl('Picking slip - after the order information', locale) }}, NULL, NULL),
+    (2041, '{{ locale }}', {{ intl('Picking slip - storage location of a line', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 {% endfor %}
 ;
 
