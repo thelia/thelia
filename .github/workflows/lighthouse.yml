@@ -101,11 +101,6 @@ jobs:
           --admin_first_name=Admin --admin_last_name=User
           --admin_email=admin@example.com
 
-      - name: TEMPORARY degrade the category page to prove the budget fails
-        run: |
-          sed -i 's#{% block body %}#&<img src="/media/cache/product_gallery/product/PROD022-2.jpg" alt="">#' templates/frontOffice/flexy/category.html.twig
-          grep -c 'PROD022-2.jpg' templates/frontOffice/flexy/category.html.twig
-
       - name: Switch the shop to production and compile its assets
         run: |
           printf '\nAPP_ENV=prod\nAPP_DEBUG=0\n' >> .env.local
@@ -178,10 +173,6 @@ jobs:
           curl -sk -D - -o /dev/null -H 'Accept-Encoding: br' "$ORIGIN/${stylesheet#public/}" | grep -qi '^content-encoding: br' \
             || { echo "::error::$stylesheet is not served from its .br copy"; exit 1; }
           echo "Flexy is active, served in production over HTTP/2, with its precompressed assets."
-
-      - name: TEMPORARY show that the degraded category page is served
-        run: |
-          echo "served category: $(curl -sk "$ORIGIN/chairs.html" | grep -c 'PROD022-2') line(s) with the image"
 
       - name: Install Lighthouse CI
         # Pinned: the Chrome of this Puppeteer version is the browser that measures, part of the method.
