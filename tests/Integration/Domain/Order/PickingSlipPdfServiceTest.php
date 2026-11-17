@@ -24,10 +24,26 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
 {
     use PickingSlipFixtureTheme;
 
+    private ?string $previousMaxOrders = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->previousMaxOrders = ConfigQuery::read(PickingSlipPdfService::CONFIG_MAX_ORDERS);
+    }
+
     protected function tearDown(): void
     {
         $this->removePickingSlipTheme();
-        ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, '');
+
+        // The variable is left as the test found it: absent when it was, not written empty.
+        if (null === $this->previousMaxOrders) {
+            ConfigQuery::create()->filterByName(PickingSlipPdfService::CONFIG_MAX_ORDERS)->delete();
+            ConfigQuery::resetCache();
+        } else {
+            ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, $this->previousMaxOrders);
+        }
 
         parent::tearDown();
     }
@@ -141,6 +157,51 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
         $defaultLocale = \Thelia\Model\Lang::getDefaultLanguage()->getLocale();
         self::assertStringContainsString('SLIP-'.$order->getId().' locale='.$defaultLocale, (string) $html);
         self::assertStringContainsString('data:image/svg+xml;base64,', (string) $html);
+    }
+
+    public function testTheTemplateReceivesTheLocaleTheCallerAsksFor(): void
+    {
+        $this->installPickingSlipTheme();
+        $order = $this->createFixtureFactory()->order();
+        $defaultLocale = \Thelia\Model\Lang::getDefaultLanguage()->getLocale();
+        $otherLocale = (string) \Thelia\Model\LangQuery::create()->filterByLocale($defaultLocale, \Propel\Runtime\ActiveQuery\Criteria::NOT_EQUAL)->findOne()?->getLocale();
+        self::assertNotSame('', $otherLocale, 'The test shop needs a second language.');
+
+        $html = null;
+        $this->getService('event_dispatcher')->addListener(
+            \Thelia\Core\Event\TheliaEvents::GENERATE_PDF,
+            static function (\Thelia\Core\Event\PdfEvent $event) use (&$html): void {
+                $html = $event->getContent();
+            },
+            1000,
+        );
+
+        $this->service()->render([$order->getId()], $otherLocale);
+
+        self::assertStringContainsString('SLIP-'.$order->getId().' locale='.$otherLocale, (string) $html);
+    }
+
+    public function testItIsAvailableWhenTheActivePdfThemeHasAPreparationDocument(): void
+    {
+        $this->installPickingSlipTheme();
+
+        self::assertTrue($this->service()->isAvailable());
+    }
+
+    public function testItIsNotAvailableWhenTheActivePdfThemeHasNoPreparationDocument(): void
+    {
+        $this->installPickingSlipTheme(withPreparationTemplate: false);
+
+        self::assertFalse($this->service()->isAvailable());
+    }
+
+    public function testTheLimitIsTheConfiguredNumberAndTheDefaultWhenItIsNotAPositiveOne(): void
+    {
+        ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, '7');
+        self::assertSame(7, $this->service()->maxOrders());
+
+        ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, '0');
+        self::assertSame(PickingSlipPdfService::DEFAULT_MAX_ORDERS, $this->service()->maxOrders());
     }
 
     private function service(): PickingSlipPdfService

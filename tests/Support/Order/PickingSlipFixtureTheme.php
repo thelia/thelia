@@ -17,7 +17,7 @@ namespace Thelia\Tests\Support\Order;
 /**
  * A throwaway PDF theme next to the installed ones, made active for a test, so the `preparation` document can be
  * exercised without a theme that carries it. The template prints one block per order id, with a page break
- * before each but the first, its locale, and the barcode of the order id.
+ * before each but the first, the locale the service passes (`picking_slip_locale`), and the barcode of the order id.
  */
 trait PickingSlipFixtureTheme
 {
@@ -43,7 +43,7 @@ trait PickingSlipFixtureTheme
                 <html><body>
                 {% for order_id in order_ids %}
                 <div{% if not loop.first %} style="page-break-before: always"{% endif %}>
-                <p>SLIP-{{ order_id }} locale={{ locale }}</p>
+                <p>SLIP-{{ order_id }} locale={{ picking_slip_locale }}</p>
                 <img src="{{ barcode_code128('REF' ~ order_id) }}" alt="REF{{ order_id }}">
                 </div>
                 {% endfor %}

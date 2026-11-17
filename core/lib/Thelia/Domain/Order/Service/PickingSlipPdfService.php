@@ -130,7 +130,27 @@ final readonly class PickingSlipPdfService
         );
     }
 
-    private function maxOrders(): int
+    /**
+     * Whether the active PDF theme has a preparation document. Asks each parser without making it the current one,
+     * so a page can call it while it renders.
+     */
+    public function isAvailable(): bool
+    {
+        $themePath = $this->templateHelper->getActivePdfTemplate()->getAbsolutePath();
+
+        foreach ($this->parserResolver->getParsers() as $parser) {
+            if ($parser->supportTemplateRender($themePath, self::DOCUMENT)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The most orders a batch may hold: the configuration variable when it is a positive number, the default otherwise.
+     */
+    public function maxOrders(): int
     {
         $configured = (int) ConfigQuery::read(self::CONFIG_MAX_ORDERS, (string) self::DEFAULT_MAX_ORDERS);
 
