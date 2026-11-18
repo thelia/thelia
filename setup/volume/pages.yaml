@@ -1,0 +1,50 @@
+# Pages and long jobs measured by bin/console thelia:test:volume:measure on a shop holding a
+# volume dataset (thelia:test:volume:generate). The protocol is in setup/volume/README.md.
+#
+# Placeholders are read from the dataset: {product_url} and {product_id} (the newest generated
+# product), {category_url} and {category_id} (the generated category holding the most products),
+# {order_id} (the newest generated order), {customer_id} and {customer_email} (the customer with
+# the most orders), {customer_password}, {admin_login}, {admin_password}, {locale}, and
+# {admin_products_last_page}, {admin_orders_last_page}, {admin_customers_last_page}.
+#
+# A page is called once to warm up, then --runs times: its query count must be the same at
+# every call. The session of a page is anonymous unless it names one of the sign_in entries.
+
+sign_in:
+  customer:
+    form: /customer/login
+    action: /customer/login
+    fields:
+      'thelia_customer_login[email]': '{customer_email}'
+      'thelia_customer_login[password]': '{customer_password}'
+      'thelia_customer_login[account]': '1'
+  admin:
+    form: /admin/login
+    action: /admin/checklogin
+    fields:
+      'thelia_admin_login[username]': '{admin_login}'
+      'thelia_admin_login[password]': '{admin_password}'
+
+pages:
+  - { name: home, path: / }
+  - { name: category, path: '{category_url}' }
+  - { name: product, path: '{product_url}' }
+  - { name: search, path: '/search?query=oak' }
+  - { name: sitemap-products, path: /sitemap-products.xml }
+  - { name: account-orders, path: /account/orders, session: customer }
+  - { name: api-products, area: api, path: '/api/front/products?itemsPerPage=24' }
+  - { name: admin-dashboard, area: back-office, path: /admin, session: admin }
+  - { name: admin-products, area: back-office, path: /admin/products, session: admin }
+  - { name: admin-products-last-page, area: back-office, path: '/admin/products?page={admin_products_last_page}', session: admin }
+  - { name: admin-product, area: back-office, path: '/admin/products/update?product_id={product_id}', session: admin }
+  - { name: admin-orders, area: back-office, path: /admin/orders, session: admin }
+  - { name: admin-orders-last-page, area: back-office, path: '/admin/orders?page={admin_orders_last_page}', session: admin }
+  - { name: admin-order, area: back-office, path: '/admin/order/update/{order_id}', session: admin }
+  - { name: admin-customers, area: back-office, path: /admin/customers, session: admin }
+  - { name: admin-customers-last-page, area: back-office, path: '/admin/customers?page={admin_customers_last_page}', session: admin }
+  - { name: admin-customer, area: back-office, path: '/admin/customer/update?customer_id={customer_id}', session: admin }
+
+jobs:
+  - { name: export-product-prices, command: [export, thelia.export.prices, thelia.csv] }
+  - { name: export-orders, command: [export, thelia.export.orders, thelia.csv] }
+  - { name: export-customers, command: [export, thelia.export.complete, thelia.csv] }
