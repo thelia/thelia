@@ -37,6 +37,7 @@ use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexer;
 use Thelia\Domain\Search\SearchIndexingQueue;
 use Thelia\Domain\Search\SearchLocales;
+use Thelia\Domain\Search\UnorderedDocumentIdentifiersException;
 
 #[AsCommand(name: 'thelia:search:reindex', description: 'Rebuild the search index of the catalogue, family by family, by batches, resuming where an interrupted run stopped.')]
 class SearchReindexCommand extends ContainerAwareCommand
@@ -167,9 +168,12 @@ class SearchReindexCommand extends ContainerAwareCommand
                     $output->writeln(\sprintf('<error>%s: the lock of the reindexing was lost (%s), the run stops here.</error>', $family, $exception::class));
 
                     break;
+                } catch (UnorderedDocumentIdentifiersException $exception) {
+                    $failed = true;
+                    $output->writeln(\sprintf('<error>%s: %s</error>', $family, $exception->getMessage()));
                 } catch (\Throwable $exception) {
                     $failed = true;
-                    $output->writeln(\sprintf('<error>%s: %s (%s)</error>', $family, $exception->getMessage(), $exception::class));
+                    $output->writeln(\sprintf('<error>%s: the reindexing failed (%s).</error>', $family, $exception::class));
                 }
             }
 
@@ -228,7 +232,7 @@ class SearchReindexCommand extends ContainerAwareCommand
             sort($ascending);
 
             if ($ascending !== $ids || $ids[0] <= $cursor) {
-                throw new \LogicException(\sprintf('The search document provider %s returns identifiers after #%d that are not in ascending order or not after it, the run cannot tell where it stopped.', $provider::class, $cursor));
+                throw new UnorderedDocumentIdentifiersException(\sprintf('The search document provider %s returns identifiers after #%d that are not in ascending order or not after it, the run cannot tell where it stopped.', $provider::class, $cursor));
             }
 
             if ($queue) {

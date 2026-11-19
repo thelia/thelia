@@ -21,11 +21,16 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Search\EventListener\SearchIndexingListener;
 use Thelia\Domain\Search\Message\IndexDocument;
 use Thelia\Domain\Search\Message\RemoveDocument;
 use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexingQueue;
+use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
@@ -225,6 +230,150 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $listener->flush();
 
         self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
+    }
+
+    public function testGivingAProductAFeatureValueQueuesIt(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->featureAv($this->fixtures->feature());
+        $listener = $this->listen(withEngine: true);
+
+        $featureProduct = $this->fixtures->featureProduct($product, $value);
+        $listener->flush();
+        $this->dispatched = [];
+        $featureProduct->delete();
+        $listener->flush();
+
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
+    }
+
+    public function testGivingASaleElementAnAttributeValueQueuesItsProduct(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->attributeAv($this->fixtures->attribute());
+        $listener = $this->listen(withEngine: true);
+
+        $this->fixtures->attributeCombination($product->getDefaultSaleElements(), $value);
+        $listener->flush();
+
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
+    }
+
+    public function testRenamingAFeatureValueQueuesTheProductsThatCarryIt(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->featureAv($this->fixtures->feature());
+        $this->fixtures->featureProduct($product, $value);
+        $listener = $this->listen(withEngine: true);
+
+        $value->setLocale('en_US')->setTitle('Teak')->save();
+        $listener->flush();
+
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
+    }
+
+    public function testDescribingAFeatureValueWithoutRenamingItQueuesNothing(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->featureAv($this->fixtures->feature());
+        $this->fixtures->featureProduct($product, $value);
+        $listener = $this->listen(withEngine: true);
+
+        $value->setLocale('en_US')->setDescription('Oiled hardwood')->save();
+        $listener->flush();
+
+        self::assertSame([], $this->dispatched);
+    }
+
+    public function testRenamingAnAttributeValueQueuesTheProductsOfItsCombinations(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->attributeAv($this->fixtures->attribute());
+        $this->fixtures->attributeCombination($product->getDefaultSaleElements(), $value);
+        $listener = $this->listen(withEngine: true);
+
+        $value->setLocale('fr_FR')->setTitle('Vert olive')->save();
+        $listener->flush();
+
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
+    }
+
+    public function testDeletingAnAttributeValueQueuesTheProductsThatCarriedIt(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->attributeAv($this->fixtures->attribute());
+        $this->fixtures->attributeCombination($product->getDefaultSaleElements(), $value);
+        $listener = $this->listen(withEngine: true);
+
+        $value->delete();
+        $listener->flush();
+
+        self::assertContainsEquals(new IndexDocument('product', [$product->getId()]), $this->dispatched);
+    }
+
+    public function testMovingAFeatureValueOfAProductWithoutChangingItQueuesNothing(): void
+    {
+        $product = $this->product();
+        $featureProduct = $this->fixtures->featureProduct($product, $this->fixtures->featureAv($this->fixtures->feature()));
+        $listener = $this->listen(withEngine: true);
+
+        $featureProduct->setPosition($featureProduct->getPosition() + 10)->save();
+        $listener->flush();
+
+        self::assertSame([], $this->dispatched);
+    }
+
+    public function testRemovingAFeatureFromAProductInTheBackOfficeQueuesIt(): void
+    {
+        $product = $this->product();
+        $value = $this->fixtures->featureAv($this->fixtures->feature());
+        $this->fixtures->featureProduct($product, $value);
+        $listener = $this->listen(withEngine: true);
+
+        $this->dispatcher()->dispatch(new FeatureProductDeleteEvent($product->getId(), $value->getFeatureId()), TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE);
+        $listener->flush();
+
+        self::assertFalse(FeatureProductQuery::create()->filterByProductId($product->getId())->exists());
+        self::assertEquals([new IndexDocument('product', [$product->getId()])], $this->dispatched);
+    }
+
+    public function testDeletingTheLastSaleElementOfAProductQueuesItForItsLostCombinations(): void
+    {
+        $product = $this->product();
+        $this->fixtures->attributeCombination($product->getDefaultSaleElements(), $this->fixtures->attributeAv($this->fixtures->attribute()));
+        $listener = $this->listen(withEngine: true);
+
+        $this->dispatcher()->dispatch(new ProductSaleElementDeleteEvent($product->getDefaultSaleElements()->getId(), 1), TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT);
+        $listener->flush();
+
+        self::assertFalse(AttributeCombinationQuery::create()->filterByProductSaleElementsId($product->getDefaultSaleElements()->getId())->exists());
+        self::assertContainsEquals(new IndexDocument('product', [$product->getId()]), $this->dispatched);
+    }
+
+    public function testDeletingAFeatureQueuesTheProductsThatCarriedOneOfItsValues(): void
+    {
+        $product = $this->product();
+        $feature = $this->fixtures->feature();
+        $this->fixtures->featureProduct($product, $this->fixtures->featureAv($feature));
+        $listener = $this->listen(withEngine: true);
+
+        $feature->delete();
+        $listener->flush();
+
+        self::assertContainsEquals(new IndexDocument('product', [$product->getId()]), $this->dispatched);
+    }
+
+    public function testDeletingAnAttributeQueuesTheProductsOfItsCombinations(): void
+    {
+        $product = $this->product();
+        $attribute = $this->fixtures->attribute();
+        $this->fixtures->attributeCombination($product->getDefaultSaleElements(), $this->fixtures->attributeAv($attribute));
+        $listener = $this->listen(withEngine: true);
+
+        $attribute->delete();
+        $listener->flush();
+
+        self::assertContainsEquals(new IndexDocument('product', [$product->getId()]), $this->dispatched);
     }
 
     public function testNothingIsQueuedWithoutAnEngine(): void
