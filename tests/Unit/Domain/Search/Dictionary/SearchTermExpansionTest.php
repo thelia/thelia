@@ -156,6 +156,13 @@ final class SearchTermExpansionTest extends TestCase
         self::assertSame(['a', 'b'], SearchTermNormalizer::normalizeAll(['A', ' a ', '', 'b']));
     }
 
+    public function testANoBreakOrInvisibleSpaceAroundTheTermIsTrimmedLikeAnyOtherSpace(): void
+    {
+        self::assertSame('café', SearchTermNormalizer::normalize("\u{00A0}Café\u{202F}"));
+        self::assertSame(SearchTermNormalizer::key('café'), SearchTermNormalizer::key("Café\u{00A0}"));
+        self::assertSame('café', SearchTermNormalizer::normalize("\u{FEFF}Café\u{200B}"));
+    }
+
     #[DataProvider('paths')]
     public function testOnlyAPathOfTheShopIsInternal(string $path, bool $internal): void
     {
