@@ -152,9 +152,9 @@ jobs:
     name: Report a broken nightly run
     needs: [ domains, mutate ]
     # A run that fails is a broken run (the initial tests are red, or the job could not
-    # start): an escaped mutant only warns. Nobody watches a scheduled run, so it opens an
-    # issue, or comments on the one still open.
-    if: failure() && github.event_name == 'schedule'
+    # start), and so is one cancelled by its timeout: an escaped mutant only warns. Nobody
+    # watches a scheduled run, so it opens an issue, or comments on the one still open.
+    if: always() && github.event_name == 'schedule' && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -167,7 +167,7 @@ jobs:
         run: |
           title='The nightly mutation run is broken'
           number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
-          body="The run of $(date -u +%F) failed before it could report its mutants: $RUN_URL"
+          body="The run of $(date -u +%F) did not report its mutants: $RUN_URL"
           if [ -n "$number" ]; then
             gh issue comment "$number" --body "$body"
           else
