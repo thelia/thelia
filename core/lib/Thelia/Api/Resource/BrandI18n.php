@@ -42,6 +42,14 @@ class BrandI18n extends I18n
     ])]
     protected ?string $description = null;
 
+    /**
+     * The text a brand page shows under its products, as `CategoryI18n::$postscriptum` does for a category.
+     * Left uninitialized until it is set: the Propel bridge writes every initialized property of a
+     * translation, so a PATCH that leaves it out must not empty the stored text.
+     */
+    #[Groups([Brand::GROUP_ADMIN_READ, Brand::GROUP_FRONT_READ])]
+    protected ?string $postscriptum;
+
     public function getTitle(): ?string
     {
         return $this->title;
@@ -74,6 +82,18 @@ class BrandI18n extends I18n
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPostscriptum(): ?string
+    {
+        return $this->postscriptum ?? null;
+    }
+
+    public function setPostscriptum(?string $postscriptum): self
+    {
+        $this->postscriptum = $postscriptum;
 
         return $this;
     }
