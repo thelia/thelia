@@ -43,6 +43,7 @@ final readonly class SearchService
         #[AutowireIterator(SearchTermExpanderInterface::TAG)]
         private iterable $expanders = [],
         private ?SearchPagePath $searchPage = null,
+        private ?SearchLocales $locales = null,
     ) {
     }
 
@@ -167,6 +168,12 @@ final readonly class SearchService
 
             if ('' === trim($query->term)) {
                 return new SearchResult([], 0);
+            }
+
+            if (null !== $query->locale && null !== $this->locales && !\in_array($query->locale, $this->locales->indexed(), true)) {
+                $this->logger->info('The locale {locale} is not indexed, the database answers instead.', ['locale' => $query->locale]);
+
+                return null;
             }
 
             if (!$engine->isAvailable()) {

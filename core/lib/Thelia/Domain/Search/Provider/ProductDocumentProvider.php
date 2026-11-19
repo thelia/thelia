@@ -17,7 +17,11 @@ namespace Thelia\Domain\Search\Provider;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Domain\Search\Document\SearchDocument;
+use Thelia\Model\AttributeAvI18nQuery;
+use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\BrandI18nQuery;
+use Thelia\Model\FeatureAvI18nQuery;
+use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -62,6 +66,8 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
         $translations = $this->translations($productIds, $locale);
         $saleElements = $this->saleElements($productIds);
         $brandTitles = $this->brandTitles($products, $locale);
+        $featureValues = $this->featureValues($productIds, $locale);
+        $attributeValues = $this->attributeValues($saleElements, $locale);
 
         $documents = [];
 
@@ -82,6 +88,8 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
                 'chapo' => $translation['Chapo'],
                 'description' => $translation['Description'],
                 'postscriptum' => $translation['Postscriptum'],
+                'features' => implode(' ', $featureValues[$id] ?? []),
+                'attributes' => implode(' ', $attributeValues[$id] ?? []),
             ]);
 
             if (!isset($texts['title'])) {
@@ -131,15 +139,15 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
     /**
      * @param list<int> $productIds
      *
-     * @return array<int, array{references: list<string>, ean_codes: list<string>}>
+     * @return array<int, array{ids: list<int>, references: list<string>, ean_codes: list<string>}>
      */
     private function saleElements(array $productIds): array
     {
-        /** @var list<array{ProductId: int|string, Ref: ?string, EanCode: ?string}> $rows */
+        /** @var list<array{Id: int|string, ProductId: int|string, Ref: ?string, EanCode: ?string}> $rows */
         $rows = ProductSaleElementsQuery::create()
             ->filterByProductId($productIds, Criteria::IN)
             ->orderById()
-            ->select(['ProductId', 'Ref', 'EanCode'])
+            ->select(['Id', 'ProductId', 'Ref', 'EanCode'])
             ->find()
             ->getData();
 
@@ -147,7 +155,8 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
 
         foreach ($rows as $row) {
             $productId = (int) $row['ProductId'];
-            $saleElements[$productId] ??= ['references' => [], 'ean_codes' => []];
+            $saleElements[$productId] ??= ['ids' => [], 'references' => [], 'ean_codes' => []];
+            $saleElements[$productId]['ids'][] = (int) $row['Id'];
 
             if (null !== $row['Ref'] && '' !== $row['Ref']) {
                 $saleElements[$productId]['references'][] = $row['Ref'];
@@ -184,5 +193,119 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
         }
 
         return $titles;
+    }
+
+    /**
+     * @param list<int> $productIds
+     *
+     * @return array<int, list<string>>
+     */
+    private function featureValues(array $productIds, string $locale): array
+    {
+        /** @var list<array{ProductId: int|string, FeatureAvId: int|string|null}> $rows */
+        $rows = FeatureProductQuery::create()
+            ->filterByProductId($productIds, Criteria::IN)
+            ->filterByFeatureAvId(null, Criteria::ISNOTNULL)
+            ->orderByPosition()
+            ->select(['ProductId', 'FeatureAvId'])
+            ->find()
+            ->getData();
+
+        $valueIdsByProduct = [];
+
+        foreach ($rows as $row) {
+            $valueIdsByProduct[(int) $row['ProductId']][] = (int) $row['FeatureAvId'];
+        }
+
+        return self::titlesByProduct($valueIdsByProduct, $this->valueTitles(FeatureAvI18nQuery::create(), $valueIdsByProduct, $locale));
+    }
+
+    /**
+     * @param array<int, array{ids: list<int>, references: list<string>, ean_codes: list<string>}> $saleElements
+     *
+     * @return array<int, list<string>>
+     */
+    private function attributeValues(array $saleElements, string $locale): array
+    {
+        $productOfSaleElements = [];
+
+        foreach ($saleElements as $productId => $productSaleElements) {
+            foreach ($productSaleElements['ids'] as $saleElementsId) {
+                $productOfSaleElements[$saleElementsId] = $productId;
+            }
+        }
+
+        if ([] === $productOfSaleElements) {
+            return [];
+        }
+
+        /** @var list<array{ProductSaleElementsId: int|string, AttributeAvId: int|string}> $rows */
+        $rows = AttributeCombinationQuery::create()
+            ->filterByProductSaleElementsId(array_keys($productOfSaleElements), Criteria::IN)
+            ->orderByProductSaleElementsId()
+            ->orderByPosition()
+            ->select(['ProductSaleElementsId', 'AttributeAvId'])
+            ->find()
+            ->getData();
+
+        $valueIdsByProduct = [];
+
+        foreach ($rows as $row) {
+            $valueIdsByProduct[$productOfSaleElements[(int) $row['ProductSaleElementsId']]][] = (int) $row['AttributeAvId'];
+        }
+
+        return self::titlesByProduct($valueIdsByProduct, $this->valueTitles(AttributeAvI18nQuery::create(), $valueIdsByProduct, $locale));
+    }
+
+    /**
+     * @param array<int, list<int>> $valueIdsByProduct
+     *
+     * @return array<int, string>
+     */
+    private function valueTitles(FeatureAvI18nQuery|AttributeAvI18nQuery $i18nQuery, array $valueIdsByProduct, string $locale): array
+    {
+        $valueIds = array_values(array_unique(array_merge(...array_values($valueIdsByProduct))));
+
+        if ([] === $valueIds) {
+            return [];
+        }
+
+        /** @var list<array{Id: int|string, Title: ?string}> $rows */
+        $rows = $i18nQuery->filterById($valueIds, Criteria::IN)->filterByLocale($locale)->select(['Id', 'Title'])->find()->getData();
+
+        $titles = [];
+
+        foreach ($rows as $row) {
+            if (null !== $row['Title'] && '' !== trim($row['Title'])) {
+                $titles[(int) $row['Id']] = $row['Title'];
+            }
+        }
+
+        return $titles;
+    }
+
+    /**
+     * @param array<int, list<int>> $valueIdsByProduct
+     * @param array<int, string>    $titles
+     *
+     * @return array<int, list<string>>
+     */
+    private static function titlesByProduct(array $valueIdsByProduct, array $titles): array
+    {
+        $titlesByProduct = [];
+
+        foreach ($valueIdsByProduct as $productId => $valueIds) {
+            $productTitles = [];
+
+            foreach ($valueIds as $valueId) {
+                if (isset($titles[$valueId])) {
+                    $productTitles[] = $titles[$valueId];
+                }
+            }
+
+            $titlesByProduct[$productId] = array_values(array_unique($productTitles));
+        }
+
+        return $titlesByProduct;
     }
 }

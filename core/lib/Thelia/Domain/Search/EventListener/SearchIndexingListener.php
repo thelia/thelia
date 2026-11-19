@@ -20,6 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
+use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Search\Provider\BrandDocumentProvider;
 use Thelia\Domain\Search\Provider\CategoryDocumentProvider;
 use Thelia\Domain\Search\Provider\ContentDocumentProvider;
@@ -27,25 +30,45 @@ use Thelia\Domain\Search\Provider\FolderDocumentProvider;
 use Thelia\Domain\Search\Provider\ProductDocumentProvider;
 use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexingQueue;
+use Thelia\Model\Attribute;
+use Thelia\Model\AttributeAvI18n;
+use Thelia\Model\AttributeCombination;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandI18n;
+use Thelia\Model\Event\AttributeAvEvent;
+use Thelia\Model\Event\AttributeAvI18nEvent;
+use Thelia\Model\Event\AttributeCombinationEvent;
+use Thelia\Model\Event\AttributeEvent;
 use Thelia\Model\Event\BrandEvent;
 use Thelia\Model\Event\BrandI18nEvent;
 use Thelia\Model\Event\CategoryEvent;
 use Thelia\Model\Event\CategoryI18nEvent;
 use Thelia\Model\Event\ContentEvent;
 use Thelia\Model\Event\ContentI18nEvent;
+use Thelia\Model\Event\FeatureAvEvent;
+use Thelia\Model\Event\FeatureAvI18nEvent;
+use Thelia\Model\Event\FeatureEvent;
+use Thelia\Model\Event\FeatureProductEvent;
 use Thelia\Model\Event\FolderEvent;
 use Thelia\Model\Event\FolderI18nEvent;
 use Thelia\Model\Event\ProductEvent;
 use Thelia\Model\Event\ProductI18nEvent;
 use Thelia\Model\Event\ProductSaleElementsEvent;
+use Thelia\Model\Feature;
+use Thelia\Model\FeatureAv;
+use Thelia\Model\FeatureAvI18n;
+use Thelia\Model\FeatureProduct;
+use Thelia\Model\Map\AttributeAvI18nTableMap;
+use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\BrandI18nTableMap;
+use Thelia\Model\Map\FeatureAvI18nTableMap;
+use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery;
 
 final readonly class SearchIndexingListener implements EventSubscriberInterface
 {
@@ -102,6 +125,20 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
             ProductSaleElementsEvent::POST_DELETE => ['onSaleElementsWrite', 0],
             BrandEvent::PRE_DELETE => ['onBrandProductsChange', 0],
             BrandI18nEvent::PRE_SAVE => ['onBrandTranslationPreSave', 0],
+            FeatureProductEvent::PRE_SAVE => ['onProductValuePreSave', 0],
+            FeatureProductEvent::POST_DELETE => ['onProductValueWrite', 0],
+            AttributeCombinationEvent::PRE_SAVE => ['onProductValuePreSave', 0],
+            AttributeCombinationEvent::POST_DELETE => ['onProductValueWrite', 0],
+            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => ['onFeatureValuesRemoved', 0],
+            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => ['onSaleElementsRemoval', 256],
+            FeatureAvI18nEvent::PRE_SAVE => ['onValueTranslationPreSave', 0],
+            FeatureAvI18nEvent::POST_DELETE => ['onValueProductsChange', 0],
+            FeatureAvEvent::PRE_DELETE => ['onValueProductsChange', 0],
+            FeatureEvent::PRE_DELETE => ['onValueProductsChange', 0],
+            AttributeAvI18nEvent::PRE_SAVE => ['onValueTranslationPreSave', 0],
+            AttributeAvI18nEvent::POST_DELETE => ['onValueProductsChange', 0],
+            AttributeAvEvent::PRE_DELETE => ['onValueProductsChange', 0],
+            AttributeEvent::PRE_DELETE => ['onValueProductsChange', 0],
         ];
 
         foreach (array_keys(self::FAMILIES) as $eventName) {
@@ -208,6 +245,90 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
 
             /** @var list<int|string> $productIds */
             $productIds = ProductQuery::create()->filterByBrandId($brandId)->select(['Id'])->find()->getData();
+
+            foreach ($productIds as $productId) {
+                $this->queue->add(ProductDocumentProvider::FAMILY, (int) $productId);
+            }
+        });
+    }
+
+    public function onProductValuePreSave(FeatureProductEvent|AttributeCombinationEvent $event): void
+    {
+        $row = $event->getModel();
+
+        if ($row instanceof FeatureProduct && ($row->isNew() || $row->isColumnModified(FeatureProductTableMap::COL_FEATURE_AV_ID))) {
+            $this->onProductValueWrite($event);
+        }
+
+        if ($row instanceof AttributeCombination && ($row->isNew() || $row->isColumnModified(AttributeCombinationTableMap::COL_ATTRIBUTE_AV_ID) || $row->isColumnModified(AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID))) {
+            $this->onProductValueWrite($event);
+        }
+    }
+
+    public function onProductValueWrite(FeatureProductEvent|AttributeCombinationEvent $event): void
+    {
+        $this->safely(function () use ($event): void {
+            $row = $event->getModel();
+            $productId = match (true) {
+                $row instanceof FeatureProduct => $row->getProductId(),
+                $row instanceof AttributeCombination => $row->getProductSaleElements()?->getProductId(),
+                default => null,
+            };
+
+            if (null !== $productId) {
+                $this->queue->add(ProductDocumentProvider::FAMILY, (int) $productId);
+            }
+        });
+    }
+
+    public function onFeatureValuesRemoved(FeatureProductDeleteEvent $event): void
+    {
+        $this->safely(function () use ($event): void {
+            $this->queue->add(ProductDocumentProvider::FAMILY, (int) $event->getProductId());
+        });
+    }
+
+    public function onSaleElementsRemoval(ProductSaleElementDeleteEvent $event): void
+    {
+        $this->safely(function () use ($event): void {
+            /** @var int|string|null $productId */
+            $productId = ProductSaleElementsQuery::create()->filterById($event->getProductSaleElementId())->select(['ProductId'])->findOne();
+
+            if (null !== $productId) {
+                $this->queue->add(ProductDocumentProvider::FAMILY, (int) $productId);
+            }
+        });
+    }
+
+    public function onValueTranslationPreSave(FeatureAvI18nEvent|AttributeAvI18nEvent $event): void
+    {
+        $translation = $event->getModel();
+        $titleColumn = $translation instanceof FeatureAvI18n ? FeatureAvI18nTableMap::COL_TITLE : AttributeAvI18nTableMap::COL_TITLE;
+
+        if (($translation instanceof FeatureAvI18n || $translation instanceof AttributeAvI18n) && ($translation->isNew() || $translation->isColumnModified($titleColumn))) {
+            $this->onValueProductsChange($event);
+        }
+    }
+
+    public function onValueProductsChange(FeatureEvent|FeatureAvEvent|FeatureAvI18nEvent|AttributeEvent|AttributeAvEvent|AttributeAvI18nEvent $event): void
+    {
+        $this->safely(function () use ($event): void {
+            $model = $event->getModel();
+            $id = $model?->getId();
+
+            if (null === $id) {
+                return;
+            }
+
+            $query = ProductQuery::create();
+
+            /** @var list<int|string> $productIds */
+            $productIds = (match (true) {
+                $model instanceof Feature => $query->useFeatureProductQuery()->filterByFeatureId($id)->endUse(),
+                $model instanceof FeatureAv, $model instanceof FeatureAvI18n => $query->useFeatureProductQuery()->filterByFeatureAvId($id)->endUse(),
+                $model instanceof Attribute => $query->useProductSaleElementsQuery()->useAttributeCombinationQuery()->filterByAttributeId($id)->endUse()->endUse(),
+                default => $query->useProductSaleElementsQuery()->useAttributeCombinationQuery()->filterByAttributeAvId($id)->endUse()->endUse(),
+            })->distinct()->select(['Id'])->find()->getData();
 
             foreach ($productIds as $productId) {
                 $this->queue->add(ProductDocumentProvider::FAMILY, (int) $productId);
