@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Accounting;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Domain\Accounting\AccountingChart;
 use Thelia\Domain\Accounting\AccountingEntry;
@@ -35,7 +36,8 @@ use Thelia\Test\ActionIntegrationTestCase;
  * The credit notes of the CreditNote module in the sales journal: each numbered credit note
  * is a piece that reverses the sales it gives back, by tax rate, read from the tables of the
  * module while it is active. The module is not shipped with the core: its tables are
- * created for this class, with the columns of CreditNote 4.4.0, and dropped after it.
+ * created for this class, with the columns of CreditNote 4.4.0, and dropped after it. In a
+ * shop that has the module, its own tables are set aside meanwhile and put back after the class.
  */
 final class CreditNoteJournalTest extends ActionIntegrationTestCase
 {
@@ -94,7 +96,14 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
             SQL,
     ];
 
+    private const SET_ASIDE_PREFIX = 'set_aside_';
+
     private static bool $tablesCreated = false;
+
+    /**
+     * @var list<string> the tables of the installed module that were renamed for this class
+     */
+    private static array $setAside = [];
 
     private AccountingChart $chart;
 
@@ -127,6 +136,7 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
                 $connection->exec(\sprintf('DROP TABLE IF EXISTS `%s`', $table));
             }
 
+            self::putBackTheTablesOfTheModule($connection);
             self::$tablesCreated = false;
         }
 
@@ -377,6 +387,7 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
     private static function createTheTablesOfTheModule(): void
     {
         $connection = Propel::getConnection('TheliaMain');
+        self::setAsideTheTablesOfTheModule($connection);
 
         foreach (self::TABLES as $table => $definition) {
             $connection->exec(\sprintf('DROP TABLE IF EXISTS `%s`', $table));
@@ -390,6 +401,35 @@ final class CreditNoteJournalTest extends ActionIntegrationTestCase
         foreach (self::TYPES as $code => $id) {
             $connection->exec(\sprintf("INSERT INTO `credit_note_type` (`id`, `code`, `position`, `required_order`) VALUES (%d, '%s', %d, %d)", $id, $code, $id, $id <= 3 ? 1 : 0));
         }
+    }
+
+    /**
+     * The tables of the installed module are referenced by foreign keys: they cannot be dropped, so
+     * they are renamed together (the keys follow) and renamed back after the class.
+     */
+    private static function setAsideTheTablesOfTheModule(ConnectionInterface $connection): void
+    {
+        $present = $connection->query(\sprintf(
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ('%s')",
+            implode("', '", array_keys(self::TABLES)),
+        ))->fetchAll(\PDO::FETCH_COLUMN);
+
+        if ([] === $present) {
+            return;
+        }
+
+        $connection->exec('RENAME TABLE '.implode(', ', array_map(static fn (string $table): string => \sprintf('`%1$s` TO `%2$s%1$s`', $table, self::SET_ASIDE_PREFIX), $present)));
+        self::$setAside = array_values($present);
+    }
+
+    private static function putBackTheTablesOfTheModule(ConnectionInterface $connection): void
+    {
+        if ([] === self::$setAside) {
+            return;
+        }
+
+        $connection->exec('RENAME TABLE '.implode(', ', array_map(static fn (string $table): string => \sprintf('`%2$s%1$s` TO `%1$s`', $table, self::SET_ASIDE_PREFIX), self::$setAside)));
+        self::$setAside = [];
     }
 
     private function activateTheModule(bool $active): void

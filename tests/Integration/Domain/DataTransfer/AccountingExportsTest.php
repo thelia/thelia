@@ -39,6 +39,7 @@ use Thelia\Model\LangQuery;
 use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductTax;
@@ -112,12 +113,22 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
     public function testAnActiveCreditNoteModuleWhoseTablesCannotBeReadIsNamedInTheReport(): void
     {
         $this->chart('411000', '708500', '20:706200:445720');
-        Propel::getConnection('TheliaMain')->exec("INSERT INTO `module` (`code`, `version`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES ('CreditNote', '4.4.0', 1, 1, 999, 'CreditNote\\\\CreditNote', NOW(), NOW())");
+        $this->activateTheCreditNoteModule();
 
-        $export = new SalesJournalExport();
-        $this->rows($export, '2026-02');
+        // In a shop that has the module, its tables are there: one is renamed meanwhile.
+        $hidden = $this->hideATableOfTheCreditNoteModule();
 
-        self::assertStringContainsString('The CreditNote module is active but its tables cannot be read', implode("\n", $export->report()->warnings()));
+        try {
+            $export = new SalesJournalExport();
+            $this->rows($export, '2026-02');
+            $warnings = implode("\n", $export->report()->warnings());
+        } finally {
+            if (null !== $hidden) {
+                $hidden->exec('RENAME TABLE `hidden_credit_note_address` TO `credit_note_address`');
+            }
+        }
+
+        self::assertStringContainsString('The CreditNote module is active but its tables cannot be read', $warnings);
     }
 
     public function testADiscountedOrderWhoseTaxIsOffItsRatesIsNamedInTheReport(): void
@@ -454,7 +465,8 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
         $report = $job->getExportReport() ?? self::fail('The job kept no report.');
         self::assertMatchesRegularExpression('/[1-9]\d* pieces?, debit /', implode("\n", $report->lines()));
-        self::assertStringContainsString('credit note', implode("\n", $report->warnings()));
+        // The warning of a shop without credit note module, or the count of a shop that has it.
+        self::assertStringContainsString('credit note', implode("\n", [...$report->lines(), ...$report->warnings()]));
     }
 
     public function testAJournalWithMoreWarningsThanTheReportKeepsEndsDoneAndSaysHowManyAreLeftOut(): void
@@ -498,6 +510,41 @@ final class AccountingExportsTest extends ActionIntegrationTestCase
         self::assertSame(JobStatus::DONE, $job->getJobStatus(), (string) $job->getError());
         self::assertNull($job->getReport());
         self::assertNull($job->getExportReport());
+    }
+
+    /**
+     * The module row of the shop when the module is installed, otherwise a row for the test.
+     */
+    private function activateTheCreditNoteModule(): void
+    {
+        $connection = Propel::getConnection('TheliaMain');
+
+        if (null !== ModuleQuery::create()->findOneByCode('CreditNote')) {
+            $connection->exec("UPDATE `module` SET `activate` = 1 WHERE `code` = 'CreditNote'");
+
+            return;
+        }
+
+        $connection->exec("INSERT INTO `module` (`code`, `version`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES ('CreditNote', '4.4.0', 1, 1, 999, 'CreditNote\\\\CreditNote', NOW(), NOW())");
+    }
+
+    /**
+     * Renamed on its own connection: a DDL statement would end the transaction of the test.
+     * Null when the module is not installed, its tables are not there.
+     */
+    private function hideATableOfTheCreditNoteModule(): ?\PDO
+    {
+        $main = Propel::getConnection('TheliaMain');
+
+        if (0 === (int) $main->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'credit_note_address'")->fetchColumn()) {
+            return null;
+        }
+
+        $configuration = Propel::getServiceContainer()->getConnectionManager('TheliaMain')->getConfiguration();
+        $other = new \PDO($configuration['dsn'], $configuration['user'] ?? null, $configuration['password'] ?? null, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        $other->exec('RENAME TABLE `credit_note_address` TO `hidden_credit_note_address`');
+
+        return $other;
     }
 
     private function chart(string $customerAccount, string $shippingAccount, string $rateAccounts): void
