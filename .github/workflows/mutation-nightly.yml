@@ -57,7 +57,7 @@ jobs:
       max-parallel: 8
       matrix:
         domain: ${{ fromJSON(needs.domains.outputs.domains) }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
       DOMAIN_PATH: core/lib/Thelia/Domain/${{ matrix.domain }}
