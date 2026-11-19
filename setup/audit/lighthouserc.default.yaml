@@ -1,17 +1,32 @@
+# Lighthouse CI configuration of the storefront audit. It is a template: `__DOMAIN__` and
+# `__PRESET__` are replaced by `node setup/audit/lighthouse.mjs config`, which writes the
+# effective configuration (setup/audit/lighthouserc.yaml by default, ignored by git) for the
+# origin and the preset (desktop or mobile) given on its command line.
+# The `lighthouse` workflow measures the demo shop with it and compares the medians with
+# setup/audit/lighthouse-budget.json.
 ci:
   collect:
     # Method
     method: "node"
     # Show the browser which is helpful when checking the config
     headful: false
-    # Number of runs by url (default: 3)
-    numberOfRuns: 1
+    # Number of runs by url: the median of three is what is compared and published, a single
+    # run varies too much on a shared machine to hold a threshold.
+    numberOfRuns: 3
     # Specify that thelia isn't pwa
     isSinglePageApplication: false
+    # Runs before each URL: signs the demo customer in for the /account pages (credentials
+    # from LIGHTHOUSE_CUSTOMER_EMAIL and LIGHTHOUSE_CUSTOMER_PASSWORD) and signs out for the
+    # others. Lighthouse empties the HTTP cache before every run but keeps the cookies.
+    puppeteerScript: "__SIGN_IN_SCRIPT__"
+    puppeteerLaunchOptions:
+      # --ignore-certificate-errors: the CI and a local DDEV serve a self-signed certificate.
+      args:
+        - "--no-sandbox"
+        - "--ignore-certificate-errors"
     # Settings
     settings:
       preset: "__PRESET__"
-      chromeFlags: "--no-sandbox"
       onlyCategories:
         - "performance"
         - "accessibility"
