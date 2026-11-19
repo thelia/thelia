@@ -33,13 +33,13 @@ set -euo pipefail
 
 # component:subdirectory:repository:branches published downstream
 readonly COMPONENTS=(
-    'core:core:thelia/core:main 3.1 3.2 3.3'
-    'setup:setup:thelia/setup:main 3.1 3.2 3.3'
+    'core:core:thelia/core:main 3.1 3.2 3.3 3.4'
+    'setup:setup:thelia/setup:main 3.1 3.2 3.3 3.4'
     'config:local/config:thelia/config:main'
 )
 
 # Branches this script may publish
-readonly MAINTAINED_BRANCHES=(main 3.1 3.2 3.3)
+readonly MAINTAINED_BRANCHES=(main 3.1 3.2 3.3 3.4)
 
 readonly mode="${SPLIT_MODE:-check}"
 readonly workspace="$(mktemp -d)"
