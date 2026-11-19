@@ -94,6 +94,18 @@ final class SearchReindexCommandTest extends IntegrationTestCase
         self::assertSame([], $this->engine->purgedFamilies);
     }
 
+    public function testAFailingEngineIsReportedByItsClassWithoutItsMessage(): void
+    {
+        $this->brand('First', 'Premier');
+        $this->engine->indexCallsBeforeFailure = 0;
+
+        $tester = $this->reindex(['--family' => ['brand']]);
+
+        self::assertSame(Command::FAILURE, $tester->getStatusCode());
+        self::assertStringContainsString(\RuntimeException::class, $tester->getDisplay());
+        self::assertStringNotContainsString('The engine went away', $tester->getDisplay());
+    }
+
     public function testAnInterruptedRunResumesAfterTheLastIndexedBatchWithoutPurgingAgain(): void
     {
         $first = $this->brand('First', 'Premier');

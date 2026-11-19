@@ -113,16 +113,28 @@ final class SearchIndexerTest extends IntegrationTestCase
         self::assertFalse($this->engine->has('product', $id, 'en_US'));
     }
 
-    public function testARemovalTakesTheDocumentOutOfEveryIndexedLocaleWithoutReadingTheCatalogue(): void
+    public function testARemovalTakesTheDocumentOutOfEveryIndexedLocale(): void
+    {
+        $product = $this->product('Old table');
+        $id = $product->getId();
+        $this->indexer->synchronize('product', [$id], self::LOCALES);
+
+        $product->delete();
+        $this->indexer->remove('product', [$id]);
+
+        foreach (self::LOCALES as $locale) {
+            self::assertFalse($this->engine->has('product', $id, $locale), $locale);
+        }
+    }
+
+    public function testARemovalOfAProductWhoseDeletionWasRolledBackKeepsItInTheIndex(): void
     {
         $product = $this->product('Old table');
         $this->indexer->synchronize('product', [$product->getId()], self::LOCALES);
 
         $this->indexer->remove('product', [$product->getId()]);
 
-        foreach (self::LOCALES as $locale) {
-            self::assertFalse($this->engine->has('product', $product->getId(), $locale), $locale);
-        }
+        self::assertTrue($this->engine->has('product', $product->getId(), 'en_US'));
     }
 
     public function testARemovalOfAFamilyWithoutProviderLeavesTheIndexAsItWas(): void
@@ -165,6 +177,42 @@ final class SearchIndexerTest extends IntegrationTestCase
         $this->indexer->synchronize('category', [$category->getId()], self::LOCALES);
 
         self::assertSame('Chairs alert(1) for 5 < 10 €', $this->engine->get('category', $category->getId(), 'en_US')?->fields['description']);
+    }
+
+    public function testAProductIsFoundByTheValuesOfItsFeaturesAndOfItsCombinationsInEachLocale(): void
+    {
+        $product = $this->product('Garden chair');
+        $product->setLocale('fr_FR')->setTitle('Chaise de jardin')->save();
+        $material = $this->fixtures->featureAv($this->fixtures->feature(), ['title' => 'Teak']);
+        $material->setLocale('fr_FR')->setTitle('Teck')->save();
+        $this->fixtures->featureProduct($product, $material);
+        $colour = $this->fixtures->attributeAv($this->fixtures->attribute(), ['title' => 'Olive green']);
+        $colour->setLocale('fr_FR')->setTitle('Vert olive')->save();
+        $this->fixtures->attributeCombination($product->getDefaultSaleElements(), $colour);
+        $secondSaleElements = $this->fixtures->productSaleElement($product);
+        $this->fixtures->attributeCombination($secondSaleElements, $colour);
+        $this->fixtures->attributeCombination($secondSaleElements, $this->fixtures->attributeAv($this->fixtures->attribute(), ['title' => 'XL']));
+
+        $this->indexer->synchronize('product', [$product->getId()], self::LOCALES);
+
+        $english = $this->engine->get('product', $product->getId(), 'en_US');
+        $french = $this->engine->get('product', $product->getId(), 'fr_FR');
+        self::assertSame('Teak', $english?->fields['features']);
+        self::assertSame('Olive green XL', $english->fields['attributes']);
+        self::assertSame('Teck', $french?->fields['features']);
+        self::assertSame('Vert olive', $french->fields['attributes']);
+        self::assertSame(1, $english->weightOf('features'));
+    }
+
+    public function testAProductWithoutFeaturesNorCombinationsHasNoSuchFields(): void
+    {
+        $product = $this->product('Garden chair');
+
+        $this->indexer->synchronize('product', [$product->getId()], self::LOCALES);
+
+        $document = $this->engine->get('product', $product->getId(), 'en_US');
+        self::assertArrayNotHasKey('features', $document?->fields ?? []);
+        self::assertArrayNotHasKey('attributes', $document?->fields ?? []);
     }
 
     public function testCodesAndComparisonsAreIndexedAsWritten(): void

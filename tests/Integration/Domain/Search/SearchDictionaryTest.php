@@ -81,6 +81,19 @@ final class SearchDictionaryTest extends IntegrationTestCase
         self::assertNull($this->search()->redirectFor('garden sale', 'fr_FR'));
     }
 
+    public function testARedirectionToASubcategoryDeletedWithItsParentIsDeactivated(): void
+    {
+        $parent = $this->fixtures->category();
+        $child = $this->fixtures->category(['parent' => $parent->getId()]);
+        $redirect = $this->redirect('garden', SearchRedirectTargetType::CATEGORY, $child->getId());
+
+        $parent->delete();
+        static::getContainer()->get(SearchTermRedirectTargetListener::class)->deactivateTheRedirectionsOfTheDeletedTargets();
+
+        self::assertNull(\Thelia\Model\CategoryQuery::create()->findPk($child->getId()));
+        self::assertSame(0, SearchTermRedirectQuery::create()->findPk($redirect->getId())?->getActive());
+    }
+
     #[DataProvider('targetTypes')]
     public function testARedirectionToADeletedTargetIsDeactivatedOnceTheRequestEnds(string $type): void
     {
