@@ -596,7 +596,8 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         // Nothing is left to pay, and the core has turned the order paid (before this listener,
         // see OrderWithNothingToPayListener): the module would be asked to charge nothing. An
-        // order the core could not turn paid is still the module's to charge.
+        // order a module refused on ORDER_NOTHING_TO_PAY is not paid and is still the module's
+        // to charge. A paid status the core is refused (transition, stock) throws before this.
         if ($order->isPaid(false) && $this->orderWithNothingToPay->hasNothingToPay($order)) {
             return;
         }
