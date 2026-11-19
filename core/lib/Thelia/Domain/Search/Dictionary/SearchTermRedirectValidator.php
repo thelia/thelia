@@ -22,8 +22,10 @@ final readonly class SearchTermRedirectValidator
 {
     public const int COMMON_TERM_THRESHOLD = 20;
 
-    public function __construct(private SearchRedirectTargets $targets)
-    {
+    public function __construct(
+        private SearchRedirectTargets $targets,
+        private SearchPagePath $searchPage,
+    ) {
     }
 
     public function validate(string $type, ?int $targetId, ?string $url): void
@@ -35,6 +37,10 @@ final readonly class SearchTermRedirectValidator
         if (SearchRedirectTargetType::URL === $type) {
             if (null === $url || mb_strlen($url) > 2048 || !SearchRedirectTargets::isInternalPath($url)) {
                 throw new \InvalidArgumentException(self::translate('The address must be a path of the shop, starting with a single slash.'));
+            }
+
+            if ($this->searchPage->leadsToTheSearch($url)) {
+                throw new \InvalidArgumentException(self::translate('The address leads back to the search: the visitor would be redirected endlessly.'));
             }
 
             return;

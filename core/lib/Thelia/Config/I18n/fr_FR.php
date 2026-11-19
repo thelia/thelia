@@ -1175,6 +1175,7 @@ return [
     'Paid orders out of created orders' => 'Commandes payées sur commandes créées',
     '"%type%" is not a redirection target.' => '« %type% » n\'est pas une cible de redirection.',
     'The address must be a path of the shop, starting with a single slash.' => 'L\'adresse doit être un chemin de la boutique, qui commence par une seule barre oblique.',
+    'The address leads back to the search: the visitor would be redirected endlessly.' => 'L\'adresse ramène à la recherche : le visiteur serait redirigé sans fin.',
     'The target of the redirection does not exist.' => 'La cible de la redirection n\'existe pas.',
     'Give at least one equivalent term, other than the term itself.' => 'Indiquez au moins un terme équivalent, différent du terme lui-même.',
     'A term has %max% equivalent terms at most.' => 'Un terme a au plus %max% termes équivalents.',

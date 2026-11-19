@@ -92,6 +92,15 @@ final class SearchServiceTest extends TestCase
         self::assertCount(SearchQuery::MAX_ALTERNATIVE_TERMS, $alternatives);
     }
 
+    public function testTheAlternativeTermsOfASearchAreThoseOfTheRewrittenTerm(): void
+    {
+        $service = $this->service(null, rewriters: [$this->rewriter('tlphone', 'telephone')], expanders: [$this->expander(['telephone' => ['mobile', 'tlphone'], 'tlphone' => ['typo']])]);
+
+        self::assertSame(['telephone', 'mobile'], $service->alternativeTermsOf(' tlphone ', 'en_US'));
+        self::assertSame(['mobile', 'tlphone'], $service->alternativeTermsOf('telephone', 'en_US'));
+        self::assertSame([], $service->alternativeTermsOf('chair', 'en_US'));
+    }
+
     public function testAFailingExpanderIsLeftOutAndLogged(): void
     {
         $failing = new class implements SearchTermExpanderInterface {

@@ -20,9 +20,9 @@ final class SearchTermNormalizer
     {
         $composed = \Normalizer::normalize($term, \Normalizer::FORM_C);
         $term = false === $composed ? $term : $composed;
-        $singleSpaced = preg_replace('/\s+/u', ' ', trim($term));
+        $singleSpaced = preg_replace('/[\s\x{200B}\x{FEFF}]+/u', ' ', $term);
 
-        return mb_strtolower(null === $singleSpaced ? trim($term) : $singleSpaced);
+        return mb_strtolower(trim(null === $singleSpaced ? $term : $singleSpaced));
     }
 
     public static function key(string $term): string
