@@ -22,7 +22,7 @@
             "url": "core/",
             "options": {
                 "versions": {
-                    "thelia/core": "3.4.0"
+                    "thelia/core": "3.5.0"
                 }
             }
         }
@@ -166,7 +166,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.4.x-dev"
+            "dev-main": "3.5.x-dev"
         },
         "symfony": {
             "allow-contrib": true,
