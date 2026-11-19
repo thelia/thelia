@@ -24,6 +24,7 @@ use Thelia\Domain\Search\Event\SearchSynonymWriteEvent;
 use Thelia\Domain\Search\Event\SearchTermRedirectWriteEvent;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\SearchTermRedirect;
 use Thelia\Test\WebIntegrationTestCase;
 
 final class SearchDictionaryTest extends WebIntegrationTestCase
@@ -78,6 +79,31 @@ final class SearchDictionaryTest extends WebIntegrationTestCase
         $content = (string) $this->client->getResponse()->getContent();
         self::assertStringContainsString('Dictionary smartphone', $content);
         self::assertStringContainsString('Mobilephone dictionary case', $content);
+    }
+
+    public function testARedirectionBackToTheSearchIsNotFollowed(): void
+    {
+        (new SearchTermRedirect())
+            ->setLangId($this->english()->getId())
+            ->setTerm('round trip')
+            ->setTargetType(SearchRedirectTargetType::URL)
+            ->setUrl('/search?query=round+trip')
+            ->setActive(1)
+            ->save();
+
+        $this->dropRequestsWithoutSession();
+        $this->assertPageRenders('/search?query='.rawurlencode('round trip'));
+    }
+
+    public function testAWildcardOfTheVisitorIsSearchedLiterally(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['title' => 'Wildcard dictionary lamp']);
+
+        $this->dropRequestsWithoutSession();
+        $this->assertPageRenders('/search?query='.rawurlencode('_ildcard dictionary'));
+
+        self::assertStringNotContainsString('Wildcard dictionary lamp', (string) $this->client->getResponse()->getContent());
     }
 
     private function dropRequestsWithoutSession(): void

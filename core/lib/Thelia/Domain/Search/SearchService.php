@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Domain\Search\Contract\SearchRedirectResolverInterface;
 use Thelia\Domain\Search\Contract\SearchTermExpanderInterface;
 use Thelia\Domain\Search\Contract\SearchTermRewriterInterface;
+use Thelia\Domain\Search\Dictionary\SearchPagePath;
 use Thelia\Domain\Search\Dictionary\SearchRedirectTargets;
 use Thelia\Domain\Search\Document\SearchHit;
 use Thelia\Domain\Search\Document\SearchQuery;
@@ -41,6 +42,7 @@ final readonly class SearchService
         private LoggerInterface $logger,
         #[AutowireIterator(SearchTermExpanderInterface::TAG)]
         private iterable $expanders = [],
+        private ?SearchPagePath $searchPage = null,
     ) {
     }
 
@@ -68,6 +70,29 @@ final readonly class SearchService
         ));
 
         return \array_slice($alternatives, 0, SearchQuery::MAX_ALTERNATIVE_TERMS);
+    }
+
+    /**
+     * The terms a search of $term looks for besides $term itself, as the engine path does:
+     * the term rewritten, then the equivalents of the rewritten term.
+     *
+     * @return list<string>
+     */
+    public function alternativeTermsOf(string $term, ?string $locale): array
+    {
+        $term = trim($term);
+        $rewritten = trim($this->rewrite($term, $locale));
+
+        if ('' === $rewritten) {
+            return [];
+        }
+
+        $alternatives = array_filter(
+            array_unique([$rewritten, ...$this->expand($rewritten, $locale)]),
+            static fn (string $alternative): bool => $alternative !== $term,
+        );
+
+        return \array_slice(array_values($alternatives), 0, SearchQuery::MAX_ALTERNATIVE_TERMS);
     }
 
     public function rewrite(string $term, ?string $locale): string
@@ -106,6 +131,12 @@ final readonly class SearchService
 
             if (!SearchRedirectTargets::isInternalPath($path)) {
                 $this->logger->warning('Search redirect resolver {resolver} gave a path outside the shop, ignored.', ['resolver' => $resolver::class]);
+
+                continue;
+            }
+
+            if (true === $this->searchPage?->leadsToTheSearch($path)) {
+                $this->logger->warning('Search redirect resolver {resolver} gave a path back to the search, ignored.', ['resolver' => $resolver::class]);
 
                 continue;
             }

@@ -30,6 +30,7 @@ final readonly class SearchDictionaryImporter
 {
     public const int MAX_BYTES = 1048576;
     public const int MAX_ROWS = 5000;
+    public const int MAX_COMMON_TERM_CHECKS = 100;
     private const string DELIMITER = ';';
 
     public function __construct(private EventDispatcherInterface $dispatcher)
@@ -57,7 +58,10 @@ final readonly class SearchDictionaryImporter
 
     public function importRedirects(string $path): SearchDictionaryImportReport
     {
-        return $this->import($path, 'term', function (Lang $lang, array $row): bool {
+        $checks = 0;
+        $commonTerms = [];
+
+        $report = $this->import($path, 'term', function (Lang $lang, array $row) use (&$checks, &$commonTerms): bool {
             $term = SearchTermNormalizer::normalize($row[1] ?? '');
             $type = strtolower(trim($row[2] ?? ''));
             $target = trim($row[3] ?? '');
@@ -71,12 +75,18 @@ final readonly class SearchDictionaryImporter
                 ->setTargetId($isUrl || 1 !== preg_match('/^\d+$/', $target) ? null : (int) $target)
                 ->setUrl($isUrl ? $target : null)
                 ->setActive(null === $existing || 1 === $existing->getActive())
-                ->setCommonTermChecked(false);
+                ->setCommonTermChecked($checks++ < self::MAX_COMMON_TERM_CHECKS);
 
             $this->dispatcher->dispatch($event, null === $existing ? TheliaEvents::SEARCH_TERM_REDIRECT_CREATE : TheliaEvents::SEARCH_TERM_REDIRECT_UPDATE);
 
+            if ($event->isCommonTerm()) {
+                $commonTerms[] = $term;
+            }
+
             return null === $existing;
         });
+
+        return new SearchDictionaryImportReport($report->created, $report->updated, $report->refused, array_values(array_unique($commonTerms)));
     }
 
     /**

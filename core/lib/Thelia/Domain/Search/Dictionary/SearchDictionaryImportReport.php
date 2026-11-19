@@ -21,11 +21,13 @@ final readonly class SearchDictionaryImportReport
 {
     /**
      * @param array<int, string> $refused
+     * @param list<string>       $commonTerms
      */
     public function __construct(
         public int $created,
         public int $updated,
         public array $refused,
+        public array $commonTerms = [],
     ) {
     }
 }

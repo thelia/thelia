@@ -15,24 +15,36 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Search;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Search\Contract\SearchScope;
+use Thelia\Domain\Search\Dictionary\DictionarySearchTermExpander;
 use Thelia\Domain\Search\Dictionary\SearchDictionary;
 use Thelia\Domain\Search\Dictionary\SearchDictionaryImporter;
+use Thelia\Domain\Search\Dictionary\SearchPagePath;
 use Thelia\Domain\Search\Dictionary\SearchRedirectTargetType;
 use Thelia\Domain\Search\Dictionary\SearchTermRedirectValidator;
+use Thelia\Domain\Search\Document\SearchDocument;
+use Thelia\Domain\Search\Document\SearchQuery;
 use Thelia\Domain\Search\Event\SearchSynonymWriteEvent;
 use Thelia\Domain\Search\Event\SearchTermRedirectWriteEvent;
 use Thelia\Domain\Search\EventListener\SearchTermRedirectTargetListener;
+use Thelia\Domain\Search\Provider\ProductDocumentProvider;
+use Thelia\Domain\Search\SearchDocumentProviders;
+use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchService;
 use Thelia\Model\Event\CategoryEvent;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Model\RewritingUrl;
 use Thelia\Model\SearchSynonymQuery;
 use Thelia\Model\SearchTermRedirect;
 use Thelia\Model\SearchTermRedirectQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
+use Thelia\Tests\Support\Search\InMemorySearchEngine;
 
 final class SearchDictionaryTest extends IntegrationTestCase
 {
@@ -145,6 +157,72 @@ final class SearchDictionaryTest extends IntegrationTestCase
         self::assertSame('/promotions', $this->search()->redirectFor('PROMO', 'en_US'));
     }
 
+    public function testARedirectionBackToTheSearchIsRefused(): void
+    {
+        foreach (['/search?query=promo', '/Search', '/?view=search&query=promo', '/index.php?view=SEARCH', '/index.php/search?query=promo', '/./search', '/promotions/../search', '//search'] as $url) {
+            try {
+                $this->redirect('promo', SearchRedirectTargetType::URL, url: $url);
+                self::fail(\sprintf('"%s" was accepted.', $url));
+            } catch (\InvalidArgumentException) {
+            }
+        }
+
+        $this->redirect('promo', SearchRedirectTargetType::URL, url: '/promotions?view=category');
+
+        self::assertSame('/promotions?view=category', $this->search()->redirectFor('promo', 'en_US'));
+    }
+
+    public function testARedirectionBackToTheSearchWrittenAroundTheValidationIsNotFollowed(): void
+    {
+        (new SearchTermRedirect())
+            ->setLangId($this->english()->getId())
+            ->setTerm('promo')
+            ->setTargetType(SearchRedirectTargetType::URL)
+            ->setUrl('/search?query=promo')
+            ->setActive(1)
+            ->save();
+        static::getContainer()->get(SearchDictionary::class)->forget();
+
+        self::assertNull($this->search()->redirectFor('promo', 'en_US'));
+    }
+
+    public function testAPathUnderTheBaseOfTheShopIsRecognisedAsTheSearch(): void
+    {
+        $requests = static::getContainer()->get('request_stack');
+        $previous = [];
+
+        while (null !== $request = $requests->pop()) {
+            $previous[] = $request;
+        }
+
+        $requests->push(Request::create('http://shop.example/shop/index.php/', server: ['SCRIPT_NAME' => '/shop/index.php', 'SCRIPT_FILENAME' => '/var/www/html/public/index.php']));
+
+        try {
+            static::getContainer()->get('thelia.url.manager');
+            $searchPage = static::getContainer()->get(SearchPagePath::class);
+
+            self::assertTrue($searchPage->leadsToTheSearch('/shop/search?query=promo'));
+            self::assertTrue($searchPage->leadsToTheSearch('/shop/index.php/search'));
+            self::assertFalse($searchPage->leadsToTheSearch('/shop/promotions'));
+        } finally {
+            $requests->pop();
+
+            foreach (array_reverse($previous) as $request) {
+                $requests->push($request);
+            }
+        }
+    }
+
+    public function testARewrittenAddressOfTheSearchIsRecognisedAsTheSearch(): void
+    {
+        (new RewritingUrl())->setUrl('b239-find-a-promo')->setView('search')->setViewLocale('en_US')->save();
+        (new RewritingUrl())->setUrl('b239-promotions')->setView('category')->setViewLocale('en_US')->setViewId('1')->save();
+        $searchPage = static::getContainer()->get(SearchPagePath::class);
+
+        self::assertTrue($searchPage->leadsToTheSearch('/b239-find-a-promo'));
+        self::assertFalse($searchPage->leadsToTheSearch('/b239-promotions'));
+    }
+
     public function testATermIsRedirectedOnlyOncePerLanguage(): void
     {
         $this->redirect('promo', SearchRedirectTargetType::URL, url: '/promotions');
@@ -201,6 +279,49 @@ final class SearchDictionaryTest extends IntegrationTestCase
         self::assertSame([], $this->search()->expand('tel', 'en_US'));
     }
 
+    public function testSynonymsReachTheEngineAndFindTheProductsOfTheirEquivalents(): void
+    {
+        $product = $this->fixtures->product($this->fixtures->category(), $this->fixtures->taxRule(), $this->fixtures->currency());
+        $engine = new InMemorySearchEngine();
+        $engine->index([new SearchDocument('product', $product->getId(), 'en_US', SearchScope::Shop, true, ['title' => 'Smart mobile'])]);
+        $search = new SearchService(
+            new SearchEngineRegistry([$engine]),
+            new SearchDocumentProviders([new ProductDocumentProvider()]),
+            [],
+            [],
+            new NullLogger(),
+            [new DictionarySearchTermExpander(static::getContainer()->get(SearchDictionary::class))],
+        );
+
+        self::assertSame([], $search->search(new SearchQuery('tel', 'en_US', ['product']))?->idsOf('product'));
+
+        $this->synonym('tel', ['mobile']);
+
+        self::assertSame([$product->getId()], $search->search(new SearchQuery('tel', 'en_US', ['product']))?->idsOf('product'));
+        self::assertSame(['mobile'], $engine->lastQuery?->alternativeTerms);
+    }
+
+    public function testTheDictionaryIsRebuiltWithoutAnyRequest(): void
+    {
+        $this->synonym('tel', ['telephone']);
+        $requests = static::getContainer()->get('request_stack');
+
+        while (null !== $requests->pop()) {
+        }
+
+        $dictionary = static::getContainer()->get(SearchDictionary::class);
+        $dictionary->forget();
+        $dictionary->forgetAfterTheRequest();
+
+        self::assertNull($requests->getCurrentRequest());
+        self::assertSame(['telephone'], $this->search()->expand('tel', 'en_US'));
+
+        SearchSynonymQuery::create()->filterByTerm('tel')->update(['Synonyms' => 'mobile']);
+        $dictionary->reset();
+
+        self::assertSame(['telephone'], $this->search()->expand('tel', 'en_US'), 'The rebuilt dictionary went to the shared cache.');
+    }
+
     public function testASynonymNeedsAnEquivalentOtherThanItself(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -240,6 +361,26 @@ final class SearchDictionaryTest extends IntegrationTestCase
         self::assertSame(2, $report->created);
         self::assertSame([2], array_keys($report->refused));
         self::assertSame('/sales', $this->search()->redirectFor('sale', 'en_US'));
+    }
+
+    public function testTheImportReportsTheRedirectionsOfAWordManyProductsBear(): void
+    {
+        $category = $this->fixtures->category();
+        $taxRule = $this->fixtures->taxRule();
+        $currency = $this->fixtures->currency();
+
+        foreach (range(1, SearchTermRedirectValidator::COMMON_TERM_THRESHOLD + 1) as $index) {
+            $this->fixtures->product($category, $taxRule, $currency, ['title' => 'Garden chair '.$index]);
+        }
+
+        $report = $this->importer()->importRedirects($this->csv(
+            "en_US;Chair;url;/chairs\n"
+            ."en_US;hammock;url;/hammocks\n"
+            ."en_US;chair;url;/garden-chairs\n"
+        ));
+
+        self::assertSame(2, $report->created);
+        self::assertSame(['chair'], $report->commonTerms);
     }
 
     public function testTheDictionaryIsKeptInTheSharedCacheUntilAWrite(): void
