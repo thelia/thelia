@@ -20,6 +20,7 @@ use Psr\Log\AbstractLogger;
 use Thelia\Domain\Search\Contract\SearchEngineInterface;
 use Thelia\Domain\Search\Contract\SearchRedirectResolverInterface;
 use Thelia\Domain\Search\Contract\SearchScope;
+use Thelia\Domain\Search\Contract\SearchTermExpanderInterface;
 use Thelia\Domain\Search\Contract\SearchTermRewriterInterface;
 use Thelia\Domain\Search\Document\SearchDocument;
 use Thelia\Domain\Search\Document\SearchQuery;
@@ -53,6 +54,56 @@ final class SearchServiceTest extends TestCase
         self::assertNotNull($result);
         self::assertSame('telephone', $engine->lastQuery?->term);
         self::assertSame([7], $result->idsOf('product'));
+    }
+
+    public function testTheEngineReceivesTheAlternativeTermsAndFindsThem(): void
+    {
+        $engine = $this->engineWith(new SearchDocument('product', 7, 'en_US', SearchScope::Shop, true, ['title' => 'Smart mobile']));
+        $service = $this->service($engine, expanders: [$this->expander(['tel' => ['telephone', 'mobile']])]);
+
+        $result = $service->search(new SearchQuery('tel', 'en_US'));
+
+        self::assertSame(['telephone', 'mobile'], $engine->lastQuery?->alternativeTerms);
+        self::assertSame([7], $result?->idsOf('product'));
+    }
+
+    public function testTheAlternativeTermsOfTheCallerAreKeptBeforeTheDictionaryOnes(): void
+    {
+        $engine = $this->engineWith();
+        $service = $this->service($engine, expanders: [$this->expander(['tel' => ['telephone', 'mobile']])]);
+
+        $service->search(new SearchQuery('tel', 'en_US', alternativeTerms: ['cellphone', 'mobile']));
+
+        self::assertSame(['cellphone', 'mobile', 'telephone'], $engine->lastQuery?->alternativeTerms);
+    }
+
+    public function testTheExpansionOfTheExpandersIsMergedWithoutTheTermAndCapped(): void
+    {
+        $many = array_map(static fn (int $index): string => 'word'.$index, range(1, 20));
+        $service = $this->service(null, expanders: [
+            $this->expander(['tel' => ['telephone', 'tel', ' ']]),
+            $this->expander(['tel' => ['telephone', ...$many]]),
+        ]);
+
+        $alternatives = $service->expand('tel', 'en_US');
+
+        self::assertSame('telephone', $alternatives[0]);
+        self::assertNotContains('tel', $alternatives);
+        self::assertCount(SearchQuery::MAX_ALTERNATIVE_TERMS, $alternatives);
+    }
+
+    public function testAFailingExpanderIsLeftOutAndLogged(): void
+    {
+        $failing = new class implements SearchTermExpanderInterface {
+            public function expand(string $term, ?string $locale): array
+            {
+                throw new \RuntimeException('The dictionary went away.');
+            }
+        };
+        $service = $this->service(null, expanders: [$failing, $this->expander(['tel' => ['telephone']])]);
+
+        self::assertSame(['telephone'], $service->expand('tel', 'en_US'));
+        self::assertSame('error', $this->logs[0]['level'] ?? null);
     }
 
     public function testRewritersApplyOneAfterTheOther(): void
@@ -264,7 +315,7 @@ final class SearchServiceTest extends TestCase
      * @param list<SearchRedirectResolverInterface> $redirectResolvers
      * @param list<SpyDocumentProvider>|null        $providers
      */
-    private function service(?SearchEngineInterface $engine, array $rewriters = [], array $redirectResolvers = [], ?array $providers = null): SearchService
+    private function service(?SearchEngineInterface $engine, array $rewriters = [], array $redirectResolvers = [], ?array $providers = null, array $expanders = []): SearchService
     {
         return new SearchService(
             new SearchEngineRegistry(null === $engine ? [] : [$engine]),
@@ -272,7 +323,26 @@ final class SearchServiceTest extends TestCase
             $rewriters,
             $redirectResolvers,
             $this->logger(),
+            $expanders,
         );
+    }
+
+    /**
+     * @param array<string, list<string>> $synonyms
+     */
+    private function expander(array $synonyms): SearchTermExpanderInterface
+    {
+        return new class($synonyms) implements SearchTermExpanderInterface {
+            /** @param array<string, list<string>> $synonyms */
+            public function __construct(private readonly array $synonyms)
+            {
+            }
+
+            public function expand(string $term, ?string $locale): array
+            {
+                return $this->synonyms[$term] ?? [];
+            }
+        };
     }
 
     private function logger(): AbstractLogger

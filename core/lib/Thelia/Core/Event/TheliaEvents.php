@@ -917,4 +917,17 @@ final class TheliaEvents
     public const WEBHOOK_DELIVERY_REPLAY = 'action.webhook.delivery.replay';
 
     // -- END WEBHOOK EVENTS ---------------------------------------------------
+
+    // -- SEARCH DICTIONARY EVENTS ----------------------------------------------
+
+    public const SEARCH_SYNONYM_CREATE = 'action.search.synonym.create';
+    public const SEARCH_SYNONYM_UPDATE = 'action.search.synonym.update';
+    public const SEARCH_SYNONYM_DELETE = 'action.search.synonym.delete';
+    public const SEARCH_SYNONYM_TOGGLE = 'action.search.synonym.toggle';
+    public const SEARCH_TERM_REDIRECT_CREATE = 'action.search.term_redirect.create';
+    public const SEARCH_TERM_REDIRECT_UPDATE = 'action.search.term_redirect.update';
+    public const SEARCH_TERM_REDIRECT_DELETE = 'action.search.term_redirect.delete';
+    public const SEARCH_TERM_REDIRECT_TOGGLE = 'action.search.term_redirect.toggle';
+
+    // -- END SEARCH DICTIONARY EVENTS ------------------------------------------
 }
