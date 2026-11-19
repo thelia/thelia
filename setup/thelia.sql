@@ -6644,6 +6644,58 @@ CREATE TABLE `report_mailing`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- search_synonym
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `search_synonym`;
+
+CREATE TABLE `search_synonym`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `lang_id` INTEGER NOT NULL,
+    `term` VARCHAR(255) NOT NULL,
+    `synonyms` TEXT NOT NULL,
+    `bidirectional` TINYINT DEFAULT 0 NOT NULL,
+    `active` TINYINT DEFAULT 1 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `search_synonym_lang_term_UNIQUE` (`lang_id`, `term`),
+    CONSTRAINT `fk_search_synonym_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- search_term_redirect
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `search_term_redirect`;
+
+CREATE TABLE `search_term_redirect`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `lang_id` INTEGER NOT NULL,
+    `term` VARCHAR(255) NOT NULL,
+    `target_type` VARCHAR(16) NOT NULL,
+    `target_id` INTEGER,
+    `url` VARCHAR(2048),
+    `active` TINYINT DEFAULT 1 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `search_term_redirect_lang_term_UNIQUE` (`lang_id`, `term`),
+    INDEX `idx_search_term_redirect_target` (`target_type`, `target_id`),
+    CONSTRAINT `fk_search_term_redirect_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- subscription_plan
 -- ---------------------------------------------------------------------
 

@@ -27,6 +27,7 @@ use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Domain\Search\Dictionary\SearchDictionary;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ConfigTableMap;
@@ -127,6 +128,7 @@ abstract class WebIntegrationTestCase extends WebTestCase
 
         $this->forgetTheVisitorSession();
         $this->forgetTheSaleUnitActivity();
+        $this->forgetTheSearchDictionary();
 
         // The configuration of the sale unit a request of the test resolved is static,
         // so it outlives the kernel the next test boots.
@@ -158,6 +160,17 @@ abstract class WebIntegrationTestCase extends WebTestCase
         $saleUnitActivityChecker = static::getContainer()->get(SaleUnitActivityChecker::class);
         $saleUnitActivityChecker->forget();
         $saleUnitActivityChecker->forgetAfterTheRequest();
+    }
+
+    private function forgetTheSearchDictionary(): void
+    {
+        if (!static::$booted || !static::getContainer()->has(SearchDictionary::class)) {
+            return;
+        }
+
+        $searchDictionary = static::getContainer()->get(SearchDictionary::class);
+        $searchDictionary->forget();
+        $searchDictionary->forgetAfterTheRequest();
     }
 
     /**

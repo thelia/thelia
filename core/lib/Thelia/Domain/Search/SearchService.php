@@ -17,7 +17,9 @@ namespace Thelia\Domain\Search;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Domain\Search\Contract\SearchRedirectResolverInterface;
+use Thelia\Domain\Search\Contract\SearchTermExpanderInterface;
 use Thelia\Domain\Search\Contract\SearchTermRewriterInterface;
+use Thelia\Domain\Search\Dictionary\SearchRedirectTargets;
 use Thelia\Domain\Search\Document\SearchHit;
 use Thelia\Domain\Search\Document\SearchQuery;
 use Thelia\Domain\Search\Document\SearchResult;
@@ -27,6 +29,7 @@ final readonly class SearchService
     /**
      * @param iterable<SearchTermRewriterInterface>     $rewriters
      * @param iterable<SearchRedirectResolverInterface> $redirectResolvers
+     * @param iterable<SearchTermExpanderInterface>     $expanders
      */
     public function __construct(
         private SearchEngineRegistry $engines,
@@ -36,7 +39,35 @@ final readonly class SearchService
         #[AutowireIterator(SearchRedirectResolverInterface::TAG)]
         private iterable $redirectResolvers,
         private LoggerInterface $logger,
+        #[AutowireIterator(SearchTermExpanderInterface::TAG)]
+        private iterable $expanders = [],
     ) {
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function expand(string $term, ?string $locale): array
+    {
+        $alternatives = [];
+
+        foreach ($this->expanders as $expander) {
+            try {
+                $alternatives = [...$alternatives, ...$expander->expand($term, $locale)];
+            } catch (\Throwable $exception) {
+                $this->logger->error('Search term expander {expander} failed ({exception}), its terms are left out.', [
+                    'expander' => $expander::class,
+                    'exception' => $exception::class,
+                ]);
+            }
+        }
+
+        $alternatives = array_values(array_filter(
+            array_unique(array_map(trim(...), $alternatives)),
+            static fn (string $alternative): bool => '' !== $alternative && $alternative !== trim($term),
+        ));
+
+        return \array_slice($alternatives, 0, SearchQuery::MAX_ALTERNATIVE_TERMS);
     }
 
     public function rewrite(string $term, ?string $locale): string
@@ -73,7 +104,7 @@ final readonly class SearchService
                 continue;
             }
 
-            if (!self::isInternalPath($path)) {
+            if (!SearchRedirectTargets::isInternalPath($path)) {
                 $this->logger->warning('Search redirect resolver {resolver} gave a path outside the shop, ignored.', ['resolver' => $resolver::class]);
 
                 continue;
@@ -113,6 +144,7 @@ final readonly class SearchService
                 return null;
             }
 
+            $query = $query->withAlternativeTerms(\array_slice(array_values(array_unique([...$query->alternativeTerms, ...$this->expand($query->term, $query->locale)])), 0, SearchQuery::MAX_ALTERNATIVE_TERMS));
             $result = $engine->search($query);
 
             return $query->visibleOnly ? $this->withoutHiddenHits($result) : $result;
@@ -144,13 +176,5 @@ final readonly class SearchService
         $hidden = \count($result->hits) - \count($hits);
 
         return 0 === $hidden ? $result : new SearchResult($hits, max(\count($hits), $result->total - $hidden));
-    }
-
-    private static function isInternalPath(string $path): bool
-    {
-        return str_starts_with($path, '/')
-            && !str_starts_with($path, '//')
-            && !str_contains($path, '\\')
-            && 1 !== preg_match('/[\x00-\x20\x7F]/', $path);
     }
 }

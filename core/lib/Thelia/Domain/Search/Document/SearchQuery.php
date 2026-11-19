@@ -21,9 +21,11 @@ use Thelia\Domain\Search\Contract\SearchScope;
 final readonly class SearchQuery
 {
     public const int MAX_LIMIT = 100;
+    public const int MAX_ALTERNATIVE_TERMS = 10;
 
     /**
      * @param list<string> $families
+     * @param list<string> $alternativeTerms
      */
     public function __construct(
         public string $term,
@@ -33,6 +35,7 @@ final readonly class SearchQuery
         public bool $visibleOnly = true,
         public int $limit = 20,
         public int $offset = 0,
+        public array $alternativeTerms = [],
     ) {
         if ($limit < 1 || $limit > self::MAX_LIMIT) {
             throw new \InvalidArgumentException(\sprintf('A search returns from 1 to %d hits, %d asked for.', self::MAX_LIMIT, $limit));
@@ -41,11 +44,23 @@ final readonly class SearchQuery
         if ($offset < 0) {
             throw new \InvalidArgumentException(\sprintf('A search starts at offset 0 or after, %d asked for.', $offset));
         }
+
+        if (\count($alternativeTerms) > self::MAX_ALTERNATIVE_TERMS) {
+            throw new \InvalidArgumentException(\sprintf('A search looks for %d alternative terms at most, %d given.', self::MAX_ALTERNATIVE_TERMS, \count($alternativeTerms)));
+        }
     }
 
     public function withTerm(string $term): self
     {
-        return new self($term, $this->locale, $this->families, $this->scope, $this->visibleOnly, $this->limit, $this->offset);
+        return new self($term, $this->locale, $this->families, $this->scope, $this->visibleOnly, $this->limit, $this->offset, $this->alternativeTerms);
+    }
+
+    /**
+     * @param list<string> $alternativeTerms
+     */
+    public function withAlternativeTerms(array $alternativeTerms): self
+    {
+        return new self($this->term, $this->locale, $this->families, $this->scope, $this->visibleOnly, $this->limit, $this->offset, $alternativeTerms);
     }
 
     public function accepts(SearchDocument $document): bool

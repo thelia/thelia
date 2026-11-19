@@ -71,7 +71,7 @@ final class InMemorySearchEngine implements SearchEngineInterface
     public function search(SearchQuery $query): SearchResult
     {
         $this->lastQuery = $query;
-        $term = mb_strtolower($query->term);
+        $terms = array_map(mb_strtolower(...), [$query->term, ...$query->alternativeTerms]);
         $hits = [];
 
         foreach ($this->documents as $document) {
@@ -82,8 +82,12 @@ final class InMemorySearchEngine implements SearchEngineInterface
             $score = 0;
 
             foreach ($document->fields as $field => $text) {
-                if (str_contains(mb_strtolower($text), $term)) {
-                    $score += $document->weightOf($field);
+                foreach ($terms as $term) {
+                    if (str_contains(mb_strtolower($text), $term)) {
+                        $score += $document->weightOf($field);
+
+                        break;
+                    }
                 }
             }
 
