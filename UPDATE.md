@@ -190,7 +190,7 @@ Update the four official themes together with the core: Flexy 1.4.0, back-office
 #### What you see in production from the first day
 
 - Customers with a discount, or in a group that has its own prices, see different prices: the product loops, the front API and the cart apply the group price, the group discount and the customer discount. See "Breaking changes" in `CHANGELOG.md`.
-- Paying a cart whose line prices changed is refused once with a 409 `cart-prices-changed`; the buyer sees the cart again with the new prices and the next attempt goes through. See "Breaking changes".
+- Paying a cart whose line prices changed is refused once with a 409 Conflict (`CartPricesChangedException` in PHP); the buyer sees the cart again with the new prices and the next attempt goes through. See "Breaking changes".
 - The data access cache starts cold: the keys of the price paths change, so the first requests are slower. See "Breaking changes".
 - Order totals are rounded to the cent and may differ by a cent from earlier versions; orders already placed keep their total. See "Breaking changes".
 - The provenance mark of AI-generated content is off by default; turn it on in Configuration > Artificial intelligence > Usages. See "Behaviour changes".
