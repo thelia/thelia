@@ -1,3 +1,9 @@
+# 3.3.4 (unreleased)
+
+## API
+
+- `BrandI18n` exposes `postscriptum`, the text a brand page shows under its products, on the admin and front brand reads (`/api/admin/brands`, `/api/front/brands`), as `CategoryI18n` does. It is written with the other texts of a locale on an admin POST, PUT or PATCH; a PATCH that leaves it out keeps the stored text.
+
 # 3.3.3
 
 Patch release of the 3.3 line. It adds an extension point that lets a module narrow the products the facets of a listing are counted on, so that they match a listing that shows only part of the catalogue. It ships `setup/update/sql/3.3.3.sql`, which only records the version.

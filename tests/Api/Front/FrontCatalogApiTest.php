@@ -79,6 +79,19 @@ final class FrontCatalogApiTest extends ApiTestCase
         self::assertSame($brand->getId(), $data['id']);
     }
 
+    public function testGetBrandByIdExposesTheTextUnderItsProducts(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $brand = $factory->brand(['title' => 'Front Brand']);
+        $brand->setLocale('en_US')->setPostscriptum('<p>Under the products of the brand.</p>')->save();
+
+        $response = $this->jsonRequest('GET', '/api/front/brands/'.$brand->getId());
+
+        self::assertJsonResponseSuccessful($response);
+        $data = json_decode($response->getContent(), true);
+        self::assertSame('<p>Under the products of the brand.</p>', $data['i18ns']['en_US']['postscriptum'] ?? null);
+    }
+
     public function testGetContentByIdReturnsResource(): void
     {
         $factory = $this->createFixtureFactory();

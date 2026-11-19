@@ -65,6 +65,22 @@ final class BrandApiTest extends ApiTestCase
         self::assertSame(0, (int) BrandQuery::create()->findPk($brand->getId())->getVisible());
     }
 
+    public function testPatchingTheTitleOfABrandKeepsTheTextUnderItsProducts(): void
+    {
+        $token = $this->authenticateAsAdmin();
+        $brand = $this->createFixtureFactory()->brand(['title' => 'Before']);
+        $brand->setLocale('en_US')->setPostscriptum('<p>Kept.</p>')->save();
+
+        $response = $this->jsonRequest('PATCH', '/api/admin/brands/'.$brand->getId(), [
+            'i18ns' => ['en_US' => ['title' => 'After']],
+        ], $token, 'merge-patch+json');
+
+        self::assertJsonResponseSuccessful($response);
+        $stored = BrandQuery::create()->findPk($brand->getId())->setLocale('en_US');
+        self::assertSame('After', $stored->getTitle());
+        self::assertSame('<p>Kept.</p>', $stored->getPostscriptum());
+    }
+
     public function testDeleteBrand(): void
     {
         $token = $this->authenticateAsAdmin();
