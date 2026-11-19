@@ -20,7 +20,8 @@ permissions:
 jobs:
   storefront:
     name: Storefront accessibility (axe, WCAG 2.1 AA)
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.59 does not support ubuntu-26.04, which ubuntu-latest now serves. Return to ubuntu-latest once a Playwright release supports it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
