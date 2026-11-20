@@ -447,6 +447,10 @@ return [
     'Customer groups' => 'Gruppi di clienti',
     'Default customer group' => 'Gruppo di clienti predefinito',
     'Pricing' => 'Listini',
+    'Companies' => 'Aziende',
+    'Company administrator' => 'Amministratore dell\'azienda',
+    'Buyer' => 'Acquirente',
+    'Approver' => 'Approvatore',
     'Low stock on {{ config("store_name") }}' => 'Scorte basse su {{ config("store_name") }}',
     '{{ report_title }}: {{ period_start }} to {{ period_end }}' => '{{ report_title }}: dal {{ period_start }} al {{ period_end }}',
     'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}' => 'Hello,<br><br>{{ report_title }}<br><br>Period: from {{ period_start }} to {{ period_end }}<br>Export: {{ export_title }}<br>{% if is_empty %}<br>Nothing to report for this period: no data, so no file is attached.{% else %}{% if summary %}<br>{% for line in summary %}{{ line.label }}: {{ line.value }}<br>{% endfor %}{% endif %}{% if attachment_name %}<br>The complete file is attached: {{ attachment_name }}{% elseif download_url %}<br>Download the report: {{ download_url|raw }}<br>This link expires on {{ download_expires_at }}.{% endif %}{% endif %}',
@@ -460,4 +464,5 @@ return [
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Pagamento non riuscito per il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }}',
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Abbonamento {{ subscription_ref }} sospeso dopo {{ failure_count }} addebiti non riusciti{% else %}Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è sospeso{% endif %}',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Il tuo abbonamento {{ subscription_ref }} su {{ config("store_name") }} è annullato',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Unisciti a {{ company_name }} su {{ config("store_name") }}',
 ];

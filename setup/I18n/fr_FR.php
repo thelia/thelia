@@ -1602,6 +1602,10 @@ return [
     'Default customer group' => 'Groupe de clients par défaut',
     'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Qui voit les prix de la boutique : visible, logged_in (clients identifiés seulement) ou on_request (aucun prix, un bouton de demande)',
     'Pricing' => 'Tarification',
+    'Companies' => 'Sociétés',
+    'Company administrator' => 'Administrateur de la société',
+    'Buyer' => 'Acheteur',
+    'Approver' => 'Valideur',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Réserver le stock des articles d\'un panier pendant que le client commande (1 = oui, 0 = non)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Moment où le stock d\'un panier est réservé : checkout (dès l\'entrée dans le tunnel de commande) ou cart (dès la mise au panier)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minutes pendant lesquelles une réservation de stock est conservée, prolongée à chaque étape du tunnel de commande (15 si invalide)',
@@ -1628,4 +1632,6 @@ return [
     'Message sent to the customer when a subscription is cancelled' => 'Message envoyé au client quand un abonnement est résilié',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Votre abonnement {{ subscription_ref }} sur {{ config("store_name") }} est résilié',
     'Days without an order after which a customer is dormant in the customer reports (180 when invalid)' => 'Jours sans commande après lesquels un client est dormant dans les rapports clients (180 si invalide)',
+    'Invitation to join a company, sent to the person invited' => 'Invitation à rejoindre une société, envoyée à la personne invitée',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Rejoignez {{ company_name }} sur {{ config("store_name") }}',
 ];

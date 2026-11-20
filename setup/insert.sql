@@ -1007,6 +1007,11 @@ INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `upda
 INSERT INTO `customer_group`(`id`, `code`, `position`, `is_default`, `discount`, `display_taxed_price`, `created_at`, `updated_at`) VALUES
 (1, 'default', 1, 1, 0.000000, 1, NOW(), NOW());
 
+INSERT INTO `company_role`(`id`, `code`, `company_id`, `permissions`, `created_at`, `updated_at`) VALUES
+(1, 'company_admin', NULL, '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit"]', NOW(), NOW()),
+(2, 'buyer', NULL, '["order.place","order.view_own"]', NOW(), NOW()),
+(3, 'approver', NULL, '["order.view_own","order.view_company","order.approve"]', NOW(), NOW());
+
 INSERT INTO `currency` (`id`, `code`, `isocode_numeric`, `symbol`, `format`, `rate`, `visible`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
 (1, 'EUR', '978', '€', '%n %s','1.00', 1, 1, '1', NOW(), NOW()),
@@ -2285,7 +2290,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (68, 'admin.order.edit', NOW(), NOW()),
 (69, 'admin.order.payment-capture', NOW(), NOW()),
 (70, 'admin.pricing', NOW(), NOW()),
-(71, 'admin.subscription', NOW(), NOW())
+(71, 'admin.subscription', NOW(), NOW()),
+(72, 'admin.company', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2304,7 +2310,8 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (13, 'low_stock_alert', NULL, NULL, 'low_stock_alert.txt', NULL, 'low_stock_alert.html', NOW(), NOW()),
 (14, 'subscription_payment_failed', NULL, NULL, 'subscription_payment_failed.txt', NULL, 'subscription_payment_failed.html', NOW(), NOW()),
 (15, 'subscription_suspended', NULL, NULL, 'subscription_suspended.txt', NULL, 'subscription_suspended.html', NOW(), NOW()),
-(16, 'subscription_cancelled', NULL, NULL, 'subscription_cancelled.txt', NULL, 'subscription_cancelled.html', NOW(), NOW())
+(16, 'subscription_cancelled', NULL, NULL, 'subscription_cancelled.txt', NULL, 'subscription_cancelled.html', NOW(), NOW()),
+(17, 'company_invitation', NULL, NULL, 'company_invitation.txt', NULL, 'company_invitation.html', NOW(), NOW())
 ;
 
 /**
@@ -9920,6 +9927,33 @@ INSERT INTO `customer_group_i18n` (`id`, `locale`, `title`, `description`) VALUE
     (1, 'ru_RU', 'Группа клиентов по умолчанию', NULL)
 ;
 
+INSERT INTO `company_role_i18n` (`id`, `locale`, `title`) VALUES
+    (1, 'cs_CZ', NULL),
+    (2, 'cs_CZ', NULL),
+    (3, 'cs_CZ', NULL),
+    (1, 'de_DE', 'Unternehmensadministrator'),
+    (2, 'de_DE', 'Einkäufer'),
+    (3, 'de_DE', 'Genehmiger'),
+    (1, 'en_US', 'Company administrator'),
+    (2, 'en_US', 'Buyer'),
+    (3, 'en_US', 'Approver'),
+    (1, 'es_ES', 'Administrador de la empresa'),
+    (2, 'es_ES', 'Comprador'),
+    (3, 'es_ES', 'Aprobador'),
+    (1, 'fr_FR', 'Administrateur de la société'),
+    (2, 'fr_FR', 'Acheteur'),
+    (3, 'fr_FR', 'Valideur'),
+    (1, 'it_IT', 'Amministratore dell\'azienda'),
+    (2, 'it_IT', 'Acquirente'),
+    (3, 'it_IT', 'Approvatore'),
+    (1, 'nl_NL', 'Bedrijfsbeheerder'),
+    (2, 'nl_NL', 'Inkoper'),
+    (3, 'nl_NL', 'Goedkeurder'),
+    (1, 'ru_RU', 'Администратор компании'),
+    (2, 'ru_RU', 'Покупатель'),
+    (3, 'ru_RU', 'Утверждающий')
+;
+
 INSERT INTO `currency_i18n` (`id`, `locale`, `name`) VALUES
     (1, 'cs_CZ', NULL),
     (2, 'cs_CZ', NULL),
@@ -15912,6 +15946,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'cs_CZ', 'Stržení platby objednávky', NULL, NULL, NULL),
     (70, 'cs_CZ', NULL, NULL, NULL, NULL),
     (71, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (72, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Adresse', NULL, NULL, NULL),
     (2, 'de_DE', 'Konfiguration / Administrator', NULL, NULL, NULL),
     (3, 'de_DE', 'Konfiguration / Zone', NULL, NULL, NULL),
@@ -15982,6 +16017,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'de_DE', 'Einzug der Bestellzahlung', NULL, NULL, NULL),
     (70, 'de_DE', 'Preisgestaltung', NULL, NULL, NULL),
     (71, 'de_DE', 'Abonnements', NULL, NULL, NULL),
+    (72, 'de_DE', 'Unternehmen', NULL, NULL, NULL),
     (1, 'en_US', 'Address', NULL, NULL, NULL),
     (2, 'en_US', 'Configuration / Administrator', NULL, NULL, NULL),
     (3, 'en_US', 'Configuration / Area', NULL, NULL, NULL),
@@ -16052,6 +16088,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'en_US', 'Order payment capture', NULL, NULL, NULL),
     (70, 'en_US', 'Pricing', NULL, NULL, NULL),
     (71, 'en_US', 'Subscriptions', NULL, NULL, NULL),
+    (72, 'en_US', 'Companies', NULL, NULL, NULL),
     (1, 'es_ES', 'Dirección', NULL, NULL, NULL),
     (2, 'es_ES', 'Configuración / administrador', NULL, NULL, NULL),
     (3, 'es_ES', 'Configuración / área', NULL, NULL, NULL),
@@ -16122,6 +16159,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'es_ES', 'Captura del pago del pedido', NULL, NULL, NULL),
     (70, 'es_ES', 'Tarifas', NULL, NULL, NULL),
     (71, 'es_ES', 'Suscripciones', NULL, NULL, NULL),
+    (72, 'es_ES', 'Empresas', NULL, NULL, NULL),
     (1, 'fr_FR', 'Adresse', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrateur', NULL, NULL, NULL),
     (3, 'fr_FR', 'Configuration / Zone', NULL, NULL, NULL),
@@ -16192,6 +16230,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'fr_FR', 'Capture du paiement d\'une commande', NULL, NULL, NULL),
     (70, 'fr_FR', 'Tarification', NULL, NULL, NULL),
     (71, 'fr_FR', 'Abonnements', NULL, NULL, NULL),
+    (72, 'fr_FR', 'Sociétés', NULL, NULL, NULL),
     (1, 'it_IT', 'Indirizzo', NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -16262,6 +16301,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'it_IT', 'Cattura del pagamento dell\'ordine', NULL, NULL, NULL),
     (70, 'it_IT', 'Listini', NULL, NULL, NULL),
     (71, 'it_IT', NULL, NULL, NULL, NULL),
+    (72, 'it_IT', 'Aziende', NULL, NULL, NULL),
     (1, 'nl_NL', 'Adres', NULL, NULL, NULL),
     (2, 'nl_NL', 'Configuratie / Beheerder', NULL, NULL, NULL),
     (3, 'nl_NL', 'Configuratie / Zone', NULL, NULL, NULL),
@@ -16332,6 +16372,7 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (69, 'nl_NL', 'Incasso van de orderbetaling', NULL, NULL, NULL),
     (70, 'nl_NL', 'Prijsstelling', NULL, NULL, NULL),
     (71, 'nl_NL', 'Abonnementen', NULL, NULL, NULL),
+    (72, 'nl_NL', 'Bedrijven', NULL, NULL, NULL),
     (1, 'ru_RU', 'Адрес', NULL, NULL, NULL),
     (2, 'ru_RU', 'Конфигурация / Администратор', NULL, NULL, NULL),
     (3, 'ru_RU', 'Конфигурация / Зона', NULL, NULL, NULL),
@@ -16401,7 +16442,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (68, 'ru_RU', NULL, NULL, NULL, NULL),
     (69, 'ru_RU', 'Списание оплаты заказа', NULL, NULL, NULL),
     (70, 'ru_RU', 'Ценообразование', NULL, NULL, NULL),
-    (71, 'ru_RU', 'Подписки', NULL, NULL, NULL)
+    (71, 'ru_RU', 'Подписки', NULL, NULL, NULL),
+    (72, 'ru_RU', 'Компании', NULL, NULL, NULL)
 ;
 
 
@@ -16422,6 +16464,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'cs_CZ', NULL, 'Platba za vaše předplatné {{ subscription_ref }} na {{ config(\"store_name\") }} se nezdařila', NULL, NULL),
     (15, 'cs_CZ', NULL, '{% if recipient == \"shop\" %}Předplatné {{ subscription_ref }} pozastaveno po {{ failure_count }} neúspěšných platbách{% else %}Vaše předplatné {{ subscription_ref }} na {{ config(\"store_name\") }} je pozastaveno{% endif %}', NULL, NULL),
     (16, 'cs_CZ', NULL, 'Vaše předplatné {{ subscription_ref }} na {{ config(\"store_name\") }} bylo zrušeno', NULL, NULL),
+    (17, 'cs_CZ', NULL, 'Připojte se k {{ company_name }} na {{ config(\"store_name\") }}', NULL, NULL),
     (1, 'de_DE', 'Bestellbestätigung den Kunden gesendet', 'Ihre Bestellung {{ order_ref }} bei {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'de_DE', 'An den Kunden gesendeter Link zum Zurücksetzen des Passworts', 'Setzen Sie Ihr Passwort für {{ config(\"store_name\") }} zurück', NULL, NULL),
     (3, 'de_DE', 'Gesendete Nachricht wenn eine neue Bestellung erteilt wird.', 'Neue Bestellung {{ order_ref }} für {{ config(\"store_name\") }}', NULL, NULL),
@@ -16438,6 +16481,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'de_DE', 'Nachricht an den Kunden, wenn die Abbuchung einer Rate seines Abonnements fehlschlägt', 'Zahlung für Ihr Abonnement {{ subscription_ref }} bei {{ config(\"store_name\") }} fehlgeschlagen', NULL, NULL),
     (15, 'de_DE', 'Nachricht an den Kunden und an den Shop, wenn ein Abonnement ausgesetzt wird', '{% if recipient == \"shop\" %}Abonnement {{ subscription_ref }} nach {{ failure_count }} fehlgeschlagenen Abbuchungen ausgesetzt{% else %}Ihr Abonnement {{ subscription_ref }} bei {{ config(\"store_name\") }} wurde ausgesetzt{% endif %}', NULL, NULL),
     (16, 'de_DE', 'Nachricht an den Kunden, wenn ein Abonnement gekündigt wird', 'Ihr Abonnement {{ subscription_ref }} bei {{ config(\"store_name\") }} wurde gekündigt', NULL, NULL),
+    (17, 'de_DE', 'Einladung, einem Unternehmen beizutreten, an die eingeladene Person gesendet', 'Treten Sie {{ company_name }} bei {{ config(\"store_name\") }} bei', NULL, NULL),
     (1, 'en_US', 'Order confirmation sent to the customer', 'Your order {{ order_ref }} at {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'en_US', 'Password reset link sent to the customer', 'Reset your password on {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {{ order_ref }} placed on {{ config(\"store_name\") }}', NULL, NULL),
@@ -16454,6 +16498,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'en_US', 'Message sent to the customer when the charge of an installment of its subscription fails', 'Payment failed for your subscription {{ subscription_ref }} on {{ config(\"store_name\") }}', NULL, NULL),
     (15, 'en_US', 'Message sent to the customer, and to the shop, when a subscription is suspended', '{% if recipient == \"shop\" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config(\"store_name\") }} is suspended{% endif %}', NULL, NULL),
     (16, 'en_US', 'Message sent to the customer when a subscription is cancelled', 'Your subscription {{ subscription_ref }} on {{ config(\"store_name\") }} is cancelled', NULL, NULL),
+    (17, 'en_US', 'Invitation to join a company, sent to the person invited', 'Join {{ company_name }} on {{ config(\"store_name\") }}', NULL, NULL),
     (1, 'es_ES', 'Confirmación de la orden enviada al cliente', 'Su orden {{ order_ref }} en {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'es_ES', 'Enlace de restablecimiento de contraseña enviado al cliente', 'Restablezca su contraseña en {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'es_ES', 'Mensaje enviado al propietario de la tienda cuando se envía una nueva orden', 'Nueva orden {{ order_ref }} ubicada en {{ config(\"store_name\") }}', NULL, NULL),
@@ -16470,6 +16515,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'es_ES', 'Mensaje enviado al cliente cuando falla el cobro de una cuota de su suscripción', 'Fallo en el pago de su suscripción {{ subscription_ref }} en {{ config(\"store_name\") }}', NULL, NULL),
     (15, 'es_ES', 'Mensaje enviado al cliente y a la tienda cuando se suspende una suscripción', '{% if recipient == \"shop\" %}Suscripción {{ subscription_ref }} suspendida tras {{ failure_count }} cobros fallidos{% else %}Su suscripción {{ subscription_ref }} en {{ config(\"store_name\") }} está suspendida{% endif %}', NULL, NULL),
     (16, 'es_ES', 'Mensaje enviado al cliente cuando se cancela una suscripción', 'Su suscripción {{ subscription_ref }} en {{ config(\"store_name\") }} está cancelada', NULL, NULL),
+    (17, 'es_ES', 'Invitación a unirse a una empresa, enviada a la persona invitada', 'Únase a {{ company_name }} en {{ config(\"store_name\") }}', NULL, NULL),
     (1, 'fr_FR', 'Confirmation de commande envoyée au client', 'Votre commande {{ order_ref }} chez {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'fr_FR', 'Lien de réinitialisation du mot de passe envoyé au client', 'Réinitialisez votre mot de passe sur {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d\'une nouvelle commande.', 'Nouvelle commande {{ order_ref }} reçue sur {{ config(\"store_name\") }}', NULL, NULL),
@@ -16486,6 +16532,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'fr_FR', 'Message envoyé au client quand le prélèvement d\'une échéance de son abonnement échoue', 'Échec du paiement de votre abonnement {{ subscription_ref }} sur {{ config(\"store_name\") }}', NULL, NULL),
     (15, 'fr_FR', 'Message envoyé au client, et à la boutique, quand un abonnement est suspendu', '{% if recipient == \"shop\" %}Abonnement {{ subscription_ref }} suspendu après {{ failure_count }} prélèvements échoués{% else %}Votre abonnement {{ subscription_ref }} sur {{ config(\"store_name\") }} est suspendu{% endif %}', NULL, NULL),
     (16, 'fr_FR', 'Message envoyé au client quand un abonnement est résilié', 'Votre abonnement {{ subscription_ref }} sur {{ config(\"store_name\") }} est résilié', NULL, NULL),
+    (17, 'fr_FR', 'Invitation à rejoindre une société, envoyée à la personne invitée', 'Rejoignez {{ company_name }} sur {{ config(\"store_name\") }}', NULL, NULL),
     (1, 'it_IT', NULL, 'Il tuo ordine {{ order_ref }} su {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'it_IT', NULL, 'Reimposta la tua password su {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'it_IT', NULL, 'Nuovo ordine {{ order_ref }} su {{ config(\"store_name\") }}', NULL, NULL),
@@ -16502,6 +16549,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'it_IT', NULL, 'Pagamento non riuscito per il tuo abbonamento {{ subscription_ref }} su {{ config(\"store_name\") }}', NULL, NULL),
     (15, 'it_IT', NULL, '{% if recipient == \"shop\" %}Abbonamento {{ subscription_ref }} sospeso dopo {{ failure_count }} addebiti non riusciti{% else %}Il tuo abbonamento {{ subscription_ref }} su {{ config(\"store_name\") }} è sospeso{% endif %}', NULL, NULL),
     (16, 'it_IT', NULL, 'Il tuo abbonamento {{ subscription_ref }} su {{ config(\"store_name\") }} è annullato', NULL, NULL),
+    (17, 'it_IT', NULL, 'Unisciti a {{ company_name }} su {{ config(\"store_name\") }}', NULL, NULL),
     (1, 'nl_NL', 'Bevestiging van de bestelling verzonden naar de klant', 'Uw bestelling {{ order_ref }} bij {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'nl_NL', 'Link om het wachtwoord opnieuw in te stellen, verzonden naar de klant', 'Stel uw wachtwoord opnieuw in op {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'nl_NL', 'Bericht dat naar de winkelier wordt verzonden bij een nieuwe bestelling', 'Nieuwe bestelling {{ order_ref }} op {{ config(\"store_name\") }}', NULL, NULL),
@@ -16518,6 +16566,7 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, 'nl_NL', 'Bericht aan de klant wanneer de afschrijving van een termijn van zijn abonnement mislukt', 'Betaling voor uw abonnement {{ subscription_ref }} bij {{ config(\"store_name\") }} mislukt', NULL, NULL),
     (15, 'nl_NL', 'Bericht aan de klant en aan de winkel wanneer een abonnement wordt opgeschort', '{% if recipient == \"shop\" %}Abonnement {{ subscription_ref }} opgeschort na {{ failure_count }} mislukte afschrijvingen{% else %}Uw abonnement {{ subscription_ref }} bij {{ config(\"store_name\") }} is opgeschort{% endif %}', NULL, NULL),
     (16, 'nl_NL', 'Bericht aan de klant wanneer een abonnement wordt opgezegd', 'Uw abonnement {{ subscription_ref }} bij {{ config(\"store_name\") }} is opgezegd', NULL, NULL),
+    (17, 'nl_NL', 'Uitnodiging om zich bij een bedrijf aan te sluiten, verstuurd aan de uitgenodigde persoon', 'Word lid van {{ company_name }} bij {{ config(\"store_name\") }}', NULL, NULL),
     (1, 'ru_RU', 'Подтверждение заказа отосланное клиенту', 'Ваш заказ {{ order_ref }} в {{ config(\"store_name\") }}', NULL, NULL),
     (2, 'ru_RU', 'Ссылка для сброса пароля, отправленная клиенту', 'Сбросьте пароль на {{ config(\"store_name\") }}', NULL, NULL),
     (3, 'ru_RU', 'Сообщение отсылаемое владельцу магазина при новом заказе', 'Новый заказ {{ order_ref }} размещен в {{ config(\"store_name\") }}', NULL, NULL),
@@ -16533,7 +16582,8 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (13, 'ru_RU', 'Уведомление владельцу магазина о нехватке запаса комбинации', 'Низкий запас в {{ config(\"store_name\") }}', NULL, NULL),
     (14, 'ru_RU', 'Сообщение клиенту, когда списание очередного платежа по подписке не удалось', 'Не удалось списать платёж по вашей подписке {{ subscription_ref }} в {{ config(\"store_name\") }}', NULL, NULL),
     (15, 'ru_RU', 'Сообщение клиенту и магазину при приостановке подписки', '{% if recipient == \"shop\" %}Подписка {{ subscription_ref }} приостановлена после {{ failure_count }} неудачных списаний{% else %}Ваша подписка {{ subscription_ref }} в {{ config(\"store_name\") }} приостановлена{% endif %}', NULL, NULL),
-    (16, 'ru_RU', 'Сообщение клиенту при отмене подписки', 'Ваша подписка {{ subscription_ref }} в {{ config(\"store_name\") }} отменена', NULL, NULL)
+    (16, 'ru_RU', 'Сообщение клиенту при отмене подписки', 'Ваша подписка {{ subscription_ref }} в {{ config(\"store_name\") }} отменена', NULL, NULL),
+    (17, 'ru_RU', 'Приглашение присоединиться к компании, отправленное приглашённому', 'Присоединяйтесь к {{ company_name }} в {{ config(\"store_name\") }}', NULL, NULL)
 ;
 
 /**
