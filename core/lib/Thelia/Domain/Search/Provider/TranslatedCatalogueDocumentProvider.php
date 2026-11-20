@@ -52,7 +52,7 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
     {
         /** @var list<int|string> $ids */
         $ids = $this->entitiesAfter($afterId)
-            ->orderById()
+            ->orderBy('Id')
             ->limit($limit)
             ->select(['Id'])
             ->find()
@@ -68,7 +68,7 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
 
     private function entitiesAfter(int $afterId): ModelCriteria
     {
-        return $this->entityQuery()->filterById($afterId, Criteria::GREATER_THAN);
+        return $this->entityQuery()->filterBy('Id', $afterId, Criteria::GREATER_THAN);
     }
 
     public function visibleIds(array $ids): array
@@ -78,8 +78,8 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
         }
 
         $query = $this->entityQuery()
-            ->filterById($ids, Criteria::IN)
-            ->filterByVisible(1);
+            ->filterBy('Id', $ids, Criteria::IN)
+            ->filterBy('Visible', 1, Criteria::EQUAL);
 
         $this->narrowToTheVisitor($query);
 
@@ -102,7 +102,7 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
         $visibility = [];
 
         /** @var list<array{Id: int|string, Visible: int|string|null}> $rows */
-        $rows = $this->entityQuery()->filterById($ids, Criteria::IN)->select(['Id', 'Visible'])->find()->getData();
+        $rows = $this->entityQuery()->filterBy('Id', $ids, Criteria::IN)->select(['Id', 'Visible'])->find()->getData();
 
         foreach ($rows as $row) {
             $visibility[(int) $row['Id']] = 1 === (int) $row['Visible'];
@@ -112,8 +112,8 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
 
         /** @var list<array{Id: int|string, Title: ?string, Chapo: ?string, Description: ?string, Postscriptum: ?string}> $translations */
         $translations = $this->i18nQuery()
-            ->filterById(array_keys($visibility), Criteria::IN)
-            ->filterByLocale($locale)
+            ->filterBy('Id', array_keys($visibility), Criteria::IN)
+            ->filterBy('Locale', $locale, Criteria::EQUAL)
             ->select(['Id', 'Title', 'Chapo', 'Description', 'Postscriptum'])
             ->find()
             ->getData();

@@ -277,7 +277,7 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
             $row = $event->getModel();
             $productId = match (true) {
                 $row instanceof FeatureProduct => $row->getProductId(),
-                $row instanceof AttributeCombination => $row->getProductSaleElements()?->getProductId(),
+                $row instanceof AttributeCombination => $row->getProductSaleElements()->getProductId(),
                 default => null,
             };
 
@@ -322,7 +322,7 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
     {
         $this->safely(function () use ($event): void {
             $model = $event->getModel();
-            $id = $model?->getId();
+            $id = method_exists($model, 'getId') ? $model->getId() : null;
 
             if (null === $id) {
                 return;
