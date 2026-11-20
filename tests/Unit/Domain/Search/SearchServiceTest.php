@@ -276,6 +276,26 @@ final class SearchServiceTest extends TestCase
         self::assertSame(['visibleIds'], $brands->calls);
     }
 
+    public function testAPageShortenedByHiddenHitsKeepsTheTotalTheEngineCounted(): void
+    {
+        $engine = $this->engineWith(
+            new SearchDocument('product', 1, 'en_US', SearchScope::Shop, true, ['title' => 'Phone']),
+            new SearchDocument('product', 2, 'en_US', SearchScope::Shop, true, ['title' => 'Phone case']),
+            new SearchDocument('product', 3, 'en_US', SearchScope::Shop, true, ['title' => 'Phone stand']),
+        );
+
+        $result = $this->service($engine, providers: [new SpyDocumentProvider('product', [3])])->search(new SearchQuery('phone', 'en_US', limit: 2));
+
+        self::assertSame([], $result?->idsOf('product'));
+        self::assertSame(1, $result->total);
+        self::assertSame(3, $result->unfilteredTotal);
+    }
+
+    public function testAResultBuiltWithoutItsUnfilteredTotalTakesItsTotal(): void
+    {
+        self::assertSame(7, (new SearchResult([], 7))->unfilteredTotal);
+    }
+
     public function testAHitOfAFamilyNoProviderVouchesForIsLeftOut(): void
     {
         $engine = $this->engineWith(new SearchDocument('blog_post', 1, 'en_US', SearchScope::Shop, true, ['title' => 'Phone review']));

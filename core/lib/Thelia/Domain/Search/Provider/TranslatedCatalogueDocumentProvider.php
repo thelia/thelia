@@ -67,15 +67,20 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
             return [];
         }
 
-        /** @var list<int|string> $visibleIds */
-        $visibleIds = $this->entityQuery()
+        $query = $this->entityQuery()
             ->filterById($ids, Criteria::IN)
-            ->filterByVisible(1)
-            ->select(['Id'])
-            ->find()
-            ->getData();
+            ->filterByVisible(1);
+
+        $this->narrowToTheVisitor($query);
+
+        /** @var list<int|string> $visibleIds */
+        $visibleIds = $query->select(['Id'])->find()->getData();
 
         return array_map(intval(...), $visibleIds);
+    }
+
+    protected function narrowToTheVisitor(ModelCriteria $query): void
+    {
     }
 
     public function documents(array $ids, ?string $locale): array

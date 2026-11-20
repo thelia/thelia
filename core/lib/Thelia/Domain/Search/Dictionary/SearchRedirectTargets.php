@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Search\Dictionary;
 
+use Thelia\Domain\Search\SearchDocumentProviders;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandQuery;
 use Thelia\Model\Category;
@@ -28,6 +29,11 @@ use Thelia\Tools\URL;
 
 final readonly class SearchRedirectTargets
 {
+    public function __construct(
+        private ?SearchDocumentProviders $providers = null,
+    ) {
+    }
+
     public function find(string $type, ?int $id): Product|Category|Content|Folder|Brand|null
     {
         if (null === $id || $id < 1) {
@@ -52,11 +58,22 @@ final readonly class SearchRedirectTargets
 
         $target = $this->find($type, $id);
 
-        if (null === $target || 1 !== (int) $target->getVisible()) {
+        if (null === $target || !$this->isVisibleToTheVisitor($type, (int) $id, $target)) {
             return null;
         }
 
         return self::pathOfAddress((string) $target->getUrl($locale));
+    }
+
+    private function isVisibleToTheVisitor(string $type, int $id, Product|Category|Content|Folder|Brand $target): bool
+    {
+        $provider = $this->providers?->get($type);
+
+        if (null === $provider) {
+            return 1 === (int) $target->getVisible();
+        }
+
+        return \in_array($id, $provider->visibleIds([$id]), true);
     }
 
     private static function pathOfAddress(string $address): ?string
