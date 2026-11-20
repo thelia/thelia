@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Helper\FormatService;
 use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Test\IntegrationTestCase;
@@ -52,6 +53,17 @@ final class FormatServiceTest extends IntegrationTestCase
 
         self::assertSame($legacy, $actual);
         self::assertStringContainsString('€', $actual);
+    }
+
+    public function testPriceIsWrittenAsTheLocaleWritesAPriceInTheCurrency(): void
+    {
+        $euro = $this->euro();
+        $english = $this->formatService()->price('99.900000', $euro->getId(), 'en_US');
+        $french = $this->formatService()->price(1800, $euro->getId(), 'fr_FR');
+
+        self::assertSame('€99.90', $english);
+        self::assertSame('1 800,00 €', preg_replace('/[\s\x{00A0}\x{202F}]+/u', ' ', $french));
+        self::assertSame('', $this->formatService()->price('', $euro->getId(), 'en_US'));
     }
 
     public function testMoneyWithoutCurrencyFormatFallsBackToPlainNumber(): void
@@ -139,6 +151,14 @@ final class FormatServiceTest extends IntegrationTestCase
         $session->setLang($lang);
 
         return $lang;
+    }
+
+    private function euro(): Currency
+    {
+        $euro = CurrencyQuery::create()->findOneByCode('EUR');
+        self::assertNotNull($euro, 'The euro is installed with the shop.');
+
+        return $euro;
     }
 
     private function currencyWithFormat(string $format): Currency

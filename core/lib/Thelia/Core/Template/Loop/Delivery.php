@@ -20,6 +20,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Model\AddressQuery;
@@ -52,6 +53,7 @@ class Delivery extends BaseSpecificModule
     public function __construct(
         protected readonly ?CartShippingRules $cartShippingRules = null,
         protected readonly ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
+        protected readonly ?AddressAccess $addressAccess = null,
     ) {
     }
 
@@ -226,7 +228,11 @@ class Delivery extends BaseSpecificModule
         }
 
         if (!empty($addressId)) {
-            $address = AddressQuery::create()->findPk($addressId);
+            $customer = $this->securityContext->getCustomerUser();
+
+            $address = null !== $customer && null !== $this->addressAccess
+                ? $this->addressAccess->find($customer, (int) $addressId)
+                : AddressQuery::create()->findPk($addressId);
         }
 
         return $address;

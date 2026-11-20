@@ -31,8 +31,10 @@ use Thelia\Log\Tlog;
 use Thelia\Mailer\EventListener\OrderEmailHistoryListener;
 use Thelia\Mailer\EventListener\SentMailGuardListener;
 use Thelia\Mailer\Exception\EmailNotSentException;
+use Thelia\Model\CompanyQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
@@ -340,6 +342,8 @@ class MailerFactory
         }
 
         try {
+            $cc += $this->copyOfTheCompanyOf($messageParameters, $to, $cc);
+
             $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale, $cc, $bcc, $replyTo);
             $this->tagWithTheOrderItIsAbout($instance, $messageCode, $messageParameters);
 
@@ -398,6 +402,55 @@ class MailerFactory
         $email->getHeaders()
             ->addTextHeader(OrderEmailHistoryListener::ORDER_ID_HEADER, (string) $orderId)
             ->addTextHeader(OrderEmailHistoryListener::MESSAGE_CODE_HEADER, $messageCode);
+    }
+
+    /**
+     * The address the company of an order wants a copy of its e-mails at, for a message sent to
+     * the customer of that order: the company records one when it wants to follow what its
+     * buyers order. This is the single place a message is handed over, so the confirmation, the
+     * status changes, the shipping notice and the messages of the modules all get it. The shop
+     * managers are not the customer and receive no copy, and a message about no order reads
+     * nothing; the message about the order of a customer with no company costs one read of the order.
+     *
+     * @param array<string, mixed>  $messageParameters
+     * @param array<string, string> $to                the recipients of the message
+     * @param array<string, string> $cc                the copies it already has
+     *
+     * @return array<string, string> the copy to add, an array of (email-address => company name), empty for none
+     */
+    private function copyOfTheCompanyOf(array $messageParameters, array $to, array $cc): array
+    {
+        $orderId = $this->orderIdFromMessageParameters($messageParameters);
+
+        if (null === $orderId) {
+            return [];
+        }
+
+        /** @var array{CompanyId: int|string|null, CustomerId: int|string}|null $order */
+        $order = OrderQuery::create()->filterById($orderId)->select(['CompanyId', 'CustomerId'])->findOne();
+
+        if (!\is_array($order) || null === $order['CompanyId']) {
+            return [];
+        }
+
+        /** @var array{Name: string, NotificationEmail: string|null}|null $company */
+        $company = CompanyQuery::create()->filterById((int) $order['CompanyId'])->select(['Name', 'NotificationEmail'])->findOne();
+        $copy = \is_array($company) ? trim((string) $company['NotificationEmail']) : '';
+
+        if ('' === $copy) {
+            return [];
+        }
+
+        $customerEmail = (string) CustomerQuery::create()->filterById((int) $order['CustomerId'])->select('Email')->findOne();
+        $recipients = array_map(strtolower(...), array_map(strval(...), array_keys($to)));
+
+        if ('' === $customerEmail || !\in_array(strtolower($customerEmail), $recipients, true)) {
+            return [];
+        }
+
+        $known = array_map(strtolower(...), array_map(strval(...), [...array_keys($to), ...array_keys($cc)]));
+
+        return \in_array(strtolower($copy), $known, true) ? [] : [$copy => (string) $company['Name']];
     }
 
     /**

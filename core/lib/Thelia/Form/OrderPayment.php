@@ -20,7 +20,9 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -32,6 +34,10 @@ use Thelia\Module\BaseModule;
  */
 class OrderPayment extends FirewallForm
 {
+    public function __construct(private readonly ?AddressAccess $addressAccess = null)
+    {
+    }
+
     protected function buildForm(): void
     {
         $this->formBuilder
@@ -67,8 +73,12 @@ class OrderPayment extends FirewallForm
 
     public function verifyInvoiceAddress($value, ExecutionContextInterface $context): void
     {
-        $address = AddressQuery::create()
-            ->findPk($value);
+        $session = $this->request->hasSession() ? $this->request->getSession() : null;
+        $customer = $session instanceof Session ? $session->getCustomerUser() : null;
+
+        $address = null !== $customer && null !== $this->addressAccess
+            ? $this->addressAccess->find($customer, (int) $value)
+            : AddressQuery::create()->findPk($value);
 
         if (null === $address) {
             $context->addViolation(Translator::getInstance()->trans('Address ID not found'));

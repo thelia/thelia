@@ -35,6 +35,7 @@ readonly class AddressService
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private Session $session,
+        private ?AddressAccess $addressAccess = null,
     ) {
     }
 
@@ -91,11 +92,13 @@ readonly class AddressService
             throw new AddressNotFoundException();
         }
 
-        if ($address->getCustomer()->getId() !== $customer->getId()) {
+        if (!$this->mayEdit($customer, $address)) {
             throw new CustomerException();
         }
 
-        $event = $this->createAddressEvent($form);
+        // The default address is the one of the account that owns the address: a colleague who
+        // edits a shared address does not make it the default one of its owner.
+        $event = $this->createAddressEvent($form, $this->isOwnedBy($customer, $address));
         $event->setAddress($address);
 
         $this->dispatcher->dispatch($event, TheliaEvents::ADDRESS_UPDATE);
@@ -125,7 +128,7 @@ readonly class AddressService
             throw new AddressNotFoundException();
         }
 
-        if ($address->getCustomer()->getId() !== $customer?->getId()) {
+        if (null === $customer || !$this->mayEdit($customer, $address)) {
             throw new CustomerException();
         }
 
@@ -133,7 +136,17 @@ readonly class AddressService
         $this->dispatcher->dispatch($addressEvent, TheliaEvents::ADDRESS_DELETE);
     }
 
-    protected function createAddressEvent(FormInterface $form): AddressCreateOrUpdateEvent
+    private function mayEdit(Customer $customer, Address $address): bool
+    {
+        return $this->addressAccess?->canEdit($customer, $address) ?? $this->isOwnedBy($customer, $address);
+    }
+
+    private function isOwnedBy(Customer $customer, Address $address): bool
+    {
+        return (int) $address->getCustomerId() === (int) $customer->getId();
+    }
+
+    protected function createAddressEvent(FormInterface $form, bool $mayBecomeDefault = true): AddressCreateOrUpdateEvent
     {
         $data = $form->getData();
 
@@ -151,7 +164,7 @@ readonly class AddressService
             isset($data['cellphone']) ? (string) $data['cellphone'] : null,
             isset($data['phone']) ? (string) $data['phone'] : null,
             $data['company'] ?? null,
-            $data['is_default'] ?? false,
+            $mayBecomeDefault && ($data['is_default'] ?? false),
             isset($data['state']) ? (int) $data['state'] : null,
             $data['siret'] ?? null,
             $data['vat_number'] ?? null,
@@ -207,8 +220,10 @@ readonly class AddressService
 
         if (null !== $addressId) {
             $address = AddressQuery::create()->findPk($addressId);
+            $customer = $securityContext->getCustomerUser();
 
-            if (null !== $address) {
+            // An address of the address book that the customer may not use is not read out.
+            if (null !== $address && (null === $customer || null === $this->addressAccess || $this->addressAccess->canUse($customer, $address))) {
                 return $address;
             }
         }

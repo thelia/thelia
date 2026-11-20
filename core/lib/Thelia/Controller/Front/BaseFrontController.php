@@ -16,10 +16,13 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Customer\Service\AuthenticationReturnUrl;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
 
@@ -32,6 +35,9 @@ class BaseFrontController extends BaseController
      * #[Route], and so do the modules. Only the back office runs a router of its own.
      */
     protected string $currentRouter = 'router';
+
+    #[Required]
+    public ?AddressAccess $addressAccess = null;
 
     /**
      * A guest checking out sits in the session under the customer key, so asking only
@@ -69,7 +75,7 @@ class BaseFrontController extends BaseController
         if (null === $order
             || null === $order->getChoosenDeliveryAddress()
             || null === $order->getDeliveryModuleId()
-            || null === AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())
+            || null === $this->addressOfTheCustomer((int) $order->getChoosenDeliveryAddress())
             || null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
             throw new RedirectException($this->retrieveUrlFromRouteId('checkout_delivery'));
         }
@@ -82,10 +88,25 @@ class BaseFrontController extends BaseController
         if (null === $order
             || null === $order->getChoosenInvoiceAddress()
             || null === $order->getPaymentModuleId()
-            || null === AddressQuery::create()->findPk($order->getChoosenInvoiceAddress())
+            || null === $this->addressOfTheCustomer((int) $order->getChoosenInvoiceAddress())
             || null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
             throw new RedirectException($this->retrieveUrlFromRouteId('checkout_payment'));
         }
+    }
+
+    /**
+     * The address of the address book, when the customer in the session may use it. Without a
+     * customer in the session, the address is read as it always was.
+     */
+    private function addressOfTheCustomer(int $addressId): ?Address
+    {
+        $customer = $this->getSecurityContext()->getCustomerUser();
+
+        if (null === $customer || null === $this->addressAccess) {
+            return AddressQuery::create()->findPk($addressId);
+        }
+
+        return $this->addressAccess->find($customer, $addressId);
     }
 
     protected function getParser(?string $template = null): ParserInterface
