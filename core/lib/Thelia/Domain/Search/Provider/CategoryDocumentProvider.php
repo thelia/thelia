@@ -15,12 +15,19 @@ declare(strict_types=1);
 namespace Thelia\Domain\Search\Provider;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Domain\Catalog\Category\CategoryVisibility;
 use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\CategoryTableMap;
 
 final class CategoryDocumentProvider extends TranslatedCatalogueDocumentProvider
 {
     public const string FAMILY = 'category';
+
+    public function __construct(
+        private readonly ?CategoryVisibility $categoryVisibility = null,
+    ) {
+    }
 
     public function family(): string
     {
@@ -35,5 +42,10 @@ final class CategoryDocumentProvider extends TranslatedCatalogueDocumentProvider
     protected function i18nQuery(): ModelCriteria
     {
         return CategoryI18nQuery::create();
+    }
+
+    protected function narrowToTheVisitor(ModelCriteria $query): void
+    {
+        $this->categoryVisibility?->applyTo($query, CategoryTableMap::COL_ID);
     }
 }
