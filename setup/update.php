@@ -207,6 +207,9 @@ try {
     $updateError = $ex;
 }
 
+// A failed run may have written part of the configuration as well.
+dropSharedConfiguration($thelia);
+
 foreach ($update->getMessages() as $message) {
     cliOutput($message[0], $message[1]);
 }
@@ -250,7 +253,10 @@ if (null === $updateError) {
         if (askConfirmation('Would you like to restore the backup database ? (Y/n)')) {
             cliOutput('Database restore started. Wait, it could take a while...');
 
-            if (false === $update->restoreDb()) {
+            $restored = $update->restoreDb();
+            dropSharedConfiguration($thelia);
+
+            if (false === $restored) {
                 cliOutput($update->getRestoreFailure() ?? 'The backup could not be restored.', 'error');
                 cliOutput(sprintf(
                     'Sorry, your database can\'t be restore. Try to do it manually : %s',
@@ -496,6 +502,27 @@ function joinPaths()
     }
 
     return $path;
+}
+
+/*
+ * The update scripts write the config table in SQL (3.4.0.sql stores thelia_version and
+ * last_float_line_rounding_order_id), and so does a restored backup. Neither dispatches the
+ * event that drops the shared configuration entry, and with THELIA_CACHE_DSN that entry lives
+ * in a remote cache that removing the cache directory does not reach: every process would go
+ * on reading the settings of the previous release until a setting is saved. The next request
+ * rebuilds the entry from the database.
+ */
+function dropSharedConfiguration(App\Kernel $kernel): void
+{
+    try {
+        $kernel->getContainer()->get(Thelia\Core\Cache\ConfigCacheService::class)->dropSharedEntry();
+    } catch (Throwable $failure) {
+        cliOutput(sprintf(
+            'The shared configuration cache could not be dropped (%s): delete its "%s" entry by hand, or save any configuration variable in the back office.',
+            $failure->getMessage(),
+            Thelia\Core\Cache\ConfigCacheService::CACHE_KEY,
+        ), 'warning');
+    }
 }
 
 function cliOutput($message, $type = null): void
