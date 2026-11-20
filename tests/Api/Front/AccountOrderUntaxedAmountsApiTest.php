@@ -182,7 +182,7 @@ final class AccountOrderUntaxedAmountsApiTest extends ApiTestCase
 
         $denied = $this->jsonRequest('GET', '/api/front/account/orders/'.$ownerOrder->getId(), token: $this->authenticateAsCustomer($intruder));
 
-        self::assertSame(403, $denied->getStatusCode());
+        self::assertSame(404, $denied->getStatusCode());
         foreach ([...self::NEW_FIELDS, 'unitTaxedPriceBeforePromotion'] as $field) {
             self::assertStringNotContainsString($field, (string) $denied->getContent());
         }
