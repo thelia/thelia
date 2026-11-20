@@ -79,6 +79,26 @@ final readonly class FormatService
     }
 
     /**
+     * Format an amount the way a theme writes a price: the currency pattern of the locale, with its
+     * own symbol position and separators (`€99.90` in en_US, `99,90 €` in fr_FR), and the decimals
+     * of the currency. `money()` keeps the pattern stored on the currency instead.
+     *
+     * @param int|float|string $number     the amount to format
+     * @param int|null         $currencyId currency to use; the one of the session, then the default one, when null
+     */
+    public function price(int|float|string $number, ?int $currencyId = null, ?string $locale = null): string
+    {
+        if ($number === '') {
+            return '';
+        }
+
+        $currency = $this->resolveCurrency($currencyId) ?? Currency::getDefaultCurrency();
+
+        return (new \NumberFormatter($this->resolveLang($locale)->getLocale(), \NumberFormatter::CURRENCY))
+            ->formatCurrency((float) $number, (string) $currency->getCode());
+    }
+
+    /**
      * Format a plain number, mirroring NumberFormat::format().
      *
      * @param int|float|string $number the number to format

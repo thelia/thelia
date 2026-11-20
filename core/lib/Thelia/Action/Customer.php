@@ -32,6 +32,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Cart\Service\CartContext;
 use Thelia\Domain\Cart\Service\CartRetriever;
+use Thelia\Domain\Company\CompanyFacade;
 use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Domain\Customer\Exception\InvalidCustomerDiscountException;
 use Thelia\Domain\Customer\Exception\InvalidPasswordResetTokenException;
@@ -43,6 +44,7 @@ use Thelia\Domain\Customer\Service\PasswordResetService;
 use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\CompanyCustomerQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
@@ -73,6 +75,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         protected CustomerGuestConversionService $customerGuestConversionService,
         protected CustomerPaymentMethodService $customerPaymentMethodService,
         protected CustomerGroupAssignment $customerGroupAssignment,
+        protected CompanyFacade $companyFacade,
     ) {
     }
 
@@ -357,6 +360,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $connection->beginTransaction();
 
         try {
+            // A buyer leaves their company before the account goes: the foreign key cascade
+            // would otherwise drop the shared addresses they created, the billing one included.
+            if (CompanyCustomerQuery::create()->filterByCustomerId($customer->getId())->exists($connection)) {
+                $this->companyFacade->release($customer);
+            }
+
             $tellProvidersToForget = $this->customerPaymentMethodService->forgetAllOf($customer, $connection);
             $customer->delete($connection);
             $connection->commit();

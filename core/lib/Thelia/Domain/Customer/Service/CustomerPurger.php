@@ -31,7 +31,9 @@ use Thelia\Model\CustomerQuery;
  *  - an account that ordered ages from its most recent order.
  *
  * Accounts already carrying the anonymization marker are skipped, so a job
- * that runs every night does its work once per account.
+ * that runs every night does its work once per account. The last administrator
+ * of a company is purged like any other idle account: the erasure hands the
+ * company to the buyer who joined first, or suspends it when nobody else is left.
  */
 final readonly class CustomerPurger
 {

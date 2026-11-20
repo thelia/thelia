@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Thelia\Domain\Checkout\Service;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Model\Address;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 
@@ -29,6 +29,10 @@ use Thelia\Model\CartAddress;
  */
 final readonly class ExpressCheckoutTotal
 {
+    public function __construct(private AddressAccess $addressAccess)
+    {
+    }
+
     /**
      * The grand total of the order this cart becomes: the goods taxed for the address the
      * cart is taxed for, the postage of the chosen carrier (untaxed for a tax-exempt cart)
@@ -79,6 +83,6 @@ final readonly class ExpressCheckoutTotal
             return null;
         }
 
-        return $customer->getDefaultAddress() ?? AddressQuery::create()->filterByCustomer($customer)->findOne();
+        return $customer->getDefaultAddress() ?? $this->addressAccess->firstOf($customer);
     }
 }

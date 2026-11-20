@@ -20,6 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Addressing\DTO\AddressDTO;
 use Thelia\Domain\Addressing\Exception\AddressNotFoundException;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Customer\Exception\CustomerException;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -31,6 +32,7 @@ final readonly class AddressFacade
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private Session $session,
+        private ?AddressAccess $addressAccess = null,
     ) {
     }
 
@@ -58,9 +60,11 @@ final readonly class AddressFacade
             throw new AddressNotFoundException();
         }
 
-        $this->assertCustomerOwnership($address);
+        $customer = $this->customerWhoMayEdit($address);
 
-        $event = $this->createEventFromDTO($dto);
+        // The default address is the one of the account that owns the address: a colleague who
+        // edits a shared address does not make it the default one of its owner.
+        $event = $this->createEventFromDTO($dto, $address->getCustomerId() === $customer->getId());
         $event->setAddress($address);
 
         $this->dispatcher->dispatch($event, TheliaEvents::ADDRESS_UPDATE);
@@ -76,7 +80,7 @@ final readonly class AddressFacade
             throw new AddressNotFoundException();
         }
 
-        $this->assertCustomerOwnership($address);
+        $this->customerWhoMayEdit($address);
 
         $this->dispatcher->dispatch(new AddressEvent($address), TheliaEvents::ADDRESS_DELETE);
     }
@@ -107,8 +111,11 @@ final readonly class AddressFacade
             return [];
         }
 
-        return AddressQuery::create()
-            ->filterByCustomerId($customer->getId())
+        $query = null === $this->addressAccess
+            ? AddressQuery::create()->filterByCustomerId($customer->getId())
+            : $this->addressAccess->restrict(AddressQuery::create(), $customer);
+
+        return $query
             ->orderByIsDefault('DESC')
             ->orderByLabel()
             ->find()
@@ -126,7 +133,7 @@ final readonly class AddressFacade
         return $customer->getDefaultAddress();
     }
 
-    private function createEventFromDTO(AddressDTO $dto): AddressCreateOrUpdateEvent
+    private function createEventFromDTO(AddressDTO $dto, bool $mayBecomeDefault = true): AddressCreateOrUpdateEvent
     {
         return new AddressCreateOrUpdateEvent(
             $dto->label,
@@ -142,11 +149,22 @@ final readonly class AddressFacade
             $dto->cellphone,
             $dto->phone,
             $dto->company,
-            $dto->isDefault,
+            $mayBecomeDefault && $dto->isDefault,
             $dto->stateId,
             $dto->siret,
             $dto->vatNumber,
         );
+    }
+
+    private function customerWhoMayEdit(Address $address): Customer
+    {
+        $customer = $this->session->getCustomerUser();
+
+        if (null === $customer || !($this->addressAccess?->canEdit($customer, $address) ?? $address->getCustomerId() === $customer->getId())) {
+            throw new CustomerException('Address does not belong to current customer');
+        }
+
+        return $customer;
     }
 
     private function assertCustomerOwnership(Address $address): void

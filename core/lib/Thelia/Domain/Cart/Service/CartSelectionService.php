@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Checkout\DTO\CheckoutDTO;
 use Thelia\Domain\Checkout\EventBuilder\CartCheckoutEventBuilder;
 use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
@@ -40,6 +41,7 @@ class CartSelectionService
         protected StoredPaymentMethodSelection $storedPaymentMethodSelection,
         protected ?DestinationRestrictionChecker $destinationRestrictionChecker = null,
         protected ?RequestStack $requestStack = null,
+        protected ?AddressAccess $addressAccess = null,
     ) {
     }
 
@@ -70,7 +72,7 @@ class CartSelectionService
      *
      * Only what travels is judged here: a download follows the invoice address, which
      * the buyer may not have chosen yet, and is judged at the placement of the order.
-     * An address of another customer is not looked at, as the action that writes the
+     * An address the customer may not use is not looked at, as the action that writes the
      * address ignores it too. A gift offered by a promotion is not judged either: the
      * buyer cannot remove it, and writing the address applies the promotions again,
      * which withdraws the gift this destination refuses (the offered lines, and the
@@ -85,10 +87,12 @@ class CartSelectionService
         }
 
         $cart = $checkoutDTO->getCart();
-        $address = AddressQuery::create()
-            ->filterByCustomerId($cart->getCustomerId())
-            ->filterById($addressId)
-            ->findOne();
+        $address = null !== $this->addressAccess
+            ? $this->addressAccess->find($cart->getCustomerId(), $addressId)
+            : AddressQuery::create()
+                ->filterByCustomerId($cart->getCustomerId())
+                ->filterById($addressId)
+                ->findOne();
 
         if (null === $address) {
             return;
