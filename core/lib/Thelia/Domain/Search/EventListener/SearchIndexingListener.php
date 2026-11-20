@@ -206,20 +206,24 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
 
     public function onSaleElementsPreSave(ProductSaleElementsEvent $event): void
     {
-        $saleElements = $event->getModel();
+        $this->safely(function () use ($event): void {
+            $saleElements = $event->getModel();
 
-        if ($saleElements instanceof ProductSaleElements && ($saleElements->isNew() || self::anyColumnModified($saleElements, self::INDEXED_SALE_ELEMENTS_COLUMNS))) {
-            $this->onSaleElementsWrite($event);
-        }
+            if ($saleElements instanceof ProductSaleElements && ($saleElements->isNew() || self::anyColumnModified($saleElements, self::INDEXED_SALE_ELEMENTS_COLUMNS))) {
+                $this->onSaleElementsWrite($event);
+            }
+        });
     }
 
     public function onBrandTranslationPreSave(BrandI18nEvent $event): void
     {
-        $translation = $event->getModel();
+        $this->safely(function () use ($event): void {
+            $translation = $event->getModel();
 
-        if ($translation instanceof BrandI18n && ($translation->isNew() || $translation->isColumnModified(BrandI18nTableMap::COL_TITLE))) {
-            $this->onBrandProductsChange($event);
-        }
+            if ($translation instanceof BrandI18n && ($translation->isNew() || $translation->isColumnModified(BrandI18nTableMap::COL_TITLE))) {
+                $this->onBrandProductsChange($event);
+            }
+        });
     }
 
     public function onSaleElementsWrite(ProductSaleElementsEvent $event): void
@@ -254,15 +258,17 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
 
     public function onProductValuePreSave(FeatureProductEvent|AttributeCombinationEvent $event): void
     {
-        $row = $event->getModel();
+        $this->safely(function () use ($event): void {
+            $row = $event->getModel();
 
-        if ($row instanceof FeatureProduct && ($row->isNew() || $row->isColumnModified(FeatureProductTableMap::COL_FEATURE_AV_ID))) {
-            $this->onProductValueWrite($event);
-        }
+            if ($row instanceof FeatureProduct && ($row->isNew() || $row->isColumnModified(FeatureProductTableMap::COL_FEATURE_AV_ID))) {
+                $this->onProductValueWrite($event);
+            }
 
-        if ($row instanceof AttributeCombination && ($row->isNew() || $row->isColumnModified(AttributeCombinationTableMap::COL_ATTRIBUTE_AV_ID) || $row->isColumnModified(AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID))) {
-            $this->onProductValueWrite($event);
-        }
+            if ($row instanceof AttributeCombination && ($row->isNew() || $row->isColumnModified(AttributeCombinationTableMap::COL_ATTRIBUTE_AV_ID) || $row->isColumnModified(AttributeCombinationTableMap::COL_PRODUCT_SALE_ELEMENTS_ID))) {
+                $this->onProductValueWrite($event);
+            }
+        });
     }
 
     public function onProductValueWrite(FeatureProductEvent|AttributeCombinationEvent $event): void
@@ -302,12 +308,14 @@ final readonly class SearchIndexingListener implements EventSubscriberInterface
 
     public function onValueTranslationPreSave(FeatureAvI18nEvent|AttributeAvI18nEvent $event): void
     {
-        $translation = $event->getModel();
-        $titleColumn = $translation instanceof FeatureAvI18n ? FeatureAvI18nTableMap::COL_TITLE : AttributeAvI18nTableMap::COL_TITLE;
+        $this->safely(function () use ($event): void {
+            $translation = $event->getModel();
+            $titleColumn = $translation instanceof FeatureAvI18n ? FeatureAvI18nTableMap::COL_TITLE : AttributeAvI18nTableMap::COL_TITLE;
 
-        if (($translation instanceof FeatureAvI18n || $translation instanceof AttributeAvI18n) && ($translation->isNew() || $translation->isColumnModified($titleColumn))) {
-            $this->onValueProductsChange($event);
-        }
+            if (($translation instanceof FeatureAvI18n || $translation instanceof AttributeAvI18n) && ($translation->isNew() || $translation->isColumnModified($titleColumn))) {
+                $this->onValueProductsChange($event);
+            }
+        });
     }
 
     public function onValueProductsChange(FeatureEvent|FeatureAvEvent|FeatureAvI18nEvent|AttributeEvent|AttributeAvEvent|AttributeAvI18nEvent $event): void
