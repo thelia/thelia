@@ -14,29 +14,67 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\CustomerList\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Domain\Company\Service\CompanyMembershipReader;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerList;
 use Thelia\Model\CustomerListQuery;
+use Thelia\Model\Map\CustomerListTableMap;
 
 /**
  * Who sees, changes and shares a purchase list. The only place those rules
  * live: the facade, the API and the theme all ask here.
  *
- * Customers cannot belong to a company yet, so a list is personal: its owner
- * reads and writes it, and nobody shares it. Company sharing (reading the
- * shared lists of colleagues, writing for the company administrator) plugs in
- * here and nowhere else.
+ * A list is its owner's: the owner reads and writes it. A list its owner shares is read, and only
+ * read, by every buyer of the company the owner belongs to: a colleague changes nothing in it.
+ * An owner who belongs to no company, or who left it, shares with nobody.
  */
 final readonly class PurchaseListAccessPolicy
 {
+    public function __construct(private CompanyMembershipReader $membershipReader)
+    {
+    }
+
+    /**
+     * The lists of the customer and, for a buyer of a company, the shared lists of the buyers of
+     * that company, in the one query.
+     */
     public function restrictToReadable(CustomerListQuery $query, Customer $customer): CustomerListQuery
     {
-        return $query->filterByCustomerId((int) $customer->getId());
+        $membership = $this->membershipReader->membershipOf($customer);
+
+        if (null === $membership) {
+            return $query->filterByCustomerId((int) $customer->getId());
+        }
+
+        return $query
+            ->condition('own', CustomerListTableMap::COL_CUSTOMER_ID.' = ?', (int) $customer->getId(), \PDO::PARAM_INT)
+            ->condition(
+                'shared',
+                \sprintf(
+                    '%s = 1 AND %s IN (SELECT `company_customer`.`customer_id` FROM `company_customer` WHERE `company_customer`.`company_id` = ?)',
+                    CustomerListTableMap::COL_SHARED,
+                    CustomerListTableMap::COL_CUSTOMER_ID,
+                ),
+                $membership->companyId,
+                \PDO::PARAM_INT,
+            )
+            ->where(['own', 'shared'], Criteria::LOGICAL_OR);
     }
 
     public function canRead(Customer $customer, CustomerList $list): bool
     {
-        return $this->isOwner($customer, $list);
+        if ($this->isOwner($customer, $list)) {
+            return true;
+        }
+
+        if (1 !== (int) $list->getShared()) {
+            return false;
+        }
+
+        $companyId = $this->membershipReader->membershipOf($customer)?->companyId;
+
+        return null !== $companyId && $this->membershipReader->membershipOf((int) $list->getCustomerId())?->companyId === $companyId;
     }
 
     public function canWrite(Customer $customer, CustomerList $list): bool
@@ -44,9 +82,12 @@ final readonly class PurchaseListAccessPolicy
         return $this->isOwner($customer, $list);
     }
 
+    /**
+     * Only the owner shares a list, and only with a company they belong to.
+     */
     public function canShare(Customer $customer, CustomerList $list): bool
     {
-        return false;
+        return $this->isOwner($customer, $list) && null !== $this->membershipReader->membershipOf($customer);
     }
 
     private function isOwner(Customer $customer, CustomerList $list): bool

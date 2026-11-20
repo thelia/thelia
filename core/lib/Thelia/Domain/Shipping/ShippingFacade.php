@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Api\Resource\DeliveryModule as DeliveryModuleResource;
 use Thelia\Api\State\Collection\DeliveryModuleCollection;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Checkout\Exception\DeliveryExcludedByProductException;
@@ -56,6 +57,7 @@ final readonly class ShippingFacade
         private CartAddressService $cartAddressService,
         private ?CartShippingRules $cartShippingRules = null,
         private ?CartGuard $cartGuard = null,
+        private ?AddressAccess $addressAccess = null,
     ) {
     }
 
@@ -122,7 +124,10 @@ final readonly class ShippingFacade
      */
     public function chooseDeliveryAddress(Cart $cart, int $addressId): void
     {
-        $address = AddressQuery::create()->findPk($addressId);
+        $customer = $cart->getCustomer();
+        $address = null !== $customer && null !== $this->addressAccess
+            ? $this->addressAccess->find($customer, $addressId)
+            : AddressQuery::create()->findPk($addressId);
 
         if (null === $address) {
             throw new \InvalidArgumentException(\sprintf('Address #%d not found', $addressId));
@@ -407,6 +412,10 @@ final readonly class ShippingFacade
 
         if ($addressId === $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId()) {
             return null;
+        }
+
+        if (null !== $this->addressAccess) {
+            return $this->addressAccess->find($customer, $addressId);
         }
 
         return AddressQuery::create()

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Shipping\Service;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Cart\Service\CartAddressService;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
@@ -26,6 +27,7 @@ final readonly class DeliverySetupService
     public function __construct(
         private PostageEstimator $postageEstimator,
         private CartAddressService $cartAddressService,
+        private AddressAccess $addressAccess,
     ) {
     }
 
@@ -69,9 +71,7 @@ final readonly class DeliverySetupService
                 ->findOne();
 
             if (null === $defaultAddress) {
-                $defaultAddress = AddressQuery::create()
-                    ->filterByCustomerId($customer->getId())
-                    ->findOne();
+                $defaultAddress = $this->addressAccess->firstOf($customer);
             }
 
             if (null !== $defaultAddress) {

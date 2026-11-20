@@ -22,6 +22,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\AddressQuery;
 use Thelia\Type\EnumType;
@@ -44,6 +45,10 @@ use Thelia\Type\TypeCollection;
 class Address extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
+
+    public function __construct(private readonly ?AddressAccess $addressAccess = null)
+    {
+    }
 
     protected function getArgDefinitions(): ArgumentCollection
     {
@@ -93,17 +98,23 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 return $search;
             }
 
-            $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
+            if (null !== $this->addressAccess) {
+                $this->addressAccess->restrict($search, $currentCustomer);
+            } else {
+                $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
+            }
         } else {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
 
         $default = $this->getDefault();
 
-        if (true === $default) {
-            $search->filterByIsDefault(1, Criteria::EQUAL);
-        } elseif (false === $default) {
-            $search->filterByIsDefault(0, Criteria::EQUAL);
+        if (\is_bool($default)) {
+            if ('current' === $customer && null !== $this->addressAccess) {
+                $this->addressAccess->filterByDefault($search, $this->currentCustomerId(), $default);
+            } else {
+                $search->filterByIsDefault($default ? 1 : 0, Criteria::EQUAL);
+            }
         }
 
         $exclude = $this->getExclude();
@@ -113,6 +124,18 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $search;
+    }
+
+    private function currentCustomerId(): int
+    {
+        return (int) $this->securityContext->getCustomerUser()?->getId();
+    }
+
+    private function isOwnedByTheCustomer(AddressModel $address): bool
+    {
+        $customer = $this->getCustomer();
+
+        return (int) $address->getCustomerId() === ('current' === $customer ? $this->currentCustomerId() : (int) $customer);
     }
 
     public function parseResults(LoopResult $loopResult): LoopResult
@@ -137,7 +160,9 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 ->set('STATE', $address->getStateId())
                 ->set('PHONE', $address->getPhone())
                 ->set('CELLPHONE', $address->getCellphone())
-                ->set('DEFAULT', $address->getIsDefault());
+                // The default address is the one of the account that owns it: an address shared by a
+                // colleague is not the default one of the customer it is listed for.
+                ->set('DEFAULT', $this->isOwnedByTheCustomer($address) ? $address->getIsDefault() : 0);
             $this->addOutputFields($loopResultRow, $address);
 
             $loopResult->addRow($loopResultRow);

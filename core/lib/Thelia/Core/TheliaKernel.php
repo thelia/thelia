@@ -93,6 +93,7 @@ use Thelia\Domain\Ai\Tool\AiWriteToolInterface;
 use Thelia\Domain\Ai\Tool\AsAiTool;
 use Thelia\Domain\Ai\Tool\Security\AiToolTokenAuthenticator;
 use Thelia\Domain\Checkout\Service\Step\CheckoutStepProviderInterface;
+use Thelia\Domain\Company\CompanyPermissionProviderInterface;
 use Thelia\Domain\Customer\Service\CustomerPersonalDataProviderInterface;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
 use Thelia\Domain\Taxation\TaxEngine\TaxTypeInterface;
@@ -673,6 +674,7 @@ class TheliaKernel extends Kernel
             TaxTypeInterface::class => 'thelia.taxType',
             CustomerPersonalDataProviderInterface::class => 'thelia.customer.personal_data_provider',
             CheckoutStepProviderInterface::class => 'thelia.checkout.step_provider',
+            CompanyPermissionProviderInterface::class => 'thelia.company.permission_provider',
 
             QueryCollectionExtensionInterface::class => 'thelia.api.propel.query_extension.collection',
             QueryItemExtensionInterface::class => 'thelia.api.propel.query_extension.item',

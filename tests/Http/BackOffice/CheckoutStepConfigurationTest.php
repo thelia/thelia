@@ -18,6 +18,7 @@ use BackOfficeDefaultTwigBundle\Controller\Configuration\CheckoutStepController;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Checkout\Enum\CheckoutDisplayMode;
+use Thelia\Domain\Company\Checkout\CompanySpendingStepProvider;
 use Thelia\Model\CheckoutStep;
 use Thelia\Model\CheckoutStepQuery;
 use Thelia\Model\ConfigQuery;
@@ -127,18 +128,21 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
         $this->injector->setAdmin($admin);
     }
 
-    public function testListShowsTheFourShippedStepsInTunnelOrder(): void
+    public function testListShowsTheShippedStepsInTunnelOrder(): void
     {
         $this->loginAdmin();
 
         $this->assertPageRenders(self::SCREEN_URL);
         $content = (string) $this->client->getResponse()->getContent();
 
+        // The step of the company accounts has no row in a new shop: the screen creates it,
+        // after the delivery whose postage it judges.
         $codes = $this->renderedCodes();
         self::assertSame(
             [
                 CheckoutStep::CODE_CART,
                 CheckoutStep::CODE_DELIVERY,
+                CompanySpendingStepProvider::CODE,
                 CheckoutStep::CODE_PAYMENT,
                 CheckoutStep::CODE_CONFIRMATION,
             ],
@@ -161,6 +165,9 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
     public function testOpeningTheListWritesNothingWhenEveryDeclaredStepHasItsRow(): void
     {
         $this->loginAdmin();
+
+        // A first visit creates the row of the step that comes with no row of its own.
+        $this->assertPageRenders(self::SCREEN_URL);
         $this->countTheSynchronisations();
 
         $this->assertPageRenders(self::SCREEN_URL);
@@ -324,8 +331,9 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
                 CheckoutStep::CODE_CART => 1,
                 'test_gift_message' => 2,
                 CheckoutStep::CODE_DELIVERY => 3,
-                CheckoutStep::CODE_PAYMENT => 4,
-                CheckoutStep::CODE_CONFIRMATION => 5,
+                CompanySpendingStepProvider::CODE => 4,
+                CheckoutStep::CODE_PAYMENT => 5,
+                CheckoutStep::CODE_CONFIRMATION => 6,
             ],
             $this->storedPositions(),
             'The moved step takes the place asked for and the list is renumbered around it.',
@@ -344,7 +352,13 @@ final class CheckoutStepConfigurationTest extends WebIntegrationTestCase
         ]), ['_token' => $this->pageToken()]);
 
         self::assertSame(
-            self::SHIPPED_POSITIONS,
+            [
+                CheckoutStep::CODE_CART => 1,
+                CheckoutStep::CODE_DELIVERY => 2,
+                CompanySpendingStepProvider::CODE => 3,
+                CheckoutStep::CODE_PAYMENT => 4,
+                CheckoutStep::CODE_CONFIRMATION => 5,
+            ],
             $this->storedPositions(),
             'The checkout opens on the cart: moving it down is refused and nothing is renumbered.',
         );
