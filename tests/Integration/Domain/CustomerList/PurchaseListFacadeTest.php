@@ -79,7 +79,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         self::assertSame('Weekly restock', $list->getTitle());
         self::assertSame(CustomerListType::Purchase, $list->getListType());
         self::assertFalse($list->getShared());
-        self::assertSame([['B-2', 3], ['A-1', 1]], $this->storedLines($list));
+        self::assertSame([['B-2', 3.0], ['A-1', 1.0]], $this->storedLines($list));
         self::assertFalse($this->facade->canShare($customer, $list));
     }
 
@@ -138,11 +138,11 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         $this->facade->appendItems($customer, (int) $list->getId(), self::lines(['C' => 5, 'A' => 4]));
 
         self::assertSame('Final', CustomerListQuery::create()->findPk($list->getId())?->getTitle());
-        self::assertSame([['A', 5], ['B', 2], ['C', 5]], $this->storedLines($list));
+        self::assertSame([['A', 5.0], ['B', 2.0], ['C', 5.0]], $this->storedLines($list));
 
         $this->facade->replaceItems($customer, (int) $list->getId(), self::lines(['Z' => 9]));
 
-        self::assertSame([['Z', 9]], $this->storedLines($list));
+        self::assertSame([['Z', 9.0]], $this->storedLines($list));
     }
 
     public function testDeletingAListDeletesItsLines(): void
@@ -204,7 +204,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
 
         $list = $this->facade->createFromOrder($customer, (int) $order->getId(), 'From my order');
 
-        self::assertSame([['KEPT', 3], ['REMOVED', 2]], $this->storedLines($list));
+        self::assertSame([['KEPT', 3.0], ['REMOVED', 2.0]], $this->storedLines($list));
         self::assertSame(
             [(int) $kept->getId(), null],
             array_map(static fn (ReferenceQuantity $line): ?int => $line->productSaleElementsId, $this->facade->linesToLoad($customer, (int) $list->getId())),
@@ -229,7 +229,26 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
 
         $list = $this->facade->createFromCart($customer, $cart, 'From my cart');
 
-        self::assertSame([['IN-CART', 4]], $this->storedLines($list));
+        self::assertSame([['IN-CART', 4.0]], $this->storedLines($list));
+    }
+
+    public function testAListKeepsTheDecimalsOfAProductSoldByMeasure(): void
+    {
+        $customer = $this->customer();
+        [$product, $saleElements] = $this->productWithSaleElement('FLOUR');
+        $cart = $this->factory->cart($customer);
+        $this->factory->cartItem($cart, $product, $saleElements, ['quantity' => 1.25]);
+        $order = $this->factory->order($customer);
+        $this->orderLine((int) $order->getId(), $product, $saleElements, 2.5);
+
+        $typed = $this->facade->create($customer, 'Typed', self::lines(['FLOUR' => 0.75]));
+        $fromCart = $this->facade->createFromCart($customer, $cart, 'From my cart');
+        $fromOrder = $this->facade->createFromOrder($customer, (int) $order->getId(), 'From my order');
+
+        self::assertSame([['FLOUR', 0.75]], $this->storedLines($typed));
+        self::assertSame([['FLOUR', 1.25]], $this->storedLines($fromCart));
+        self::assertSame([['FLOUR', 2.5]], $this->storedLines($fromOrder));
+        self::assertSame(1.25, $this->facade->linesToLoad($customer, (int) $fromCart->getId())[0]->quantity);
     }
 
     public function testTheCartOfAnotherCustomerIsRefused(): void
@@ -257,7 +276,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
         $this->facade->appendFromCart($customer, (int) $list->getId(), $cart);
         $this->facade->appendFromOrder($customer, (int) $list->getId(), (int) $order->getId());
 
-        self::assertSame([['ADDED', 8], ['OTHER', 2]], $this->storedLines($list));
+        self::assertSame([['ADDED', 8.0], ['OTHER', 2.0]], $this->storedLines($list));
     }
 
     public function testTheCartOrTheOrderOfAnotherCustomerAddsNothing(): void
@@ -278,7 +297,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
             }
         }
 
-        self::assertSame([['MINE', 1]], $this->storedLines($list));
+        self::assertSame([['MINE', 1.0]], $this->storedLines($list));
     }
 
     public function testTheListOfAnotherCustomerCannotReceiveTheCart(): void
@@ -332,7 +351,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
             [(int) $saleElements->getId(), null],
             array_map(static fn (ReferenceQuantity $line): ?int => $line->productSaleElementsId, $this->facade->linesToLoad($customer, (int) $list->getId())),
         );
-        self::assertSame([['KNOWN', 1], ['GHOST', 2]], $this->storedLines($list));
+        self::assertSame([['KNOWN', 1.0], ['GHOST', 2.0]], $this->storedLines($list));
     }
 
     public function testALineWhoseSaleElementLeftTheCatalogStaysWithItsReference(): void
@@ -402,7 +421,7 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
     }
 
     /**
-     * @param array<string, int> $quantities
+     * @param array<string, int|float> $quantities
      */
     private static function lines(array $quantities): ReferenceQuantityLines
     {
@@ -416,14 +435,14 @@ final class PurchaseListFacadeTest extends IntegrationTestCase
     }
 
     /**
-     * @return list<array{string, int}>
+     * @return list<array{string, float}>
      */
     private function storedLines(CustomerList $list): array
     {
         $lines = [];
 
         foreach (CustomerListItemQuery::create()->filterByCustomerListId($list->getId())->orderByPosition()->find() as $item) {
-            $lines[] = [(string) $item->getRef(), (int) $item->getQuantity()];
+            $lines[] = [(string) $item->getRef(), (float) $item->getQuantity()];
         }
 
         return $lines;

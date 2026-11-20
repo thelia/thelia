@@ -52,7 +52,7 @@ final class CustomerListsPersonalDataTest extends IntegrationTestCase
         $lists = $data['customer_lists'];
         self::assertCount(1, $lists);
         self::assertSame('Restock', $lists[0]['title']);
-        self::assertSame([['reference' => 'ABC', 'quantity' => 3]], $lists[0]['items']);
+        self::assertSame([['reference' => 'ABC', 'quantity' => 3.0]], $lists[0]['items']);
     }
 
     public function testAnonymizationDeletesTheListsButKeepsTheCustomerRow(): void
