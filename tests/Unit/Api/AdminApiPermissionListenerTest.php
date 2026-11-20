@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Thelia\Api\EventListener\AdminApiPermissionListener;
+use Thelia\Api\Routing\RequestOperationResolver;
 use Thelia\Api\Security\AdminApiResourcePermissions;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Customer;
@@ -71,7 +72,7 @@ final class AdminApiPermissionListenerTest extends TestCase
             $security,
             $this->createMock(SecurityContext::class),
             new AdminApiResourcePermissions(),
-            $this->createMock(ResourceMetadataCollectionFactoryInterface::class),
+            new RequestOperationResolver($this->createMock(ResourceMetadataCollectionFactoryInterface::class)),
         );
     }
 
