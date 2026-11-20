@@ -16,10 +16,13 @@ namespace Thelia\Domain\Catalog\Stock;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\SaleUnitProductSaleElementsQuery;
 
 /**
  * The stock level at which a sale element is reported as running low: its own
- * threshold when it has one, the shop-wide one otherwise.
+ * threshold when it has one, the shop-wide one otherwise. The own stock of a sale
+ * unit runs low on the threshold of the unit, then on the one of the sale element,
+ * then on the shop-wide one.
  */
 final readonly class LowStockThreshold
 {
@@ -57,5 +60,51 @@ final readonly class LowStockThreshold
     public function forOne(int $productSaleElementsId): float
     {
         return $this->forMany([$productSaleElementsId])[$productSaleElementsId] ?? $this->settings->lowStockThreshold();
+    }
+
+    /**
+     * @param list<array{0: int, 1: int}> $stocks sale unit and sale element
+     *
+     * @return array<string, float> the effective threshold of each known stock of a sale unit, keyed
+     *                              "<sale unit id>:<sale element id>", in a single query
+     */
+    public function forManySaleUnits(array $stocks): array
+    {
+        if ([] === $stocks) {
+            return [];
+        }
+
+        $global = $this->settings->lowStockThreshold();
+        $thresholds = [];
+
+        $rows = SaleUnitProductSaleElementsQuery::create()
+            ->filterBySaleUnitId(array_values(array_unique(array_column($stocks, 0))), Criteria::IN)
+            ->filterByProductSaleElementsId(array_values(array_unique(array_column($stocks, 1))), Criteria::IN)
+            ->joinProductSaleElements()
+            ->withColumn('ProductSaleElements.LowStockThreshold', 'SaleElementThreshold')
+            ->select(['SaleUnitId', 'ProductSaleElementsId', 'LowStockThreshold', 'SaleElementThreshold'])
+            ->find();
+
+        foreach ($rows as $row) {
+            $threshold = $global;
+
+            foreach ([$row['LowStockThreshold'], $row['SaleElementThreshold']] as $own) {
+                if (null !== $own && '' !== $own) {
+                    $threshold = (float) $own;
+
+                    break;
+                }
+            }
+
+            $thresholds[$row['SaleUnitId'].':'.$row['ProductSaleElementsId']] = $threshold;
+        }
+
+        return $thresholds;
+    }
+
+    public function forSaleUnit(int $saleUnitId, int $productSaleElementsId): float
+    {
+        return $this->forManySaleUnits([[$saleUnitId, $productSaleElementsId]])[$saleUnitId.':'.$productSaleElementsId]
+            ?? $this->forOne($productSaleElementsId);
     }
 }

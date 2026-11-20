@@ -253,7 +253,17 @@ final class TheliaEvents
     /** The physical stock of sale elements changed (dispatched after the commit): StockLevelChangedEvent. */
     public const PRODUCT_SALE_ELEMENTS_STOCK_CHANGED = 'thelia.pse.stock_changed';
 
-    /** A sale element went from above its low stock threshold to at or under it: LowStockReachedEvent. */
+    /**
+     * The own stock of sale units changed (dispatched after the commit): SaleUnitStockChangedEvent, each
+     * change naming its sale unit. The national counter of a sale element is told on
+     * PRODUCT_SALE_ELEMENTS_STOCK_CHANGED only.
+     */
+    public const SALE_UNIT_STOCK_CHANGED = 'thelia.sale_unit.stock_changed';
+
+    /**
+     * A sale element, or the own stock of a sale unit for it, went from above its low stock threshold to
+     * at or under it: LowStockReachedEvent.
+     */
     public const PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED = 'thelia.pse.low_stock_reached';
 
     /** A cart started to hold the stock of some of its lines (dispatched after the commit): StockReservedEvent. */

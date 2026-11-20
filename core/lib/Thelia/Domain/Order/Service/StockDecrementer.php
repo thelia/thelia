@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Order\Service;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\OutOfStockPolicy;
 use Thelia\Domain\Catalog\Stock\PreorderRule;
@@ -183,6 +184,51 @@ readonly class StockDecrementer
         }
 
         $statement->execute();
+    }
+
+    /**
+     * What the increments just made put back did to each stock they moved: the own stock of the sale
+     * unit when it keeps a row for the sale element, the national counter otherwise. Read on the
+     * connection of the increments, whose UPDATEs hold the rows: what is read is what they left, and
+     * the level before is that less what went back.
+     *
+     * @param array<int, float> $putBack what went back, by sale element id, all for $saleUnitId
+     *
+     * @return list<StockLevelChange>
+     */
+    public function levelsAfterPutBack(array $putBack, ConnectionInterface $connection, ?int $saleUnitId = null): array
+    {
+        $putBack = array_filter($putBack, static fn (float $quantity): bool => $quantity > 0);
+        $ids = [false => [], true => []];
+
+        foreach (array_keys($putBack) as $productSaleElementsId) {
+            $ids[$this->movesSaleUnitStock($saleUnitId, $productSaleElementsId)][] = $productSaleElementsId;
+        }
+
+        $changes = [];
+
+        foreach ($ids as $ownStock => $productSaleElementsIds) {
+            if ([] === $productSaleElementsIds) {
+                continue;
+            }
+
+            $in = implode(',', array_map('intval', $productSaleElementsIds));
+            $statement = $ownStock
+                ? $connection->prepare('SELECT `product_sale_elements_id`, `quantity` FROM `'.self::SALE_UNIT_TABLE."` WHERE `sale_unit_id` = :saleUnitId AND `product_sale_elements_id` IN ($in)")
+                : $connection->prepare("SELECT `id`, `quantity` FROM `product_sale_elements` WHERE `id` IN ($in)");
+
+            if ($ownStock) {
+                $statement->bindValue(':saleUnitId', $saleUnitId, \PDO::PARAM_INT);
+            }
+
+            $statement->execute();
+
+            foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $quantity]) {
+                $changes[] = new StockLevelChange((int) $id, (float) $quantity - $putBack[(int) $id], (float) $quantity, $ownStock ? $saleUnitId : null);
+            }
+        }
+
+        return $changes;
     }
 
     /**
