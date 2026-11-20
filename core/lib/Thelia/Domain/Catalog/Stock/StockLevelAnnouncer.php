@@ -23,12 +23,14 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
+use Thelia\Core\Event\ProductSaleElement\SaleUnitStockChangedEvent;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\SaleUnitProductSaleElementsQuery;
 
 /**
  * Tells the listeners of the stock levels what a change of stock did, once the change is written
@@ -41,11 +43,17 @@ use Thelia\Model\ProductSaleElementsQuery;
  * rolled back, or moved back since, and is never told. A change of the same sale element told
  * after that transaction, before the end, takes the waiting one over: one change, from the stock
  * before the first. A failing listener is logged; the stock stays changed.
+ *
+ * The national counter of a sale element is told on PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, the own
+ * stock a sale unit keeps for it on SALE_UNIT_STOCK_CHANGED: two stocks, never mixed in one event.
  */
 final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterface
 {
     /** @var array<int, float> by sale element id, the first stock before a change still waiting */
     private array $waiting = [];
+
+    /** @var array<string, StockLevelChange> by sale unit and sale element, the first stock before a change still waiting */
+    private array $waitingOnSaleUnits = [];
 
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
@@ -53,9 +61,12 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
     ) {
     }
 
-    public function announce(int $productSaleElementsId, float $before, float $after): void
+    /**
+     * @param int|null $saleUnitId the sale unit whose own stock changed; null for the national counter
+     */
+    public function announce(int $productSaleElementsId, float $before, float $after, ?int $saleUnitId = null): void
     {
-        $this->announceChanges([new StockLevelChange($productSaleElementsId, $before, $after)]);
+        $this->announceChanges([new StockLevelChange($productSaleElementsId, $before, $after, $saleUnitId)]);
     }
 
     /**
@@ -74,7 +85,11 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
 
         if ($this->callerTransaction->isOpen(Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME))) {
             foreach ($changes as $change) {
-                $this->waiting[$change->productSaleElementsId] ??= $change->previousQuantity;
+                if ($change->onSaleUnitStock()) {
+                    $this->waitingOnSaleUnits[self::saleUnitKey($change)] ??= $change;
+                } else {
+                    $this->waiting[$change->productSaleElementsId] ??= $change->previousQuantity;
+                }
             }
 
             return;
@@ -83,6 +98,17 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
         // A sale element whose change still waits for a committed transaction: told once, from the
         // stock before the change that waited, never the two apart.
         foreach ($changes as $index => $change) {
+            if ($change->onSaleUnitStock()) {
+                $key = self::saleUnitKey($change);
+
+                if (isset($this->waitingOnSaleUnits[$key])) {
+                    $changes[$index] = new StockLevelChange($change->productSaleElementsId, $this->waitingOnSaleUnits[$key]->previousQuantity, $change->newQuantity, $change->saleUnitId);
+                    unset($this->waitingOnSaleUnits[$key]);
+                }
+
+                continue;
+            }
+
             if (isset($this->waiting[$change->productSaleElementsId])) {
                 $changes[$index] = new StockLevelChange($change->productSaleElementsId, $this->waiting[$change->productSaleElementsId], $change->newQuantity);
                 unset($this->waiting[$change->productSaleElementsId]);
@@ -98,12 +124,28 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
      */
     public function flush(): void
     {
-        if ([] === $this->waiting || $this->callerTransaction->isOpen(Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME))) {
+        if (([] === $this->waiting && [] === $this->waitingOnSaleUnits) || $this->callerTransaction->isOpen(Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME))) {
             return;
         }
 
         $waiting = $this->waiting;
+        $waitingOnSaleUnits = $this->waitingOnSaleUnits;
         $this->waiting = [];
+        $this->waitingOnSaleUnits = [];
+
+        self::tell($this->dispatcher, [...$this->readBack($waiting), ...$this->readBackOnSaleUnits($waitingOnSaleUnits)]);
+    }
+
+    /**
+     * @param array<int, float> $waiting
+     *
+     * @return list<StockLevelChange>
+     */
+    private function readBack(array $waiting): array
+    {
+        if ([] === $waiting) {
+            return [];
+        }
 
         /** @var list<array{Id: int|string, Quantity: int|string|float|null}> $rows */
         $rows = ProductSaleElementsQuery::create()
@@ -124,12 +166,47 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
             }
         }
 
-        self::tell($this->dispatcher, $changes);
+        return $changes;
+    }
+
+    /**
+     * The own stock of each sale unit read back, as readBack() does for the national counters.
+     *
+     * @param array<string, StockLevelChange> $waiting
+     *
+     * @return list<StockLevelChange>
+     */
+    private function readBackOnSaleUnits(array $waiting): array
+    {
+        if ([] === $waiting) {
+            return [];
+        }
+
+        /** @var list<array{SaleUnitId: int|string, ProductSaleElementsId: int|string, Quantity: int|string|float|null}> $rows */
+        $rows = SaleUnitProductSaleElementsQuery::create()
+            ->filterBySaleUnitId(array_values(array_unique(array_map(static fn (StockLevelChange $change): ?int => $change->saleUnitId, $waiting))), Criteria::IN)
+            ->filterByProductSaleElementsId(array_values(array_unique(array_map(static fn (StockLevelChange $change): int => $change->productSaleElementsId, $waiting))), Criteria::IN)
+            ->select(['SaleUnitId', 'ProductSaleElementsId', 'Quantity'])
+            ->find()
+            ->getData();
+        $changes = [];
+
+        foreach ($rows as $row) {
+            $first = $waiting[$row['SaleUnitId'].':'.$row['ProductSaleElementsId']] ?? null;
+            $stored = (float) $row['Quantity'];
+
+            if (null !== $first && $stored !== $first->previousQuantity) {
+                $changes[] = new StockLevelChange($first->productSaleElementsId, $first->previousQuantity, $stored, $first->saleUnitId);
+            }
+        }
+
+        return $changes;
     }
 
     public function reset(): void
     {
         $this->waiting = [];
+        $this->waitingOnSaleUnits = [];
     }
 
     /**
@@ -146,11 +223,30 @@ final class StockLevelAnnouncer implements EventSubscriberInterface, ResetInterf
             return;
         }
 
+        $national = array_values(array_filter($changes, static fn (StockLevelChange $change): bool => !$change->onSaleUnitStock()));
+        $onSaleUnits = array_values(array_filter($changes, static fn (StockLevelChange $change): bool => $change->onSaleUnitStock()));
+
+        if ([] !== $national) {
+            self::dispatchSafely($dispatcher, new StockLevelChangedEvent($national), TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED);
+        }
+
+        if ([] !== $onSaleUnits) {
+            self::dispatchSafely($dispatcher, new SaleUnitStockChangedEvent($onSaleUnits), TheliaEvents::SALE_UNIT_STOCK_CHANGED);
+        }
+    }
+
+    private static function dispatchSafely(EventDispatcherInterface $dispatcher, StockLevelChangedEvent $event, string $eventName): void
+    {
         try {
-            $dispatcher->dispatch(new StockLevelChangedEvent($changes), TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED);
+            $dispatcher->dispatch($event, $eventName);
         } catch (\Throwable $throwable) {
             Tlog::getInstance()->addError('A listener of the stock levels failed after a change of stock: '.$throwable->getMessage(), $throwable);
         }
+    }
+
+    private static function saleUnitKey(StockLevelChange $change): string
+    {
+        return $change->saleUnitId.':'.$change->productSaleElementsId;
     }
 
     /**

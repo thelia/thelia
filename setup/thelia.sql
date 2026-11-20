@@ -6153,6 +6153,7 @@ CREATE TABLE `sale_unit_product_sale_elements`
     `sale_unit_id` INTEGER NOT NULL,
     `product_sale_elements_id` INTEGER NOT NULL,
     `quantity` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `low_stock_threshold` DOUBLE COMMENT 'stock level at or under which the shop owner is alerted for this sale unit; null: the threshold of the sale element',
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),

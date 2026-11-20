@@ -14,13 +14,22 @@ declare(strict_types=1);
 
 namespace Thelia\Core\Event\ProductSaleElement;
 
-/** The stock of one sale element before and after a change. */
+/**
+ * The stock of one sale element before and after a change: its national counter, or the own stock
+ * a sale unit keeps for it when $saleUnitId is given.
+ */
 final readonly class StockLevelChange
 {
     public function __construct(
         public int $productSaleElementsId,
         public float $previousQuantity,
         public float $newQuantity,
+        public ?int $saleUnitId = null,
     ) {
+    }
+
+    public function onSaleUnitStock(): bool
+    {
+        return null !== $this->saleUnitId;
     }
 }

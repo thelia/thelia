@@ -350,12 +350,13 @@ final class UpdateScriptTest extends TestCase
      * filled, then made required, in that order: made required first, the update
      * fails on the first existing customer (or, in a lax SQL mode, silently points
      * them all at group 0). `customer_version` keeps the history of the customer
-     * and goes through the same three steps.
+     * and goes through the same three steps. The column arrives with 3.4.0, so the
+     * test reads that script, whatever version comes after it.
      */
     #[DataProvider('tablesHoldingTheGroupOfACustomer')]
     public function testTheCustomerGroupColumnIsMadeRequiredOnlyAfterEveryRowHasAGroup(string $table): void
     {
-        $statements = $this->statementsOf($this->pendingScript());
+        $statements = $this->statementsOf((string) file_get_contents($this->setupDirectory().'/update/sql/3.4.0.sql'));
 
         $defaultGroup = $this->positionOfTheFirstStatementMatching($statements, '/^INSERT\s+IGNORE\s+INTO\s+`customer_group`\s/i');
         $addNullable = $this->positionOfTheFirstStatementMatching($statements, \sprintf('/ALTER TABLE `%s` ADD COLUMN `customer_group_id` INTEGER NULL\b/', $table));

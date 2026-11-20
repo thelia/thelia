@@ -154,11 +154,11 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
     /**
      * @param list<OrderProduct> $lines
      *
-     * @return list<StockLevelChange> what went back to the shared counter of each sale element
+     * @return list<StockLevelChange> what went back to each stock: the sale unit's own, or the shared counter
      */
     private function putBack(array $lines, ?int $saleUnitId, ConnectionInterface $connection): array
     {
-        /** @var array<int, float> $putBack on the shared counter, by sale element id */
+        /** @var array<int, float> $putBack by sale element id */
         $putBack = [];
 
         foreach ($lines as $orderProduct) {
@@ -166,26 +166,14 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
             $quantity = (float) $orderProduct->getQuantity();
 
             $this->stockDecrementer->increment($productSaleElementsId, $quantity, $connection, $saleUnitId);
-
-            if (!$this->stockDecrementer->movesSaleUnitStock($saleUnitId, $productSaleElementsId)) {
-                $putBack[$productSaleElementsId] = ($putBack[$productSaleElementsId] ?? 0.0) + $quantity;
-            }
+            $putBack[$productSaleElementsId] = ($putBack[$productSaleElementsId] ?? 0.0) + $quantity;
         }
 
-        if ([] === $putBack || (null === $this->stockLevelAnnouncer && null === $this->dispatcher)) {
+        if (null === $this->stockLevelAnnouncer && null === $this->dispatcher) {
             return [];
         }
 
-        // Our own UPDATEs hold the rows: what is read now is what they left.
-        $statement = $connection->prepare('SELECT `id`, `quantity` FROM `product_sale_elements` WHERE `id` IN ('.implode(',', array_keys($putBack)).')');
-        $statement->execute();
-        $changes = [];
-
-        foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $quantity]) {
-            $changes[] = new StockLevelChange((int) $id, (float) $quantity - $putBack[(int) $id], (float) $quantity);
-        }
-
-        return $changes;
+        return $this->stockDecrementer->levelsAfterPutBack($putBack, $connection, $saleUnitId);
     }
 
     /**
@@ -198,7 +186,7 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
      *
      * @param list<OrderProduct> $lines
      *
-     * @return list<StockLevelChange> what was taken from the shared counter of each sale element
+     * @return list<StockLevelChange> what was taken from each stock: the sale unit's own, or the shared counter
      */
     private function takeOut(OrderStatusActionContext $context, array $lines, ?int $saleUnitId, bool $checkAvailableStock, ConnectionInterface $connection): array
     {
@@ -223,7 +211,7 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
             throw new TheliaProcessException($lines[$shortage->takeKey]->getProductSaleElementsRef().' : Not enough stock', previous: $shortage);
         }
 
-        /** @var array<int, StockLevelChange> $changes */
+        /** @var array<string, StockLevelChange> $changes one per stock, from before the first line to after the last */
         $changes = [];
         /** @var array<int, list<StockMovement|null>> $componentMovementsByPack */
         $componentMovementsByPack = [];
@@ -239,11 +227,13 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
                 $componentMovementsByPack[(int) $orderProduct->getParent()][] = $movement;
             }
 
-            if (null !== $movement && !$movement->onSaleUnitStock()) {
-                $changes[$movement->productSaleElementsId] = new StockLevelChange(
+            if (null !== $movement) {
+                $key = $movement->saleUnitId.':'.$movement->productSaleElementsId;
+                $changes[$key] = new StockLevelChange(
                     $movement->productSaleElementsId,
-                    $changes[$movement->productSaleElementsId]->previousQuantity ?? $movement->previousQuantity,
+                    $changes[$key]->previousQuantity ?? $movement->previousQuantity,
                     $movement->newQuantity,
+                    $movement->saleUnitId,
                 );
             }
         }

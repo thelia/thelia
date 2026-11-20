@@ -45,6 +45,6 @@ final readonly class StockMovement
 
     public function toLevelChange(): StockLevelChange
     {
-        return new StockLevelChange($this->productSaleElementsId, $this->previousQuantity, $this->newQuantity);
+        return new StockLevelChange($this->productSaleElementsId, $this->previousQuantity, $this->newQuantity, $this->saleUnitId);
     }
 }

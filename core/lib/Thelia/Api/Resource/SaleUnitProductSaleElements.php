@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -26,17 +27,21 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Api\Security\SaleUnitScopeVoter;
+use Thelia\Api\State\Processor\SaleUnitStockProcessor;
 use Thelia\Model\Map\SaleUnitProductSaleElementsTableMap;
 use Thelia\Model\SaleUnitProductSaleElementsQuery;
 
 /**
  * The stock a sale unit keeps of a sale element. A unit with a row sells from it, and
  * the checkout decrements it, its cancellations and returns give back to it; a unit
- * without a row sells from the shared national counter.
+ * without a row sells from the shared national counter. A change of its quantity is told
+ * on SALE_UNIT_STOCK_CHANGED, and it runs low on its own threshold, else on the one of
+ * the sale element, else on the shop-wide one.
  *
  * Administration only: the front reads the resulting quantity on the sale element.
  */
@@ -56,10 +61,12 @@ use Thelia\Model\SaleUnitProductSaleElementsQuery;
         new Put(
             uriTemplate: '/admin/sale_unit_product_sale_elements/{id}',
             securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
+            processor: SaleUnitStockProcessor::class,
         ),
         new Patch(
             uriTemplate: '/admin/sale_unit_product_sale_elements/{id}',
             securityPostDenormalize: 'is_granted("'.SaleUnitScopeVoter::SCOPE.'", object)',
+            processor: SaleUnitStockProcessor::class,
         ),
         new Delete(
             uriTemplate: '/admin/sale_unit_product_sale_elements/{id}',
@@ -110,6 +117,11 @@ class SaleUnitProductSaleElements implements PropelResourceInterface
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     #[NotNull(groups: [self::GROUP_ADMIN_WRITE])]
     public float $quantity;
+
+    #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
+    #[ApiProperty(description: 'Stock level of the sale unit at or under which the shop owner is alerted. Null: the threshold of the sale element applies, then the shop-wide one.')]
+    #[PositiveOrZero(groups: [self::GROUP_ADMIN_WRITE])]
+    public ?float $lowStockThreshold = null;
 
     #[Groups([self::GROUP_ADMIN_READ])]
     public ?\DateTime $createdAt = null;
@@ -187,6 +199,18 @@ class SaleUnitProductSaleElements implements PropelResourceInterface
     public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getLowStockThreshold(): ?float
+    {
+        return $this->lowStockThreshold;
+    }
+
+    public function setLowStockThreshold(?float $lowStockThreshold): self
+    {
+        $this->lowStockThreshold = $lowStockThreshold;
 
         return $this;
     }
