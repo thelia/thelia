@@ -20,9 +20,10 @@ use Thelia\Domain\Report\Customer\CustomerDormancy;
 use Thelia\Domain\Report\Customer\CustomerSegment;
 
 /**
- * The new, returning and dormant customers of the period: how many they are, what they spent in
- * the period and its share of the revenue, what they spent since their first order and its share.
- * A customer is dormant after the number of days of the shop setting customer_dormant_after_days.
+ * The new, returning, lapsing and dormant customers of the period, one segment each: how many they
+ * are, what they spent in the period and its share of the revenue, what they spent since their
+ * first order and its share. A customer without an order in the period is dormant after the number
+ * of days of the shop setting customer_dormant_after_days, lapsing before.
  */
 class CustomerSegmentsExport extends AbstractCustomerReportExport
 {
@@ -67,7 +68,7 @@ class CustomerSegmentsExport extends AbstractCustomerReportExport
     }
 
     /**
-     * The number of new, returning and dormant customers.
+     * The number of new, returning, lapsing and dormant customers.
      *
      * @return list<ReportSummaryLine>
      */
@@ -88,6 +89,7 @@ class CustomerSegmentsExport extends AbstractCustomerReportExport
         return match ($segment) {
             CustomerSegment::New => $this->label('New customers'),
             CustomerSegment::Returning => $this->label('Returning customers'),
+            CustomerSegment::Lapsing => $this->label('Lapsing customers (no order in the period, not dormant yet)'),
             CustomerSegment::Dormant => \Thelia\Core\Translation\Translator::getInstance()->trans('Dormant customers (no order for %days% days)', ['%days%' => $days], 'core', $this->locale()),
         };
     }

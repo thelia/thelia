@@ -15,13 +15,15 @@ declare(strict_types=1);
 namespace Thelia\Domain\Report\Customer;
 
 /**
- * New: the first order of the customer falls in the period. Returning: the customer ordered in the
- * period and before it. Dormant: the last order of the customer is older than the dormancy
- * threshold at the end of the period.
+ * Each customer who ordered up to the end of the period is in one segment. New: the first order of
+ * the customer falls in the period. Returning: the customer ordered in the period and before it.
+ * Lapsing: no order in the period, the last one within the dormancy threshold at its end. Dormant:
+ * no order in the period, the last one older than the threshold.
  */
 enum CustomerSegment: string
 {
     case New = 'new';
     case Returning = 'returning';
+    case Lapsing = 'lapsing';
     case Dormant = 'dormant';
 }

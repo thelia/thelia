@@ -15,11 +15,9 @@ declare(strict_types=1);
 namespace Thelia\Domain\Report\Customer;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Connection\StatementInterface;
-use Propel\Runtime\Propel;
 use Thelia\Domain\Order\Sql\OrderAmountSql;
+use Thelia\Domain\Report\ReportQuery;
 use Thelia\Domain\Report\Sales\SalesReportCriteria;
-use Thelia\Domain\Report\Sales\StatusScope;
 use Thelia\Model\OrderStatusQuery;
 
 /**
@@ -34,6 +32,10 @@ use Thelia\Model\OrderStatusQuery;
  * ordered before the period is not new in it. Only the orders created up to the end of the
  * criteria are read.
  *
+ * A cancelled or refunded order (a status of the shop answering for one of them included) is left
+ * out in both status scopes: the customer reports count what customers spent, as the customer
+ * list does, where the sales reports of every order count it.
+ *
  * Each order is totalled as it was charged (goods with taxes, less the discount, plus the
  * postage) by the rounding rule of its order (OrderAmountSql), as the sales reports and the
  * dashboard total it, and the amounts are summed whatever the currency of the order. The
@@ -41,8 +43,6 @@ use Thelia\Model\OrderStatusQuery;
  */
 final readonly class CustomerLifetimeCalculator
 {
-    private const string SQL_DATE_FORMAT = 'Y-m-d H:i:s';
-
     public function __construct(private ?ConnectionInterface $connection = null)
     {
     }
@@ -106,10 +106,10 @@ final readonly class CustomerLifetimeCalculator
                 $cells[] = new CohortCell(
                     $elapsed,
                     $customers,
-                    self::share($customers, $size),
+                    ReportQuery::share($customers, $size),
                     $revenue,
                     $cumulative,
-                    self::share($cumulative, $size),
+                    ReportQuery::share($cumulative, $size),
                 );
             }
 
@@ -154,21 +154,22 @@ final readonly class CustomerLifetimeCalculator
             $customers,
             $orders,
             $revenue,
-            self::share($revenue, $customers),
+            ReportQuery::share($revenue, $customers),
             round((float) ($row['lifespan_days'] ?? 0), 1),
-            self::share((int) ($row['repeat_customers'] ?? 0), $customers),
-            self::share($orders, $customers),
+            ReportQuery::share((int) ($row['repeat_customers'] ?? 0), $customers),
+            ReportQuery::share($orders, $customers),
         );
     }
 
     /**
-     * The new, returning and dormant customers of the period of the criteria. New and returning
-     * customers both ordered in the period, and share its revenue; a dormant customer has not
-     * ordered for the given number of days at the end of the period, whenever they ordered last.
-     * Each segment also gives what its customers spent since their first order, against what
-     * every customer spent up to the end of the period.
+     * Every customer who ordered up to the end of the period, in one segment each: new and
+     * returning customers ordered in the period, and share its revenue; the others did not, and
+     * are dormant when their last order is older than the given number of days at the end of the
+     * period, lapsing otherwise. Each segment also gives what its customers spent since their
+     * first order, against what every customer spent up to the end of the period: both shares
+     * add up to the whole.
      *
-     * @return list<SegmentRow> new, returning, dormant
+     * @return list<SegmentRow> new, returning, lapsing, dormant
      */
     public function segments(SalesReportCriteria $criteria, int $dormantAfterDays): array
     {
@@ -200,7 +201,8 @@ final readonly class CustomerLifetimeCalculator
                     customer_life.*,
                     customer_life.period_orders > 0 AND customer_life.first_at >= bound.period_start AS is_new,
                     customer_life.period_orders > 0 AND customer_life.first_at < bound.period_start AS is_returning,
-                    customer_life.last_at < bound.dormant_before AS is_dormant
+                    customer_life.period_orders = 0 AND customer_life.last_at >= bound.dormant_before AS is_lapsing,
+                    customer_life.period_orders = 0 AND customer_life.last_at < bound.dormant_before AS is_dormant
                 FROM customer_life
                 CROSS JOIN bound
             )
@@ -211,6 +213,9 @@ final readonly class CustomerLifetimeCalculator
                 COALESCE(SUM(is_returning), 0) AS returning_customers,
                 CAST(COALESCE(SUM(CASE WHEN is_returning THEN period_revenue ELSE 0 END), 0) AS DECIMAL(16,6)) AS returning_period,
                 CAST(COALESCE(SUM(CASE WHEN is_returning THEN lifetime_revenue ELSE 0 END), 0) AS DECIMAL(16,6)) AS returning_lifetime,
+                COALESCE(SUM(is_lapsing), 0) AS lapsing_customers,
+                CAST(COALESCE(SUM(CASE WHEN is_lapsing THEN period_revenue ELSE 0 END), 0) AS DECIMAL(16,6)) AS lapsing_period,
+                CAST(COALESCE(SUM(CASE WHEN is_lapsing THEN lifetime_revenue ELSE 0 END), 0) AS DECIMAL(16,6)) AS lapsing_lifetime,
                 COALESCE(SUM(is_dormant), 0) AS dormant_customers,
                 CAST(COALESCE(SUM(CASE WHEN is_dormant THEN period_revenue ELSE 0 END), 0) AS DECIMAL(16,6)) AS dormant_period,
                 CAST(COALESCE(SUM(CASE WHEN is_dormant THEN lifetime_revenue ELSE 0 END), 0) AS DECIMAL(16,6)) AS dormant_lifetime,
@@ -218,7 +223,7 @@ final readonly class CustomerLifetimeCalculator
                 CAST(COALESCE(SUM(lifetime_revenue), 0) AS DECIMAL(16,6)) AS lifetime_total
             FROM classified';
 
-        $row = $this->fetchAll($sql, $criteria, ['dormant_before' => $dormantBefore->format(self::SQL_DATE_FORMAT)])[0] ?? [];
+        $row = $this->fetchAll($sql, $criteria, ['dormant_before' => ReportQuery::sqlDate($dormantBefore)])[0] ?? [];
         $periodTotal = (float) ($row['period_total'] ?? 0);
         $lifetimeTotal = (float) ($row['lifetime_total'] ?? 0);
 
@@ -233,9 +238,9 @@ final readonly class CustomerLifetimeCalculator
                 $segment,
                 (int) ($row[$prefix.'_customers'] ?? 0),
                 $periodRevenue,
-                self::share($periodRevenue, $periodTotal),
+                ReportQuery::share($periodRevenue, $periodTotal),
                 $lifetimeRevenue,
-                self::share($lifetimeRevenue, $lifetimeTotal),
+                ReportQuery::share($lifetimeRevenue, $lifetimeTotal),
             );
         }
 
@@ -244,10 +249,10 @@ final readonly class CustomerLifetimeCalculator
 
     /**
      * Every order of the scope and the sale units of the criteria created up to its end, whatever
-     * its start, with what the customer was charged for it. MariaDB merges the expression into
-     * each query that reads it: the amount is then only computed for the orders a query keeps (the
-     * orders of the customers of the cohorts), five times faster on five years of orders than a
-     * table of every order built beforehand.
+     * its start, cancelled and refunded orders left out, with what the customer was charged for
+     * it. MariaDB merges the expression into each query that reads it: the amount is then only
+     * computed for the orders a query keeps (the orders of the customers of the cohorts), five
+     * times faster on five years of orders than a table of every order built beforehand.
      *
      * @param bool $computedOnce for a query that reads every order and its amount twice (the
      *                           segments): DISTINCT, over rows the order id makes unique, keeps the
@@ -255,15 +260,9 @@ final readonly class CustomerLifetimeCalculator
      */
     private function placedOrderSql(SalesReportCriteria $criteria, bool $computedOnce = false): string
     {
-        $condition = 'o.created_at <= :to';
-
-        if (StatusScope::Paid === $criteria->scope) {
-            $condition .= ' AND '.self::inList('o.status_id', OrderStatusQuery::getPaidStatusIdList());
-        }
-
-        if (null !== $criteria->saleUnitIds) {
-            $condition .= ' AND '.self::inList('o.sale_unit_id', $criteria->saleUnitIds);
-        }
+        $condition = 'o.created_at <= :to'
+            .ReportQuery::scopeCondition($criteria)
+            .' AND NOT ('.ReportQuery::inList('o.status_id', [...OrderStatusQuery::getCanceledStatusIdList(), ...OrderStatusQuery::getRefundedStatusIdList()]).')';
 
         return 'placed_order AS (
                 SELECT'.($computedOnce ? ' DISTINCT' : '').'
@@ -277,49 +276,12 @@ final readonly class CustomerLifetimeCalculator
     }
 
     /**
-     * @param array<mixed> $ids
-     */
-    private static function inList(string $column, array $ids): string
-    {
-        $ids = array_values(array_unique(array_map('intval', $ids)));
-
-        return [] === $ids ? '1 = 0' : $column.' IN ('.implode(', ', $ids).')';
-    }
-
-    /**
      * @param array<string, scalar> $parameters
      *
      * @return list<array<string, mixed>>
      */
     private function fetchAll(string $sql, SalesReportCriteria $criteria, array $parameters = []): array
     {
-        $statement = ($this->connection ?? Propel::getConnection())->prepare($sql);
-
-        if (!$statement instanceof StatementInterface) {
-            throw new \RuntimeException('The customer report statement could not be prepared.');
-        }
-
-        $statement->bindValue('from', $criteria->from->format(self::SQL_DATE_FORMAT));
-        $statement->bindValue('to', $criteria->to->format(self::SQL_DATE_FORMAT));
-        OrderAmountSql::bindRoundingPivots($statement, $sql);
-
-        foreach ($parameters as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
-
-        $statement->execute();
-
-        $rows = [];
-
-        while (false !== ($row = $statement->fetch(\PDO::FETCH_ASSOC))) {
-            $rows[] = $row;
-        }
-
-        return $rows;
-    }
-
-    private static function share(float|int $part, float|int $whole): float
-    {
-        return 0 == $whole ? 0.0 : $part / $whole;
+        return (new ReportQuery($this->connection))->fetchAll($sql, $criteria, $parameters);
     }
 }

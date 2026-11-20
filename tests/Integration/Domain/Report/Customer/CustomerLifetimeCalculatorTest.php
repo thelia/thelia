@@ -28,6 +28,7 @@ use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Test\FixtureFactory;
 use Thelia\Test\IntegrationTestCase;
 
@@ -204,10 +205,10 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
         self::assertEqualsWithDelta($charged, $this->calculator->lifetime($this->firstFourMonths())->revenue, 0.000001);
     }
 
-    public function testThePaidScopeLeavesACancelledOrderOut(): void
+    public function testThePaidScopeLeavesAnUnpaidOrderOut(): void
     {
         $customer = $this->customer();
-        $this->order($customer, '2001-01-10 10:00:00', '30.000000', ['status' => OrderStatus::CODE_CANCELED]);
+        $this->order($customer, '2001-01-10 10:00:00', '30.000000', ['status' => OrderStatus::CODE_NOT_PAID]);
         $this->order($customer, '2001-02-10 10:00:00', '10.000000');
 
         $paid = $this->calculator->cohorts($this->firstFourMonths(StatusScope::Paid), CohortGranularity::Month);
@@ -215,6 +216,28 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
 
         self::assertSame(['2001-02'], array_map(static fn (CohortRow $row): string => $row->label, $paid->rows), 'Paid orders only: the first one is the order of February.');
         self::assertSame(['2001-01'], array_map(static fn (CohortRow $row): string => $row->label, $all->rows));
+    }
+
+    public function testACancelledOrRefundedOrderCountsInNeitherScopeACustomStatusStandingForOneIncluded(): void
+    {
+        $cancelledAtTheCounter = $this->factory->orderStatus(['code' => 'cancelled-at-the-counter', 'equivalentCode' => OrderStatus::CODE_CANCELED]);
+        $this->forgetTheStatusLists();
+        $customer = $this->customer();
+        $this->order($customer, '2001-01-10 10:00:00', '30.000000', ['status' => OrderStatus::CODE_CANCELED]);
+        $this->order($customer, '2001-01-20 10:00:00', '40.000000', ['status' => $cancelledAtTheCounter->getCode()]);
+        $this->order($customer, '2001-02-10 10:00:00', '50.000000', ['status' => OrderStatus::CODE_REFUNDED]);
+        $this->order($customer, '2001-03-10 10:00:00', '10.000000');
+
+        try {
+            foreach (StatusScope::cases() as $scope) {
+                $table = $this->calculator->cohorts($this->firstFourMonths($scope), CohortGranularity::Month);
+
+                self::assertSame(['2001-03'], array_map(static fn (CohortRow $row): string => $row->label, $table->rows), $scope->value.': the first order kept is the order of March.');
+                self::assertSame([1, 10.0], [$this->calculator->lifetime($this->firstFourMonths($scope))->orderCount, $this->calculator->lifetime($this->firstFourMonths($scope))->revenue], $scope->value);
+            }
+        } finally {
+            $this->forgetTheStatusLists();
+        }
     }
 
     public function testASaleUnitAdministratorSeesTheCohortsOfTheOrdersOfTheirUnitsOnly(): void
@@ -229,7 +252,7 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
         self::assertSame(1, $this->calculator->lifetime($scoped)->customerCount);
     }
 
-    public function testTheSegmentsSplitTheBuyersOfThePeriodIntoNewAndReturningAndCountTheDormantOnes(): void
+    public function testTheSegmentsPutEachCustomerInOneSegment(): void
     {
         $returning = $this->customer();
         $this->order($returning, '2001-01-10 10:00:00', '30.000000');
@@ -248,11 +271,30 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
         self::assertSame([1, 60.0], [$segments['new']->customerCount, $segments['new']->periodRevenue]);
         self::assertEqualsWithDelta(0.75, $segments['new']->periodShare, 0.000001);
         self::assertEqualsWithDelta(0.25, $segments['returning']->periodShare, 0.000001);
+        self::assertSame([1, 50.0], [$segments['lapsing']->customerCount, $segments['lapsing']->lifetimeRevenue], 'No order in June, the last one within 180 days on June 30: the order of May 20.');
         self::assertSame(1, $segments['dormant']->customerCount, 'Without an order for more than 180 days on June 30: the order of December 25.');
         self::assertSame(40.0, $segments['dormant']->lifetimeRevenue);
         self::assertEqualsWithDelta(40 / 200, $segments['dormant']->lifetimeShare, 0.000001);
+        $this->assertSegmentsAddUp($segments, 4);
 
-        self::assertSame(2, $this->bySegment($this->calculator->segments($june, 30))['dormant']->customerCount, 'At 30 days, the order of May 20 is dormant too.');
+        $atThirtyDays = $this->bySegment($this->calculator->segments($june, 30));
+        self::assertSame([0, 2], [$atThirtyDays['lapsing']->customerCount, $atThirtyDays['dormant']->customerCount], 'At 30 days, the order of May 20 is dormant too.');
+        $this->assertSegmentsAddUp($atThirtyDays, 4);
+    }
+
+    public function testACustomerWhoOrderedInAPeriodLongerThanTheThresholdIsNotDormantInIt(): void
+    {
+        $february = $this->customer();
+        $this->order($february, '2001-02-10 10:00:00', '30.000000');
+        $december = $this->customer();
+        $this->order($december, '2001-12-10 10:00:00', '10.000000');
+
+        $year = new SalesReportCriteria(new \DateTimeImmutable('2001-01-01 00:00:00'), new \DateTimeImmutable('2001-12-31 23:59:59'));
+        $segments = $this->bySegment($this->calculator->segments($year, 180));
+
+        self::assertSame(2, $segments['new']->customerCount, 'Both ordered first in the year, whenever they ordered last.');
+        self::assertSame(0, $segments['dormant']->customerCount);
+        $this->assertSegmentsAddUp($segments, 2);
     }
 
     public function testADormancyThresholdUnderOneDayIsRefused(): void
@@ -260,6 +302,21 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $this->calculator->segments($this->firstFourMonths(), 0);
+    }
+
+    /**
+     * @param array<string, SegmentRow> $segments
+     */
+    private function assertSegmentsAddUp(array $segments, int $customers): void
+    {
+        self::assertSame($customers, array_sum(array_map(static fn (SegmentRow $row): int => $row->customerCount, $segments)), 'Each customer is in one segment.');
+        self::assertEqualsWithDelta(1.0, array_sum(array_map(static fn (SegmentRow $row): float => $row->periodShare, $segments)), 0.000001, 'The shares of the revenue of the period add up.');
+        self::assertEqualsWithDelta(1.0, array_sum(array_map(static fn (SegmentRow $row): float => $row->lifetimeShare, $segments)), 0.000001, 'The shares of the revenue since the first order add up.');
+    }
+
+    private function forgetTheStatusLists(): void
+    {
+        (new \ReflectionProperty(OrderStatusQuery::class, 'statusIdListsCache'))->setValue(null, []);
     }
 
     private function firstFourMonths(StatusScope $scope = StatusScope::All): SalesReportCriteria
