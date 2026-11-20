@@ -27,7 +27,7 @@ final readonly class QuickOrderLine
      */
     public function __construct(
         public string $reference,
-        public int $quantity,
+        public float $quantity,
         public LineStatus $status,
         public ?int $productSaleElementsId = null,
         public ?int $productId = null,

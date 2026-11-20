@@ -116,13 +116,12 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
 
         self::assertCount(1, $table->lines);
         self::assertSame((int) $saleElements->getId(), $table->lines[0]->productSaleElementsId);
-        self::assertSame(3, $table->lines[0]->quantity);
+        self::assertSame(3.0, $table->lines[0]->quantity);
     }
 
     /**
-     * The quick order and the purchase lists count whole units: a line off the rules of
-     * its combination, or of a combination sold by measure, is refused before anything
-     * reaches the cart, and the other lines go on.
+     * A line off the rules of its combination (its step, or more decimals than it is sold
+     * with) is refused before anything reaches the cart, and the other lines go on.
      */
     public function testALineTheRulesOfItsCombinationRefuseNeverReachesTheCart(): void
     {
@@ -137,7 +136,7 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
 
         $table = $this->facade->addToCart($this->customer, $cart, self::lines([
             (string) $bySix->getRef() => 7,
-            (string) $byMeasure->getRef() => 2,
+            (string) $byMeasure->getRef() => 1.25,
             (string) $plain->getRef() => 1,
         ]));
 
@@ -146,8 +145,21 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
             array_map(static fn (QuickOrderLine $line): LineStatus => $line->status, $table->lines),
         );
         self::assertSame('Sold by 6: 6, 12, 18…', $table->lines[0]->refusalReason);
-        self::assertSame('This product is sold by measure: order it from its product page.', $table->lines[1]->refusalReason);
+        self::assertSame('The quantity cannot carry more than 1 decimal places.', $table->lines[1]->refusalReason);
         self::assertSame([[(int) $plain->getId(), 1.0]], $this->cartLines($cart));
+    }
+
+    public function testADecimalQuantityOfACombinationSoldByMeasureReachesTheCart(): void
+    {
+        $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+        $byMeasure = $this->saleElements();
+        (new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2))->applyTo($byMeasure);
+        $byMeasure->save();
+
+        $table = $this->facade->addToCart($this->customer, $cart, self::lines([(string) $byMeasure->getRef() => 1.25]));
+
+        self::assertSame(LineStatus::Resolved, $table->lines[0]->status);
+        self::assertSame([[(int) $byMeasure->getId(), 1.25]], $this->cartLines($cart));
     }
 
     public function testAPurchaseListLineOffTheRulesIsToldWhenTheListIsLoaded(): void
@@ -290,7 +302,7 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
     }
 
     /**
-     * @param array<string, int> $quantities
+     * @param array<string, int|float> $quantities
      */
     private static function lines(array $quantities): ReferenceQuantityLines
     {

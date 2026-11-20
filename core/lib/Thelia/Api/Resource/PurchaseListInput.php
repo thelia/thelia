@@ -35,7 +35,7 @@ final class PurchaseListInput
     public ?string $title = null;
 
     /**
-     * @var list<array{reference: string, quantity: int, productSaleElementsId?: int|null}>|null
+     * @var list<array{reference: string, quantity: int|float, productSaleElementsId?: int|null}>|null
      */
     #[ApiProperty(
         description: 'On a creation only: the first lines of the list, at most 500, in the format of `POST /front/account/quick-order/resolve`.',
