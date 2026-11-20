@@ -18,6 +18,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\CustomerList\Enum\CustomerListType;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
@@ -130,7 +131,7 @@ final readonly class PurchaseListRepository
         foreach ($items as $item) {
             $lines[] = new ReferenceQuantity(
                 (string) $item->getRef(),
-                (int) $item->getQuantity(),
+                self::storedQuantity($item->getQuantity()),
                 null !== $item->getProductSaleElementsId() ? (int) $item->getProductSaleElementsId() : null,
             );
         }
@@ -155,7 +156,7 @@ final readonly class PurchaseListRepository
             $saleElements = $item->getProductSaleElements();
             $lines[] = new ReferenceQuantity(
                 (string) $saleElements->getRef(),
-                self::wholeQuantity($item->getQuantity()),
+                self::storedQuantity($item->getQuantity()),
                 (int) $saleElements->getId(),
             );
         }
@@ -214,7 +215,7 @@ final readonly class PurchaseListRepository
 
             $lines[] = new ReferenceQuantity(
                 $reference,
-                self::wholeQuantity($orderProduct->getQuantity()),
+                self::storedQuantity($orderProduct->getQuantity()),
                 isset($existing[$saleElementsId]) ? $saleElementsId : null,
             );
         }
@@ -231,11 +232,12 @@ final readonly class PurchaseListRepository
     }
 
     /**
-     * Cart and order quantities are stored as floats; a list keeps whole units.
+     * A list keeps the quantity of the cart or the order as it is, 1.25 kg included, to
+     * the millionth a quantity is stored to.
      */
-    private static function wholeQuantity(float|int|string|null $quantity): int
+    private static function storedQuantity(float|int|string|null $quantity): float
     {
-        return max(1, (int) round((float) $quantity));
+        return QuantityScale::micro((float) $quantity) / QuantityScale::micro(1);
     }
 
     private function lockRow(string $table, int $id, ConnectionInterface $connection): void

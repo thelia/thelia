@@ -56,7 +56,7 @@ final class PurchaseListApiTest extends ApiTestCase
         self::assertSame('Monthly restock', $list['title']);
         self::assertTrue($list['canWrite']);
         self::assertFalse($list['shared']);
-        self::assertSame([['reference' => 'LIFE-A', 'quantity' => 2, 'productSaleElementsId' => null]], $list['items']);
+        self::assertSame([['reference' => 'LIFE-A', 'quantity' => 2.0, 'productSaleElementsId' => null]], $list['items']);
         $item = self::BASE.'/'.$list['id'];
 
         $collection = self::decode($this->jsonRequest('GET', self::BASE, token: $token, format: 'json'));
@@ -71,8 +71,8 @@ final class PurchaseListApiTest extends ApiTestCase
         $appended = $this->jsonRequest('POST', $item.'/items', ['lines' => [['reference' => 'LIFE-A', 'quantity' => 3], ['reference' => 'LIFE-B', 'quantity' => 1, 'productSaleElementsId' => (int) $second->getId()]]], $token, 'json');
         self::assertSame(200, $appended->getStatusCode(), (string) $appended->getContent());
         self::assertSame([
-            ['reference' => 'LIFE-A', 'quantity' => 5, 'productSaleElementsId' => null],
-            ['reference' => 'LIFE-B', 'quantity' => 1, 'productSaleElementsId' => (int) $second->getId()],
+            ['reference' => 'LIFE-A', 'quantity' => 5.0, 'productSaleElementsId' => null],
+            ['reference' => 'LIFE-B', 'quantity' => 1.0, 'productSaleElementsId' => (int) $second->getId()],
         ], self::decode($appended)['items']);
 
         $replaced = $this->jsonRequest('PUT', $item.'/items', ['lines' => [['reference' => 'LIFE-B', 'quantity' => 4, 'productSaleElementsId' => (int) $second->getId()]]], $token, 'json');
@@ -106,7 +106,7 @@ final class PurchaseListApiTest extends ApiTestCase
         $response = $this->jsonRequest('POST', self::BASE.'/from-cart/'.$cart->getId(), ['title' => 'From my cart'], $this->authenticateAsCustomer($customer), 'json');
 
         self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
-        self::assertSame([['reference' => 'CART-A', 'quantity' => 2, 'productSaleElementsId' => (int) $saleElements->getId()]], self::decode($response)['items']);
+        self::assertSame([['reference' => 'CART-A', 'quantity' => 2.0, 'productSaleElementsId' => (int) $saleElements->getId()]], self::decode($response)['items']);
     }
 
     public function testTheCartOfAnotherAccountAnswersAsACartThatDoesNotExist(): void
@@ -133,7 +133,7 @@ final class PurchaseListApiTest extends ApiTestCase
         $response = $this->jsonRequest('POST', self::BASE.'/from-order/'.$order->getId(), ['title' => 'From my order'], $this->authenticateAsCustomer($customer), 'json');
 
         self::assertSame(201, $response->getStatusCode(), (string) $response->getContent());
-        self::assertSame([['reference' => 'ORDER-A', 'quantity' => 3, 'productSaleElementsId' => (int) $saleElements->getId()]], self::decode($response)['items']);
+        self::assertSame([['reference' => 'ORDER-A', 'quantity' => 3.0, 'productSaleElementsId' => (int) $saleElements->getId()]], self::decode($response)['items']);
     }
 
     public function testTheOrderOfAnotherAccountAnswersAsAnOrderThatDoesNotExist(): void
@@ -220,6 +220,16 @@ final class PurchaseListApiTest extends ApiTestCase
         self::assertSame(['resolved', 'unknown'], array_column($lines, 'status'));
     }
 
+    public function testAListKeepsTheDecimalsOfAQuantity(): void
+    {
+        $token = $this->authenticateAsCustomer($this->customer());
+
+        $created = $this->jsonRequest('POST', self::BASE, ['title' => 'Bulk', 'lines' => [['reference' => 'FLOUR', 'quantity' => 1.25]]], $token, 'json');
+
+        self::assertSame(201, $created->getStatusCode(), (string) $created->getContent());
+        self::assertSame([['reference' => 'FLOUR', 'quantity' => 1.25, 'productSaleElementsId' => null]], self::decode($created)['items']);
+    }
+
     public function testASaleElementThatDoesNotExistIsSavedAsAnUnknownReference(): void
     {
         $token = $this->authenticateAsCustomer($this->customer());
@@ -227,7 +237,7 @@ final class PurchaseListApiTest extends ApiTestCase
         $created = $this->jsonRequest('POST', self::BASE, ['title' => 'Ghost', 'lines' => [['reference' => 'GHOST', 'quantity' => 1, 'productSaleElementsId' => 999999999]]], $token, 'json');
 
         self::assertSame(201, $created->getStatusCode(), (string) $created->getContent());
-        self::assertSame([['reference' => 'GHOST', 'quantity' => 1, 'productSaleElementsId' => null]], self::decode($created)['items']);
+        self::assertSame([['reference' => 'GHOST', 'quantity' => 1.0, 'productSaleElementsId' => null]], self::decode($created)['items']);
     }
 
     /**

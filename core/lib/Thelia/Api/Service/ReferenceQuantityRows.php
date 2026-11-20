@@ -28,7 +28,7 @@ use Thelia\Domain\Catalog\Exception\InvalidReferenceQuantityException;
 final class ReferenceQuantityRows
 {
     /**
-     * @param list<array{reference: string, quantity: int, productSaleElementsId?: int|null}> $rows
+     * @param list<array{reference: string, quantity: int|float, productSaleElementsId?: int|null}> $rows
      */
     public static function toLines(array $rows): ReferenceQuantityLines
     {
@@ -37,7 +37,7 @@ final class ReferenceQuantityRows
         foreach ($rows as $row) {
             $lines[] = new ReferenceQuantity(
                 (string) $row['reference'],
-                (int) $row['quantity'],
+                (float) $row['quantity'],
                 isset($row['productSaleElementsId']) ? (int) $row['productSaleElementsId'] : null,
             );
         }

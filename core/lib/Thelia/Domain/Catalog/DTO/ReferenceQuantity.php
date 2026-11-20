@@ -23,7 +23,7 @@ final readonly class ReferenceQuantity
 {
     public function __construct(
         public string $reference,
-        public int $quantity,
+        public float $quantity,
         public ?int $productSaleElementsId = null,
     ) {
     }

@@ -1,3 +1,16 @@
+# 3.5.0
+
+Not released yet. The update script is `setup/update/sql/3.5.0.sql`.
+
+## Catalog
+
+- Decimal quantities in the quick order and the purchase lists (#521). A sale element sold by measure is ordered there with its decimals, 1.25 kg as on its product page, and its minimum, step and decimals apply through `QuantityPolicy`: 1.255 on a sale element sold with two decimals is refused with the number of decimals it takes, a decimal on a sale element sold by the piece with "The quantity must be a whole number.". The quick order no longer sends a sale element sold by measure to its product page. A cart or an order saved as a list keeps its decimals (they were rounded to the unit). `customer_list_item.quantity` moves from `INTEGER` to `DOUBLE`, a saved whole quantity is kept as it is. The quick order and purchase list endpoints of the front API take a decimal `quantity` and the purchase list reads return it as a number (`2.0`).
+
+## Breaking changes
+
+- `Thelia\Domain\Catalog\DTO\ReferenceQuantity::$quantity` and `Thelia\Domain\QuickOrder\DTO\QuickOrderLine::$quantity` are a `float` (they were an `int`). Passing an integer still works; code that reads the property as an `int` (a typed parameter, a strict comparison with an integer) casts it or compares with `QuantityScale::isTheSameQuantity()`.
+- Decimal quantities in the quick order change one Flexy component. `FlexyBundle\Components\Organisms\QuickOrderTable\Base::__construct()` takes `FlexyBundle\Service\SaleElementQuantityRules` as its last argument, to write the unit of a line sold by measure. A child theme that overrides this constructor declares the new argument and passes it to `parent::__construct()`; one that does not override it needs nothing, the component is autowired. The quantity field of the table is a text field (`inputmode="decimal"`), no longer a number field.
+
 # 3.4.0
 
 Fourth minor of the 3.x line. 435 commits since 3.3.0. The version number follows the update script this release ships, `setup/update/sql/3.4.0.sql`, which creates the tables of the customer groups, the price lists and assortments, the subscriptions, the payment transactions, the product bundles, the promotion exclusions and the report mailings, and moves the quantities of the catalog, the carts, the orders, the returns and the shipments to double precision.

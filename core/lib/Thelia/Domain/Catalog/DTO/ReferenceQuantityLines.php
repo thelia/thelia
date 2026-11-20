@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Domain\Catalog\DTO;
 
 use Thelia\Domain\Catalog\Exception\InvalidReferenceQuantityException;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 
 /**
  * References and quantities as a buyer types, imports or saves them, checked once
@@ -36,8 +37,9 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
     public const int MAX_REFERENCE_LENGTH = 255;
 
     /**
-     * Per line, the lines of one reference added up: a list keeps it in an INTEGER
-     * column, and no order by reference needs more.
+     * Per line, the lines of one reference added up: no order by reference needs
+     * more. Whether a quantity suits the sale element (its minimum, step and
+     * decimals) is the quantity policy's call, once the reference is resolved.
      */
     public const int MAX_QUANTITY = 999_999;
 
@@ -62,8 +64,8 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
                 throw new InvalidReferenceQuantityException(\sprintf('A reference is at most %d characters long.', self::MAX_REFERENCE_LENGTH));
             }
 
-            if ($line->quantity < 1) {
-                throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" must be at least 1.', $reference));
+            if (is_nan($line->quantity) || QuantityScale::micro($line->quantity) <= 0) {
+                throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" must be greater than zero.', $reference));
             }
 
             $key = $reference."\0".($line->productSaleElementsId ?? '');
@@ -79,15 +81,21 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
     }
 
     /**
-     * Checked before the addition, so that it never leaves the integers.
+     * Added up as whole numbers of millionths, so that 0.1 + 0.2 stays 0.3, and checked
+     * before the addition.
      */
-    private static function boundedQuantity(string $reference, int $current, int $added): int
+    private static function boundedQuantity(string $reference, float $current, float $added): float
     {
-        if ($added > self::MAX_QUANTITY - $current) {
+        if (QuantityScale::micro($added) > QuantityScale::micro(self::MAX_QUANTITY) - QuantityScale::micro($current)) {
             throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" is at most %d.', $reference, self::MAX_QUANTITY));
         }
 
-        return $current + $added;
+        return self::sum($current, $added);
+    }
+
+    private static function sum(float $quantity, float $other): float
+    {
+        return (QuantityScale::micro($quantity) + QuantityScale::micro($other)) / QuantityScale::micro(1);
     }
 
     public static function normalizeReference(string $reference): string
@@ -122,7 +130,7 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
 
             $lines[$index] = new ReferenceQuantity(
                 $lines[$index]->reference,
-                $lines[$index]->quantity + $line->quantity,
+                self::sum($lines[$index]->quantity, $line->quantity),
                 $lines[$index]->productSaleElementsId ?? $line->productSaleElementsId,
             );
         }

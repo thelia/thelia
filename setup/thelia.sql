@@ -6047,7 +6047,7 @@ CREATE TABLE `customer_list_item`
     `customer_list_id` INTEGER NOT NULL,
     `ref` VARCHAR(255) NOT NULL COMMENT 'the reference as the customer entered it, kept when the sale element is gone',
     `product_sale_elements_id` INTEGER COMMENT 'the sale element the reference was resolved to, null once it left the catalog',
-    `quantity` INTEGER NOT NULL,
+    `quantity` DOUBLE NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
