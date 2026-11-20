@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Search\EventListener;
 
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -44,31 +45,31 @@ final class SearchTermRedirectTargetListener implements ResetInterface
     #[AsEventListener(event: ProductEvent::POST_DELETE)]
     public function onProductDelete(ProductEvent $event): void
     {
-        $this->remember(SearchRedirectTargetType::PRODUCT, $event->getModel()->getId());
+        $this->remember(SearchRedirectTargetType::PRODUCT, self::idOf($event->getModel()));
     }
 
     #[AsEventListener(event: CategoryEvent::POST_DELETE)]
     public function onCategoryDelete(CategoryEvent $event): void
     {
-        $this->remember(SearchRedirectTargetType::CATEGORY, $event->getModel()->getId());
+        $this->remember(SearchRedirectTargetType::CATEGORY, self::idOf($event->getModel()));
     }
 
     #[AsEventListener(event: ContentEvent::POST_DELETE)]
     public function onContentDelete(ContentEvent $event): void
     {
-        $this->remember(SearchRedirectTargetType::CONTENT, $event->getModel()->getId());
+        $this->remember(SearchRedirectTargetType::CONTENT, self::idOf($event->getModel()));
     }
 
     #[AsEventListener(event: FolderEvent::POST_DELETE)]
     public function onFolderDelete(FolderEvent $event): void
     {
-        $this->remember(SearchRedirectTargetType::FOLDER, $event->getModel()->getId());
+        $this->remember(SearchRedirectTargetType::FOLDER, self::idOf($event->getModel()));
     }
 
     #[AsEventListener(event: BrandEvent::POST_DELETE)]
     public function onBrandDelete(BrandEvent $event): void
     {
-        $this->remember(SearchRedirectTargetType::BRAND, $event->getModel()->getId());
+        $this->remember(SearchRedirectTargetType::BRAND, self::idOf($event->getModel()));
     }
 
     #[AsEventListener(event: KernelEvents::TERMINATE, priority: 10)]
@@ -88,6 +89,13 @@ final class SearchTermRedirectTargetListener implements ResetInterface
     public function reset(): void
     {
         $this->deletedTargets = [];
+    }
+
+    private static function idOf(ActiveRecordInterface $model): ?int
+    {
+        $id = method_exists($model, 'getId') ? $model->getId() : null;
+
+        return is_numeric($id) ? (int) $id : null;
     }
 
     private function remember(string $type, ?int $id): void

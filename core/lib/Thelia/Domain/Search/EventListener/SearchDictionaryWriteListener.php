@@ -64,13 +64,15 @@ final readonly class SearchDictionaryWriteListener
             }
         }
 
-        $duplicate = SearchSynonymQuery::create()
+        $duplicates = SearchSynonymQuery::create()
             ->filterByLangId($lang->getId())
-            ->filterByTerm($term)
-            ->_if(!$synonym->isNew())
-                ->filterById($synonym->getId(), Criteria::NOT_EQUAL)
-            ->_endif()
-            ->exists();
+            ->filterByTerm($term);
+
+        if (!$synonym->isNew()) {
+            $duplicates->filterById($synonym->getId(), Criteria::NOT_EQUAL);
+        }
+
+        $duplicate = $duplicates->exists();
 
         if ($duplicate) {
             throw new \InvalidArgumentException(self::translate('The term "%term%" already has synonyms in this language.', ['%term%' => $term]));
@@ -114,13 +116,15 @@ final readonly class SearchDictionaryWriteListener
 
         $this->redirectValidator->validate($type, $targetId, $url);
 
-        $duplicate = SearchTermRedirectQuery::create()
+        $duplicates = SearchTermRedirectQuery::create()
             ->filterByLangId($lang->getId())
-            ->filterByTerm($term)
-            ->_if(!$redirect->isNew())
-                ->filterById($redirect->getId(), Criteria::NOT_EQUAL)
-            ->_endif()
-            ->exists();
+            ->filterByTerm($term);
+
+        if (!$redirect->isNew()) {
+            $duplicates->filterById($redirect->getId(), Criteria::NOT_EQUAL);
+        }
+
+        $duplicate = $duplicates->exists();
 
         if ($duplicate) {
             throw new \InvalidArgumentException(self::translate('The term "%term%" is already redirected in this language.', ['%term%' => $term]));
