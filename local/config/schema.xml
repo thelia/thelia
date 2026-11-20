@@ -512,6 +512,7 @@
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
     <column defaultValue="0" name="is_default" type="TINYINT" />
+    <column defaultValue="NULL" description="the company the address is shared with, NULL for an address of the customer alone; customer_id stays the account that created it" name="company_id" type="INTEGER" />
     <foreign-key foreignTable="customer" name="fk_address_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -524,6 +525,9 @@
     <foreign-key foreignTable="state" name="fk_address_state_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="state_id" />
     </foreign-key>
+    <foreign-key foreignTable="company" name="fk_address_company_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="SharingCompany" refPhpName="SharedAddress">
+      <reference foreign="id" local="company_id" />
+    </foreign-key>
     <index name="idx_address_customer_id">
       <index-column name="customer_id" />
     </index>
@@ -532,6 +536,9 @@
     </index>
     <index name="idx_address_country_id">
       <index-column name="country_id" />
+    </index>
+    <index name="idx_address_company_id">
+      <index-column name="company_id" />
     </index>
     <index name="fk_address_state_id_idx">
       <index-column name="state_id" />
@@ -629,6 +636,94 @@
     </foreign-key>
     <index name="idx_customer_group_category_category_id">
       <index-column name="category_id" />
+    </index>
+  </table>
+  <table name="company" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="name" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" description="copied onto the billing address of the company each time the company is saved" name="siret" size="20" type="VARCHAR" />
+    <column defaultValue="NULL" description="copied onto the billing address of the company each time the company is saved" name="vat_number" size="20" type="VARCHAR" />
+    <column defaultValue="NULL" description="the company this one belongs to; a plain column with no foreign key, read by nothing yet" name="parent_id" type="INTEGER" />
+    <column defaultValue="1" description="a suspended company (0) keeps its buyers and its history but places no order" name="active" required="true" type="TINYINT" />
+    <column defaultValue="NULL" description="receives a copy of every e-mail about an order of the company" name="notification_email" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" description="a note for the shop administrators, never shown to the company" name="internal_note" type="LONGVARCHAR" />
+    <column defaultValue="NULL" description="the address invoices of the company are made out to, NULL when none is chosen" name="billing_address_id" type="INTEGER" />
+    <foreign-key foreignTable="address" name="fk_company_billing_address_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="BillingAddress" refPhpName="BilledCompany">
+      <reference foreign="id" local="billing_address_id" />
+    </foreign-key>
+    <index name="idx_company_parent_id">
+      <index-column name="parent_id" />
+    </index>
+    <index name="idx_company_billing_address_id">
+      <index-column name="billing_address_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="company_role" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column description="stable machine name of the role, which the code of the company looks it up by" name="code" required="true" size="100" type="VARCHAR" />
+    <column defaultValue="NULL" description="the company the role belongs to, NULL for a role every company may give" name="company_id" type="INTEGER" />
+    <column description="JSON list of the permissions the role grants, each a string" name="permissions" required="true" type="LONGVARCHAR" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <foreign-key foreignTable="company" name="fk_company_role_company_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="company_id" />
+    </foreign-key>
+    <index name="idx_company_role_code_company_id">
+      <index-column name="code" />
+      <index-column name="company_id" />
+    </index>
+    <index name="idx_company_role_company_id">
+      <index-column name="company_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title" />
+    </behavior>
+  </table>
+  <table name="company_customer" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="company_id" required="true" type="INTEGER" />
+    <column description="the buyer; an account belongs to one company at most" name="customer_id" required="true" type="INTEGER" />
+    <column name="company_role_id" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the most the buyer may spend on one order, taxes and delivery included, in the default currency; NULL for no limit" name="order_limit" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="NULL" description="the most the buyer may spend over one period, taxes and delivery included, in the default currency; NULL for no limit" name="period_limit" scale="6" size="16" type="DECIMAL" />
+    <column defaultValue="NULL" description="the period period_limit counts over: week, month or year" name="period" size="10" type="VARCHAR" />
+    <foreign-key foreignTable="company" name="fk_company_customer_company_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="company_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_company_customer_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <foreign-key foreignTable="company_role" name="fk_company_customer_company_role_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="company_role_id" />
+    </foreign-key>
+    <unique name="company_customer_customer_id_unique">
+      <unique-column name="customer_id" />
+    </unique>
+    <index name="idx_company_customer_company_id">
+      <index-column name="company_id" />
+    </index>
+    <index name="idx_company_customer_company_role_id">
+      <index-column name="company_role_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="company_invitation_use" namespace="Thelia\Model">
+    <column description="SHA-256 of the invitation token, in hexadecimal; the key makes an invitation usable once, whatever became of the buyer it took in" name="fingerprint" primaryKey="true" required="true" size="64" type="CHAR" />
+    <column name="company_id" required="true" type="INTEGER" />
+    <column defaultValue="NULL" description="the account the invitation took in; NULL once that account is deleted" name="customer_id" type="INTEGER" />
+    <column name="used_at" required="true" type="DATETIME" />
+    <foreign-key foreignTable="company" name="fk_company_invitation_use_company_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="company_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_company_invitation_use_customer_id" onDelete="SET NULL" onUpdate="RESTRICT">
+      <reference foreign="id" local="customer_id" />
+    </foreign-key>
+    <index name="idx_company_invitation_use_company_id">
+      <index-column name="company_id" />
+    </index>
+    <index name="idx_company_invitation_use_customer_id">
+      <index-column name="customer_id" />
     </index>
   </table>
   <table name="price_list" namespace="Thelia\Model">
@@ -955,6 +1050,8 @@
     <column defaultValue="NULL" description="the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted" name="customer_group_id" type="INTEGER" />
     <column defaultValue="0.000000" description="the customer group discount rate, as a percentage, already included in the order products prices" name="customer_group_discount_rate" scale="6" size="16" type="DECIMAL" />
     <column defaultValue="1" description="the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices" name="customer_group_display_taxed_price" required="true" type="TINYINT" />
+    <column defaultValue="NULL" description="the company the order was placed for, frozen when it was placed: NULL for an order of a customer alone, kept when the buyer leaves the company" name="company_id" type="INTEGER" />
+    <column defaultValue="NULL" description="the account that placed the order, NULL once that account is deleted; customer_id stays the owner of the order" name="placed_by_customer_id" type="INTEGER" />
     <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
@@ -964,7 +1061,7 @@
     <foreign-key foreignTable="customer_group" name="fk_order_customer_group_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_group_id" />
     </foreign-key>
-    <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+    <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT" phpName="Customer" refPhpName="Order">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
     <foreign-key foreignTable="order_address" name="fk_order_invoice_order_address_id" onDelete="RESTRICT" onUpdate="RESTRICT">
@@ -987,6 +1084,12 @@
     </foreign-key>
     <foreign-key foreignTable="delivery_slot" name="fk_order_delivery_slot_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="delivery_slot_id" />
+    </foreign-key>
+    <foreign-key foreignTable="company" name="fk_order_company_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="company_id" />
+    </foreign-key>
+    <foreign-key foreignTable="customer" name="fk_order_placed_by_customer_id" onDelete="SET NULL" onUpdate="RESTRICT" phpName="PlacedByCustomer" refPhpName="PlacedOrder">
+      <reference foreign="id" local="placed_by_customer_id" />
     </foreign-key>
     <index name="idx_order_currency_id">
       <index-column name="currency_id" />
@@ -1027,6 +1130,12 @@
     </index>
     <index name="idx_order_delivery_slot_id">
       <index-column name="delivery_slot_id" />
+    </index>
+    <index name="idx_order_company_id">
+      <index-column name="company_id" />
+    </index>
+    <index name="idx_order_placed_by_customer_id">
+      <index-column name="placed_by_customer_id" />
     </index>
     <behavior name="timestampable" />
     <behavior name="versionable">
