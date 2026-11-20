@@ -61,7 +61,7 @@ jobs:
 
       - name: Create the backport pull requests
         # Pinned to the commit of v4.7.0: this action holds a token that can write to the repository.
-        uses: korthout/backport-action@8560fb503c275d433c56f05a2f64850093baa9f7 # v4.7.0
+        uses: korthout/backport-action@ad272ff24e4a8593bf18a951a154ae6af93b26b8 # v5.0.0
         with:
           label_pattern: ${{ steps.select.outputs.pattern }}
           experimental: '{"conflict_resolution": "draft_commit_conflicts"}'
