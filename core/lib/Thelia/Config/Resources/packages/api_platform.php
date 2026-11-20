@@ -37,6 +37,11 @@ return static function (ContainerConfigurator $container): void {
         'title' => 'Thelia API',
         'version' => TheliaKernel::THELIA_VERSION,
         'show_webby' => false,
+        // The operation of a request is put on it by API Platform's Symfony listeners: with
+        // this off, the upload and cart controllers and the admin permission check never see it.
+        // Set here, a project keeps the last word: its own api_platform configuration is
+        // merged over this prepended default.
+        'use_symfony_listeners' => true,
         'serializer' => [
             'hydra_prefix' => true,
         ],
