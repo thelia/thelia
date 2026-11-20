@@ -259,7 +259,7 @@ final class PurchaseList
     #[Groups([self::GROUP_FRONT_READ])]
     public string $title = '';
 
-    #[ApiProperty(description: 'Whether the list is shared with the company of its owner. Always false until companies exist.')]
+    #[ApiProperty(description: 'Whether the list is shared with the company of its owner: the buyers of that company read it, and only its owner changes it.')]
     #[Groups([self::GROUP_FRONT_READ])]
     public bool $shared = false;
 

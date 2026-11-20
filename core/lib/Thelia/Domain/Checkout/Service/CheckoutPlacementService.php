@@ -27,6 +27,8 @@ use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
 use Thelia\Domain\Checkout\Exception\DeliverySlotFullException;
 use Thelia\Domain\Checkout\Exception\UnknownConsentException;
+use Thelia\Domain\Company\Checkout\CompanySpendingStepProvider;
+use Thelia\Domain\Company\Checkout\Exception\CompanyOrderRefusedException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Model\CheckoutStep;
 use Thelia\Model\Order;
@@ -166,6 +168,11 @@ final readonly class CheckoutPlacementService
                 // reached the conditional update, and the order was rolled back. Answered
                 // like every other refusal, so the caller can offer another slot.
                 throw new CheckoutRefusedException([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $full)], previous: $full);
+            } catch (CompanyOrderRefusedException $refused) {
+                // The guard above judged the cart before anything was locked; the order was
+                // judged again once it was written, on what the buyer's other orders had used up
+                // meanwhile, and rolled back. Answered like every other refusal.
+                throw new CheckoutRefusedException([CheckoutViolation::fromRefusal(CompanySpendingStepProvider::CODE, $refused)], previous: $refused);
             } catch (CartAlreadyOrderedException $race) {
                 // Another node wrote the order between the re-read above and the insert:
                 // the lock this request holds is local to the server it runs on, and the

@@ -17,6 +17,7 @@ namespace Thelia\Domain\Order\Service;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Domain\Cart\Exception\CartPricesChangedException;
 use Thelia\Domain\Cart\Service\CartPriceGuard;
+use Thelia\Domain\Company\Checkout\Service\CompanyOrderAttacher;
 use Thelia\Domain\Customer\Service\CustomerGroupResolver;
 use Thelia\Domain\Pricing\CustomerPrice\CustomerDiscountRate;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
@@ -38,6 +39,7 @@ readonly class OrderFactory
         private CustomerGroupResolver $customerGroupResolver,
         private CartPriceGuard $cartPriceGuard,
         private CustomerDiscountRate $customerDiscountRate,
+        private CompanyOrderAttacher $companyOrderAttacher,
     ) {
     }
 
@@ -67,6 +69,9 @@ readonly class OrderFactory
         $order->setCartId($cart->getId());
         $order->setDiscount($cart->getDiscount());
         $this->snapshotPricing($order, $cart, $currency, $customer);
+        // The company the buyer places this order for, frozen with it: a buyer who changes
+        // company later leaves their orders where they were.
+        $this->companyOrderAttacher->attach($order, $customer);
         // Stamped by the server from the resolved context, never by the client: the
         // order carries the sale unit it was placed on for good, whatever the session
         // does afterwards. NULL is a national (single-shop) order.

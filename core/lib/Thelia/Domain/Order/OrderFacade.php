@@ -31,6 +31,9 @@ use Thelia\Domain\Catalog\Stock\StockLevelAnnouncer;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Checkout\Service\ConsentAnswerStoreInterface;
 use Thelia\Domain\Checkout\Service\ConsentProvider;
+use Thelia\Domain\Company\Checkout\Exception\CompanyOrderRefusedException;
+use Thelia\Domain\Company\Checkout\Service\CompanyBillingAddressImposer;
+use Thelia\Domain\Company\Checkout\Service\CompanyPlacementGuard;
 use Thelia\Domain\Order\Exception\BundleLineNotOrderableException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
 use Thelia\Domain\Order\Exception\OrderPlacementConflictException;
@@ -111,6 +114,8 @@ readonly class OrderFacade
         ?SellableStock $sellableStock = null,
         private ?StockReservationService $stockReservation = null,
         private ?StockLevelAnnouncer $stockLevelAnnouncer = null,
+        private ?CompanyPlacementGuard $companyPlacement = null,
+        private ?CompanyBillingAddressImposer $companyBillingAddress = null,
     ) {
         // A facade built without them sells as a shop that does not reserve its stock.
         $this->sellableStock = $sellableStock ?? new SellableStock(new NoReservedQuantity(), new SaleUnitAvailableStock($saleUnitContext, $saleUnitStockResolver));
@@ -121,8 +126,11 @@ readonly class OrderFacade
      * @param bool $recordConsentAnswers     whether the buyer's consent answers get frozen onto the order. Only the
      *                                       checkout tunnel has answers to freeze: an order created outside of it
      *                                       (the back office, the command line) has no buyer at the keyboard, so
-     *                                       there is nothing to record and no session to purge afterwards.
+     *                                       there is nothing to record and no session to purge afterwards. Those same
+     *                                       placements are the ones the limits of a company buyer apply to: an order
+     *                                       written by an administrator or by a subscription is not bound by them.
      *
+     * @throws CompanyOrderRefusedException    the company of the buyer does not let them place this order
      * @throws BundleLineNotOrderableException a pack of the cart whose composition the catalogue no longer holds
      * @throws StockShortageException          a line, or a component of a pack, the stock cannot serve
      * @throws OrderPlacementConflictException another order placed at the same moment broke a lock tie with this one
@@ -172,12 +180,23 @@ readonly class OrderFacade
         // as they stand, and a cart holding a unit is never sold to this one.
         $stockRowsToLock = true === $this->stockReservation?->isActive() ? self::stockRowsOf($cart, $bundleComponents) : [];
 
+        // The buyer of a company, when the order is placed for them at the keyboard (the same
+        // placements that freeze consent answers): their limits are judged inside the transaction.
+        $companyBuyer = $recordConsentAnswers ? $this->companyPlacement?->prepare($customer) : null;
+
         $connection = $this->orderTransactionManager->begin();
 
         /** @var list<StockMovement> $stockMovements what the order took from the stock, for the event sent once it is committed */
         $stockMovements = [];
 
         try {
+            // First of all, before the transaction reads anything it does not lock: its view of the
+            // database is then taken once the other placements of this buyer are over, and two
+            // carts of the same buyer cannot both pass a limit the first one used up.
+            if (null !== $companyBuyer) {
+                $this->companyPlacement->lock($companyBuyer, $connection);
+            }
+
             $this->refuseACartThatHasAlreadyBeenOrdered($cart, $connection, $stockRowsToLock);
 
             // What the other carts hold of those rows, read once, now that they are locked: the
@@ -188,6 +207,12 @@ readonly class OrderFacade
                 (int) $cart->getId(),
                 $connection,
             );
+
+            // The buyer of a company is invoiced to its billing address, before anything reads the
+            // invoice address of the cart (the VAT exemption among it).
+            if (null !== $companyBuyer && !$useOrderDefinedAddresses) {
+                $this->companyBillingAddress?->imposeOn($cart, (int) $customer->getId());
+            }
 
             $placedOrder = $this->orderFactory->createFromSessionOrder($sessionOrder, $currency, $lang, $cart, $customer);
 
@@ -379,6 +404,12 @@ readonly class OrderFacade
                 $connection,
                 $vatExempted,
             );
+
+            // The order is whole: judged on its own amount and on what the buyer ordered before it
+            // over the period. A refusal rolls everything back, before the slot is taken.
+            if (null !== $companyBuyer) {
+                $this->companyPlacement->verify($companyBuyer, $placedOrder, $connection);
+            }
 
             // The place in the delivery slot, taken by a conditional update like the stock
             // above: the guard that ran before the transaction read a count, this is what

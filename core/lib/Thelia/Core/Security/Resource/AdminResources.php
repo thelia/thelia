@@ -123,6 +123,7 @@ class AdminResources
     public const CUSTOMER_GROUP = 'admin.customer.group';
     public const PRICING = 'admin.pricing';
     public const SUBSCRIPTION = 'admin.subscription';
+    public const COMPANY = 'admin.company';
 
     /**
      * Create a new AdminRessources instance.

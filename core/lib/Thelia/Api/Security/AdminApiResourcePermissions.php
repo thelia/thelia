@@ -37,6 +37,9 @@ use Thelia\Api\Resource\CatalogRestriction;
 use Thelia\Api\Resource\Category;
 use Thelia\Api\Resource\CategoryDocument;
 use Thelia\Api\Resource\CategoryImage;
+use Thelia\Api\Resource\Company;
+use Thelia\Api\Resource\CompanyCustomer;
+use Thelia\Api\Resource\CompanyRole;
 use Thelia\Api\Resource\Config;
 use Thelia\Api\Resource\Content;
 use Thelia\Api\Resource\ContentDocument;
@@ -143,6 +146,10 @@ final readonly class AdminApiResourcePermissions
         Category::class => AdminResources::CATEGORY,
         CategoryDocument::class => AdminResources::CATEGORY,
         CategoryImage::class => AdminResources::CATEGORY,
+        // A company, the buyers it holds and the roles they hold: one right, the one that opens the company screens.
+        Company::class => AdminResources::COMPANY,
+        CompanyCustomer::class => AdminResources::COMPANY,
+        CompanyRole::class => AdminResources::COMPANY,
         Config::class => AdminResources::CONFIG,
         Content::class => AdminResources::CONTENT,
         ContentDocument::class => AdminResources::CONTENT,

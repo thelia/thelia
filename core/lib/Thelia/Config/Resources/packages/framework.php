@@ -88,6 +88,20 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => 10,
                 'interval' => '1 hour',
             ],
+            // Invitations to join a company. An invitation mails an address a buyer typed, so a buyer
+            // could otherwise make the shop mail anyone on demand. The per-company window is what a
+            // company onboarding its buyers needs and no more; the per-client one stops a single caller
+            // from spreading over many companies.
+            'company_invitation_per_company' => [
+                'policy' => 'sliding_window',
+                'limit' => 20,
+                'interval' => '1 hour',
+            ],
+            'company_invitation_per_client' => [
+                'policy' => 'sliding_window',
+                'limit' => 10,
+                'interval' => '1 hour',
+            ],
             // Holds of the stock of a cart. A hold locks the stock rows and writes the lines, so
             // a script that keeps adding to a cart, or that walks through many carts, could keep
             // the stock out of every real buyer. The per-cart window is far above what a buyer

@@ -46,4 +46,5 @@ return [
     'Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}' => 'Platba za vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} se nezdařila',
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Předplatné {{ subscription_ref }} pozastaveno po {{ failure_count }} neúspěšných platbách{% else %}Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} je pozastaveno{% endif %}',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} bylo zrušeno',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Připojte se k {{ company_name }} na {{ config("store_name") }}',
 ];

@@ -173,6 +173,37 @@ final class TheliaEvents
 
     // -- END CUSTOMER EVENTS ---------------------------------------------------------
 
+    // -- COMPANY EVENTS -----------------------------------------------
+
+    /** Sent once a company is created ({@see \Thelia\Domain\Company\Event\CompanyEvent}), after its transaction. */
+    public const COMPANY_CREATE = 'action.company.create';
+
+    /** Sent once the details of a company are written, on the same terms. */
+    public const COMPANY_UPDATE = 'action.company.update';
+
+    /** Sent once a company is suspended: it keeps its buyers and its history, and places no order. */
+    public const COMPANY_SUSPEND = 'action.company.suspend';
+
+    /** Sent once a suspended company is active again. */
+    public const COMPANY_REACTIVATE = 'action.company.reactivate';
+
+    /** Sent once a company is deleted: the model it carries no longer exists in the database. */
+    public const COMPANY_DELETE = 'action.company.delete';
+
+    /** Sent once a customer is a buyer of a company ({@see \Thelia\Domain\Company\Event\CompanyCustomerEvent}). */
+    public const COMPANY_CUSTOMER_ATTACH = 'action.company.customer.attach';
+
+    /** Sent once a buyer left a company and the shared addresses they created were handed over ({@see \Thelia\Domain\Company\Event\CompanyCustomerDetachedEvent}). */
+    public const COMPANY_CUSTOMER_DETACH = 'action.company.customer.detach';
+
+    /** Sent once a buyer holds another role ({@see \Thelia\Domain\Company\Event\CompanyCustomerRoleChangedEvent}). */
+    public const COMPANY_CUSTOMER_CHANGE_ROLE = 'action.company.customer.changeRole';
+
+    /** Sent once the limits of a buyer are written ({@see \Thelia\Domain\Company\Event\CompanyCustomerEvent}). */
+    public const COMPANY_CUSTOMER_CHANGE_LIMITS = 'action.company.customer.changeLimits';
+
+    // -- END COMPANY EVENTS ---------------------------------------------------------
+
     // -- FOLDER EVENTS -----------------------------------------------
 
     public const FOLDER_CREATE = 'action.createFolder';

@@ -35,6 +35,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Cart\Bundle\CartLineAvailability;
 use Thelia\Domain\Cart\Exception\CartQuantityRefusedException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
@@ -67,6 +68,7 @@ use Thelia\Domain\Shipping\ProductRule\CartShippingRules;
 use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Domain\Shipping\Service\PostageTaxBreakdownCalculator;
 use Thelia\Log\Tlog;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
@@ -118,6 +120,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?QuantityPolicy $quantityPolicy = null,
         protected ?CartQuantityReconciler $cartQuantityReconciler = null,
         protected ?ApplicablePriceLists $applicablePriceLists = null,
+        protected ?AddressAccess $addressAccess = null,
     ) {
     }
 
@@ -134,10 +137,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             return;
         }
-        $address = AddressQuery::create()
-            ->filterByCustomerId($cart->getCustomerId())
-            ->filterById($addressId)
-            ->findOne();
+        $address = $this->addressTheCustomerMayUse($cart, $addressId);
 
         if (!$address) {
             return;
@@ -231,10 +231,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             return;
         }
-        $address = AddressQuery::create()
-            ->filterByCustomerId($cart->getCustomerId())
-            ->filterById($addressId)
-            ->findOne();
+        // A buyer of a company that has a billing address is invoiced there, whatever they chose.
+        $address = $this->addressAccess?->billingAddressImposedOn($cart->getCustomerId())
+            ?? $this->addressTheCustomerMayUse($cart, $addressId);
         if (!$address) {
             return;
         }
@@ -1192,20 +1191,27 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     protected function validateAddressOwnership(CartModel $cart, int $addressId): bool
     {
-        if (!$customerId = $cart->getCustomerId()) {
+        if (!$cart->getCustomerId()) {
             return false;
         }
 
-        $address = AddressQuery::create()
-            ->filterByCustomerId($customerId)
+        return null !== $this->addressTheCustomerMayUse($cart, $addressId);
+    }
+
+    /**
+     * The address of the address book the customer of the cart may choose: one of theirs or, for
+     * the buyer of a company, one shared with it.
+     */
+    private function addressTheCustomerMayUse(CartModel $cart, int $addressId): ?Address
+    {
+        if (null !== $this->addressAccess) {
+            return $this->addressAccess->find($cart->getCustomerId(), $addressId);
+        }
+
+        return AddressQuery::create()
+            ->filterByCustomerId($cart->getCustomerId())
             ->filterById($addressId)
             ->findOne();
-
-        if (!$address) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

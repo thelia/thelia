@@ -97,7 +97,16 @@ final class CheckoutStepConfigurationTest extends IntegrationTestCase
 
     public function testSynchronisationCreatesNothingWhenEveryStepIsAlreadyThere(): void
     {
-        self::assertSame([], $this->configuration()->synchronize());
+        $configuration = $this->configuration();
+
+        // The step of the company account is created when it is first synchronised; every other
+        // step comes with the installation.
+        self::assertSame(['company.spending_limit'], $configuration->synchronize());
+        self::assertSame([], $configuration->synchronize());
+        self::assertSame(
+            ['cart', 'company.spending_limit', 'confirmation', 'delivery', 'payment'],
+            $this->sortedCodes(),
+        );
     }
 
     /**
@@ -217,6 +226,22 @@ final class CheckoutStepConfigurationTest extends IntegrationTestCase
     {
         return CheckoutStepQuery::create()->findOneByCode($code, $this->getPropelConnection())
             ?? throw new \RuntimeException(\sprintf('No step "%s" seeded — run bin/test-prepare.', $code));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function sortedCodes(): array
+    {
+        $codes = [];
+
+        foreach (CheckoutStepQuery::create()->find($this->getPropelConnection()) as $step) {
+            $codes[] = (string) $step->getCode();
+        }
+
+        sort($codes);
+
+        return $codes;
     }
 
     private function configuration(): CheckoutStepConfigurationService

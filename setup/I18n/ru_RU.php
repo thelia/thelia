@@ -1571,6 +1571,10 @@ return [
     'Default customer group' => 'Группа клиентов по умолчанию',
     'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Кто видит цены магазина: visible, logged_in (только авторизованные клиенты) или on_request (без цены, кнопка запроса)',
     'Pricing' => 'Ценообразование',
+    'Companies' => 'Компании',
+    'Company administrator' => 'Администратор компании',
+    'Buyer' => 'Покупатель',
+    'Approver' => 'Утверждающий',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Резервировать запас товаров корзины, пока клиент оформляет заказ (1 = да, 0 = нет)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Когда резервируется запас корзины: checkout (с начала оформления заказа) или cart (как только товар попал в корзину)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Минуты хранения резерва запаса, продлевается на каждом шаге оформления заказа (15 при неверном значении)',
@@ -1596,4 +1600,6 @@ return [
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Подписка {{ subscription_ref }} приостановлена после {{ failure_count }} неудачных списаний{% else %}Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} приостановлена{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Сообщение клиенту при отмене подписки',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Ваша подписка {{ subscription_ref }} в {{ config("store_name") }} отменена',
+    'Invitation to join a company, sent to the person invited' => 'Приглашение присоединиться к компании, отправленное приглашённому',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Присоединяйтесь к {{ company_name }} в {{ config("store_name") }}',
 ];

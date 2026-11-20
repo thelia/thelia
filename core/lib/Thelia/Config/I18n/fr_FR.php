@@ -1271,4 +1271,8 @@ return [
     'Top category' => 'Première catégorie',
     'Top product' => 'Premier produit',
     'Top customer' => 'Premier client',
+    'Your company account is suspended: orders cannot be placed until it is reactivated.' => 'Le compte de votre société est suspendu : aucune commande ne peut être passée tant qu\'il n\'est pas réactivé.',
+    'Your role in your company does not allow you to place orders.' => 'Votre rôle dans votre société ne vous permet pas de passer commande.',
+    'This order of %total exceeds the %limit your company allows for a single order.' => 'Cette commande de %total dépasse les %limit que votre société autorise pour une seule commande.',
+    'This order of %total, added to the %spent already ordered over the period, exceeds the %limit your company allows.' => 'Cette commande de %total, ajoutée aux %spent déjà commandés sur la période, dépasse les %limit que votre société autorise.',
 ];

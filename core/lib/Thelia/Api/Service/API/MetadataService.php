@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\AccessMapInterface;
+use Thelia\Api\Security\CompanyVoter;
 use Thelia\Core\Security\SecurityContext;
 
 readonly class MetadataService
@@ -38,6 +39,7 @@ readonly class MetadataService
         private readonly ?AuthenticationTrustResolverInterface $authenticationTrustResolver = null,
         #[Autowire(service: 'security.authorization_checker')]
         private readonly ?AuthorizationCheckerInterface $authorizationChecker = null,
+        private readonly ?CompanyVoter $companyVoter = null,
     ) {
     }
 
@@ -85,7 +87,7 @@ readonly class MetadataService
                 // needed for the is_granted expression function; resolves ROLE_*
                 // against the Thelia session user because no firewall token exists
                 // on in-process evaluations (Twig resources() on front pages)
-                'auth_checker' => new SessionUserAuthorizationChecker($user, $this->authorizationChecker),
+                'auth_checker' => new SessionUserAuthorizationChecker($user, $this->authorizationChecker, $this->companyVoter),
             ]);
 
             return (bool) $this->expressionLanguage->evaluate($expression, $variables);

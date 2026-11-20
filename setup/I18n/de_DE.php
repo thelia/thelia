@@ -1161,6 +1161,10 @@ return [
     'Default customer group' => 'Standard-Kundengruppe',
     'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Wer die Preise des Shops sieht: visible, logged_in (nur angemeldete Kunden) oder on_request (kein Preis, eine Anfrageschaltfläche)',
     'Pricing' => 'Preisgestaltung',
+    'Companies' => 'Unternehmen',
+    'Company administrator' => 'Unternehmensadministrator',
+    'Buyer' => 'Einkäufer',
+    'Approver' => 'Genehmiger',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Den Bestand der Artikel eines Warenkorbs während der Bestellung reservieren (1 = ja, 0 = nein)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Wann der Bestand eines Warenkorbs reserviert wird: checkout (ab Beginn der Bestellung) oder cart (sobald ein Artikel im Warenkorb liegt)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minuten, die eine Bestandsreservierung gehalten wird, bei jedem Bestellschritt verlängert (15 bei ungültigem Wert)',
@@ -1186,4 +1190,6 @@ return [
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} nach {{ failure_count }} fehlgeschlagenen Abbuchungen ausgesetzt{% else %}Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde ausgesetzt{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Nachricht an den Kunden, wenn ein Abonnement gekündigt wird',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Ihr Abonnement {{ subscription_ref }} bei {{ config("store_name") }} wurde gekündigt',
+    'Invitation to join a company, sent to the person invited' => 'Einladung, einem Unternehmen beizutreten, an die eingeladene Person gesendet',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Treten Sie {{ company_name }} bei {{ config("store_name") }} bei',
 ];

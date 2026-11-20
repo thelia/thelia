@@ -33,6 +33,7 @@ use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Security\CompanyVoter;
 use Thelia\Api\State\Processor\CustomerAddressProcessor;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Legal\CompanyIdentifier;
@@ -78,16 +79,16 @@ use Thelia\Model\Map\AddressTableMap;
         new Get(
             uriTemplate: '/front/account/addresses/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'object.customer.getId() == user.getId()',
+            security: 'is_granted("'.CompanyVoter::ADDRESS_USE.'", object)',
         ),
         new Put(
             uriTemplate: '/front/account/addresses/{id}',
-            security: 'object.customer.getId() == user.getId()',
+            security: 'is_granted("'.CompanyVoter::ADDRESS_EDIT.'", object)',
             processor: CustomerAddressProcessor::class,
         ),
         new Delete(
             uriTemplate: '/front/account/addresses/{id}',
-            security: 'object.customer.getId() == user.getId()',
+            security: 'is_granted("'.CompanyVoter::ADDRESS_EDIT.'", object)',
         ),
         // Outside /front/account on purpose: that prefix is locked to ROLE_CUSTOMER by
         // the firewall, and the lock stays exactly as strict — a guest never reaches an

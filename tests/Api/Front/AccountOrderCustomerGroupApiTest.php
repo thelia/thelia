@@ -50,7 +50,7 @@ final class AccountOrderCustomerGroupApiTest extends ApiTestCase
 
         $response = $this->jsonRequest('GET', '/api/front/account/orders/'.$order->getId(), token: $this->authenticateAsCustomer($intruder));
 
-        self::assertSame(403, $response->getStatusCode());
+        self::assertSame(404, $response->getStatusCode());
         self::assertStringNotContainsString('front-secret', (string) $response->getContent());
 
         $list = $this->jsonRequest('GET', '/api/front/account/orders', token: $this->authenticateAsCustomer($intruder));

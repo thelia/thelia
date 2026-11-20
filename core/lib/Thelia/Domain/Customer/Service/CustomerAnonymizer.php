@@ -20,6 +20,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
+use Thelia\Domain\Company\CompanyFacade;
 use Thelia\Domain\Order\Enum\OrderHistoryActorType;
 use Thelia\Domain\Payment\CustomerPaymentMethodService;
 use Thelia\Domain\Subscription\Enum\ActorType;
@@ -29,6 +30,7 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminLogQuery;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartQuery;
+use Thelia\Model\CompanyCustomerQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerGroupQuery;
 use Thelia\Model\CustomerListQuery;
@@ -62,7 +64,10 @@ use Thelia\Model\TagElementQuery;
  * keeps the group frozen on it, part of its accounting record.
  *
  * The country and state of an order address are kept, because they justify
- * the tax rate applied on the order.
+ * the tax rate applied on the order. So is the invoice address of an order placed
+ * for a company: it holds the identity of the company, not the one of the buyer.
+ * A buyer leaves their company, and the shared addresses they created go to its
+ * administrator before the address book is erased.
  *
  * Modules add their own data to the operation by implementing
  * CustomerPersonalDataProviderInterface.
@@ -78,6 +83,7 @@ final readonly class CustomerAnonymizer
      * @param CustomerGroupAssignment|null                    $customerGroupAssignment  what announces the move to the default group; without it, the move is written and not announced
      * @param StockReservationService|null                    $stockReservation         what tells the listeners of the reservations the lines the carts held; without it, the carts go without a word
      * @param SubscriptionStateMachine|null                   $subscriptionStateMachine what ends the running subscriptions; without it, they are left as they are
+     * @param CompanyFacade|null                              $companyFacade            what hands the shared addresses of a buyer over to the administrator who stays, cuts the link with the company, and sees to the company when its last administrator goes; without it, a buyer is anonymized as any other account
      */
     public function __construct(
         private CustomerPaymentMethodService $customerPaymentMethodService,
@@ -86,6 +92,7 @@ final readonly class CustomerAnonymizer
         private ?CustomerGroupAssignment $customerGroupAssignment = null,
         private ?StockReservationService $stockReservation = null,
         private ?SubscriptionStateMachine $subscriptionStateMachine = null,
+        private ?CompanyFacade $companyFacade = null,
     ) {
     }
 
@@ -96,6 +103,8 @@ final readonly class CustomerAnonymizer
     {
         $connection = Propel::getConnection(CustomerTableMap::DATABASE_NAME);
         $previousCustomerGroupId = (int) $customer->getCustomerGroupId();
+        // Before the transaction: the company operation is a transaction of its own.
+        $this->leaveTheCompany($customer);
         $connection->beginTransaction();
 
         try {
@@ -105,6 +114,7 @@ final readonly class CustomerAnonymizer
             $this->anonymizeOrderHistory($customer, $connection);
             $this->endSubscriptions($customer);
             $this->deleteCarts($customer, $connection);
+
             $this->deleteAddresses($customer, $connection);
             $this->deleteCustomerLists($customer, $connection);
             $this->deleteNewsletterSubscription($customer, $connection);
@@ -135,6 +145,21 @@ final readonly class CustomerAnonymizer
     }
 
     /**
+     * A buyer who is erased leaves their company: the shared addresses they created go to the
+     * administrator who stays, as when a buyer is detached, and the link is cut. The last
+     * administrator leaves too: the buyer who joined first takes over, and a company with nobody
+     * left to run it is suspended (see {@see CompanyFacade::release()}).
+     */
+    private function leaveTheCompany(Customer $customer): void
+    {
+        if (null === $this->companyFacade || !CompanyCustomerQuery::create()->filterByCustomerId($customer->getId())->exists()) {
+            return;
+        }
+
+        $this->companyFacade->release($customer);
+    }
+
+    /**
      * The order addresses are frozen copies made at checkout: they are not
      * shared with the address book, so they are neutralized in place rather
      * than deleted, which would break the orders that reference them.
@@ -144,7 +169,12 @@ final readonly class CustomerAnonymizer
         $orderAddressIds = [];
 
         foreach (OrderQuery::create()->filterByCustomerId($customer->getId())->find($connection) as $order) {
-            $orderAddressIds[] = $order->getInvoiceOrderAddressId();
+            // The invoice address of an order placed for a company is the identity of the
+            // company, not the one of the buyer who placed it: the company keeps it.
+            if (null === $order->getCompanyId()) {
+                $orderAddressIds[] = $order->getInvoiceOrderAddressId();
+            }
+
             $orderAddressIds[] = $order->getDeliveryOrderAddressId();
         }
 

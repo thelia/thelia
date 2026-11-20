@@ -1230,4 +1230,8 @@ return [
     'Top category' => 'Top category',
     'Top product' => 'Top product',
     'Top customer' => 'Top customer',
+    'Your company account is suspended: orders cannot be placed until it is reactivated.' => 'Your company account is suspended: orders cannot be placed until it is reactivated.',
+    'Your role in your company does not allow you to place orders.' => 'Your role in your company does not allow you to place orders.',
+    'This order of %total exceeds the %limit your company allows for a single order.' => 'This order of %total exceeds the %limit your company allows for a single order.',
+    'This order of %total, added to the %spent already ordered over the period, exceeds the %limit your company allows.' => 'This order of %total, added to the %spent already ordered over the period, exceeds the %limit your company allows.',
 ];
