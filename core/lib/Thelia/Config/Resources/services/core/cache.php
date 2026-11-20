@@ -65,9 +65,11 @@ return static function (ContainerConfigurator $container): void {
     // The configuration table, shared with every other process of the shop the
     // same way cache.app is: THELIA_CACHE_DSN decides the backend, empty or not.
     // Kept apart from cache.app itself and tied to the container cache directory
-    // rather than to thelia.cache.directory, so it goes away with cache:clear -
-    // the one safety net left for a row changed outside ConfigQuery::write(),
-    // a raw migration or a restored backup among them.
+    // rather than to thelia.cache.directory, so that on the filesystem backend
+    // it goes away with cache:clear. A remote backend (THELIA_CACHE_DSN) keeps it
+    // through cache:clear: a row changed outside ConfigQuery::write() has to drop
+    // it itself, as setup/update.php does after the update scripts and after a
+    // restored backup.
     //
     // No lifetime: the entry is dropped by whatever writes what it was built
     // from (the configuration table, through ModelConfigListener), never by
