@@ -1753,4 +1753,5 @@ return [
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Message sent to the customer when a subscription is cancelled',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled',
+    'Days without an order after which a customer is dormant in the customer reports (180 when invalid)' => 'Days without an order after which a customer is dormant in the customer reports (180 when invalid)',
 ];
