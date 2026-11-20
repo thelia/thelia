@@ -38,6 +38,7 @@ use Thelia\Domain\Search\SearchIndexer;
 use Thelia\Domain\Search\SearchIndexingQueue;
 use Thelia\Domain\Search\SearchLocales;
 use Thelia\Model\Brand;
+use Thelia\Model\BrandQuery;
 use Thelia\Test\IntegrationTestCase;
 use Thelia\Tests\Support\Search\InMemorySearchEngine;
 use Thelia\Tests\Support\Search\SpyDocumentProvider;
@@ -73,6 +74,34 @@ final class SearchReindexCommandTest extends IntegrationTestCase
         self::assertSame([], $this->engine->purgedFamilies);
         self::assertSame('Garden & co', $this->engine->get('brand', $brand->getId(), 'en_US')?->fields['title']);
         self::assertSame('Jardin et cie', $this->engine->get('brand', $brand->getId(), 'fr_FR')?->fields['title']);
+    }
+
+    public function testTheProgressOfAFamilyIsShownAgainstItsTotal(): void
+    {
+        foreach (['First', 'Second', 'Third'] as $title) {
+            $this->brand($title, $title);
+        }
+        $total = BrandQuery::create()->count();
+
+        $display = $this->reindex(['--family' => ['brand'], '--batch-size' => '1'])->getDisplay();
+
+        self::assertStringContainsString(\sprintf('0/%d [', $total), $display);
+        self::assertStringContainsString(\sprintf('%d/%d [============================] 100%%', $total, $total), $display);
+    }
+
+    public function testAResumedRunShowsItsProgressAgainstWhatRemains(): void
+    {
+        $this->brand('First', 'Premier');
+        $this->brand('Second', 'Deuxième');
+        $total = BrandQuery::create()->count();
+        $this->engine->indexCallsBeforeFailure = self::INDEX_CALLS_PER_BRAND;
+        $this->reindex(['--family' => ['brand'], '--batch-size' => '1']);
+        $this->engine->indexCallsBeforeFailure = null;
+
+        $display = $this->reindex(['--family' => ['brand'], '--batch-size' => '1'])->getDisplay();
+
+        self::assertStringContainsString(\sprintf('0/%d [', $total - 1), $display);
+        self::assertStringContainsString(\sprintf('%d/%d [============================] 100%%', $total - 1, $total - 1), $display);
     }
 
     public function testPurgeEmptiesTheFamilyBeforeIndexingIt(): void

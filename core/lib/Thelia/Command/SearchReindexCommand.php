@@ -29,6 +29,7 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Thelia\Domain\Search\Contract\CountableDocumentProviderInterface;
 use Thelia\Domain\Search\Contract\SearchableDocumentProviderInterface;
 use Thelia\Domain\Search\Contract\SearchEngineInterface;
 use Thelia\Domain\Search\Message\IndexDocument;
@@ -217,7 +218,7 @@ class SearchReindexCommand extends ContainerAwareCommand
         }
 
         $output->writeln(0 === $cursor ? \sprintf('<info>%s</info>', $family) : \sprintf('<info>%s</info>, resuming after #%d', $family, $cursor));
-        $progress = new ProgressBar($output);
+        $progress = new ProgressBar($output, $provider instanceof CountableDocumentProviderInterface ? $provider->countAfter($cursor) : 0);
         $progress->start();
 
         while (true) {
