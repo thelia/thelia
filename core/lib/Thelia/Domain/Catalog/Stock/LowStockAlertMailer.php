@@ -21,9 +21,12 @@ use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\Lang;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\SaleUnitQuery;
 
 /**
- * Tells the shop managers that a sale element is running low.
+ * Tells the shop managers that a sale element is running low, or the own stock a
+ * sale unit keeps for it: the alert of a sale unit adds `sale_unit_id`,
+ * `sale_unit_code` and `sale_unit_title` to the variables of the message.
  *
  * Runs late so that a module can handle the alert its own way and stop the
  * propagation. A failure to send is logged and swallowed: the stock change that
@@ -50,7 +53,7 @@ final readonly class LowStockAlertMailer
 
             $product->setLocale(Lang::getDefaultLanguage()->getLocale());
 
-            $this->mailer->sendEmailToShopManagers(self::MESSAGE_CODE, [
+            $parameters = [
                 'pse_id' => (int) $pse->getId(),
                 'product_id' => (int) $product->getId(),
                 'product_ref' => (string) $product->getRef(),
@@ -61,7 +64,17 @@ final readonly class LowStockAlertMailer
                 // So that the template writes the stock left with its unit (format_quantity): "4,25 kg".
                 'quantity_decimals' => (int) $pse->getQuantityDecimals(),
                 'unit_code' => $pse->getUnitCode(),
-            ]);
+            ];
+
+            $saleUnit = null !== $event->getSaleUnitId() ? SaleUnitQuery::create()->findPk($event->getSaleUnitId()) : null;
+
+            if (null !== $saleUnit) {
+                $parameters['sale_unit_id'] = (int) $saleUnit->getId();
+                $parameters['sale_unit_code'] = (string) $saleUnit->getCode();
+                $parameters['sale_unit_title'] = (string) $saleUnit->getTitle();
+            }
+
+            $this->mailer->sendEmailToShopManagers(self::MESSAGE_CODE, $parameters);
         } catch (\Throwable $exception) {
             Tlog::getInstance()->error(\sprintf('The low stock alert of sale element %d was not sent: %s', $event->getProductSaleElementsId(), $exception->getMessage()));
         }

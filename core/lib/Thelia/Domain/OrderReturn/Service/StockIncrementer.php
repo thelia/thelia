@@ -49,9 +49,8 @@ readonly class StockIncrementer
      * placement of an order locked the stock rows in, so that two writers moving the same rows
      * never wait for each other the other way round.
      *
-     * What went back to the shared counter of each sale element is given back, for the caller to
-     * announce once its transaction is over; what went to the stock of a sale unit is not part of
-     * it, the listeners of the stock levels follow the shared counter only.
+     * What went back to each stock (the own stock of the sale unit, or the shared counter) is given
+     * back, for the caller to announce once its transaction is over.
      *
      * @param list<array{0: int, 1: float}> $quantities sale element and quantity
      *
@@ -61,31 +60,18 @@ readonly class StockIncrementer
     {
         usort($quantities, static fn (array $first, array $second): int => $first[0] <=> $second[0]);
 
-        /** @var array<int, float> $putBack on the shared counter, by sale element id */
+        /** @var array<int, float> $putBack by sale element id */
         $putBack = [];
 
         foreach ($quantities as [$productSaleElementsId, $quantity]) {
             $this->increment($productSaleElementsId, $quantity, $connection, $saleUnitId);
 
-            if ($quantity > 0 && !$this->stockDecrementer->movesSaleUnitStock($saleUnitId, $productSaleElementsId)) {
+            if ($quantity > 0) {
                 $putBack[$productSaleElementsId] = ($putBack[$productSaleElementsId] ?? 0.0) + $quantity;
             }
         }
 
-        if ([] === $putBack) {
-            return [];
-        }
-
-        // Our own UPDATEs hold the rows: what is read now is what they left.
-        $statement = $connection->prepare('SELECT `id`, `quantity` FROM `product_sale_elements` WHERE `id` IN ('.implode(',', array_keys($putBack)).')');
-        $statement->execute();
-        $changes = [];
-
-        foreach ($statement->fetchAll(\PDO::FETCH_NUM) as [$id, $stock]) {
-            $changes[] = new StockLevelChange((int) $id, (float) $stock - $putBack[(int) $id], (float) $stock);
-        }
-
-        return $changes;
+        return $this->stockDecrementer->levelsAfterPutBack($putBack, $connection, $saleUnitId);
     }
 
     /**

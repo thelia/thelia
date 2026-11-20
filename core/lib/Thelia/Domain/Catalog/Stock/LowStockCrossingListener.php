@@ -17,13 +17,16 @@ namespace Thelia\Domain\Catalog\Stock;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ProductSaleElement\LowStockReachedEvent;
+use Thelia\Core\Event\ProductSaleElement\SaleUnitStockChangedEvent;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
  * Raises the low stock signal when a sale element goes from above its threshold
  * to at or under it. A level that was already at or under the threshold raises
- * nothing again; it has to climb back above first.
+ * nothing again; it has to climb back above first. The own stock of a sale unit
+ * crosses its own threshold, and its signal names the unit.
  */
 final readonly class LowStockCrossingListener
 {
@@ -48,16 +51,37 @@ final readonly class LowStockCrossingListener
         ))));
 
         foreach ($changes as $change) {
-            $threshold = $thresholds[$change->productSaleElementsId] ?? null;
-
-            if (null === $threshold || !($change->previousQuantity > $threshold && $change->newQuantity <= $threshold)) {
-                continue;
-            }
-
-            $this->dispatcher->dispatch(
-                new LowStockReachedEvent($change->productSaleElementsId, $change->newQuantity, $threshold),
-                TheliaEvents::PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED,
-            );
+            $this->signalWhenCrossed($change, $thresholds[$change->productSaleElementsId] ?? null);
         }
+    }
+
+    #[AsEventListener(event: TheliaEvents::SALE_UNIT_STOCK_CHANGED)]
+    public function onSaleUnitStockChanged(SaleUnitStockChangedEvent $event): void
+    {
+        $stocks = [];
+
+        foreach ($event->getChanges() as $change) {
+            if (null !== $change->saleUnitId) {
+                $stocks[$change->saleUnitId.':'.$change->productSaleElementsId] = [$change->saleUnitId, $change->productSaleElementsId];
+            }
+        }
+
+        $thresholds = $this->threshold->forManySaleUnits(array_values($stocks));
+
+        foreach ($event->getChanges() as $change) {
+            $this->signalWhenCrossed($change, $thresholds[$change->saleUnitId.':'.$change->productSaleElementsId] ?? null);
+        }
+    }
+
+    private function signalWhenCrossed(StockLevelChange $change, ?float $threshold): void
+    {
+        if (null === $threshold || !($change->previousQuantity > $threshold && $change->newQuantity <= $threshold)) {
+            return;
+        }
+
+        $this->dispatcher->dispatch(
+            new LowStockReachedEvent($change->productSaleElementsId, $change->newQuantity, $threshold, $change->saleUnitId),
+            TheliaEvents::PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED,
+        );
     }
 }
