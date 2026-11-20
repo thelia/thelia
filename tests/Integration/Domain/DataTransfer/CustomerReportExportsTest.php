@@ -153,14 +153,23 @@ final class CustomerReportExportsTest extends IntegrationTestCase
         );
     }
 
-    public function testThePaidVariantLeavesTheCancelledOrdersOut(): void
+    public function testThePaidVariantLeavesTheUnpaidOrdersOut(): void
     {
-        $this->order($this->customer(), '2001-01-10 10:00:00', '30.000000', OrderStatus::CODE_CANCELED);
+        $this->order($this->customer(), '2001-01-10 10:00:00', '30.000000', OrderStatus::CODE_NOT_PAID);
 
         self::assertCount(1, $this->csv(CustomerCohortsExport::class, $this->firstThreeMonths())[1]);
 
         $this->expectException(DataTransferNoDataFoundException::class);
         $this->csv(CustomerCohortsPaidExport::class, $this->firstThreeMonths());
+    }
+
+    public function testACancelledOrRefundedOrderIsInNoVariant(): void
+    {
+        $this->order($this->customer(), '2001-01-10 10:00:00', '30.000000', OrderStatus::CODE_CANCELED);
+        $this->order($this->customer(), '2001-01-11 10:00:00', '30.000000', OrderStatus::CODE_REFUNDED);
+
+        $this->expectException(DataTransferNoDataFoundException::class);
+        $this->csv(CustomerCohortsExport::class, $this->firstThreeMonths());
     }
 
     public function testTheSegmentFileFollowsTheDormancySettingOfTheShop(): void
@@ -178,6 +187,7 @@ final class CustomerReportExportsTest extends IntegrationTestCase
         self::assertSame([
             ['New customers', '1', '60', '75', '60', '40'],
             ['Returning customers', '1', '20', '25', '50', '33.33'],
+            ['Lapsing customers (no order in the period, not dormant yet)', '0', '0', '0', '0', '0'],
             ['Dormant customers (no order for 45 days)', '1', '0', '0', '40', '26.67'],
         ], $rows);
     }

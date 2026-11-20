@@ -1285,5 +1285,6 @@ return [
     'Revenue since the first order incl. tax' => 'Chiffre d\'affaires depuis la première commande TTC',
     'Share of the revenue since the first order (%)' => 'Part du chiffre d\'affaires depuis la première commande (%)',
     'Returning customers' => 'Clients récurrents',
+    'Lapsing customers (no order in the period, not dormant yet)' => 'Clients sans commande sur la période, pas encore dormants',
     'Dormant customers (no order for %days% days)' => 'Clients dormants (sans commande depuis %days% jours)',
 ];

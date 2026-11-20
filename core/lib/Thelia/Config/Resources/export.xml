@@ -305,13 +305,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer cohorts</title>
                 <description>
-                    One line per month of first order in the period, one pair of columns per month elapsed since: the customers of the cohort who ordered in that month and their share of the cohort. Every order created is counted. Without a period, from the first order until today.
+                    One line per month of first order in the period, one pair of columns per month elapsed since: the customers of the cohort who ordered in that month and their share of the cohort. Every order is counted except the cancelled and refunded ones. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Cohortes de clients</title>
                 <description>
-                    Une ligne par mois de première commande dans la période, une paire de colonnes par mois écoulé depuis : les clients de la cohorte qui ont commandé ce mois-là et leur part de la cohorte. Toutes les commandes créées sont comptées. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par mois de première commande dans la période, une paire de colonnes par mois écoulé depuis : les clients de la cohorte qui ont commandé ce mois-là et leur part de la cohorte. Toutes les commandes sont comptées, sauf les annulées et les remboursées. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -319,13 +319,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer cohorts, paid orders</title>
                 <description>
-                    One line per month of first order in the period, one pair of columns per month elapsed since: the customers of the cohort who ordered in that month and their share of the cohort. Paid orders only (paid, processing or sent). Without a period, from the first order until today.
+                    One line per month of first order in the period, one pair of columns per month elapsed since: the customers of the cohort who ordered in that month and their share of the cohort. Paid orders only (paid, processing or sent), the cancelled and refunded ones left out. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Cohortes de clients, commandes payées</title>
                 <description>
-                    Une ligne par mois de première commande dans la période, une paire de colonnes par mois écoulé depuis : les clients de la cohorte qui ont commandé ce mois-là et leur part de la cohorte. Commandes payées seulement (payées, en traitement ou expédiées). Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par mois de première commande dans la période, une paire de colonnes par mois écoulé depuis : les clients de la cohorte qui ont commandé ce mois-là et leur part de la cohorte. Commandes payées seulement (payées, en traitement ou expédiées), les annulées et les remboursées laissées de côté. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -333,13 +333,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer cohorts, by quarter</title>
                 <description>
-                    One line per quarter of first order in the period, one pair of columns per quarter elapsed since: the customers of the cohort who ordered in that quarter and their share of the cohort. Every order created is counted. Without a period, from the first order until today.
+                    One line per quarter of first order in the period, one pair of columns per quarter elapsed since: the customers of the cohort who ordered in that quarter and their share of the cohort. Every order is counted except the cancelled and refunded ones. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Cohortes de clients, par trimestre</title>
                 <description>
-                    Une ligne par trimestre de première commande dans la période, une paire de colonnes par trimestre écoulé depuis : les clients de la cohorte qui ont commandé ce trimestre-là et leur part de la cohorte. Toutes les commandes créées sont comptées. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par trimestre de première commande dans la période, une paire de colonnes par trimestre écoulé depuis : les clients de la cohorte qui ont commandé ce trimestre-là et leur part de la cohorte. Toutes les commandes sont comptées, sauf les annulées et les remboursées. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -347,13 +347,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer cohorts, by quarter, paid orders</title>
                 <description>
-                    One line per quarter of first order in the period, one pair of columns per quarter elapsed since: the customers of the cohort who ordered in that quarter and their share of the cohort. Paid orders only (paid, processing or sent). Without a period, from the first order until today.
+                    One line per quarter of first order in the period, one pair of columns per quarter elapsed since: the customers of the cohort who ordered in that quarter and their share of the cohort. Paid orders only (paid, processing or sent), the cancelled and refunded ones left out. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Cohortes de clients, par trimestre, commandes payées</title>
                 <description>
-                    Une ligne par trimestre de première commande dans la période, une paire de colonnes par trimestre écoulé depuis : les clients de la cohorte qui ont commandé ce trimestre-là et leur part de la cohorte. Commandes payées seulement (payées, en traitement ou expédiées). Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par trimestre de première commande dans la période, une paire de colonnes par trimestre écoulé depuis : les clients de la cohorte qui ont commandé ce trimestre-là et leur part de la cohorte. Commandes payées seulement (payées, en traitement ou expédiées), les annulées et les remboursées laissées de côté. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -361,13 +361,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer lifetime value</title>
                 <description>
-                    One line per month of first order in the period, one column per month elapsed since: what the cohort spent from its first order to the end of that month, per customer, incl. tax (revenue, not margin). Every order created is counted. Without a period, from the first order until today.
+                    One line per month of first order in the period, one column per month elapsed since: what the cohort spent from its first order to the end of that month, per customer, incl. tax (revenue, not margin). Every order is counted except the cancelled and refunded ones. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Valeur vie client</title>
                 <description>
-                    Une ligne par mois de première commande dans la période, une colonne par mois écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce mois, par client, TTC (chiffre d'affaires, pas marge). Toutes les commandes créées sont comptées. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par mois de première commande dans la période, une colonne par mois écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce mois, par client, TTC (chiffre d'affaires, pas marge). Toutes les commandes sont comptées, sauf les annulées et les remboursées. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -375,13 +375,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer lifetime value, paid orders</title>
                 <description>
-                    One line per month of first order in the period, one column per month elapsed since: what the cohort spent from its first order to the end of that month, per customer, incl. tax (revenue, not margin). Paid orders only (paid, processing or sent). Without a period, from the first order until today.
+                    One line per month of first order in the period, one column per month elapsed since: what the cohort spent from its first order to the end of that month, per customer, incl. tax (revenue, not margin). Paid orders only (paid, processing or sent), the cancelled and refunded ones left out. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Valeur vie client, commandes payées</title>
                 <description>
-                    Une ligne par mois de première commande dans la période, une colonne par mois écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce mois, par client, TTC (chiffre d'affaires, pas marge). Commandes payées seulement (payées, en traitement ou expédiées). Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par mois de première commande dans la période, une colonne par mois écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce mois, par client, TTC (chiffre d'affaires, pas marge). Commandes payées seulement (payées, en traitement ou expédiées), les annulées et les remboursées laissées de côté. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -389,13 +389,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer lifetime value, by quarter</title>
                 <description>
-                    One line per quarter of first order in the period, one column per quarter elapsed since: what the cohort spent from its first order to the end of that quarter, per customer, incl. tax (revenue, not margin). Every order created is counted. Without a period, from the first order until today.
+                    One line per quarter of first order in the period, one column per quarter elapsed since: what the cohort spent from its first order to the end of that quarter, per customer, incl. tax (revenue, not margin). Every order is counted except the cancelled and refunded ones. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Valeur vie client, par trimestre</title>
                 <description>
-                    Une ligne par trimestre de première commande dans la période, une colonne par trimestre écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce trimestre, par client, TTC (chiffre d'affaires, pas marge). Toutes les commandes créées sont comptées. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par trimestre de première commande dans la période, une colonne par trimestre écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce trimestre, par client, TTC (chiffre d'affaires, pas marge). Toutes les commandes sont comptées, sauf les annulées et les remboursées. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -403,13 +403,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer lifetime value, by quarter, paid orders</title>
                 <description>
-                    One line per quarter of first order in the period, one column per quarter elapsed since: what the cohort spent from its first order to the end of that quarter, per customer, incl. tax (revenue, not margin). Paid orders only (paid, processing or sent). Without a period, from the first order until today.
+                    One line per quarter of first order in the period, one column per quarter elapsed since: what the cohort spent from its first order to the end of that quarter, per customer, incl. tax (revenue, not margin). Paid orders only (paid, processing or sent), the cancelled and refunded ones left out. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Valeur vie client, par trimestre, commandes payées</title>
                 <description>
-                    Une ligne par trimestre de première commande dans la période, une colonne par trimestre écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce trimestre, par client, TTC (chiffre d'affaires, pas marge). Commandes payées seulement (payées, en traitement ou expédiées). Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Une ligne par trimestre de première commande dans la période, une colonne par trimestre écoulé depuis : ce que la cohorte a dépensé de sa première commande à la fin de ce trimestre, par client, TTC (chiffre d'affaires, pas marge). Commandes payées seulement (payées, en traitement ou expédiées), les annulées et les remboursées laissées de côté. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -417,13 +417,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer segments</title>
                 <description>
-                    New customers (first order in the period), returning customers (an order in the period and one before it) and dormant customers (no order for the number of days of the setting customer_dormant_after_days at the end of the period), with their revenue of the period and since their first order, and their shares. Every order created is counted. Without a period, from the first order until today.
+                    Every customer who ordered up to the end of the period, in one segment each: new customers (first order in the period), returning customers (an order in the period and one before it), and among the customers without an order in the period, the dormant ones (no order for the number of days of the setting customer_dormant_after_days at the end of the period) and the lapsing others, with their revenue of the period and since their first order, and their shares. Every order is counted except the cancelled and refunded ones. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Segments de clients</title>
                 <description>
-                    Clients nouveaux (première commande dans la période), récurrents (une commande dans la période et une avant) et dormants (sans commande depuis le nombre de jours du réglage customer_dormant_after_days à la fin de la période), avec leur chiffre d'affaires de la période et depuis leur première commande, et leurs parts. Toutes les commandes créées sont comptées. Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Chaque client ayant commandé jusqu'à la fin de la période, dans un seul segment : nouveaux (première commande dans la période), récurrents (une commande dans la période et une avant), et parmi les clients sans commande dans la période, les dormants (sans commande depuis le nombre de jours du réglage customer_dormant_after_days à la fin de la période) et les autres, pas encore dormants, avec leur chiffre d'affaires de la période et depuis leur première commande, et leurs parts. Toutes les commandes sont comptées, sauf les annulées et les remboursées. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>
@@ -431,13 +431,13 @@
             <export_descriptive locale="en_US">
                 <title>Customer segments, paid orders</title>
                 <description>
-                    New customers (first order in the period), returning customers (an order in the period and one before it) and dormant customers (no order for the number of days of the setting customer_dormant_after_days at the end of the period), with their revenue of the period and since their first order, and their shares. Paid orders only (paid, processing or sent). Without a period, from the first order until today.
+                    Every customer who ordered up to the end of the period, in one segment each: new customers (first order in the period), returning customers (an order in the period and one before it), and among the customers without an order in the period, the dormant ones (no order for the number of days of the setting customer_dormant_after_days at the end of the period) and the lapsing others, with their revenue of the period and since their first order, and their shares. Paid orders only (paid, processing or sent), the cancelled and refunded ones left out. Without a period, from the first order until today.
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Segments de clients, commandes payées</title>
                 <description>
-                    Clients nouveaux (première commande dans la période), récurrents (une commande dans la période et une avant) et dormants (sans commande depuis le nombre de jours du réglage customer_dormant_after_days à la fin de la période), avec leur chiffre d'affaires de la période et depuis leur première commande, et leurs parts. Commandes payées seulement (payées, en traitement ou expédiées). Sans période, depuis la première commande jusqu'à aujourd'hui.
+                    Chaque client ayant commandé jusqu'à la fin de la période, dans un seul segment : nouveaux (première commande dans la période), récurrents (une commande dans la période et une avant), et parmi les clients sans commande dans la période, les dormants (sans commande depuis le nombre de jours du réglage customer_dormant_after_days à la fin de la période) et les autres, pas encore dormants, avec leur chiffre d'affaires de la période et depuis leur première commande, et leurs parts. Commandes payées seulement (payées, en traitement ou expédiées), les annulées et les remboursées laissées de côté. Sans période, depuis la première commande jusqu'à aujourd'hui.
                 </description>
             </export_descriptive>
         </export>

@@ -15,13 +15,11 @@ declare(strict_types=1);
 namespace Thelia\Domain\Report\Sales;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Connection\StatementInterface;
-use Propel\Runtime\Propel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Order\Sql\OrderAmountSql;
+use Thelia\Domain\Report\ReportQuery;
 use Thelia\Model\OrderProduct;
-use Thelia\Model\OrderStatusQuery;
 
 /**
  * The sales of a period by category, by product and by customer, and how they add up to the
@@ -39,8 +37,6 @@ use Thelia\Model\OrderStatusQuery;
  */
 final readonly class SalesReportCalculator
 {
-    private const string SQL_DATE_FORMAT = 'Y-m-d H:i:s';
-
     private const int MAX_PER_PAGE = 500;
 
     /** Far beyond any shop, low enough for the offset of its last row to stay an integer. */
@@ -125,7 +121,7 @@ final readonly class SalesReportCalculator
                 $figures['ownRevenue'],
                 $figures['quantity'],
                 $figures['orderCount'],
-                self::share($figures['revenue'], $linesTotal),
+                ReportQuery::share($figures['revenue'], $linesTotal),
                 $previous['category:'.$categoryId]['revenue'] ?? 0.0,
             );
 
@@ -165,7 +161,7 @@ final readonly class SalesReportCalculator
                 $figures['ownRevenue'],
                 $figures['quantity'],
                 $figures['orderCount'],
-                self::share($figures['revenue'], $linesTotal),
+                ReportQuery::share($figures['revenue'], $linesTotal),
                 $previous[$kind->value]['revenue'] ?? 0.0,
             );
         }
@@ -221,7 +217,7 @@ final readonly class SalesReportCalculator
                 (null !== $productId ? $titles[$productId] ?? null : null) ?? (string) $row['line_title'],
                 self::quantity($row['quantity']),
                 $revenue,
-                self::share($revenue, (float) $row['lines_total']),
+                ReportQuery::share($revenue, (float) $row['lines_total']),
                 $previous[$ref] ?? 0.0,
             );
         }
@@ -483,27 +479,7 @@ final readonly class SalesReportCalculator
      */
     private function orderCondition(SalesReportCriteria $criteria): string
     {
-        $condition = 'o.created_at >= :from AND o.created_at <= :to';
-
-        if (StatusScope::Paid === $criteria->scope) {
-            $condition .= ' AND '.self::inList('o.status_id', OrderStatusQuery::getPaidStatusIdList());
-        }
-
-        if (null !== $criteria->saleUnitIds) {
-            $condition .= ' AND '.self::inList('o.sale_unit_id', $criteria->saleUnitIds);
-        }
-
-        return $condition;
-    }
-
-    /**
-     * @param array<mixed> $ids
-     */
-    private static function inList(string $column, array $ids): string
-    {
-        $ids = array_values(array_unique(array_map('intval', $ids)));
-
-        return [] === $ids ? '1 = 0' : $column.' IN ('.implode(', ', $ids).')';
+        return 'o.created_at >= :from AND o.created_at <= :to'.ReportQuery::scopeCondition($criteria);
     }
 
     private function countSoldProducts(SalesReportCriteria $criteria): int
@@ -560,7 +536,7 @@ final readonly class SalesReportCalculator
      */
     private function customerTotals(SalesReportCriteria $criteria, array $customerIds): array
     {
-        $sql = 'WITH '.$this->placedOrderSql($criteria, ' AND '.self::inList('o.customer_id', $customerIds)).'
+        $sql = 'WITH '.$this->placedOrderSql($criteria, ' AND '.ReportQuery::inList('o.customer_id', $customerIds)).'
             SELECT
                 placed_order.customer_id,
                 CAST(SUM('.OrderAmountSql::orderTotal('placed_order', 'placed_order.items_total').') AS DECIMAL(16,6)) AS total
@@ -592,7 +568,7 @@ final readonly class SalesReportCalculator
         $sql = 'SELECT category.id, category.parent, category_i18n.locale, category_i18n.title
             FROM category
             LEFT JOIN category_i18n ON category_i18n.id = category.id
-            WHERE '.self::inList('category.id', $categoryIds).'
+            WHERE '.ReportQuery::inList('category.id', $categoryIds).'
             ORDER BY category.id, category_i18n.locale';
 
         $parents = [];
@@ -626,7 +602,7 @@ final readonly class SalesReportCalculator
 
         $sql = 'SELECT product_i18n.id, product_i18n.locale, product_i18n.title
             FROM product_i18n
-            WHERE '.self::inList('product_i18n.id', $productIds).'
+            WHERE '.ReportQuery::inList('product_i18n.id', $productIds).'
             ORDER BY product_i18n.id, product_i18n.locale';
 
         $titles = [];
@@ -674,37 +650,7 @@ final readonly class SalesReportCalculator
      */
     private function fetchAll(string $sql, ?SalesReportCriteria $criteria, array $parameters = []): array
     {
-        $statement = ($this->connection ?? Propel::getConnection())->prepare($sql);
-
-        if (!$statement instanceof StatementInterface) {
-            throw new \RuntimeException('The sales report statement could not be prepared.');
-        }
-
-        if ($criteria instanceof SalesReportCriteria) {
-            $this->bindCriteria($statement, $sql, $criteria);
-        }
-
-        foreach ($parameters as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
-
-        $statement->execute();
-
-        $rows = [];
-
-        while (false !== ($row = $statement->fetch(\PDO::FETCH_ASSOC))) {
-            $rows[] = $row;
-        }
-
-        return $rows;
-    }
-
-    private function bindCriteria(StatementInterface $statement, string $sql, SalesReportCriteria $criteria): void
-    {
-        $statement->bindValue('from', $criteria->from->format(self::SQL_DATE_FORMAT));
-        $statement->bindValue('to', $criteria->to->format(self::SQL_DATE_FORMAT));
-
-        OrderAmountSql::bindRoundingPivots($statement, $sql);
+        return (new ReportQuery($this->connection))->fetchAll($sql, $criteria, $parameters);
     }
 
     /**
@@ -722,10 +668,5 @@ final readonly class SalesReportCalculator
     private static function quantity(mixed $summed): float
     {
         return round((float) $summed, QuantityScale::MAXIMUM_DECIMALS) + 0.0;
-    }
-
-    private static function share(float $amount, float $total): float
-    {
-        return 0.0 === $total ? 0.0 : $amount / $total;
     }
 }

@@ -1244,5 +1244,6 @@ return [
     'Revenue since the first order incl. tax' => 'Revenue since the first order incl. tax',
     'Share of the revenue since the first order (%)' => 'Share of the revenue since the first order (%)',
     'Returning customers' => 'Returning customers',
+    'Lapsing customers (no order in the period, not dormant yet)' => 'Lapsing customers (no order in the period, not dormant yet)',
     'Dormant customers (no order for %days% days)' => 'Dormant customers (no order for %days% days)',
 ];
