@@ -582,12 +582,14 @@ CREATE TABLE `address`
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
     `is_default` TINYINT DEFAULT 0,
+    `company_id` INTEGER COMMENT 'the company the address is shared with, NULL for an address of the customer alone; customer_id stays the account that created it',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_address_customer_id` (`customer_id`),
     INDEX `idx_address_customer_title_id` (`title_id`),
     INDEX `idx_address_country_id` (`country_id`),
+    INDEX `idx_address_company_id` (`company_id`),
     INDEX `fk_address_state_id_idx` (`state_id`),
     CONSTRAINT `fk_address_customer_id`
         FOREIGN KEY (`customer_id`)
@@ -608,7 +610,12 @@ CREATE TABLE `address`
         FOREIGN KEY (`state_id`)
         REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_address_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -736,6 +743,124 @@ CREATE TABLE `customer_group_category`
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- company
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `company`;
+
+CREATE TABLE `company`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `siret` VARCHAR(20) COMMENT 'copied onto the billing address of the company each time the company is saved',
+    `vat_number` VARCHAR(20) COMMENT 'copied onto the billing address of the company each time the company is saved',
+    `parent_id` INTEGER COMMENT 'the company this one belongs to; a plain column with no foreign key, read by nothing yet',
+    `active` TINYINT DEFAULT 1 NOT NULL COMMENT 'a suspended company (0) keeps its buyers and its history but places no order',
+    `notification_email` VARCHAR(255) COMMENT 'receives a copy of every e-mail about an order of the company',
+    `internal_note` TEXT COMMENT 'a note for the shop administrators, never shown to the company',
+    `billing_address_id` INTEGER COMMENT 'the address invoices of the company are made out to, NULL when none is chosen',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_company_parent_id` (`parent_id`),
+    INDEX `idx_company_billing_address_id` (`billing_address_id`),
+    CONSTRAINT `fk_company_billing_address_id`
+        FOREIGN KEY (`billing_address_id`)
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- company_role
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `company_role`;
+
+CREATE TABLE `company_role`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(100) NOT NULL COMMENT 'stable machine name of the role, which the code of the company looks it up by',
+    `company_id` INTEGER COMMENT 'the company the role belongs to, NULL for a role every company may give',
+    `permissions` TEXT NOT NULL COMMENT 'JSON list of the permissions the role grants, each a string',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_company_role_code_company_id` (`code`, `company_id`),
+    INDEX `idx_company_role_company_id` (`company_id`),
+    CONSTRAINT `fk_company_role_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- company_customer
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `company_customer`;
+
+CREATE TABLE `company_customer`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `company_id` INTEGER NOT NULL,
+    `customer_id` INTEGER NOT NULL COMMENT 'the buyer; an account belongs to one company at most',
+    `company_role_id` INTEGER NOT NULL,
+    `order_limit` DECIMAL(16,6) COMMENT 'the most the buyer may spend on one order, taxes and delivery included, in the default currency; NULL for no limit',
+    `period_limit` DECIMAL(16,6) COMMENT 'the most the buyer may spend over one period, taxes and delivery included, in the default currency; NULL for no limit',
+    `period` VARCHAR(10) COMMENT 'the period period_limit counts over: week, month or year',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `company_customer_customer_id_unique` (`customer_id`),
+    INDEX `idx_company_customer_company_id` (`company_id`),
+    INDEX `idx_company_customer_company_role_id` (`company_role_id`),
+    CONSTRAINT `fk_company_customer_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_company_customer_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_company_customer_company_role_id`
+        FOREIGN KEY (`company_role_id`)
+        REFERENCES `company_role` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- company_invitation_use
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `company_invitation_use`;
+
+CREATE TABLE `company_invitation_use`
+(
+    `fingerprint` CHAR(64) NOT NULL COMMENT 'SHA-256 of the invitation token, in hexadecimal; the key makes an invitation usable once, whatever became of the buyer it took in',
+    `company_id` INTEGER NOT NULL,
+    `customer_id` INTEGER COMMENT 'the account the invitation took in; NULL once that account is deleted',
+    `used_at` DATETIME NOT NULL,
+    PRIMARY KEY (`fingerprint`),
+    INDEX `idx_company_invitation_use_company_id` (`company_id`),
+    INDEX `idx_company_invitation_use_customer_id` (`customer_id`),
+    CONSTRAINT `fk_company_invitation_use_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_company_invitation_use_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
@@ -1080,6 +1205,8 @@ CREATE TABLE `order`
     `customer_group_id` INTEGER COMMENT 'the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted',
     `customer_group_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the customer group discount rate, as a percentage, already included in the order products prices',
     `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices',
+    `company_id` INTEGER COMMENT 'the company the order was placed for, frozen when it was placed: NULL for an order of a customer alone, kept when the buyer leaves the company',
+    `placed_by_customer_id` INTEGER COMMENT 'the account that placed the order, NULL once that account is deleted; customer_id stays the owner of the order',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -1099,6 +1226,8 @@ CREATE TABLE `order`
     INDEX `fk_order_lang_id_idx` (`lang_id`),
     INDEX `idx_order_cart_fk` (`cart_id`),
     INDEX `idx_order_delivery_slot_id` (`delivery_slot_id`),
+    INDEX `idx_order_company_id` (`company_id`),
+    INDEX `idx_order_placed_by_customer_id` (`placed_by_customer_id`),
     INDEX `fi_order_sale_unit_id` (`sale_unit_id`),
     INDEX `fi_order_customer_group_id` (`customer_group_id`),
     CONSTRAINT `fk_order_currency_id`
@@ -1154,6 +1283,16 @@ CREATE TABLE `order`
     CONSTRAINT `fk_order_delivery_slot_id`
         FOREIGN KEY (`delivery_slot_id`)
         REFERENCES `delivery_slot` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_order_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_placed_by_customer_id`
+        FOREIGN KEY (`placed_by_customer_id`)
+        REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -4600,6 +4739,24 @@ CREATE TABLE `customer_group_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- company_role_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `company_role_i18n`;
+
+CREATE TABLE `company_role_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `company_role_i18n_fk_29ffc7`
+        FOREIGN KEY (`id`)
+        REFERENCES `company_role` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- price_list_i18n
 -- ---------------------------------------------------------------------
 
@@ -5538,12 +5695,15 @@ CREATE TABLE `order_version`
     `customer_group_id` INTEGER COMMENT 'the customer group the buyer belonged to when the order was placed, NULL for an order that predates the groups or once the group is deleted',
     `customer_group_discount_rate` DECIMAL(16,6) DEFAULT 0.000000 COMMENT 'the customer group discount rate, as a percentage, already included in the order products prices',
     `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices',
+    `company_id` INTEGER COMMENT 'the company the order was placed for, frozen when it was placed: NULL for an order of a customer alone, kept when the buyer leaves the company',
+    `placed_by_customer_id` INTEGER COMMENT 'the account that placed the order, NULL once that account is deleted; customer_id stays the owner of the order',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     `customer_id_version` INTEGER DEFAULT 0,
+    `placed_by_customer_id_version` INTEGER DEFAULT 0,
     `order_return_ids` TEXT,
     `order_return_versions` TEXT,
     PRIMARY KEY (`id`,`version`),

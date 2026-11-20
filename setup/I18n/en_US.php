@@ -1730,6 +1730,10 @@ return [
     'Default customer group' => 'Default customer group',
     'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)',
     'Pricing' => 'Pricing',
+    'Companies' => 'Companies',
+    'Company administrator' => 'Company administrator',
+    'Buyer' => 'Buyer',
+    'Approver' => 'Approver',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)',
@@ -1756,4 +1760,6 @@ return [
     'Message sent to the customer when a subscription is cancelled' => 'Message sent to the customer when a subscription is cancelled',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled',
     'Days without an order after which a customer is dormant in the customer reports (180 when invalid)' => 'Days without an order after which a customer is dormant in the customer reports (180 when invalid)',
+    'Invitation to join a company, sent to the person invited' => 'Invitation to join a company, sent to the person invited',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Join {{ company_name }} on {{ config("store_name") }}',
 ];

@@ -459,6 +459,10 @@ return [
     'Default customer group' => 'Standaard klantgroep',
     'Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)' => 'Wie de prijzen van de winkel ziet: visible, logged_in (alleen ingelogde klanten) of on_request (geen prijs, een aanvraagknop)',
     'Pricing' => 'Prijsstelling',
+    'Companies' => 'Bedrijven',
+    'Company administrator' => 'Bedrijfsbeheerder',
+    'Buyer' => 'Inkoper',
+    'Approver' => 'Goedkeurder',
     'Hold the stock of the items of a cart while the customer checks out (1 = yes, 0 = no)' => 'De voorraad van de artikelen in een winkelwagen reserveren terwijl de klant afrekent (1 = ja, 0 = nee)',
     'When the stock of a cart is held: checkout (from the start of the checkout) or cart (as soon as an item is in the cart)' => 'Wanneer de voorraad van een winkelwagen wordt gereserveerd: checkout (vanaf het begin van het afrekenen) of cart (zodra een artikel in de winkelwagen ligt)',
     'Minutes a stock reservation is held, extended at each step of the checkout (15 when invalid)' => 'Minuten dat een voorraadreservering wordt vastgehouden, bij elke stap van het afrekenen verlengd (15 bij een ongeldige waarde)',
@@ -484,4 +488,6 @@ return [
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Abonnement {{ subscription_ref }} opgeschort na {{ failure_count }} mislukte afschrijvingen{% else %}Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgeschort{% endif %}',
     'Message sent to the customer when a subscription is cancelled' => 'Bericht aan de klant wanneer een abonnement wordt opgezegd',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Uw abonnement {{ subscription_ref }} bij {{ config("store_name") }} is opgezegd',
+    'Invitation to join a company, sent to the person invited' => 'Uitnodiging om zich bij een bedrijf aan te sluiten, verstuurd aan de uitgenodigde persoon',
+    'Join {{ company_name }} on {{ config("store_name") }}' => 'Word lid van {{ company_name }} bij {{ config("store_name") }}',
 ];
