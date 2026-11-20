@@ -16,11 +16,12 @@ namespace Thelia\Domain\Search\Provider;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Domain\Search\Contract\CountableDocumentProviderInterface;
 use Thelia\Domain\Search\Contract\SearchableDocumentProviderInterface;
 use Thelia\Domain\Search\Contract\SearchScope;
 use Thelia\Domain\Search\Document\SearchDocument;
 
-abstract class TranslatedCatalogueDocumentProvider implements SearchableDocumentProviderInterface
+abstract class TranslatedCatalogueDocumentProvider implements SearchableDocumentProviderInterface, CountableDocumentProviderInterface
 {
     private const array WEIGHTS = ['title' => 10, 'chapo' => 5];
 
@@ -50,8 +51,7 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
     public function idsAfter(int $afterId, int $limit): array
     {
         /** @var list<int|string> $ids */
-        $ids = $this->entityQuery()
-            ->filterById($afterId, Criteria::GREATER_THAN)
+        $ids = $this->entitiesAfter($afterId)
             ->orderById()
             ->limit($limit)
             ->select(['Id'])
@@ -59,6 +59,16 @@ abstract class TranslatedCatalogueDocumentProvider implements SearchableDocument
             ->getData();
 
         return array_map(intval(...), $ids);
+    }
+
+    public function countAfter(int $afterId): int
+    {
+        return $this->entitiesAfter($afterId)->count();
+    }
+
+    private function entitiesAfter(int $afterId): ModelCriteria
+    {
+        return $this->entityQuery()->filterById($afterId, Criteria::GREATER_THAN);
     }
 
     public function visibleIds(array $ids): array
