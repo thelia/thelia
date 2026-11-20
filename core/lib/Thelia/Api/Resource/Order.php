@@ -23,6 +23,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -34,6 +36,7 @@ use Thelia\Api\Bridge\Propel\Filter\NotInFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Api\Security\CompanyVoter;
 use Thelia\Api\Security\SaleUnitScopeVoter;
 use Thelia\Api\State\Processor\OrderProcessor;
 use Thelia\Api\State\Provider\GuestOrderProvider;
@@ -75,11 +78,22 @@ use Thelia\Model\OrderQuery;
     operations: [
         new GetCollection(
             uriTemplate: '/front/account/orders',
+            openapi: new OpenApiOperation(
+                parameters: [
+                    new OpenApiParameter(
+                        name: 'scope',
+                        in: 'query',
+                        description: 'own keeps the orders the caller placed; company keeps the orders of the caller\'s company that their role may read, and nothing without that right.',
+                        required: false,
+                        schema: ['type' => 'string', 'enum' => ['own', 'company']],
+                    ),
+                ],
+            ),
         ),
         new Get(
             uriTemplate: '/front/account/orders/{id}',
             normalizationContext: ['groups' => [self::GROUP_FRONT_READ, self::GROUP_FRONT_READ_SINGLE]],
-            security: 'object.customer.getId() == user.getId()',
+            security: 'is_granted("'.CompanyVoter::ORDER_READ.'", object)',
         ),
         // Someone who ordered without an account has nothing to sign in with, so the
         // signed link they were mailed is what identifies them. Deliberately outside

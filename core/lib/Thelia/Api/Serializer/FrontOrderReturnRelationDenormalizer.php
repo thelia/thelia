@@ -40,8 +40,8 @@ use Thelia\Domain\OrderReturn\Service\ReturnEligibilityChecker;
  * relation that failed is one of those two.
  *
  * That is all it promises, within this request. It does not hide which orders
- * exist: `GET /api/front/account/orders/{id}` (403 for somebody else's order,
- * 404 for a missing one), an IRI of another surface and some malformed bodies
+ * exist: `GET /api/front/account/orders/{id}` (404 for somebody else's order and
+ * for a missing one alike), an IRI of another surface and some malformed bodies
  * (an empty line, the order of the keys) still answer differently. With
  * `collect_denormalization_errors` the serializer would gather the failures of
  * the properties itself, and this denormalizer would no longer see the missing

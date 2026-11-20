@@ -112,7 +112,7 @@ final class AccountOrderNotesApiTest extends ApiTestCase
             token: $this->authenticateAsCustomer($intruder),
         );
 
-        self::assertSame(403, $response->getStatusCode());
+        self::assertSame(404, $response->getStatusCode());
     }
 
     /**
