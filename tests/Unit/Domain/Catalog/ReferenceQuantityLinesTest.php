@@ -39,7 +39,7 @@ final class ReferenceQuantityLinesTest extends TestCase
 
         self::assertCount(2, $lines);
         self::assertSame(['ABC-1', 'XYZ-9'], array_map(static fn (ReferenceQuantity $line): string => $line->reference, $lines->all()));
-        self::assertSame(5, $lines->all()[0]->quantity);
+        self::assertSame(5.0, $lines->all()[0]->quantity);
     }
 
     public function testOneReferenceSettledOnTwoSaleElementsStaysTwoLines(): void
@@ -58,7 +58,7 @@ final class ReferenceQuantityLinesTest extends TestCase
         $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('C', 4), new ReferenceQuantity('A', 2)]));
 
         self::assertSame(['A', 'B', 'C'], array_map(static fn (ReferenceQuantity $line): string => $line->reference, $merged->all()));
-        self::assertSame(3, $merged->all()[0]->quantity);
+        self::assertSame(3.0, $merged->all()[0]->quantity);
     }
 
     public function testALineWithoutSaleElementJoinsTheOnlyLineOfItsReference(): void
@@ -67,7 +67,7 @@ final class ReferenceQuantityLinesTest extends TestCase
         $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('azer1', 2)]));
 
         self::assertCount(2, $merged);
-        self::assertSame(['AZER1', 5, 7], [$merged->all()[0]->reference, $merged->all()[0]->quantity, $merged->all()[0]->productSaleElementsId]);
+        self::assertSame(['AZER1', 5.0, 7], [$merged->all()[0]->reference, $merged->all()[0]->quantity, $merged->all()[0]->productSaleElementsId]);
     }
 
     public function testAGivenSaleElementSettlesALineThatHadNone(): void
@@ -76,7 +76,7 @@ final class ReferenceQuantityLinesTest extends TestCase
         $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('AZER1', 2, 7)]));
 
         self::assertCount(1, $merged);
-        self::assertSame([5, 7], [$merged->all()[0]->quantity, $merged->all()[0]->productSaleElementsId]);
+        self::assertSame([5.0, 7], [$merged->all()[0]->quantity, $merged->all()[0]->productSaleElementsId]);
     }
 
     public function testTwoSaleElementsOfOneReferenceStayTwoLines(): void
@@ -87,13 +87,27 @@ final class ReferenceQuantityLinesTest extends TestCase
         self::assertCount(2, $merged);
     }
 
+    public function testDecimalQuantitiesOfOneReferenceAddUpWithoutAFloatError(): void
+    {
+        $lines = new ReferenceQuantityLines([new ReferenceQuantity('FLOUR', 0.1), new ReferenceQuantity('FLOUR', 0.2)]);
+        $merged = $lines->merge(new ReferenceQuantityLines([new ReferenceQuantity('flour', 1.25)]));
+
+        self::assertSame(0.3, $lines->all()[0]->quantity);
+        self::assertSame(1.55, $merged->all()[0]->quantity);
+    }
+
+    public function testADecimalQuantityAboveZeroIsTaken(): void
+    {
+        self::assertSame(0.005, (new ReferenceQuantityLines([new ReferenceQuantity('SAFFRON', 0.005)]))->all()[0]->quantity);
+    }
+
     public function testALineWithoutSaleElementDoesNotPickBetweenTwoLines(): void
     {
         $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11), new ReferenceQuantity('TSHIRT', 1, 12)]);
         $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 2)]));
 
         self::assertCount(3, $merged);
-        self::assertSame([1, 1, 2], array_map(static fn (ReferenceQuantity $line): int => $line->quantity, $merged->all()));
+        self::assertSame([1.0, 1.0, 2.0], array_map(static fn (ReferenceQuantity $line): float => $line->quantity, $merged->all()));
     }
 
     public function testAQuantityAboveTheMaximumIsRefused(): void
@@ -105,7 +119,7 @@ final class ReferenceQuantityLinesTest extends TestCase
 
     public function testTheMaximumHoldsForTheLinesOfOneReferenceAddedUp(): void
     {
-        self::assertSame(ReferenceQuantityLines::MAX_QUANTITY, (new ReferenceQuantityLines([
+        self::assertSame((float) ReferenceQuantityLines::MAX_QUANTITY, (new ReferenceQuantityLines([
             new ReferenceQuantity('A', ReferenceQuantityLines::MAX_QUANTITY - 1),
             new ReferenceQuantity('A', 1),
         ]))->all()[0]->quantity);
@@ -149,7 +163,7 @@ final class ReferenceQuantityLinesTest extends TestCase
             new ReferenceQuantity('A', 3, 11),
         ]);
 
-        self::assertSame([['A1', 2, 1], ['A', 3, 11]], array_map(
+        self::assertSame([['A1', 2.0, 1], ['A', 3.0, 11]], array_map(
             static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity, $line->productSaleElementsId],
             $lines->all(),
         ));
@@ -162,8 +176,8 @@ final class ReferenceQuantityLinesTest extends TestCase
         $upperCaseCurrent = (new ReferenceQuantityLines([new ReferenceQuantity('ÉCLAIR', 1)]))
             ->merge(new ReferenceQuantityLines([new ReferenceQuantity('éclair', 2)]));
 
-        self::assertSame([['éclair', 3]], array_map(static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity], $lowerCaseCurrent->all()));
-        self::assertSame([['ÉCLAIR', 3]], array_map(static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity], $upperCaseCurrent->all()));
+        self::assertSame([['éclair', 3.0]], array_map(static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity], $lowerCaseCurrent->all()));
+        self::assertSame([['ÉCLAIR', 3.0]], array_map(static fn (ReferenceQuantity $line): array => [$line->reference, $line->quantity], $upperCaseCurrent->all()));
     }
 
     public function testAGivenSaleElementJoinsTheLineHoldingTheSameOneAmongSeveral(): void
@@ -171,7 +185,7 @@ final class ReferenceQuantityLinesTest extends TestCase
         $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11), new ReferenceQuantity('TSHIRT', 1, 12)]);
         $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('tshirt', 2, 12)]));
 
-        self::assertSame([[11, 1], [12, 3]], array_map(
+        self::assertSame([[11, 1.0], [12, 3.0]], array_map(
             static fn (ReferenceQuantity $line): array => [$line->productSaleElementsId, $line->quantity],
             $merged->all(),
         ));
@@ -182,7 +196,7 @@ final class ReferenceQuantityLinesTest extends TestCase
         $current = new ReferenceQuantityLines([new ReferenceQuantity('TSHIRT', 1, 11)]);
         $merged = $current->merge(new ReferenceQuantityLines([new ReferenceQuantity('tshirt', 2, 11)]));
 
-        self::assertSame([[11, 3]], array_map(
+        self::assertSame([[11, 3.0]], array_map(
             static fn (ReferenceQuantity $line): array => [$line->productSaleElementsId, $line->quantity],
             $merged->all(),
         ));
@@ -208,6 +222,8 @@ final class ReferenceQuantityLinesTest extends TestCase
         yield 'empty reference' => [new ReferenceQuantity("  \u{200B} ", 1)];
         yield 'zero quantity' => [new ReferenceQuantity('ABC', 0)];
         yield 'negative quantity' => [new ReferenceQuantity('ABC', -3)];
+        yield 'quantity finer than a millionth' => [new ReferenceQuantity('ABC', 0.0000004)];
+        yield 'quantity that is not a number' => [new ReferenceQuantity('ABC', \NAN)];
         yield 'reference too long' => [new ReferenceQuantity(str_repeat('a', ReferenceQuantityLines::MAX_REFERENCE_LENGTH + 1), 1)];
     }
 

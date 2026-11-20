@@ -29,15 +29,16 @@ use Thelia\Api\Validator\ReferenceQuantityRows;
 final class QuickOrderInput
 {
     /**
-     * @var list<array{reference: string, quantity: int, productSaleElementsId?: int|null}>
+     * @var list<array{reference: string, quantity: int|float, productSaleElementsId?: int|null}>
      */
     #[ApiProperty(
-        description: 'The lines to resolve, at most 500. A reference given twice for the same sale element is resolved once, quantities added up.',
+        description: 'The lines to resolve, at most 500. A quantity carries the decimals its sale element is sold with (1.25 for a product sold by the kilogram). A reference given twice for the same sale element is resolved once, quantities added up.',
         required: true,
         example: [
             ['reference' => 'TSHIRT-01', 'quantity' => 3],
             ['reference' => 'TSHIRT-01', 'quantity' => 2, 'productSaleElementsId' => 412],
             ['reference' => '3760123450012', 'quantity' => 1],
+            ['reference' => 'FLOUR-T65', 'quantity' => 1.25],
         ],
     )]
     #[Assert\NotNull]

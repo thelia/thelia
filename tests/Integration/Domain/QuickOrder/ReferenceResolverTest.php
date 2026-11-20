@@ -65,7 +65,7 @@ final class ReferenceResolverTest extends IntegrationTestCase
         self::assertSame((int) $product->getId(), $line->productId);
         self::assertSame('Nitrile gloves', $line->title);
         self::assertEqualsWithDelta(12.5, $line->untaxedUnitPrice, 0.0001);
-        self::assertSame(3, $line->quantity);
+        self::assertSame(3.0, $line->quantity);
     }
 
     public function testAQuantityTheRulesOfTheCombinationRefuseIsToldWithTheValidOnes(): void
@@ -82,16 +82,38 @@ final class ReferenceResolverTest extends IntegrationTestCase
         self::assertSame(LineStatus::Resolved, $accepted->status);
     }
 
-    public function testACombinationSoldByMeasureIsOrderedFromItsProductPage(): void
+    public function testACombinationSoldByMeasureTakesTheDecimalsItIsSoldWith(): void
     {
         $saleElements = $this->defaultSaleElementsOf($this->product());
         (new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2))->applyTo($saleElements);
         $saleElements->save($this->getPropelConnection());
 
-        $line = $this->resolveOne((string) $saleElements->getRef(), 2);
+        $line = $this->resolveOne((string) $saleElements->getRef(), 1.25);
+
+        self::assertSame(LineStatus::Resolved, $line->status);
+        self::assertSame(1.25, $line->quantity);
+    }
+
+    public function testAQuantityWithMoreDecimalsThanTheCombinationIsToldHowManyItTakes(): void
+    {
+        $saleElements = $this->defaultSaleElementsOf($this->product());
+        (new QuantityRule(minQuantity: 0.01, step: 0.01, decimals: 2))->applyTo($saleElements);
+        $saleElements->save($this->getPropelConnection());
+
+        $line = $this->resolveOne((string) $saleElements->getRef(), 1.255);
 
         self::assertSame(LineStatus::QuantityRefused, $line->status);
-        self::assertSame('This product is sold by measure: order it from its product page.', $line->refusalReason);
+        self::assertSame('The quantity cannot carry more than 2 decimal places.', $line->refusalReason);
+    }
+
+    public function testADecimalQuantityOfACombinationSoldByThePieceIsRefused(): void
+    {
+        $saleElements = $this->defaultSaleElementsOf($this->product());
+
+        $line = $this->resolveOne((string) $saleElements->getRef(), 1.5);
+
+        self::assertSame(LineStatus::QuantityRefused, $line->status);
+        self::assertSame('The quantity must be a whole number.', $line->refusalReason);
     }
 
     public function testTheCaseOfTheReferenceDoesNotMatter(): void
@@ -325,7 +347,7 @@ final class ReferenceResolverTest extends IntegrationTestCase
         return \count($this->recordSqlQueriesWithoutPooledModels(fn () => $this->resolver->resolve($this->customer, $lines, $this->currency)));
     }
 
-    private function resolveOne(string $reference, int $quantity = 1, ?int $productSaleElementsId = null): QuickOrderLine
+    private function resolveOne(string $reference, float $quantity = 1, ?int $productSaleElementsId = null): QuickOrderLine
     {
         $table = $this->resolver->resolve(
             $this->customer,

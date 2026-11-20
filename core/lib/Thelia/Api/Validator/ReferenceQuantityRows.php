@@ -70,7 +70,7 @@ final class ReferenceQuantityRows extends Compound
                             ],
                             'quantity' => [
                                 new Assert\NotNull(groups: $groups),
-                                new Assert\Type('int', groups: $groups),
+                                new Assert\Type(['int', 'float'], groups: $groups),
                                 new Assert\Positive(groups: $groups),
                                 new Assert\LessThanOrEqual(ReferenceQuantityLines::MAX_QUANTITY, groups: $groups),
                             ],

@@ -23,8 +23,7 @@ use Thelia\Domain\Catalog\Quantity\InvalidQuantityRuleException;
 use Thelia\Domain\Catalog\Quantity\NotPositiveQuantityException;
 use Thelia\Domain\Catalog\Quantity\QuantityPolicy;
 use Thelia\Domain\Catalog\Quantity\QuantityRefusedException;
-use Thelia\Domain\Catalog\Quantity\QuantityRule;
-use Thelia\Domain\Catalog\Quantity\QuantityTranslation;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Quantity\UnreadableQuantityException;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Localization\Service\LangService;
@@ -212,7 +211,7 @@ final readonly class ReferenceResolver
                 return new QuickOrderLine($line->reference, $line->quantity, LineStatus::Unavailable, $saleElementsId, $productId, $title, availableQuantity: 0.0);
             }
 
-            if (null !== $stock && $line->quantity > $stock) {
+            if (null !== $stock && QuantityScale::micro($line->quantity) > QuantityScale::micro($stock)) {
                 return new QuickOrderLine($line->reference, $line->quantity, LineStatus::QuantityRefused, $saleElementsId, $productId, $title, availableQuantity: $stock);
             }
         }
@@ -236,17 +235,12 @@ final readonly class ReferenceResolver
 
     /**
      * Why the rules of the combination refuse the quantity of a line, null when they sell
-     * it. The quick order and the purchase lists count whole units: a combination sold by
-     * measure is ordered from its product page, where its decimals can be typed.
+     * it: its minimum, its step and the decimals it is sold with, as on its product page.
      */
-    private function refusalByTheRules(ProductSaleElements $saleElements, int $quantity): ?string
+    private function refusalByTheRules(ProductSaleElements $saleElements, float $quantity): ?string
     {
         try {
-            if (QuantityRule::fromProductSaleElements($saleElements)->isSoldByMeasure()) {
-                return QuantityTranslation::trans('This product is sold by measure: order it from its product page.');
-            }
-
-            $this->quantityPolicy->assertAcceptable((float) $quantity, $saleElements);
+            $this->quantityPolicy->assertAcceptable($quantity, $saleElements);
         } catch (QuantityRefusedException|NotPositiveQuantityException|UnreadableQuantityException $refusal) {
             return $refusal->getMessage();
         } catch (InvalidQuantityRuleException) {
@@ -486,28 +480,21 @@ final readonly class ReferenceResolver
         foreach ($decisions as $decision) {
             if (null !== $decision['chosen']) {
                 $saleElementsId = (int) $decision['chosen']->getId();
-                $quantities[$saleElementsId] = ($quantities[$saleElementsId] ?? 0) + $decision['line']->quantity;
+                $quantities[$saleElementsId] = ($quantities[$saleElementsId] ?? 0.0) + $decision['line']->quantity;
             }
         }
 
-        if (null === $cart || [] === $quantities) {
-            return $quantities;
-        }
-
-        $held = [];
-
-        foreach (CartItemQuery::create()->filterByCartId($cart->getId())->filterByProductSaleElementsId(array_keys($quantities))->find() as $item) {
-            if (1 !== (int) $item->getIsOffered()) {
-                $saleElementsId = (int) $item->getProductSaleElementsId();
-                $held[$saleElementsId] = ($held[$saleElementsId] ?? 0.0) + (float) $item->getQuantity();
+        if (null !== $cart && [] !== $quantities) {
+            foreach (CartItemQuery::create()->filterByCartId($cart->getId())->filterByProductSaleElementsId(array_keys($quantities))->find() as $item) {
+                if (1 !== (int) $item->getIsOffered()) {
+                    $saleElementsId = (int) $item->getProductSaleElementsId();
+                    $quantities[$saleElementsId] += (float) $item->getQuantity();
+                }
             }
         }
 
-        foreach ($held as $saleElementsId => $quantity) {
-            $quantities[$saleElementsId] = (int) floor($quantities[$saleElementsId] + $quantity);
-        }
-
-        return $quantities;
+        // A tier counts whole units, as the cart reads it.
+        return array_map(static fn (float $quantity): int => (int) floor(QuantityScale::micro($quantity) / QuantityScale::micro(1)), $quantities);
     }
 
     /**
