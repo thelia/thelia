@@ -19,13 +19,17 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 #[Exclude]
 final readonly class SearchResult
 {
+    public int $unfilteredTotal;
+
     /**
      * @param list<SearchHit> $hits
      */
     public function __construct(
         public array $hits,
         public int $total,
+        ?int $unfilteredTotal = null,
     ) {
+        $this->unfilteredTotal = $unfilteredTotal ?? $total;
     }
 
     /**

@@ -16,12 +16,14 @@ namespace Thelia\Domain\Search\Provider;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Domain\Catalog\Product\ProductVisibility;
 use Thelia\Domain\Search\Document\SearchDocument;
 use Thelia\Model\AttributeAvI18nQuery;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\BrandI18nQuery;
 use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -38,6 +40,11 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
         'chapo' => 5,
         'brand' => 3,
     ];
+
+    public function __construct(
+        private readonly ?ProductVisibility $productVisibility = null,
+    ) {
+    }
 
     public function family(): string
     {
@@ -110,6 +117,11 @@ final class ProductDocumentProvider extends TranslatedCatalogueDocumentProvider
     protected function i18nQuery(): ModelCriteria
     {
         return ProductI18nQuery::create();
+    }
+
+    protected function narrowToTheVisitor(ModelCriteria $query): void
+    {
+        $this->productVisibility?->applyTo($query, ProductTableMap::COL_ID);
     }
 
     /**

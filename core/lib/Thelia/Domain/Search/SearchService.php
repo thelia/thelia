@@ -213,6 +213,6 @@ final readonly class SearchService
         $hits = array_values(array_filter($result->hits, static fn (SearchHit $hit): bool => isset($visible[$hit->family][$hit->id])));
         $hidden = \count($result->hits) - \count($hits);
 
-        return 0 === $hidden ? $result : new SearchResult($hits, max(\count($hits), $result->total - $hidden));
+        return 0 === $hidden ? $result : new SearchResult($hits, max(\count($hits), $result->total - $hidden), $result->unfilteredTotal);
     }
 }
