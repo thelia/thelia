@@ -19,6 +19,7 @@ Not released yet. The update script is `setup/update/sql/3.5.0.sql`.
 
 - `PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED` is also dispatched for the own stock of a sale unit, with `LowStockReachedEvent::getSaleUnitId()` set (null for the national counter, as before). A listener that acts on the national stock of the sale element (a restocking order, a back in stock notice) skips the events that carry a sale unit.
 - `Thelia\Domain\OrderReturn\Service\StockIncrementer::incrementInAscendingId()` returns the changes of the own stock of a sale unit too, each with its `saleUnitId` (it returned those of the national counter only). A caller that hands them to `StockLevelAnnouncer` needs nothing; one that reads them as national levels skips those with a `saleUnitId`.
+- The threshold of the stock of a sale unit changes two classes of the default-twig theme. `BackOfficeDefaultTwigBundle\Service\Product\SaleUnitValuesWriter::__construct()` takes `Thelia\Domain\SaleUnit\Stock\SaleUnitStockWriter` last, and `SaleUnitValuesContextBuilder::__construct()` takes `Thelia\Domain\Catalog\Stock\StockSettings` last. Both are autowired: code that builds them by hand passes the new argument.
 
 ## Company accounts
 
