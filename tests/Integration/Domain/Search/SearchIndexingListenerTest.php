@@ -30,6 +30,10 @@ use Thelia\Domain\Search\Message\RemoveDocument;
 use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexingQueue;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\Event\BrandI18nEvent;
+use Thelia\Model\Event\FeatureAvI18nEvent;
+use Thelia\Model\Event\FeatureProductEvent;
+use Thelia\Model\Event\ProductSaleElementsEvent;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductI18nQuery;
@@ -387,6 +391,22 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         self::assertSame([], $this->dispatched);
     }
 
+    public function testAModelThatCannotBeReadBeforeItsSaveNeverBreaksTheSave(): void
+    {
+        $listener = new SearchIndexingListener(
+            new SearchEngineRegistry([new InMemorySearchEngine()]),
+            new SearchIndexingQueue($this->bus(), new NullLogger()),
+            new NullLogger(),
+        );
+
+        $listener->onSaleElementsPreSave($this->unreadable(ProductSaleElementsEvent::class));
+        $listener->onBrandTranslationPreSave($this->unreadable(BrandI18nEvent::class));
+        $listener->onProductValuePreSave($this->unreadable(FeatureProductEvent::class));
+        $listener->onValueTranslationPreSave($this->unreadable(FeatureAvI18nEvent::class));
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testAQueueThatRefusesTheMessageDoesNotBreakTheWrite(): void
     {
         $product = $this->product();
@@ -456,6 +476,21 @@ final class SearchIndexingListenerTest extends IntegrationTestCase
         $queue->flush();
 
         self::assertSame(\DomainException::class, $context['exception'] ?? null);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    private function unreadable(string $class): object
+    {
+        $event = $this->createStub($class);
+        $event->method('getModel')->willThrowException(new \RuntimeException('The model cannot be read.'));
+
+        return $event;
     }
 
     private function listen(bool $withEngine): SearchIndexingListener
