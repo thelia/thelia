@@ -115,6 +115,91 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
     }
 
     /**
+     * A company holds who buys for it, with what limits, and whom it invited: every operation that
+     * reads or writes any of it demands an account, stated on the operation rather than left to the
+     * path prefix, and an account of nobody's company is refused as well.
+     */
+    #[DataProvider('companyOperations')]
+    public function testCompanyOperationsRejectAnonymousAccess(string $method, string $path, string $format): void
+    {
+        $response = $this->jsonRequest($method, '/api/front/account/company'.str_replace('{id}', '1', $path), ['name' => 'Anonymous', 'token' => 'x', 'email' => 'a@b.test', 'roleCode' => 'buyer'], format: $format);
+
+        self::assertSame(401, $response->getStatusCode(), \sprintf('%s /front/account/company%s must demand an account.', $method, $path));
+    }
+
+    #[DataProvider('companyOperations')]
+    public function testCompanyOperationsRefuseAnAccountOfNoCompany(string $method, string $path, string $format): void
+    {
+        $factory = $this->createFixtureFactory();
+        $customer = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+
+        $response = $this->jsonRequest(
+            $method,
+            '/api/front/account/company'.str_replace('{id}', '1', $path),
+            ['name' => 'Mine', 'token' => 'x', 'email' => 'a@b.test', 'roleCode' => 'buyer'],
+            $this->authenticateAsCustomer($customer),
+            $format,
+        );
+
+        // Accepting an invitation is what an account of no company does: a token that is no token is a 422, not a 2xx.
+        self::assertContains($response->getStatusCode(), [403, 404, 422], \sprintf('%s /front/account/company%s must not answer an account of no company.', $method, $path));
+    }
+
+    /**
+     * The orders and the addresses of the account are read through the company as well: still an
+     * account only.
+     */
+    #[DataProvider('accountOperations')]
+    public function testOrderAndAddressOperationsRejectAnonymousAccess(string $method, string $path): void
+    {
+        $response = $this->jsonRequest($method, '/api/front/account/'.$path, format: 'json');
+
+        self::assertSame(401, $response->getStatusCode(), \sprintf('%s /front/account/%s must demand an account.', $method, $path));
+    }
+
+    /**
+     * The one company operation open to anybody reads an invitation, and answers a token that does
+     * not stand with a 404 and no other word.
+     */
+    public function testTheInvitationReadIsPublicAndAnswersOnlyA404ToWhatDoesNotStand(): void
+    {
+        $response = $this->jsonRequest('GET', '/api/front/company-invitations/not-a-token');
+
+        self::assertSame(404, $response->getStatusCode());
+        self::assertStringNotContainsString('Acme', (string) $response->getContent());
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function companyOperations(): iterable
+    {
+        yield 'company read' => ['GET', '', 'json'];
+        yield 'company edit' => ['PATCH', '', 'merge-patch+json'];
+        yield 'buyers' => ['GET', '/customers', 'json'];
+        yield 'buyer read' => ['GET', '/customers/{id}', 'json'];
+        yield 'buyer change' => ['PATCH', '/customers/{id}', 'merge-patch+json'];
+        yield 'buyer detach' => ['DELETE', '/customers/{id}', 'json'];
+        yield 'roles' => ['GET', '/roles', 'json'];
+        yield 'invitation' => ['POST', '/invitations', 'json'];
+        yield 'invitation accepted' => ['POST', '/invitations/accept', 'json'];
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function accountOperations(): iterable
+    {
+        yield 'orders' => ['GET', 'orders'];
+        yield 'order' => ['GET', 'orders/1'];
+        yield 'addresses' => ['GET', 'addresses'];
+        yield 'address' => ['GET', 'addresses/1'];
+        yield 'address creation' => ['POST', 'addresses'];
+        yield 'address change' => ['PUT', 'addresses/1'];
+        yield 'address deletion' => ['DELETE', 'addresses/1'];
+    }
+
+    /**
      * @return iterable<string, array{0: string, 1: string, 2: string}>
      */
     public static function purchaseListOperations(): iterable

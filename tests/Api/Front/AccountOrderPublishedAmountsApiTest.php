@@ -307,7 +307,7 @@ final class AccountOrderPublishedAmountsApiTest extends ApiTestCase
 
         $denied = $this->jsonRequest('GET', '/api/front/account/orders/'.$ownerOrder->getId(), token: $this->authenticateAsCustomer($other));
 
-        self::assertSame(403, $denied->getStatusCode());
+        self::assertSame(404, $denied->getStatusCode());
         self::assertStringNotContainsString('totalGoods', (string) $denied->getContent());
     }
 
@@ -326,7 +326,7 @@ final class AccountOrderPublishedAmountsApiTest extends ApiTestCase
 
         $denied = $this->jsonRequest('GET', '/api/front/account/orders/'.$ownerOrder->getId(), token: $this->authenticateAsCustomer($other));
 
-        self::assertSame(403, $denied->getStatusCode());
+        self::assertSame(404, $denied->getStatusCode());
         foreach (['totalAmountWithoutTaxesWithShipping', 'lineTotalWithoutTaxes', 'lineTotalWithTaxes'] as $field) {
             self::assertStringNotContainsString($field, (string) $denied->getContent());
         }

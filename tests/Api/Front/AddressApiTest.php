@@ -55,7 +55,8 @@ final class AddressApiTest extends ApiTestCase
 
         $response = $this->jsonRequest('GET', '/api/front/account/addresses/'.$victimAddress->getId(), token: $token);
 
-        self::assertSame(403, $response->getStatusCode());
+        // Out of reach reads as absent: the answer a missing id gets.
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testCollectionOnlyExposesOwnAddresses(): void

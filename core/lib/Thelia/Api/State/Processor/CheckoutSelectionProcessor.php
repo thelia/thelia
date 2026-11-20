@@ -33,6 +33,7 @@ use Thelia\Api\Resource\CheckoutInvoiceAddressInput;
 use Thelia\Api\Resource\CheckoutPaymentModuleInput;
 use Thelia\Api\Resource\CheckoutValidationOutput;
 use Thelia\Api\Security\CheckoutCartLocator;
+use Thelia\Domain\Addressing\Service\AddressAccess;
 use Thelia\Domain\Cart\CartFacade;
 use Thelia\Domain\Cart\Service\CartGuard;
 use Thelia\Domain\Catalog\Stock\Exception\StockReservationRateLimitedException;
@@ -49,7 +50,6 @@ use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Model\Address;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\CheckoutStep;
@@ -81,6 +81,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         private CartFacade $cartFacade,
         private CartGuard $cartGuard,
         private CustomerGroupPaymentPolicy $customerGroupPaymentPolicy,
+        private AddressAccess $addressAccess,
     ) {
     }
 
@@ -256,7 +257,8 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
     }
 
     /**
-     * An address of the authenticated account, or nothing at all.
+     * An address the authenticated account may use, or nothing at all: one of its own or, for the
+     * buyer of a company, one shared with it.
      *
      * The selection service of the domain answers an address it does not recognise by
      * doing nothing, which is safe and silent: the caller is told its choice was taken
@@ -273,10 +275,7 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('An address identifier is required.');
         }
 
-        $address = AddressQuery::create()
-            ->filterByCustomerId($cart->getCustomerId())
-            ->filterById($addressId)
-            ->findOne();
+        $address = $this->addressAccess->find($cart->getCustomerId(), $addressId);
 
         if (!$address instanceof Address) {
             throw new NotFoundHttpException(self::UNKNOWN_ADDRESS_MESSAGE);
