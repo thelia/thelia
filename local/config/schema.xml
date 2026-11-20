@@ -4106,6 +4106,43 @@
     <column defaultValue="NULL" name="last_sent_at" type="TIMESTAMP" />
     <behavior name="timestampable" />
   </table>
+  <table name="search_synonym" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="lang_id" required="true" type="INTEGER" />
+    <column name="term" required="true" size="255" type="VARCHAR" />
+    <column name="synonyms" required="true" type="LONGVARCHAR" />
+    <column defaultValue="0" name="bidirectional" required="true" type="TINYINT" />
+    <column defaultValue="1" name="active" required="true" type="TINYINT" />
+    <foreign-key foreignTable="lang" name="fk_search_synonym_lang_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="lang_id" />
+    </foreign-key>
+    <unique name="search_synonym_lang_term_UNIQUE">
+      <unique-column name="lang_id" />
+      <unique-column name="term" />
+    </unique>
+    <behavior name="timestampable" />
+  </table>
+  <table name="search_term_redirect" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="lang_id" required="true" type="INTEGER" />
+    <column name="term" required="true" size="255" type="VARCHAR" />
+    <column name="target_type" required="true" size="16" type="VARCHAR" />
+    <column name="target_id" type="INTEGER" />
+    <column name="url" size="2048" type="VARCHAR" />
+    <column defaultValue="1" name="active" required="true" type="TINYINT" />
+    <foreign-key foreignTable="lang" name="fk_search_term_redirect_lang_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="lang_id" />
+    </foreign-key>
+    <unique name="search_term_redirect_lang_term_UNIQUE">
+      <unique-column name="lang_id" />
+      <unique-column name="term" />
+    </unique>
+    <index name="idx_search_term_redirect_target">
+      <index-column name="target_type" />
+      <index-column name="target_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
   <!-- Subscriptions with recurring billing. A plan says how a product is sold by subscription
        (period, trial, number of installments, commitment) and what it costs per currency. A
        subscription copies the plan when it is created: editing the plan never changes a running

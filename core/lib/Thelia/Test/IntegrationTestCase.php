@@ -28,6 +28,7 @@ use Thelia\Core\TheliaKernel;
 use Thelia\Core\Translation\Translator;
 use Thelia\Domain\SaleUnit\Config\SaleUnitConfigScope;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Domain\Search\Dictionary\SearchDictionary;
 use Thelia\Model\AreaZipCodeRuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
@@ -188,6 +189,12 @@ abstract class IntegrationTestCase extends KernelTestCase
             $saleUnitActivityChecker = static::getContainer()->get(SaleUnitActivityChecker::class);
             $saleUnitActivityChecker->forget();
             $saleUnitActivityChecker->forgetAfterTheRequest();
+        }
+
+        if (static::$booted && static::getContainer()->has(SearchDictionary::class)) {
+            $searchDictionary = static::getContainer()->get(SearchDictionary::class);
+            $searchDictionary->forget();
+            $searchDictionary->forgetAfterTheRequest();
         }
 
         SaleUnitConfigScope::reset();

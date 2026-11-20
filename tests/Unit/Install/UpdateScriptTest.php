@@ -29,6 +29,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class UpdateScriptTest extends TestCase
 {
+    private const string CUSTOMER_GROUP_SCRIPT = '3.4.0.sql';
+
     /**
      * Accepted by MariaDB, a syntax error on MySQL 8 - which stops the update
      * in the middle of the script, FOREIGN_KEY_CHECKS still at 0. The portable
@@ -350,12 +352,12 @@ final class UpdateScriptTest extends TestCase
      * filled, then made required, in that order: made required first, the update
      * fails on the first existing customer (or, in a lax SQL mode, silently points
      * them all at group 0). `customer_version` keeps the history of the customer
-     * and goes through the same three steps.
+     * and goes through the same three steps, all in the 3.4.0 script.
      */
     #[DataProvider('tablesHoldingTheGroupOfACustomer')]
     public function testTheCustomerGroupColumnIsMadeRequiredOnlyAfterEveryRowHasAGroup(string $table): void
     {
-        $statements = $this->statementsOf($this->pendingScript());
+        $statements = $this->statementsOf($this->updateScripts()[self::CUSTOMER_GROUP_SCRIPT]);
 
         $defaultGroup = $this->positionOfTheFirstStatementMatching($statements, '/^INSERT\s+IGNORE\s+INTO\s+`customer_group`\s/i');
         $addNullable = $this->positionOfTheFirstStatementMatching($statements, \sprintf('/ALTER TABLE `%s` ADD COLUMN `customer_group_id` INTEGER NULL\b/', $table));
@@ -387,7 +389,7 @@ final class UpdateScriptTest extends TestCase
             }
         }
 
-        self::fail(\sprintf('The pending script has no statement matching %s.', $pattern));
+        self::fail(\sprintf('The script has no statement matching %s.', $pattern));
     }
 
     /**
