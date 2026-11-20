@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Resource\Cart;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Api\Routing\RequestOperationResolver;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\CartQuery;
 
@@ -34,6 +35,7 @@ readonly class CartController
         RequestStack $requestStack,
         EventDispatcherInterface $eventDispatcher,
         Session $session,
+        RequestOperationResolver $operationResolver,
     ): PropelResourceInterface {
         $request = $requestStack->getMainRequest();
         $request->setSession($session);
@@ -50,8 +52,6 @@ readonly class CartController
             throw new NotFoundHttpException('Cart not found.');
         }
 
-        $operation = $request->attributes->get('_api_operation');
-
-        return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operation->getNormalizationContext());
+        return $apiResourcePropelTransformerService->modelToResource(Cart::class, $cart, $operationResolver->resolve($request)->getNormalizationContext());
     }
 }

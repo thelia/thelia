@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Thelia\Api\Controller\Admin;
 
-use ApiPlatform\Metadata\Post;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +26,7 @@ use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
 use Thelia\Api\Bridge\Propel\Service\ItemFileResourceService;
 use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Api\Routing\RequestOperationResolver;
 use Thelia\Core\File\Exception\ProcessFileException;
 use Thelia\Core\File\LocalizedFileModelInterface;
 
@@ -42,6 +42,7 @@ class PostItemFileTranslationController
         ItemFileResourceService $itemFileResourceService,
         ApiResourcePropelTransformerService $apiResourceService,
         ValidatorInterface $validator,
+        RequestOperationResolver $operationResolver,
     ): PropelResourceInterface {
         /** @var class-string<ItemFileResourceInterface&PropelResourceInterface> $resourceClass */
         $resourceClass = $request->attributes->get('_api_resource_class');
@@ -82,9 +83,7 @@ class PostItemFileTranslationController
             throw new HttpException($exception->getCode() >= 400 && $exception->getCode() < 600 ? $exception->getCode() : Response::HTTP_UNSUPPORTED_MEDIA_TYPE, $exception->getMessage(), $exception);
         }
 
-        /** @var Post $operation */
-        $operation = $request->attributes->get('_api_operation');
-        $context = $operation->getNormalizationContext() ?? [];
+        $context = $operationResolver->resolve($request)->getNormalizationContext() ?? [];
         // The answer reads the file in the language that was just written.
         $context['filters']['locale'] = $locale;
 

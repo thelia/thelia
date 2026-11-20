@@ -14,15 +14,14 @@ declare(strict_types=1);
 
 namespace Thelia\Api\EventListener;
 
-use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Api\Routing\RequestOperationResolver;
 use Thelia\Api\Security\AdminApiResourcePermissions;
 use Thelia\Core\HttpFoundation\RequestPath;
 use Thelia\Core\Security\AccessManager;
@@ -82,7 +81,7 @@ final readonly class AdminApiPermissionListener
         private Security $security,
         private SecurityContext $securityContext,
         private AdminApiResourcePermissions $permissions,
-        private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private RequestOperationResolver $operationResolver,
     ) {
     }
 
@@ -99,7 +98,7 @@ final readonly class AdminApiPermissionListener
             return;
         }
 
-        $operation = $this->matchedOperation($request);
+        $operation = $this->operationResolver->find($request);
 
         if (!str_starts_with($path, self::ADMIN_API_PREFIX) && !$this->isAdminOperation($operation)) {
             return;
@@ -133,35 +132,6 @@ final readonly class AdminApiPermissionListener
 
         if (!$this->securityContext->isUserGranted(['ADMIN'], [$resource], [], [$access], $user)) {
             $this->deny($user, $request, $resource, $access);
-        }
-    }
-
-    /**
-     * The operation the router matched, whether or not API Platform has resolved it yet.
-     *
-     * API Platform sets "_api_operation" lazily, from its own listeners, which run after
-     * this one; what the router itself leaves on the request is the resource class and
-     * the operation name, which is enough to look the operation up.
-     */
-    private function matchedOperation(Request $request): ?Operation
-    {
-        $operation = $request->attributes->get('_api_operation');
-
-        if ($operation instanceof Operation) {
-            return $operation;
-        }
-
-        $resourceClass = $request->attributes->get('_api_resource_class');
-        $operationName = $request->attributes->get('_api_operation_name');
-
-        if (!\is_string($resourceClass) || !\is_string($operationName)) {
-            return null;
-        }
-
-        try {
-            return $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-        } catch (OperationNotFoundException) {
-            return null;
         }
     }
 
