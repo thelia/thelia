@@ -16,6 +16,7 @@ namespace Thelia\Test\Trait;
 
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Psr\Log\AbstractLogger;
+use Thelia\Domain\Search\SearchIndexingQueue;
 
 /**
  * Records the SQL statements a piece of code makes the database run.
@@ -31,6 +32,7 @@ trait RecordsSqlQueries
      */
     protected function recordSqlQueries(callable $work): array
     {
+        static::indexTheFixturesBeforeMeasuring();
         $connection = $this->getPropelConnection();
 
         if (!$connection instanceof ConnectionWrapper) {
@@ -58,6 +60,19 @@ trait RecordsSqlQueries
         }
 
         return $collector->statements;
+    }
+
+    protected static function indexTheFixturesBeforeMeasuring(): void
+    {
+        if (!method_exists(static::class, 'getContainer')) {
+            return;
+        }
+
+        $container = static::getContainer();
+
+        if ($container->has(SearchIndexingQueue::class)) {
+            $container->get(SearchIndexingQueue::class)->flush();
+        }
     }
 
     /**
