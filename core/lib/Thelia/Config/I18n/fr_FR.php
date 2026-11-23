@@ -1288,6 +1288,7 @@ return [
     'Lapsing customers (no order in the period, not dormant yet)' => 'Clients sans commande sur la période, pas encore dormants',
     'Dormant customers (no order for %days% days)' => 'Clients dormants (sans commande depuis %days% jours)',
     'Your company account is suspended: orders cannot be placed until it is reactivated.' => 'Le compte de votre société est suspendu : aucune commande ne peut être passée tant qu\'il n\'est pas réactivé.',
+    'Your company has no billing address yet: orders can be placed once it is chosen.' => 'Votre société n\'a pas encore d\'adresse de facturation : vous pourrez commander dès qu\'elle sera choisie.',
     'Your role in your company does not allow you to place orders.' => 'Votre rôle dans votre société ne vous permet pas de passer commande.',
     'This order of %total exceeds the %limit your company allows for a single order.' => 'Cette commande de %total dépasse les %limit que votre société autorise pour une seule commande.',
     'This order of %total, added to the %spent already ordered over the period, exceeds the %limit your company allows.' => 'Cette commande de %total, ajoutée aux %spent déjà commandés sur la période, dépasse les %limit que votre société autorise.',

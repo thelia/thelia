@@ -21,6 +21,7 @@ use Thelia\Domain\Company\Checkout\Exception\CompanyOrderNotPermittedException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyOrderRefusedException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyPeriodLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanySuspendedException;
+use Thelia\Domain\Company\Checkout\Exception\CompanyWithoutBillingAddressException;
 use Thelia\Domain\Company\CompanyPermission;
 use Thelia\Domain\Company\DTO\CompanyMembership;
 use Thelia\Domain\Company\Service\CompanyAmount;
@@ -46,7 +47,7 @@ final readonly class CompanySpendingJudge
 
     /**
      * Every reason this order is refused, in the order the buyer meets them: a suspended
-     * company or a role without the permission say everything there is to say, and the limits
+     * company, a company without a billing address or a role without the permission say everything there is to say, and the limits
      * are only read for a buyer who may order.
      *
      * @param string|null        $total         what the order costs in the default currency, null while
@@ -61,6 +62,10 @@ final readonly class CompanySpendingJudge
     {
         if (!$membership->companyActive) {
             return [new CompanySuspendedException()];
+        }
+
+        if (!$membership->companyHasBillingAddress) {
+            return [new CompanyWithoutBillingAddressException()];
         }
 
         if (!$membership->has(CompanyPermission::ORDER_PLACE)) {
