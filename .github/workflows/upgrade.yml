@@ -37,6 +37,26 @@ permissions:
   contents: read
 
 jobs:
+  published-scripts:
+    # The updater only runs the scripts of the versions above the installed one: a change to the
+    # script of a released version never reaches the shops that run that version.
+    name: Update scripts of released versions unchanged
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # The whole history with its tags, to know which versions are released.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check the update scripts the pull request changes
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: .github/scripts/upgrade/published-update-scripts.sh "origin/$BASE_REF"
+
   upgrade:
     name: Update from the latest release (PHP 8.3)
     runs-on: ubuntu-latest
