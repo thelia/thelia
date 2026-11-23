@@ -140,11 +140,18 @@ final readonly class CompanyAccountWriter
             $this->grantPolicy->assertIssuerMayGrant($issuer, $companyId, $role, $orderLimit, $periodLimit, $period);
         }
 
+        $limitsDiffer = $this->limitsDiffer($buyer, $orderLimit, $periodLimit, $period);
+
+        // Refused limits must not leave the new role written behind them.
+        if ($limitsDiffer) {
+            CompanyLimits::assertValid($orderLimit, $periodLimit, $period);
+        }
+
         if ((int) $role->getId() !== (int) $buyer->getCompanyRoleId()) {
             $this->facade->changeRole($customer, $roleCode);
         }
 
-        if ($this->limitsDiffer($buyer, $orderLimit, $periodLimit, $period)) {
+        if ($limitsDiffer) {
             $this->facade->changeLimits($customer, $orderLimit, $periodLimit, $period);
         }
 
