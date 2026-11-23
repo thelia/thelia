@@ -18,10 +18,11 @@ use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Model\ConfigQuery;
 
 /**
- * How the lines of an order were totalled when it was invoiced, in SQL for the totals read
- * from the database and in PHP for the amounts computed line by line: the order total, the
- * export of the orders, the sales journal and the refunds all read their lines through it, so
- * that a full refund gives back, to the cent, the goods the order charged.
+ * How the lines of an order were totalled when it was invoiced, in PHP for the amounts
+ * computed line by line: the sales journal and the refunds read their lines through it, so
+ * that a full refund gives back, to the cent, the goods the order charged. The same rule in
+ * SQL, for the order total and the queries that total many orders, is
+ * Thelia\Domain\Order\Sql\OrderAmountSql.
  *
  * - Before 2.4 (last_legacy_rounding_order_id), nothing was rounded, not even the quantity.
  * - Under the sum of roundings, each unit amount is rounded to the cent before the quantity.
@@ -35,16 +36,6 @@ use Thelia\Model\ConfigQuery;
  */
 final readonly class OrderLineRounding
 {
-    private const UNIT_PRICE = 'IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)';
-
-    /**
-     * An IF takes the type of its operands: a text promotional price makes the unit price of
-     * every line of the order a text, the price of a line that is not on promotion included.
-     */
-    private const UNIT_PRICE_AS_TEXT = 'IF(order_product.was_in_promo = 1, COALESCE(CAST(order_product.promo_price AS CHAR), \'\'), order_product.price)';
-
-    private const UNIT_TAX = 'IF(order_product.was_in_promo = 1, order_product_tax.promo_amount, order_product_tax.amount)';
-
     private const STORED_DECIMALS = 6;
 
     private function __construct(
@@ -147,46 +138,6 @@ final readonly class OrderLineRounding
     public function orderTotal(float $sumOfLineTotals): float
     {
         return $this->legacy ? $sumOfLineTotals : MoneyRounding::toTheCent($sumOfLineTotals);
-    }
-
-    /**
-     * lineTotal() in SQL, on a row of order_product, before the order total is rounded.
-     */
-    public function lineTotalSql(bool $taxed): string
-    {
-        $unitPrice = $this->textPromoPrice ? self::UNIT_PRICE_AS_TEXT : self::UNIT_PRICE;
-        $unitTax = self::UNIT_TAX;
-
-        if (!$this->legacy && !$this->roundingOfSums) {
-            $unitPrice = 'ROUND('.$unitPrice.', 2)';
-            $unitTax = 'ROUND('.$unitTax.', 2)';
-        }
-
-        $unitAmount = $taxed
-            ? '('.$unitPrice.' + (
-                SELECT COALESCE(SUM('.$unitTax.'), 0)
-                FROM order_product_tax
-                WHERE order_product_tax.order_product_id = order_product.id
-            ))'
-            : $unitPrice;
-
-        if ($this->legacy) {
-            return 'order_product.quantity * '.$unitAmount;
-        }
-
-        // The quantity column is a binary floating point number: a single precision FLOAT kept
-        // 0.7 kg as 0.69999998. A quantity carries three decimals at most.
-        $lineTotal = 'ROUND(order_product.quantity, '.QuantityScale::MAXIMUM_DECIMALS.') * '.$unitAmount;
-
-        if (!$this->roundingOfSums) {
-            return $lineTotal;
-        }
-
-        // A DOUBLE line total of 1.25 x 14.82 is 18.524999…, which ROUND() would bring down to
-        // 18.52 where the cart charged 18.53: it is rounded as a decimal at six places.
-        return $this->textPromoPrice || $this->floatLineRounding
-            ? 'ROUND('.$lineTotal.', 2)'
-            : 'ROUND(CAST('.$lineTotal.' AS DECIMAL(20,'.self::STORED_DECIMALS.')), 2)';
     }
 
     /**

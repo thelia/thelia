@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Model;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Domain\DataTransfer\Export\Type\OrderExport;
+use Thelia\Domain\Order\Sql\OrderAmountSql;
 use Thelia\Domain\OrderReturn\Service\RefundAmountCalculator;
 use Thelia\Domain\Pricing\MoneyRounding;
 use Thelia\Model\ConfigQuery;
@@ -27,8 +29,9 @@ use Thelia\Model\OrderProductTax;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * The total of an order, the lines its invoice is booked with and the refund of all its lines
- * apply one rounding rule: a full refund gives back, to the cent, the goods that were charged.
+ * The total of an order, the lines its invoice is booked with, the refund of all its lines and
+ * the SQL that totals many orders at once apply one rounding rule: a full refund gives back, to
+ * the cent, the goods that were charged.
  * The sums are compared to the cent as the order rounds its total (MoneyRounding), the same
  * on every PHP version.
  */
@@ -42,7 +45,10 @@ final class OrderLineRoundingAgreementTest extends IntegrationTestCase
     }
 
     /**
-     * @return iterable<string, array{string, list<array{float|string, string, list<string>}>}>
+     * A line is [quantity, price, taxes] and, for a line sold on promotion, [..., promotional
+     * price, promotional taxes].
+     *
+     * @return iterable<string, array{0: string, 1: list<array<mixed>>, 2?: string}>
      */
     public static function orderProvider(): iterable
     {
@@ -60,54 +66,63 @@ final class OrderLineRoundingAgreementTest extends IntegrationTestCase
             yield $label.', a quantity stored as a single precision float' => [$rule, [[0.69999998, '0.75', ['0']]]];
             yield $label.', a quantity stored as a single precision float, on a dear line' => [$rule, [[0.69999998, '25.75', ['0']]]];
             yield $label.', several lines' => [$rule, [[3, '1.005', ['0.201', '0.0502']], [2, '4.175', ['0.835']], ['0.333', '9.99', ['1.998', '0.0999']]]];
+            yield $label.', two lines sold by measure' => [$rule, [['1.25', '14.82', ['0']], ['1.25', '14.82', ['0']]]];
+            yield $label.', a promotional price and an order discount' => [$rule, [['1.25', '14.82', ['2.964'], '12.345', ['2.469']], [3, '1.005', ['0.201']]], '5.00'];
         }
     }
 
     /**
-     * @param list<array{float|string, string, list<string>}> $lines
+     * @param list<array<mixed>> $lines
      */
     #[DataProvider('orderProvider')]
-    public function testTheBookedLinesAddUpToTheGoodsOfTheOrder(string $rule, array $lines): void
+    public function testTheBookedLinesAddUpToTheGoodsOfTheOrder(string $rule, array $lines, string $discount = '0'): void
     {
-        $order = $this->orderUnder($rule, $lines);
+        $order = $this->orderUnder($rule, $lines, $discount);
         [$goods, $goodsTax] = $this->goodsOf($order);
 
         $booked = 0.0;
         $bookedTax = 0.0;
-        foreach ($lines as [$quantity, $price, $taxes]) {
+        foreach ($lines as $line) {
+            [$quantity, $price, $taxes] = [$line[0], $line[3] ?? $line[1], $line[4] ?? $line[2]];
             [$amount, $tax] = $order->getLineAmounts((float) $quantity, (float) $price, array_map('floatval', $taxes));
             $booked += $amount;
             $bookedTax += $tax;
         }
 
         self::assertSame(MoneyRounding::toTheCent($goods), MoneyRounding::toTheCent($booked + $bookedTax), 'The booked lines must add up to the goods of the order, tax included.');
-        self::assertSame(MoneyRounding::toTheCent($goodsTax), MoneyRounding::toTheCent($bookedTax), 'The booked tax must be the tax of the goods of the order.');
+        // The tax of an order is the gap between its two rounded totals: the line taxes may add
+        // up to half a cent more (18.425 excluding tax, 22.1125 tax included). The journal
+        // books the totals of the order and weighs its rates with the lines.
+        self::assertSame(MoneyRounding::toTheCent($goods - $goodsTax), MoneyRounding::toTheCent($booked), 'The booked lines must add up to the goods of the order, excluding tax.');
     }
 
     /**
-     * @param list<array{float|string, string, list<string>}> $lines
+     * @param list<array<mixed>> $lines
      */
     #[DataProvider('orderProvider')]
-    public function testRefundingEveryLineGivesBackTheGoodsOfTheOrder(string $rule, array $lines): void
+    public function testRefundingEveryLineGivesBackTheGoodsOfTheOrder(string $rule, array $lines, string $discount = '0'): void
     {
-        $order = $this->orderUnder($rule, $lines);
-        [$goods] = $this->goodsOf($order);
+        $order = $this->orderUnder($rule, $lines, $discount);
 
         $returned = [];
         foreach ($order->getOrderProducts() as $orderProduct) {
             $returned[] = ['order_product' => $orderProduct, 'quantity' => (float) $orderProduct->getQuantity()];
         }
 
-        self::assertSame(MoneyRounding::toTheCent($goods), MoneyRounding::toTheCent((new RefundAmountCalculator())->linesRefund($order, $returned)));
+        // A full refund gives back the goods less the discount, the postage aside.
+        $tax = 0;
+        $paidForTheGoods = $order->getTotalAmount($tax, false, true);
+
+        self::assertSame(MoneyRounding::toTheCent($paidForTheGoods), MoneyRounding::toTheCent((new RefundAmountCalculator())->linesRefund($order, $returned)));
     }
 
     /**
-     * @param list<array{float|string, string, list<string>}> $lines
+     * @param list<array<mixed>> $lines
      */
     #[DataProvider('orderProvider')]
-    public function testTheExportStatesTheGoodsOfTheOrder(string $rule, array $lines): void
+    public function testTheExportStatesTheGoodsOfTheOrder(string $rule, array $lines, string $discount = '0'): void
     {
-        $order = $this->orderUnder($rule, $lines);
+        $order = $this->orderUnder($rule, $lines, $discount);
         [$goods, $goodsTax] = $this->goodsOf($order);
 
         // getDataJsonCache() writes its row cache there without creating it.
@@ -129,6 +144,27 @@ final class OrderLineRoundingAgreementTest extends IntegrationTestCase
     }
 
     /**
+     * The SQL total a list of orders filters and sums on is the total the order charges:
+     * goods, less the discount, plus the postage.
+     *
+     * @param list<array<mixed>> $lines
+     */
+    #[DataProvider('orderProvider')]
+    public function testTheSqlTotalIsTheTotalTheOrderCharges(string $rule, array $lines, string $discount = '0'): void
+    {
+        $order = $this->orderUnder($rule, $lines, $discount);
+        $charged = MoneyRounding::toTheCent($order->getTotalAmount());
+
+        $sql = 'SELECT '.OrderAmountSql::orderTotal('`order`').' AS total FROM `order` WHERE `order`.id = :order_id';
+
+        $statement = Propel::getConnection()->prepare($sql);
+        OrderAmountSql::bindRoundingPivots($statement, $sql);
+        $statement->bindValue('order_id', $order->getId(), \PDO::PARAM_INT);
+        $statement->execute();
+        self::assertSame($charged, MoneyRounding::toTheCent((float) $statement->fetchColumn()));
+    }
+
+    /**
      * @return array{float, float} the goods of the order tax included, and their tax
      */
     private function goodsOf(Order $order): array
@@ -140,13 +176,19 @@ final class OrderLineRoundingAgreementTest extends IntegrationTestCase
     }
 
     /**
-     * @param list<array{float|string, string, list<string>}> $lines
+     * @param list<array<mixed>> $lines
      */
-    private function orderUnder(string $rule, array $lines): Order
+    private function orderUnder(string $rule, array $lines, string $discount = '0'): Order
     {
-        $order = $this->createFixtureFactory()->order(overrides: ['discount' => 0]);
+        // The fixture takes the postage, not the discount: both are set on the order.
+        $order = $this->createFixtureFactory()->order(overrides: ['postage' => '0' === $discount ? '0' : '4.90']);
+        $order->setDiscount($discount)->save();
 
-        foreach ($lines as [$quantity, $price, $taxes]) {
+        foreach ($lines as $lineSpec) {
+            [$quantity, $price, $taxes] = $lineSpec;
+            $promoPrice = $lineSpec[3] ?? null;
+            $promoTaxes = $lineSpec[4] ?? $taxes;
+
             $line = (new OrderProduct())
                 ->setOrderId($order->getId())
                 ->setProductRef('REF')
@@ -155,13 +197,13 @@ final class OrderLineRoundingAgreementTest extends IntegrationTestCase
                 ->setTitle('Line')
                 ->setQuantity((float) $quantity)
                 ->setPrice($price)
-                ->setPromoPrice($price)
+                ->setPromoPrice($promoPrice ?? $price)
                 ->setWasNew(0)
-                ->setWasInPromo(0);
+                ->setWasInPromo(null === $promoPrice ? 0 : 1);
             $line->save();
 
-            foreach ($taxes as $tax) {
-                (new OrderProductTax())->setOrderProductId($line->getId())->setTitle('VAT')->setAmount($tax)->setPromoAmount($tax)->save();
+            foreach ($taxes as $index => $tax) {
+                (new OrderProductTax())->setOrderProductId($line->getId())->setTitle('VAT')->setAmount($tax)->setPromoAmount($promoTaxes[$index])->save();
             }
         }
 

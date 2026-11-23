@@ -43,7 +43,7 @@ final class OrderAmountSql
      * ConfigQuery has no constant for it: it is not a mode a shop can be set to,
      * only a state some rows are frozen in.
      */
-    private const int ROUNDING_MODE_LEGACY = 0;
+    public const int ROUNDING_MODE_LEGACY = 0;
 
     /**
      * The total of one order line, with or without its taxes, rounded by the rule of its
@@ -166,24 +166,16 @@ final class OrderAmountSql
     }
 
     /**
-     * Chooses, line by line, how the promotional price is read. The choice is made on the line and not on the
-     * price operand: an IF takes the type of its operands, so a text read for the frozen orders would make the
-     * unit price of every order a text.
+     * One line total under a rule the caller already knows, with no pivot to bind: the
+     * statement reads the lines of one order whose rule was looked up beforehand, as
+     * Thelia\Model\Order::getTotalAmount() does. The other expressions of this class choose
+     * the same rule line by line from the pivots. Thelia\Domain\Pricing\OrderLineRounding is
+     * the same rule in PHP.
+     *
+     * @param int $roundingMode one of the ConfigQuery::ROUNDING_MODE_* constants, or
+     *                          self::ROUNDING_MODE_LEGACY for an order frozen by the 2.4 upgrade
      */
-    private static function lineTotalOfOrder(string $orderProductAlias, string $orderIdColumn, int $roundingMode, bool $taxed): string
-    {
-        return 'CASE
-                                WHEN '.$orderIdColumn.' <= :'.self::TEXT_PROMO_PRICE_PIVOT.' THEN '.self::roundedLineTotal($orderProductAlias, $orderIdColumn, $roundingMode, $taxed, true).'
-                                ELSE '.self::roundedLineTotal($orderProductAlias, $orderIdColumn, $roundingMode, $taxed, false).'
-                            END';
-    }
-
-    /**
-     * One line total, rounded where the given mode says to round: on the unit
-     * amounts under sum of roundings, on the line total under rounding of sums,
-     * nowhere at all for an order frozen by the 2.4 upgrade.
-     */
-    private static function roundedLineTotal(string $orderProductAlias, string $orderIdColumn, int $roundingMode, bool $taxed, bool $textPromoPrice): string
+    public static function lineTotalUnderRule(string $orderProductAlias, int $roundingMode, bool $taxed, bool $textPromoPrice, bool $floatLineRounding): string
     {
         $unitPrice = $textPromoPrice ? self::unitPriceAsText($orderProductAlias) : self::unitPrice($orderProductAlias);
         $roundUnitAmounts = ConfigQuery::ROUNDING_MODE_SUM_OF_ROUNDINGS === $roundingMode;
@@ -201,30 +193,48 @@ final class OrderAmountSql
                             ))';
         }
 
+        // An order frozen by the 2.4 upgrade was totalled on the quantity as stored, its
+        // binary error included (Order::getTotalAmountLegacy()).
+        if (self::ROUNDING_MODE_LEGACY === $roundingMode) {
+            return $orderProductAlias.'.quantity * '.$unitAmount;
+        }
+
         $lineTotal = self::soldQuantity($orderProductAlias).' * '.$unitAmount;
 
         if (ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS !== $roundingMode) {
             return $lineTotal;
         }
 
-        // A DOUBLE line total is rounded as a decimal (18.524999… is 18.53), as
-        // Order::getTotalAmount() rounds it, except on a frozen line or on an order placed
-        // before the line totals were rounded so: their order was invoiced on the floating
-        // point figure.
-        if ($textPromoPrice) {
-            return 'ROUND('.$lineTotal.', 2)';
-        }
+        // A DOUBLE line total is rounded as a decimal (18.524999… is 18.53), as the cart
+        // rounds it, except on an order read with a text promotional price or placed before
+        // the line totals were rounded so: it was invoiced on the floating point figure.
+        return $textPromoPrice || $floatLineRounding
+            ? 'ROUND('.$lineTotal.', 2)'
+            : 'ROUND(CAST('.$lineTotal.' AS DECIMAL(20,6)), 2)';
+    }
+
+    /**
+     * Chooses, line by line, how the promotional price is read and, under the rounding of
+     * sums, how the line total is rounded. The choice is made on the line and not on the
+     * price operand: an IF takes the type of its operands, so a text read for the frozen
+     * orders would make the unit price of every order a text.
+     */
+    private static function lineTotalOfOrder(string $orderProductAlias, string $orderIdColumn, int $roundingMode, bool $taxed): string
+    {
+        $floatLineRoundingBranch = ConfigQuery::ROUNDING_MODE_ROUNDING_OF_SUMS === $roundingMode
+            ? 'WHEN '.$orderIdColumn.' <= :'.self::FLOAT_LINE_ROUNDING_PIVOT.' THEN '.self::lineTotalUnderRule($orderProductAlias, $roundingMode, $taxed, false, true)
+            : '';
 
         return 'CASE
-                                WHEN '.$orderIdColumn.' <= :'.self::FLOAT_LINE_ROUNDING_PIVOT.' THEN ROUND('.$lineTotal.', 2)
-                                ELSE ROUND(CAST('.$lineTotal.' AS DECIMAL(20,6)), 2)
+                                WHEN '.$orderIdColumn.' <= :'.self::TEXT_PROMO_PRICE_PIVOT.' THEN '.self::lineTotalUnderRule($orderProductAlias, $roundingMode, $taxed, true, true).'
+                                '.$floatLineRoundingBranch.'
+                                ELSE '.self::lineTotalUnderRule($orderProductAlias, $roundingMode, $taxed, false, false).'
                             END';
     }
 
     /**
      * The quantity of a line as it was sold: the column is a binary floating point number
-     * (0.7 kg read back as 0.69999998), and a quantity carries three decimals at most. See
-     * Thelia\Model\Order::storedQuantity().
+     * (0.7 kg read back as 0.69999998), and a quantity carries three decimals at most.
      */
     public static function soldQuantity(string $orderProductAlias): string
     {
