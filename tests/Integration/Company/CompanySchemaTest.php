@@ -232,10 +232,11 @@ final class CompanySchemaTest extends IntegrationTestCase
         $customer = $this->customer();
         $digest = hash('sha256', 'a token');
         $insert = \sprintf(
-            "INSERT INTO `company_invitation_use` (`fingerprint`, `company_id`, `customer_id`, `used_at`) VALUES ('%s', %d, %d, NOW())",
+            "INSERT INTO `company_invitation_use` (`fingerprint`, `company_id`, `customer_id`, `addressee`, `used_at`) VALUES ('%s', %d, %d, '%s', NOW())",
             $digest,
             $company->getId(),
             $customer->getId(),
+            hash('sha256', (string) $customer->getEmail()),
         );
         $this->connection()->exec($insert);
 

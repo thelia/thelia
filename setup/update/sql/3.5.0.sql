@@ -145,10 +145,12 @@ SET @statement := IF(@create_table, 'CREATE TABLE `company_invitation_use`
     `fingerprint` CHAR(64) NOT NULL COMMENT \'SHA-256 of the invitation token, in hexadecimal; the key makes an invitation usable once, whatever became of the buyer it took in\',
     `company_id` INTEGER NOT NULL,
     `customer_id` INTEGER COMMENT \'the account the invitation took in; NULL once that account is deleted\',
+    `addressee` CHAR(64) NOT NULL COMMENT \'SHA-256 of the address the invitation was sent to, lowercased, in hexadecimal: the earlier join of an address is found whatever address its account holds now\',
     `used_at` DATETIME NOT NULL,
     PRIMARY KEY (`fingerprint`),
     INDEX `idx_company_invitation_use_company_id` (`company_id`),
     INDEX `idx_company_invitation_use_customer_id` (`customer_id`),
+    INDEX `idx_company_invitation_use_company_id_addressee` (`company_id`, `addressee`),
     CONSTRAINT `fk_company_invitation_use_company_id`
         FOREIGN KEY (`company_id`)
         REFERENCES `company` (`id`)

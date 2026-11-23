@@ -197,7 +197,7 @@ final readonly class CompanyInvitationService
             $invitation->period,
             function (ConnectionInterface $connection) use ($invitation, $fingerprint, $customer): void {
                 $this->assertTheIssuerStillMayGive($invitation, $connection);
-                $this->recordTheUse($fingerprint, $invitation->companyId, (int) $customer->getId(), $connection);
+                $this->recordTheUse($fingerprint, $invitation, (int) $customer->getId(), $connection);
             },
         );
     }
@@ -240,12 +240,13 @@ final readonly class CompanyInvitationService
     /**
      * The key of the digest is what lets one acceptance through when two arrive together.
      */
-    private function recordTheUse(string $fingerprint, int $companyId, int $customerId, ConnectionInterface $connection): void
+    private function recordTheUse(string $fingerprint, CompanyInvitation $invitation, int $customerId, ConnectionInterface $connection): void
     {
         $use = new CompanyInvitationUse();
         $use->setFingerprint($fingerprint);
-        $use->setCompanyId($companyId);
+        $use->setCompanyId($invitation->companyId);
         $use->setCustomerId($customerId);
+        $use->setAddressee(CompanyInvitationAddressee::digest($invitation->email));
         $use->setUsedAt($this->clock->now()->format('Y-m-d H:i:s'));
 
         try {
@@ -268,12 +269,13 @@ final readonly class CompanyInvitationService
 
     private function normalize(string $email): string
     {
-        return mb_strtolower(trim($email));
+        return CompanyInvitationAddressee::normalize($email);
     }
 
     /**
      * An invitation issued before its addressee last joined the company through another one is
-     * spent with it: once detached, they do not come back with an invitation sent before.
+     * spent with it: once detached, they do not come back with an invitation sent before. The
+     * earlier join is found by the address it was sent to, not by the one its account holds now.
      */
     private function addresseeJoinedSinceIssued(CompanyInvitation $invitation, \DateTimeImmutable $now): bool
     {
@@ -282,10 +284,8 @@ final readonly class CompanyInvitationService
 
         return CompanyInvitationUseQuery::create()
             ->filterByCompanyId($invitation->companyId)
+            ->filterByAddressee(CompanyInvitationAddressee::digest($invitation->email))
             ->filterByUsedAt($issuedAt, Criteria::GREATER_EQUAL)
-            ->useCustomerQuery()
-                ->filterByEmail($invitation->email)
-            ->endUse()
             ->exists();
     }
 
