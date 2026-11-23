@@ -17,6 +17,8 @@ namespace Thelia\Domain\Company;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
+use Psr\Clock\ClockInterface;
+use Symfony\Component\Clock\NativeClock;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Company\DTO\CompanyData;
@@ -34,6 +36,7 @@ use Thelia\Domain\Company\Exception\InvalidCompanyIdentifiersException;
 use Thelia\Domain\Company\Exception\LastCompanyAdministratorException;
 use Thelia\Domain\Company\Exception\UnknownCompanyException;
 use Thelia\Domain\Company\Exception\UnknownCompanyRoleException;
+use Thelia\Domain\Company\Service\CompanyInvitationAddressee;
 use Thelia\Domain\Company\Service\CompanyLimits;
 use Thelia\Domain\Company\Service\CompanyMembershipReader;
 use Thelia\Domain\Company\Service\CompanyPermissionChecker;
@@ -44,6 +47,7 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Company;
 use Thelia\Model\CompanyCustomer;
 use Thelia\Model\CompanyCustomerQuery;
+use Thelia\Model\CompanyDeparture;
 use Thelia\Model\CompanyQuery;
 use Thelia\Model\CompanyRole;
 use Thelia\Model\CompanyRoleQuery;
@@ -72,6 +76,7 @@ final readonly class CompanyFacade
         private CompanyRoleResolver $roleResolver,
         private CompanyMembershipReader $membershipReader,
         private ?CompanyPermissionChecker $permissionChecker = null,
+        private ClockInterface $clock = new NativeClock(),
     ) {
     }
 
@@ -213,6 +218,9 @@ final readonly class CompanyFacade
      * Cuts the link between a customer and the company, once the shared addresses the customer
      * created belong to the first administrator who stays: the one with the smallest link.
      *
+     * The departure of the address the account holds is recorded with it: an invitation to the
+     * company sent to that address before no longer takes anybody in.
+     *
      * @throws CustomerNotInCompanyException
      * @throws LastCompanyAdministratorException when the customer is the last administrator, or
      *                                           holds shared addresses and no administrator stays to take them
@@ -222,7 +230,7 @@ final readonly class CompanyFacade
         $customerId = (int) $customer->getId();
         $companyId = $this->companyIdOf($customerId);
 
-        $detached = $this->inTransaction(function (ConnectionInterface $connection) use ($customerId, $companyId): CompanyCustomerDetachedEvent {
+        $detached = $this->inTransaction(function (ConnectionInterface $connection) use ($customer, $customerId, $companyId): CompanyCustomerDetachedEvent {
             $this->lockCompanyById($companyId, $connection);
 
             $buyer = $this->buyerOf($customerId, $companyId, $connection);
@@ -241,6 +249,7 @@ final readonly class CompanyFacade
 
             $buyer->delete($connection);
             CompanyCustomerTableMap::clearInstancePool();
+            $this->recordTheDeparture($companyId, (string) $customer->getEmail(), $connection);
 
             return new CompanyCustomerDetachedEvent($companyId, $customerId, (string) $role->getCode(), $addressIds, [] === $addressIds ? null : $successor);
         });
@@ -526,6 +535,15 @@ final readonly class CompanyFacade
 
             throw $exception;
         }
+    }
+
+    private function recordTheDeparture(int $companyId, string $email, ConnectionInterface $connection): void
+    {
+        (new CompanyDeparture())
+            ->setCompanyId($companyId)
+            ->setAddressee(CompanyInvitationAddressee::digest($email))
+            ->setLeftAt($this->clock->now()->format('Y-m-d H:i:s'))
+            ->save($connection);
     }
 
     private function lockCompany(Company $company, ConnectionInterface $connection): void

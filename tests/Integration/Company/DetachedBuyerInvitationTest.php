@@ -17,6 +17,8 @@ namespace Thelia\Tests\Integration\Company;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Domain\Company\CompanyFacade;
 use Thelia\Domain\Company\CompanyRoleCode;
 use Thelia\Domain\Company\Exception\InvalidCompanyInvitationException;
 use Thelia\Domain\Company\Service\CompanyGrantPolicy;
@@ -103,7 +105,67 @@ final class DetachedBuyerInvitationTest extends CompanyDomainTestCase
         self::assertNull($this->buyerRow($newAccount), 'The detached person is a buyer of the company again.');
     }
 
-    private function service(MockClock $clock): CompanyInvitationService
+    public function testAnInvitationPendingWhenTheMerchantAttachedTheBuyerDoesNotLetThemBackInOnceDetached(): void
+    {
+        $clock = new MockClock('2026-11-18 10:00:00');
+        $service = $this->service($clock);
+
+        $company = $this->company();
+        $administrator = $this->buyerOf($company, CompanyRoleCode::ADMINISTRATOR);
+        $invited = $this->customer('leaver@acme.test');
+
+        $pending = $service->createToken($company, 'leaver@acme.test', CompanyRoleCode::BUYER, $administrator, null, null, null);
+        $clock->sleep(60);
+
+        // The merchant attaches the account from the back office, as the admin API does.
+        $this->buyerOf($company, CompanyRoleCode::BUYER, $invited);
+        self::assertNotNull($this->buyerRow($invited));
+
+        $this->facade->detach($invited);
+        $this->reader->forget((int) $invited->getId());
+        self::assertNull($this->buyerRow($invited));
+
+        $rejoined = true;
+
+        try {
+            $service->accept($pending, $invited);
+        } catch (InvalidCompanyInvitationException) {
+            $rejoined = false;
+        }
+
+        self::assertFalse($rejoined, 'The detached buyer rejoined the company with the invitation pending before the detachment.');
+        self::assertNull($this->buyerRow($invited), 'The detached buyer is a buyer of the company again.');
+    }
+
+    public function testAnInvitationSentAfterTheDetachmentTakesTheBuyerBackIn(): void
+    {
+        $clock = new MockClock('2026-11-18 10:00:00');
+        $dispatcher = static::getContainer()->get('event_dispatcher');
+        \assert($dispatcher instanceof EventDispatcherInterface);
+        $facade = new CompanyFacade($dispatcher, new CompanyRoleResolver(), $this->reader, null, $clock);
+        $service = $this->service($clock, $facade);
+
+        $company = $this->company();
+        $administrator = $this->buyerOf($company, CompanyRoleCode::ADMINISTRATOR);
+        $invited = $this->customer('leaver@acme.test');
+
+        $first = $service->createToken($company, 'leaver@acme.test', CompanyRoleCode::BUYER, $administrator, null, null, null);
+        $service->accept($first, $invited);
+        $clock->sleep(60);
+
+        $facade->detach($invited);
+        $this->reader->forget((int) $invited->getId());
+        self::assertNull($this->buyerRow($invited));
+
+        // The company changes its mind and invites the same address again.
+        $clock->sleep(60);
+        $again = $service->createToken($company, 'leaver@acme.test', CompanyRoleCode::BUYER, $administrator, null, null, null);
+        $service->accept($again, $invited);
+
+        self::assertNotNull($this->buyerRow($invited), 'An invitation sent after the detachment did not take the buyer back in.');
+    }
+
+    private function service(MockClock $clock, ?CompanyFacade $facade = null): CompanyInvitationService
     {
         $window = static fn (): RateLimiterFactory => new RateLimiterFactory(
             ['id' => 'pipe', 'policy' => 'sliding_window', 'limit' => 1000, 'interval' => '1 hour'],
@@ -111,7 +173,7 @@ final class DetachedBuyerInvitationTest extends CompanyDomainTestCase
         );
 
         return new CompanyInvitationService(
-            $this->facade,
+            $facade ?? $this->facade,
             new CompanyRoleResolver(),
             new CompanyGrantPolicy($this->reader, $this->checker),
             new CompanyInvitationLimiter($window(), $window(), static::getContainer()->get('request_stack')),
