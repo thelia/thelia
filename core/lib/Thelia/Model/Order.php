@@ -23,6 +23,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Service\SequenceOrderRefGenerator;
+use Thelia\Domain\Order\Sql\OrderAmountSql;
 use Thelia\Domain\Payment\Enum\PaymentTransactionState;
 use Thelia\Domain\Payment\Enum\PaymentTransactionType;
 use Thelia\Domain\Payment\Service\PaymentAmount;
@@ -348,12 +349,10 @@ class Order extends BaseOrder
      */
     private function buildTotalAmountQuery(int $roundingMode, bool $textPromoPrice, bool $floatLineRounding): string
     {
-        $rounding = OrderLineRounding::inMode($roundingMode, $textPromoPrice, $floatLineRounding);
-
         return '
             SELECT
-                SUM('.$rounding->lineTotalSql(true).') as total_taxed_price,
-                SUM('.$rounding->lineTotalSql(false).') as total_untaxed_price
+                SUM('.OrderAmountSql::lineTotalUnderRule(OrderProductTableMap::TABLE_NAME, $roundingMode, true, $textPromoPrice, $floatLineRounding).') as total_taxed_price,
+                SUM('.OrderAmountSql::lineTotalUnderRule(OrderProductTableMap::TABLE_NAME, $roundingMode, false, $textPromoPrice, $floatLineRounding).') as total_untaxed_price
             FROM '.OrderProductTableMap::TABLE_NAME.'
             WHERE '.OrderProductTableMap::COL_ORDER_ID.' = :order_id
         ';
