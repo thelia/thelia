@@ -10,13 +10,6 @@ Not released yet.
 - Ten exports in the `thelia.export.reports` category write those reports as CSV, for the period of the job (the period of the first orders for the cohorts and the lifetime value; without a start, from the first order of the shop; without an end, up to today): `thelia.export.customer_cohorts` (the cross table of the screen, a pair of columns per month elapsed: the customers and their share of the cohort), `thelia.export.customer_lifetime_value` (a column per month elapsed with the cumulated value per customer) and `thelia.export.customer_segments`. The cohort and lifetime value exports have `_quarter` variants, and each has a `_paid` variant that counts the paid orders only. They are restricted to the sale units of the administrator who runs them, and can be sent by e-mail as scheduled reports: the summary gives the new customers and the repeat rate, the average lifetime value and lifespan, or the size of each segment. Every order variant leaves the cancelled and refunded orders out.
 - Back office (default-twig theme): a "Customer loyalty" screen beside the sales report (`/admin/reports/customers/cohorts`, `/lifetime`, `/segments`), read with the customer permission, shows the cohort table over 12, 24 or 36 months of first orders, by month or by quarter, the lifetime value of the cohorts with the average lifetime value, lifespan and repeat rate, and the segments of a preset period or free dates, for every order created or the paid orders only. Its top customers tab leads to the "By customer" tab of the sales report, over the days and on the orders on screen, and the dormancy threshold opens in the edit dialog of its variable. The figures are kept 15 minutes like those of the sales report. Measured on 60,680 orders of 15,010 customers over five years: the cohort table takes 0.4 s over 24 months and 1.1 s over five years, the lifetime summary 1.1 s, the segments 1.2 s, under 16 MB.
 
-# 3.4.1
-
-Not released yet.
-
-## Back-office hooks
-
-- The install and the 3.4.1 update seed `product.combinations-table-header` and `product.combinations-table-row`, the two hooks through which the combinations tab of a product (default-twig theme) offers a column to modules. A module listens to a hook only if the hook has a row in the `hook` table: without these two, the listener was dropped when the container was built ("Hook ... is unknown.") and the column never showed.
 ## Company accounts
 
 - A company (`company`) groups several customer accounts, its buyers (`company_customer`, one company per customer). It carries a name, a registration number and a VAT number, an optional parent company (informative only), an e-mail address that receives a copy of the order e-mails, an internal note, a billing address and an active flag. A shop with no company runs the queries it ran before, with one more read of `company_customer` on the account lists of orders and addresses.
@@ -41,6 +34,14 @@ Not released yet.
 
 - Company accounts add a constructor argument with no default to two services: `Thelia\Action\Customer::__construct()` takes `Thelia\Domain\Company\CompanyFacade` last, and `Thelia\Domain\Order\Service\OrderFactory::__construct()` takes `Thelia\Domain\Company\Checkout\CompanyOrderAttacher` last. A subclass that declares its own constructor passes them on to the parent.
 - Company accounts change three Flexy components and one form. `FlexyBundle\Components\Forms\Address\Base::__construct()` takes `Thelia\Domain\Addressing\Service\AddressAccess` last, `FlexyBundle\Components\Forms\Address\Account::__construct()` takes `AddressAccess` and `FlexyBundle\Service\CompanyAccount` last, `FlexyBundle\Components\Layouts\AccountOrders\Base::__construct()` takes an optional `CompanyAccount`, and `FlexyBundle\Form\AddressEditForm` gains a constructor that takes the translator after the arguments of `AddressCreateForm`. A child theme that overrides one of them passes the new arguments on to the parent.
+
+# 3.4.1
+
+Not released yet.
+
+## Back-office hooks
+
+- The install and the 3.4.1 update seed `product.combinations-table-header` and `product.combinations-table-row`, the two hooks through which the combinations tab of a product (default-twig theme) offers a column to modules. A module listens to a hook only if the hook has a row in the `hook` table: without these two, the listener was dropped when the container was built ("Hook ... is unknown.") and the column never showed.
 
 # 3.4.0
 
