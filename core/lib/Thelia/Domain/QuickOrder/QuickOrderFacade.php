@@ -21,6 +21,7 @@ use Thelia\Domain\Cart\DTO\CartItemAddDTO;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
 use Thelia\Domain\Catalog\Bundle\BundleDisplayedStock;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\QuantityScale;
 use Thelia\Domain\Catalog\Stock\SellableStock;
 use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\CustomerList\PurchaseListFacade;
@@ -170,7 +171,9 @@ final readonly class QuickOrderFacade
                 $before = $inCart[(int) $item->getId()] ?? 0.0;
                 $inCart[(int) $item->getId()] = (float) $item->getQuantity();
 
-                $tableLines[] = $inCart[(int) $item->getId()] - $before >= $line->quantity
+                // Judged in millionths, as the cart rounds the sum (CartItem::addQuantity):
+                // 0.3 - 0.1 is not 0.2 in floats.
+                $tableLines[] = QuantityScale::micro($inCart[(int) $item->getId()] - $before) >= QuantityScale::micro($line->quantity)
                     ? $line->markAdded()
                     : $line->refusedByTheCart($this->sellableFor($item->getProductSaleElements(), $cart) - $before);
             }
