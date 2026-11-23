@@ -363,4 +363,36 @@ PREPARE list_quantity_to_double_statement FROM @statement;
 EXECUTE list_quantity_to_double_statement;
 DEALLOCATE PREPARE list_quantity_to_double_statement;
 
+-- ---------------------------------------------------------------------
+-- PDF hooks of the picking slip template
+--
+-- The picking slip template calls these hooks, but no seed declared them: a module
+-- subscribing to one was dropped when the container was built ("Hook preparation.css
+-- is unknown."). A hook is only added when no PDF hook has its code, and its titles
+-- only for the languages it has none in. The script can be replayed.
+-- ---------------------------------------------------------------------
+
+INSERT INTO `hook` (`code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`)
+SELECT `missing`.`code`, 3, 0, 0, 1, 1, 1, NOW(), NOW()
+FROM (
+    SELECT 'preparation.css' AS `code`
+    UNION ALL SELECT 'preparation.after-information'
+    UNION ALL SELECT 'preparation.product-location'
+) AS `missing`
+WHERE NOT EXISTS (SELECT 1 FROM `hook` WHERE `hook`.`code` = `missing`.`code` AND `hook`.`type` = 3);
+
+-- English and French titles, as the fresh install seeds them: the other languages have no wording yet.
+INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`)
+SELECT `hook`.`id`, `lang`.`locale`,
+    CASE `lang`.`locale` WHEN 'en_US' THEN `missing`.`title_en` WHEN 'fr_FR' THEN `missing`.`title_fr` ELSE NULL END,
+    NULL, NULL
+FROM (
+    SELECT 'preparation.css' AS `code`, 'Picking slip - CSS' AS `title_en`, 'Bon de préparation - CSS' AS `title_fr`
+    UNION ALL SELECT 'preparation.after-information', 'Picking slip - after the order information', 'Bon de préparation - après les informations de la commande'
+    UNION ALL SELECT 'preparation.product-location', 'Picking slip - storage location of a line', 'Bon de préparation - emplacement de stockage d\'une ligne'
+) AS `missing`
+JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 3
+JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
+WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
+
 SET FOREIGN_KEY_CHECKS = 1;
