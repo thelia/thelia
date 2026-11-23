@@ -30,6 +30,7 @@ final readonly class CompanyMembership
         public string $roleCode,
         public array $permissions,
         public bool $companyActive,
+        public bool $companyHasBillingAddress,
         public ?string $orderLimit,
         public ?string $periodLimit,
         public ?string $period,

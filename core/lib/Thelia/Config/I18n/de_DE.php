@@ -911,6 +911,7 @@ return [
     'Credit note %ref: it was issued in another currency without exchange rate, it cannot be booked in the shop currency.' => 'Gutschrift %ref: In einer anderen Währung ohne Wechselkurs ausgestellt, kann sie nicht in der Shopwährung gebucht werden.',
     'The account of commercial credit notes "%account" is not an account number: letters and digits only, 20 at most.' => 'Das Konto der kaufmännischen Gutschriften "%account" ist keine Kontonummer: nur Buchstaben und Ziffern, höchstens 20.',
     'Your company account is suspended: orders cannot be placed until it is reactivated.' => 'Das Konto Ihres Unternehmens ist gesperrt: Bestellungen sind erst nach der Reaktivierung möglich.',
+    'Your company has no billing address yet: orders can be placed once it is chosen.' => 'Ihr Unternehmen hat noch keine Rechnungsadresse: Bestellungen sind möglich, sobald eine gewählt wurde.',
     'Your role in your company does not allow you to place orders.' => 'Ihre Rolle in Ihrem Unternehmen erlaubt es Ihnen nicht, Bestellungen aufzugeben.',
     'This order of %total exceeds the %limit your company allows for a single order.' => 'Diese Bestellung über %total überschreitet die %limit, die Ihr Unternehmen für eine einzelne Bestellung erlaubt.',
     'This order of %total, added to the %spent already ordered over the period, exceeds the %limit your company allows.' => 'Diese Bestellung über %total überschreitet zusammen mit den bereits im Zeitraum bestellten %spent die %limit, die Ihr Unternehmen erlaubt.',

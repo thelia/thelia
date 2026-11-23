@@ -62,7 +62,7 @@ class CompanyMembershipReader implements ResetInterface
 
     private function read(int $customerId): ?CompanyMembership
     {
-        /** @var array{CompanyId: int|string, OrderLimit: string|null, PeriodLimit: string|null, Period: string|null, RoleCode: string, RolePermissions: string, CompanyActive: int|string}|null $row */
+        /** @var array{CompanyId: int|string, OrderLimit: string|null, PeriodLimit: string|null, Period: string|null, RoleCode: string, RolePermissions: string, CompanyActive: int|string, CompanyBillingAddressId: int|string|null}|null $row */
         $row = CompanyCustomerQuery::create()
             ->filterByCustomerId($customerId)
             ->joinCompany()
@@ -70,7 +70,8 @@ class CompanyMembershipReader implements ResetInterface
             ->withColumn('CompanyRole.Code', 'RoleCode')
             ->withColumn('CompanyRole.Permissions', 'RolePermissions')
             ->withColumn('Company.Active', 'CompanyActive')
-            ->select(['CompanyId', 'OrderLimit', 'PeriodLimit', 'Period', 'RoleCode', 'RolePermissions', 'CompanyActive'])
+            ->withColumn('Company.BillingAddressId', 'CompanyBillingAddressId')
+            ->select(['CompanyId', 'OrderLimit', 'PeriodLimit', 'Period', 'RoleCode', 'RolePermissions', 'CompanyActive', 'CompanyBillingAddressId'])
             ->findOne();
 
         if (null === $row) {
@@ -83,6 +84,7 @@ class CompanyMembershipReader implements ResetInterface
             roleCode: (string) $row['RoleCode'],
             permissions: CompanyRole::decodePermissions((string) $row['RolePermissions']),
             companyActive: 1 === (int) $row['CompanyActive'],
+            companyHasBillingAddress: null !== $row['CompanyBillingAddressId'],
             orderLimit: null === $row['OrderLimit'] ? null : (string) $row['OrderLimit'],
             periodLimit: null === $row['PeriodLimit'] ? null : (string) $row['PeriodLimit'],
             period: null === $row['Period'] ? null : (string) $row['Period'],
