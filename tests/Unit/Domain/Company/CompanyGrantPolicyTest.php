@@ -141,6 +141,7 @@ final class CompanyGrantPolicyTest extends TestCase
                 CompanyPermission::COMPANY_EDIT,
             ],
             companyActive: true,
+            companyHasBillingAddress: true,
             orderLimit: $orderLimit,
             periodLimit: $periodLimit,
             period: $period,

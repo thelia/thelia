@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Company;
 
+use Thelia\Domain\Company\Checkout\Exception\CompanyWithoutBillingAddressException;
 use Thelia\Domain\Company\CompanyRoleCode;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Model\Address;
@@ -93,33 +94,25 @@ final class OrderBillingAddressTest extends OrderCompanyTestCase
         self::assertSame($deliveryStreet, OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId())?->getAddress1(), 'The delivery is still where the buyer asked.');
     }
 
-    public function testACompanyWithoutBillingAddressAndACustomerWithoutCompanyKeepTheInvoiceOfTheCart(): void
+    public function testACustomerWithoutCompanyKeepsTheInvoiceOfTheCart(): void
     {
-        $company = $this->company();
-        $member = $this->buyerOf($company);
         $alone = $this->customer();
-
-        foreach ([$member, $alone] as $customer) {
-            $cart = $this->cartOf($customer, '100');
-            $keptStreet = $cart->getCartAddressRelatedByAddressInvoiceId()?->getAddress1();
-
-            $order = $this->placeFromTheCartAddresses($cart, $customer);
-
-            self::assertSame($keptStreet, $this->invoiceOf($order)->getAddress1());
-        }
-    }
-
-    public function testAnOrderNotPlacedAtTheKeyboardKeepsTheInvoiceOfTheCart(): void
-    {
-        $company = $this->company();
-        $this->billingAddressOf($company, 'Lyon');
-        $buyer = $this->buyerOf($company);
-        $cart = $this->cartOf($buyer, '100');
+        $cart = $this->cartOf($alone, '100');
         $keptStreet = $cart->getCartAddressRelatedByAddressInvoiceId()?->getAddress1();
 
-        $order = $this->placeFromTheCartAddresses($cart, $buyer, atTheKeyboard: false);
+        $order = $this->placeFromTheCartAddresses($cart, $alone);
 
-        self::assertSame($keptStreet, $this->invoiceOf($order)->getAddress1(), 'An installment of a subscription or an order of the back office is invoiced as it says.');
+        self::assertSame($keptStreet, $this->invoiceOf($order)->getAddress1());
+        self::assertNull($order->getCompanyId());
+    }
+
+    public function testTheBuyerOfACompanyWithoutBillingAddressCannotOrderWhereTheOrderIsWritten(): void
+    {
+        $member = $this->buyerOf($this->company(withBillingAddress: false));
+
+        $this->expectException(CompanyWithoutBillingAddressException::class);
+
+        $this->placeFromTheCartAddresses($this->cartOf($member, '100'), $member);
     }
 
     private function billingAddressOf(Company $company, string $city): Address

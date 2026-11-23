@@ -96,6 +96,25 @@ final class OrderSpendingCheckoutTest extends OrderCompanyTestCase
         self::assertNull(OrderQuery::create()->filterByCartId($cart->getId())->findOne(), 'Nothing was written for the cart.');
     }
 
+    public function testTheBuyerOfACompanyWithoutBillingAddressIsRefusedWithAMessageTheBuyerCanReadAndNothingIsWritten(): void
+    {
+        $company = $this->company(withBillingAddress: false);
+        $buyer = $this->buyerOf($company);
+        $cart = $this->readyCart($buyer, '150');
+
+        try {
+            $this->placement()->place($this->requestFor($cart, $buyer));
+            self::fail('A company without billing address placed an order.');
+        } catch (CheckoutRefusedException $refusal) {
+            self::assertCount(1, $refusal->violations);
+            self::assertSame(CompanySpendingStepProvider::CODE, $refusal->violations[0]->stepCode);
+            self::assertSame('company-without-billing-address', $refusal->violations[0]->code);
+            self::assertStringContainsString('no billing address', $refusal->violations[0]->message);
+        }
+
+        self::assertNull(OrderQuery::create()->filterByCartId($cart->getId())->findOne(), 'Nothing was written for the cart.');
+    }
+
     public function testACartOverTheLimitIsRefusedByTheCheckoutBeforeAnythingIsWritten(): void
     {
         [$buyer, $company] = $this->limitedBuyer();
