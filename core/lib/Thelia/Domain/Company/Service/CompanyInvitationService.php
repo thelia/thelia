@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Domain\Company\Service;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Psr\Clock\ClockInterface;
@@ -150,15 +151,17 @@ final readonly class CompanyInvitationService
         }
 
         $invitation = $this->decode($payload);
+        $now = $this->clock->now();
 
-        if (null === $invitation || $invitation->expiresAt <= $this->clock->now()->getTimestamp()) {
+        if (null === $invitation || $invitation->expiresAt <= $now->getTimestamp()) {
             return null;
         }
 
         if (!CompanyQuery::create()->filterById($invitation->companyId)->exists()
             || null === $this->roleResolver->resolve($invitation->companyId, $invitation->roleCode)
             || $this->belongsToABuyer($invitation->email)
-            || CompanyInvitationUseQuery::create()->filterByFingerprint($this->fingerprint($token))->exists()) {
+            || CompanyInvitationUseQuery::create()->filterByFingerprint($this->fingerprint($token))->exists()
+            || $this->addresseeJoinedSinceIssued($invitation, $now)) {
             return null;
         }
 
@@ -266,6 +269,24 @@ final readonly class CompanyInvitationService
     private function normalize(string $email): string
     {
         return mb_strtolower(trim($email));
+    }
+
+    /**
+     * An invitation issued before its addressee last joined the company through another one is
+     * spent with it: once detached, they do not come back with an invitation sent before.
+     */
+    private function addresseeJoinedSinceIssued(CompanyInvitation $invitation, \DateTimeImmutable $now): bool
+    {
+        // Written in the time zone the uses are recorded in.
+        $issuedAt = $now->setTimestamp($invitation->expiresAt - self::LIFETIME_IN_SECONDS)->format('Y-m-d H:i:s');
+
+        return CompanyInvitationUseQuery::create()
+            ->filterByCompanyId($invitation->companyId)
+            ->filterByUsedAt($issuedAt, Criteria::GREATER_EQUAL)
+            ->useCustomerQuery()
+                ->filterByEmail($invitation->email)
+            ->endUse()
+            ->exists();
     }
 
     private function belongsToABuyer(string $email): bool
