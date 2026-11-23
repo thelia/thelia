@@ -16,6 +16,7 @@ namespace Thelia\Tests\Integration\Domain\QuickOrder;
 
 use Thelia\Domain\Catalog\DTO\ReferenceQuantity;
 use Thelia\Domain\Catalog\DTO\ReferenceQuantityLines;
+use Thelia\Domain\Catalog\Quantity\QuantityRule;
 use Thelia\Domain\QuickOrder\DTO\QuickOrderLine;
 use Thelia\Domain\QuickOrder\Enum\LineStatus;
 use Thelia\Domain\QuickOrder\QuickOrderFacade;
@@ -85,6 +86,33 @@ final class ReferenceResolverPriceTiersTest extends IntegrationTestCase
         self::assertEqualsWithDelta(10.0, $this->unitPriceOf(1), 0.000001);
         self::assertEqualsWithDelta(10.0, $this->unitPriceOf(49), 0.000001);
         self::assertEqualsWithDelta(9.0, $this->unitPriceOf(50), 0.000001, 'the tier of the quantity typed, not the first one');
+    }
+
+    /**
+     * A combination sold by measure reaches its tier on a decimal quantity, alone or as the sum
+     * of two lines: 1.25 + 1.75 kg are the 3 kg of the tier, not 2.9999999.
+     */
+    public function testADecimalQuantityIsPricedAtTheTierItReaches(): void
+    {
+        (new QuantityRule(minQuantity: 0.25, step: 0.25, decimals: 2))->applyTo($this->pse);
+        $this->pse->save($this->getPropelConnection());
+        $list = $this->priceList('TIERS');
+        $this->assignToCustomer($list, $this->customer);
+        $this->priceListItem($list, $this->pse, '10', 1);
+        $this->priceListItem($list, $this->pse, '9', 3);
+        $this->forgetRequestMemos();
+
+        self::assertEqualsWithDelta(10.0, $this->unitPriceOf(2.75), 0.000001);
+        self::assertEqualsWithDelta(9.0, $this->unitPriceOf(3.0), 0.000001);
+
+        $table = $this->resolver->resolve($this->customer, new ReferenceQuantityLines([
+            new ReferenceQuantity((string) $this->pse->getRef(), 1.25),
+            new ReferenceQuantity((string) $this->product->getRef(), 1.75),
+        ]), Currency::getDefaultCurrency());
+
+        self::assertSame(LineStatus::Resolved, $table->lines[0]->status);
+        self::assertEqualsWithDelta(9.0, $table->lines[0]->untaxedUnitPrice, 0.000001);
+        self::assertEqualsWithDelta(9.0, $table->lines[1]->untaxedUnitPrice, 0.000001);
     }
 
     public function testTwoLinesThatSettleOnTheSameSaleElementReachTheTierTogetherAsTheCartMergesThem(): void
@@ -177,12 +205,12 @@ final class ReferenceResolverPriceTiersTest extends IntegrationTestCase
         self::assertEqualsWithDelta(9.0, (float) $table->lines[0]->untaxedUnitPrice, 0.000001);
     }
 
-    private function unitPriceOf(int $quantity, ?Cart $cart = null): float
+    private function unitPriceOf(float $quantity, ?Cart $cart = null): float
     {
         return (float) $this->lineOf($quantity, $cart)->untaxedUnitPrice;
     }
 
-    private function lineOf(int $quantity, ?Cart $cart = null): QuickOrderLine
+    private function lineOf(float $quantity, ?Cart $cart = null): QuickOrderLine
     {
         return $this->resolver->resolve(
             $this->customer,

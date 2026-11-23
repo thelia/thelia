@@ -162,6 +162,27 @@ final class QuickOrderFacadeTest extends IntegrationTestCase
         self::assertSame([[(int) $byMeasure->getId(), 1.25]], $this->cartLines($cart));
     }
 
+    /**
+     * 0.1 + 0.2 is 0.30000000000000004 in floats: the cart rounds the sum to six decimals,
+     * the table must judge what the cart took the same way, or it tells the buyer that a
+     * line the cart took was refused.
+     */
+    public function testADecimalQuantityAddedToALineAlreadyInTheCartIsToldAdded(): void
+    {
+        $cart = $this->factory->cart($this->customer, ['currency' => $this->currency]);
+        $byMeasure = $this->saleElements();
+        (new QuantityRule(minQuantity: 0.1, step: 0.1, decimals: 1))->applyTo($byMeasure);
+        $byMeasure->save();
+
+        $this->facade->addToCart($this->customer, $cart, self::lines([(string) $byMeasure->getRef() => 0.1]));
+        $table = $this->facade->addToCart($this->customer, $cart, self::lines([(string) $byMeasure->getRef() => 0.2]));
+
+        self::assertSame([[(int) $byMeasure->getId(), 0.3]], $this->cartLines($cart));
+        self::assertSame(LineStatus::Resolved, $table->lines[0]->status);
+        self::assertTrue($table->lines[0]->added, (string) $table->lines[0]->refusalReason);
+        self::assertNull($table->lines[0]->refusalReason);
+    }
+
     public function testAPurchaseListLineOffTheRulesIsToldWhenTheListIsLoaded(): void
     {
         $saleElements = $this->saleElements();
