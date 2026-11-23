@@ -22,8 +22,9 @@ use Thelia\Domain\Report\Customer\CustomerSegment;
 /**
  * The new, returning, lapsing and dormant customers of the period, one segment each: how many they
  * are, what they spent in the period and its share of the revenue, what they spent since their
- * first order and its share. A customer without an order in the period is dormant after the number
- * of days of the shop setting customer_dormant_after_days, lapsing before.
+ * first order and its share. A customer whose last order is older than the number of days of the
+ * shop setting customer_dormant_after_days at the end of the period is dormant, even if they ordered
+ * earlier in the period; a customer without an order in the period is lapsing before that.
  */
 class CustomerSegmentsExport extends AbstractCustomerReportExport
 {

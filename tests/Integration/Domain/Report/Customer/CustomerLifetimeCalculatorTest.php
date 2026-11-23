@@ -282,7 +282,7 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
         $this->assertSegmentsAddUp($atThirtyDays, 4);
     }
 
-    public function testACustomerWhoOrderedInAPeriodLongerThanTheThresholdIsNotDormantInIt(): void
+    public function testACustomerWithoutAnOrderForTheThresholdAtTheEndOfALongerPeriodIsDormantEvenIfTheyOrderedInIt(): void
     {
         $february = $this->customer();
         $this->order($february, '2001-02-10 10:00:00', '30.000000');
@@ -292,8 +292,10 @@ final class CustomerLifetimeCalculatorTest extends IntegrationTestCase
         $year = new SalesReportCriteria(new \DateTimeImmutable('2001-01-01 00:00:00'), new \DateTimeImmutable('2001-12-31 23:59:59'));
         $segments = $this->bySegment($this->calculator->segments($year, 180));
 
-        self::assertSame(2, $segments['new']->customerCount, 'Both ordered first in the year, whenever they ordered last.');
-        self::assertSame(0, $segments['dormant']->customerCount);
+        self::assertSame([1, 30.0], [$segments['dormant']->customerCount, $segments['dormant']->periodRevenue], 'Last order on February 10, more than 180 days before December 31: dormant, with what they spent in the year.');
+        self::assertSame([1, 10.0], [$segments['new']->customerCount, $segments['new']->periodRevenue], 'Only the customer of December is new.');
+        self::assertSame(0, $segments['returning']->customerCount);
+        self::assertSame(0, $segments['lapsing']->customerCount);
         $this->assertSegmentsAddUp($segments, 2);
     }
 

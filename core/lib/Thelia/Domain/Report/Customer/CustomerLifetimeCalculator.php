@@ -162,10 +162,10 @@ final readonly class CustomerLifetimeCalculator
     }
 
     /**
-     * Every customer who ordered up to the end of the period, in one segment each: new and
-     * returning customers ordered in the period, and share its revenue; the others did not, and
-     * are dormant when their last order is older than the given number of days at the end of the
-     * period, lapsing otherwise. Each segment also gives what its customers spent since their
+     * Every customer who ordered up to the end of the period, in one segment each: dormant when
+     * their last order is older than the given number of days at the end of the period, even if
+     * they ordered earlier in it; otherwise new or returning when they ordered in the period,
+     * lapsing when they did not. Each segment also gives what its customers spent since their
      * first order, against what every customer spent up to the end of the period: both shares
      * add up to the whole.
      *
@@ -199,10 +199,10 @@ final readonly class CustomerLifetimeCalculator
             classified AS (
                 SELECT
                     customer_life.*,
-                    customer_life.period_orders > 0 AND customer_life.first_at >= bound.period_start AS is_new,
-                    customer_life.period_orders > 0 AND customer_life.first_at < bound.period_start AS is_returning,
-                    customer_life.period_orders = 0 AND customer_life.last_at >= bound.dormant_before AS is_lapsing,
-                    customer_life.period_orders = 0 AND customer_life.last_at < bound.dormant_before AS is_dormant
+                    customer_life.last_at >= bound.dormant_before AND customer_life.period_orders > 0 AND customer_life.first_at >= bound.period_start AS is_new,
+                    customer_life.last_at >= bound.dormant_before AND customer_life.period_orders > 0 AND customer_life.first_at < bound.period_start AS is_returning,
+                    customer_life.last_at >= bound.dormant_before AND customer_life.period_orders = 0 AS is_lapsing,
+                    customer_life.last_at < bound.dormant_before AS is_dormant
                 FROM customer_life
                 CROSS JOIN bound
             )
