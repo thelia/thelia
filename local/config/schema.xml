@@ -731,6 +731,19 @@
       <index-column name="addressee" />
     </index>
   </table>
+  <table name="company_departure" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="company_id" required="true" type="INTEGER" />
+    <column description="SHA-256 of the address the account held when it left, lowercased, in hexadecimal: an invitation sent to that address before is spent" name="addressee" required="true" size="64" type="CHAR" />
+    <column name="left_at" required="true" type="DATETIME" />
+    <foreign-key foreignTable="company" name="fk_company_departure_company_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="company_id" />
+    </foreign-key>
+    <index name="idx_company_departure_company_id_addressee">
+      <index-column name="company_id" />
+      <index-column name="addressee" />
+    </index>
+  </table>
   <table name="price_list" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column description="stable machine name a deployment references a price list by, not meant as a label" name="code" required="true" size="64" type="VARCHAR" />

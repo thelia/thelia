@@ -27,7 +27,8 @@ FROM `config` WHERE `config`.`name` = 'customer_dormant_after_days';
 -- (`order.company_id`, `order.placed_by_customer_id`), and an address can be
 -- shared with a company (`address.company_id`). An invitation to join a company
 -- is used once: `company_invitation_use` keeps the digest of each token that
--- was. A shop without a company is untouched: every new column is nullable and no row is rewritten.
+-- was, and `company_departure` the digest of the address of each buyer the
+-- company detached, which spends the invitations sent to it before. A shop without a company is untouched: every new column is nullable and no row is rewritten.
 --
 -- Replayable: each table is created through PREPARE/EXECUTE only when it is
 -- missing (a bare CREATE TABLE IF NOT EXISTS commits the transaction
@@ -161,6 +162,25 @@ SET @statement := IF(@create_table, 'CREATE TABLE `company_invitation_use`
         REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'company_departure');
+SET @statement := IF(@create_table, 'CREATE TABLE `company_departure`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `company_id` INTEGER NOT NULL,
+    `addressee` CHAR(64) NOT NULL COMMENT \'SHA-256 of the address the account held when it left, lowercased, in hexadecimal: an invitation sent to that address before is spent\',
+    `left_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_company_departure_company_id_addressee` (`company_id`, `addressee`),
+    CONSTRAINT `fk_company_departure_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
 PREPARE create_table_statement FROM @statement;
 EXECUTE create_table_statement;

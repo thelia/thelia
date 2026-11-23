@@ -866,6 +866,27 @@ CREATE TABLE `company_invitation_use`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- company_departure
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `company_departure`;
+
+CREATE TABLE `company_departure`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `company_id` INTEGER NOT NULL,
+    `addressee` CHAR(64) NOT NULL COMMENT 'SHA-256 of the address the account held when it left, lowercased, in hexadecimal: an invitation sent to that address before is spent',
+    `left_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_company_departure_company_id_addressee` (`company_id`, `addressee`),
+    CONSTRAINT `fk_company_departure_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- price_list
 -- ---------------------------------------------------------------------
 

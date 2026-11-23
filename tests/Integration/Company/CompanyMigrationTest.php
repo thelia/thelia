@@ -34,7 +34,7 @@ final class CompanyMigrationTest extends IntegrationTestCase
     private const BLOCK_TITLE = '-- Company accounts';
 
     /** Created by the block, children first. */
-    private const NEW_TABLES = ['company_invitation_use', 'company_customer', 'company_role_i18n', 'company_role', 'company'];
+    private const NEW_TABLES = ['company_departure', 'company_invitation_use', 'company_customer', 'company_role_i18n', 'company_role', 'company'];
 
     /** Changed by the block, whose whole shape is compared. */
     private const ALTERED_TABLES = ['address', 'order', 'order_version'];

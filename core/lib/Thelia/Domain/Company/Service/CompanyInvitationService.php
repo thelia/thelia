@@ -30,6 +30,7 @@ use Thelia\Domain\Company\Exception\UnknownCompanyRoleException;
 use Thelia\Model\Company;
 use Thelia\Model\CompanyCustomer;
 use Thelia\Model\CompanyCustomerQuery;
+use Thelia\Model\CompanyDepartureQuery;
 use Thelia\Model\CompanyInvitationUse;
 use Thelia\Model\CompanyInvitationUseQuery;
 use Thelia\Model\CompanyQuery;
@@ -132,7 +133,8 @@ final readonly class CompanyInvitationService
     /**
      * What the invitation says, or null when the token is not one this shop issued, was altered,
      * has expired, or can no longer be used: the company or the role is gone, the address
-     * already belongs to a buyer, or the invitation was used.
+     * already belongs to a buyer, the invitation was used, or its addressee joined or left the
+     * company since it was sent.
      */
     public function read(string $token): ?CompanyInvitation
     {
@@ -161,7 +163,8 @@ final readonly class CompanyInvitationService
             || null === $this->roleResolver->resolve($invitation->companyId, $invitation->roleCode)
             || $this->belongsToABuyer($invitation->email)
             || CompanyInvitationUseQuery::create()->filterByFingerprint($this->fingerprint($token))->exists()
-            || $this->addresseeJoinedSinceIssued($invitation, $now)) {
+            || $this->addresseeJoinedSinceIssued($invitation, $now)
+            || $this->addresseeLeftSinceIssued($invitation, $now)) {
             return null;
         }
 
@@ -279,14 +282,32 @@ final readonly class CompanyInvitationService
      */
     private function addresseeJoinedSinceIssued(CompanyInvitation $invitation, \DateTimeImmutable $now): bool
     {
-        // Written in the time zone the uses are recorded in.
-        $issuedAt = $now->setTimestamp($invitation->expiresAt - self::LIFETIME_IN_SECONDS)->format('Y-m-d H:i:s');
-
         return CompanyInvitationUseQuery::create()
             ->filterByCompanyId($invitation->companyId)
             ->filterByAddressee(CompanyInvitationAddressee::digest($invitation->email))
-            ->filterByUsedAt($issuedAt, Criteria::GREATER_EQUAL)
+            ->filterByUsedAt($this->issuedAt($invitation, $now), Criteria::GREATER_EQUAL)
             ->exists();
+    }
+
+    /**
+     * An invitation issued before its addressee last left the company is spent, however they had
+     * joined it: by another invitation, or attached by the merchant.
+     */
+    private function addresseeLeftSinceIssued(CompanyInvitation $invitation, \DateTimeImmutable $now): bool
+    {
+        return CompanyDepartureQuery::create()
+            ->filterByCompanyId($invitation->companyId)
+            ->filterByAddressee(CompanyInvitationAddressee::digest($invitation->email))
+            ->filterByLeftAt($this->issuedAt($invitation, $now), Criteria::GREATER_EQUAL)
+            ->exists();
+    }
+
+    /**
+     * Written in the time zone the uses and the departures are recorded in.
+     */
+    private function issuedAt(CompanyInvitation $invitation, \DateTimeImmutable $now): string
+    {
+        return $now->setTimestamp($invitation->expiresAt - self::LIFETIME_IN_SECONDS)->format('Y-m-d H:i:s');
     }
 
     private function belongsToABuyer(string $email): bool
