@@ -91,6 +91,8 @@ final class AiUsageApiTest extends ApiTestCase
         $token = $this->authenticateAsAdmin();
         $connection = (new AiConnection())->setCode('pin')->setTitle('pin')->setProvider('mistral')->setJurisdiction('eu');
         $connection->save();
+        // A module may ship settings of its own usages (TheliaCMS 2.42 does): count what this test adds.
+        $settings = AiUsageSettingQuery::create()->count();
 
         foreach ([
             ['usageId' => 'nobody.declared'],
@@ -108,7 +110,7 @@ final class AiUsageApiTest extends ApiTestCase
             self::assertSame(422, $response->getStatusCode(), json_encode($override).' '.$response->getContent());
         }
 
-        self::assertSame(0, AiUsageSettingQuery::create()->count());
+        self::assertSame($settings, AiUsageSettingQuery::create()->count());
     }
 
     public function testAUsageHasOneSetting(): void

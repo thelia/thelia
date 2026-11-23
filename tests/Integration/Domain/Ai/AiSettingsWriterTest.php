@@ -322,6 +322,9 @@ final class AiSettingsWriterTest extends IntegrationTestCase
 
     public function testAUsageSettingThatBreaksARuleIsRefused(): void
     {
+        // A module may ship settings of its own usages (TheliaCMS 2.42 does): count what this test adds.
+        $settings = AiUsageSettingQuery::create()->count();
+
         foreach ([
             ['tier' => 'turbo'],
             ['effort' => 'turbo'],
@@ -339,7 +342,7 @@ final class AiSettingsWriterTest extends IntegrationTestCase
             }
         }
 
-        self::assertSame(0, AiUsageSettingQuery::create()->count());
+        self::assertSame($settings, AiUsageSettingQuery::create()->count());
 
         $this->writer->saveUsageSetting(null, 'aiprobe.writing');
 
