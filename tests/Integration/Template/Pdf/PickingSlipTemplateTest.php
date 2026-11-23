@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Template\Pdf;
 
+use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Domain\Order\Service\PickingSlipPdfService;
 use Thelia\Model\Order;
@@ -135,6 +137,64 @@ final class PickingSlipTemplateTest extends IntegrationTestCase
     private function factory(): FixtureFactory
     {
         return new FixtureFactory($this->getPropelConnection());
+    }
+
+    /**
+     * A module writes the storage location of each line on `preparation.product-location`: the column
+     * shows it, and the picker walks the locations in order, a line without one coming last by reference.
+     */
+    public function testTheLinesAModuleLocatesShowTheirLocationAndArePickedInItsOrder(): void
+    {
+        $this->skipUnlessTheThemeHasThePickingSlip("locations['line_' ~ first.ID]");
+
+        $factory = $this->factory();
+        $order = $factory->order();
+        $first = $factory->orderProduct($order, ['productRef' => 'AA-FIRST', 'title' => 'Shelf B item']);
+        $last = $factory->orderProduct($order, ['productRef' => 'ZZ-LAST', 'title' => 'Shelf A item']);
+        $factory->orderProduct($order, ['productRef' => 'MM-MIDDLE', 'title' => 'Unlocated item']);
+        $locations = [(int) $first->getId() => 'B-02', (int) $last->getId() => 'A-01'];
+
+        $listener = static function (HookRenderEvent $event) use ($locations): void {
+            $event->add($locations[(int) $event->getArgument('order_product')] ?? '');
+        };
+        $dispatcher = $this->getService('event_dispatcher');
+        $dispatcher->addListener('hook.'.TemplateDefinition::PDF.'.preparation.product-location', $listener);
+
+        try {
+            [$html] = $this->render([$order]);
+        } finally {
+            $dispatcher->removeListener('hook.'.TemplateDefinition::PDF.'.preparation.product-location', $listener);
+        }
+
+        self::assertStringContainsString('Location', $html, 'A module wrote a location: the column is there.');
+        self::assertStringContainsString('A-01', $html);
+        self::assertStringContainsString('B-02', $html);
+        self::assertLessThan(strpos($html, 'Shelf B item'), strpos($html, 'Shelf A item'), 'A-01 before B-02, whatever the references.');
+        self::assertLessThan(strpos($html, 'Unlocated item'), strpos($html, 'Shelf B item'), 'A line without a location comes after the located ones.');
+    }
+
+    /**
+     * An order reference Code 128 cannot encode has no barcode, its reference printed in clear, and the other
+     * orders of the batch keep theirs: the batch is printed.
+     */
+    public function testAReferenceWithAnAccentIsPrintedWithoutBarcodeAndTheBatchGoesOn(): void
+    {
+        $this->skipUnlessTheThemeHasThePickingSlip('set barcode = barcode_code128');
+
+        $factory = $this->factory();
+        $accented = $factory->order();
+        $accented->setRef('CMD-ÉTÉ-'.random_int(1000, 9999))->save();
+        $plain = $factory->order();
+        foreach ([$accented, $plain] as $order) {
+            $factory->orderProduct($order, ['title' => 'Widget']);
+        }
+
+        [$html, $pdf] = $this->render([$accented, $plain]);
+
+        self::assertSame(2, $this->pageCount($pdf));
+        self::assertStringContainsString($accented->getRef(), $html);
+        self::assertStringNotContainsString('alt="'.$accented->getRef().'"', $html, 'no barcode image for the accented reference');
+        self::assertStringContainsString('alt="'.$plain->getRef().'"', $html, 'the other order keeps its barcode');
     }
 
     /**
