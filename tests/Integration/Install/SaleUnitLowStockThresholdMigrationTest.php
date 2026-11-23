@@ -88,7 +88,14 @@ final class SaleUnitLowStockThresholdMigrationTest extends IntegrationTestCase
 
     private function takeTheTableBackToA34Shop(): void
     {
-        $this->connection()->exec('ALTER TABLE `sale_unit_product_sale_elements` DROP COLUMN IF EXISTS `low_stock_threshold`');
+        // DROP COLUMN IF EXISTS is MariaDB only: the CI runs on MySQL.
+        $exists = (int) $this->connection()->query(
+            "SELECT COUNT(*) FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'sale_unit_product_sale_elements' AND `COLUMN_NAME` = 'low_stock_threshold'"
+        )->fetchColumn();
+
+        if (0 < $exists) {
+            $this->connection()->exec('ALTER TABLE `sale_unit_product_sale_elements` DROP COLUMN `low_stock_threshold`');
+        }
     }
 
     /**
