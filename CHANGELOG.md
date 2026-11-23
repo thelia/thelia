@@ -14,6 +14,7 @@ Not released yet. The update script is `setup/update/sql/3.5.0.sql`.
 ## Catalog
 
 - Decimal quantities in the quick order and the purchase lists (#521). A sale element sold by measure is ordered there with its decimals, 1.25 kg as on its product page, and its minimum, step and decimals apply through `QuantityPolicy`: 1.255 on a sale element sold with two decimals is refused with the number of decimals it takes, a decimal on a sale element sold by the piece with "The quantity must be a whole number.". The quick order no longer sends a sale element sold by measure to its product page. A cart or an order saved as a list keeps its decimals (they were rounded to the unit). `customer_list_item.quantity` moves from `INTEGER` to `DOUBLE`, a saved whole quantity is kept as it is. The quick order and purchase list endpoints of the front API take a decimal `quantity` and the purchase list reads return it as a number (`2.0`).
+- `Thelia\Domain\Catalog\Quantity\QuantityScale` is no longer `@internal`: a theme or a module compares quantities in millionths (`isTheSameQuantity()`, `micro()`) and reads the finest decimals a sale element takes (`MAXIMUM_DECIMALS`) from it (#521).
 
 ## Breaking changes
 
