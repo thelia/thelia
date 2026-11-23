@@ -18,9 +18,8 @@ namespace Thelia\Domain\Catalog\Quantity;
  * Quantities compared as integers. A quantity is stored with six decimals at most
  * (DECIMAL(16,6) for the rules, DOUBLE for the quantities), so it is read as a whole
  * number of millionths first, then counted in steps of 10^-decimals: two floats are
- * never compared for equality.
- *
- * @internal
+ * never compared for equality. Themes and modules compare and bound quantities with it
+ * rather than rewriting the arithmetic.
  */
 final class QuantityScale
 {
