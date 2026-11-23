@@ -56,6 +56,17 @@ final class RefusalMessagesTest extends IntegrationTestCase
         self::assertSame("Le compte de votre société est suspendu : aucune commande ne peut être passée tant qu'il n'est pas réactivé.", $refusals[0]->getMessage());
     }
 
+    public function testACompanyWithoutBillingAddressIsSaidInFrenchAndInEnglish(): void
+    {
+        $this->speak('fr_FR');
+        $refusals = $this->judge()->refusalsFor($this->membership(billingAddress: false), '1.000000', static fn (): string => '0');
+        self::assertSame("Votre société n'a pas encore d'adresse de facturation : vous pourrez commander dès qu'elle sera choisie.", $refusals[0]->getMessage());
+
+        $this->speak('en_US');
+        $refusals = $this->judge()->refusalsFor($this->membership(billingAddress: false), '1.000000', static fn (): string => '0');
+        self::assertSame('Your company has no billing address yet: orders can be placed once it is chosen.', $refusals[0]->getMessage());
+    }
+
     public function testARoleWithoutThePermissionIsSaidInFrench(): void
     {
         $this->speak('fr_FR');
@@ -129,7 +140,7 @@ final class RefusalMessagesTest extends IntegrationTestCase
     /**
      * @param list<string>|null $permissions
      */
-    private function membership(bool $active = true, ?string $orderLimit = null, ?string $periodLimit = null, ?string $period = null, ?array $permissions = null): CompanyMembership
+    private function membership(bool $active = true, ?string $orderLimit = null, ?string $periodLimit = null, ?string $period = null, ?array $permissions = null, bool $billingAddress = true): CompanyMembership
     {
         return new CompanyMembership(
             companyId: 3,
@@ -137,6 +148,7 @@ final class RefusalMessagesTest extends IntegrationTestCase
             roleCode: 'buyer',
             permissions: $permissions ?? [CompanyPermission::ORDER_PLACE],
             companyActive: $active,
+            companyHasBillingAddress: $billingAddress,
             orderLimit: $orderLimit,
             periodLimit: $periodLimit,
             period: $period,

@@ -27,6 +27,7 @@ use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
+use Thelia\Model\Company;
 use Thelia\Model\CountryArea;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Customer;
@@ -92,7 +93,7 @@ final class CompanyCheckoutTest extends CompanyAccountTestCase
 
     public function testTheCheckoutIsNotCutShortForAnActiveCompany(): void
     {
-        $buyer = $this->buyer($this->company());
+        $buyer = $this->buyer($this->companyWithBillingAddress());
         $this->signInWithCart($buyer, $this->factory->cart($buyer));
 
         $this->get('/checkout/delivery');
@@ -104,7 +105,7 @@ final class CompanyCheckoutTest extends CompanyAccountTestCase
 
     public function testTheSpendingStepOfTheCompanyIsNotAStopOfTheBar(): void
     {
-        $buyer = $this->buyer($this->company(), CompanyRoleCode::BUYER);
+        $buyer = $this->buyer($this->companyWithBillingAddress(), CompanyRoleCode::BUYER);
         $cart = $this->factory->cart($buyer);
         $this->signInWithCart($buyer, $cart);
 
@@ -128,7 +129,7 @@ final class CompanyCheckoutTest extends CompanyAccountTestCase
 
     public function testAnOrderAboveTheLimitOfTheBuyerIsRefusedWithTheReasonAndOneWithinItIsNot(): void
     {
-        $buyer = $this->buyer($this->company(), CompanyRoleCode::BUYER);
+        $buyer = $this->buyer($this->companyWithBillingAddress(), CompanyRoleCode::BUYER);
         $this->companies->changeLimits($buyer, '500', null, null);
 
         $this->signInWithCart($buyer, $this->cartAtThePaymentStep($buyer, '150'));
@@ -144,9 +145,25 @@ final class CompanyCheckoutTest extends CompanyAccountTestCase
         self::assertStringContainsString('500', $refused->filter('body')->text());
     }
 
+    public function testTheBuyerOfACompanyWithoutBillingAddressIsSentBackWithTheReasonAndOneOfACompanyWithItIsNot(): void
+    {
+        $buyer = $this->buyer($this->companyWithBillingAddress(), CompanyRoleCode::BUYER);
+        $this->signInWithCart($buyer, $this->cartAtThePaymentStep($buyer, '150'));
+        $this->get('/checkout/payment');
+        self::assertSame(200, $this->statusCode(), 'Control: with a billing address the company reaches the payment.');
+
+        $buyer = $this->buyer($this->company(), CompanyRoleCode::BUYER);
+        $this->signInWithCart($buyer, $this->cartAtThePaymentStep($buyer, '150'));
+        $this->get('/checkout/payment');
+        self::assertResponseRedirects();
+
+        $cart = $this->client->followRedirect();
+        self::assertStringContainsString('Your company has no billing address yet: orders can be placed once it is chosen.', $cart->filter('body')->text());
+    }
+
     public function testThePaymentStepOffersToEditTheBillingAddressOnlyToWhoMayChangeIt(): void
     {
-        $company = $this->company();
+        $company = $this->companyWithBillingAddress();
         $creator = $this->buyer($company, CompanyRoleCode::ADMINISTRATOR);
         $colleague = $this->buyer($company, CompanyRoleCode::BUYER);
         $warehouse = $this->factory->address($creator, CountryQuery::create()->findOneByIsoalpha2('FR'), $creator->getCustomerTitle(), ['label' => 'Warehouse', 'zipcode' => '69003', 'city' => 'Lyon']);
@@ -163,6 +180,19 @@ final class CompanyCheckoutTest extends CompanyAccountTestCase
         $page = $this->get('/checkout/payment');
 
         self::assertStringContainsString('Edit the address', $page->filter('body')->text(), 'The one who made the address may change it.');
+    }
+
+    /**
+     * A company that has chosen its billing address, as one must for its buyers to order: the address is
+     * shared with it by an account that is not one of its buyers.
+     */
+    private function companyWithBillingAddress(string $name = 'Acme'): Company
+    {
+        $company = $this->company($name);
+        $headquarters = $this->sharedAddress($this->customer(), $company, 'Headquarters');
+        $company->setBillingAddressId((int) $headquarters->getId())->save($this->getPropelConnection());
+
+        return $company;
     }
 
     /**

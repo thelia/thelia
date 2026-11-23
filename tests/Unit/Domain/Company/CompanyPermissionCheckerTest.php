@@ -331,6 +331,7 @@ final class CompanyPermissionCheckerTest extends TestCase
             roleCode: $roleCode,
             permissions: $permissions,
             companyActive: $companyActive,
+            companyHasBillingAddress: true,
             orderLimit: null,
             periodLimit: null,
             period: null,

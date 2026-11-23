@@ -18,6 +18,7 @@ use Thelia\Domain\Company\Checkout\Exception\CompanyOrderLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyOrderNotPermittedException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyPeriodLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanySuspendedException;
+use Thelia\Domain\Company\Checkout\Exception\CompanyWithoutBillingAddressException;
 use Thelia\Domain\Company\Checkout\Service\CompanyPlacementGuard;
 use Thelia\Domain\Company\Service\CompanyMembershipReader;
 use Thelia\Model\Company;
@@ -120,6 +121,23 @@ final class OrderSpendingPlacementTest extends OrderCompanyTestCase
 
         $this->reader->reset();
         self::assertTrue($this->checker->canAccessOrder($buyer, $before), 'The buyer still reads what the company ordered.');
+    }
+
+    public function testACompanyWithoutBillingAddressPlacesNothingWhereTheOrderIsWrittenButStillGetsTheOrdersAnAdministratorPlacesForIt(): void
+    {
+        $company = $this->company(withBillingAddress: false);
+        $buyer = $this->buyerOf($company);
+
+        try {
+            $this->place($this->cartOf($buyer, '10'), $buyer);
+            self::fail('A company without billing address placed an order.');
+        } catch (CompanyWithoutBillingAddressException $refusal) {
+            self::assertStringContainsString('no billing address', $refusal->getMessage());
+        }
+
+        $order = $this->place($this->cartOf($buyer, '10'), $buyer, atTheKeyboard: false);
+
+        self::assertSame((int) $company->getId(), OrderQuery::create()->findPk($order->getId())?->getCompanyId());
     }
 
     public function testASuspendedCompanyStillGetsTheOrdersAnAdministratorPlacesForIt(): void

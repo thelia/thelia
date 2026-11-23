@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Domain\Order\OrderFacade;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
+use Thelia\Model\Company;
 use Thelia\Model\Country;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
@@ -43,6 +44,22 @@ abstract class OrderCompanyTestCase extends CompanyDomainTestCase
         parent::setUp();
 
         $this->dispatcher = $this->getService(EventDispatcherInterface::class);
+    }
+
+    /**
+     * A company that has chosen its billing address, as a company must have for its buyers to order:
+     * the address is shared with it by an account that does not belong to it.
+     */
+    protected function company(string $name = 'Acme', bool $withBillingAddress = true): Company
+    {
+        $company = parent::company($name);
+
+        if ($withBillingAddress) {
+            $address = $this->addressOf($this->customer(), $company, 'Headquarters');
+            $company->setBillingAddressId((int) $address->getId())->save($this->getPropelConnection());
+        }
+
+        return $company;
     }
 
     /**
@@ -111,7 +128,7 @@ abstract class OrderCompanyTestCase extends CompanyDomainTestCase
      *
      * @param array<string, mixed> $overrides statusCode, currencyRate, postage, as {@see \Thelia\Test\FixtureFactory::order()} reads them
      */
-    protected function orderInTheBooks(Customer $buyer, ?\Thelia\Model\Company $company, string $amount, array $overrides = [], ?\DateTimeInterface $createdAt = null): Order
+    protected function orderInTheBooks(Customer $buyer, ?Company $company, string $amount, array $overrides = [], ?\DateTimeInterface $createdAt = null): Order
     {
         $order = $this->fixtures->order($buyer, $overrides);
         $this->fixtures->orderProduct($order, ['price' => $amount, 'promoPrice' => $amount]);

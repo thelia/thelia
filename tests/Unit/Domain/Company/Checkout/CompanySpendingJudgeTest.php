@@ -21,6 +21,7 @@ use Thelia\Domain\Company\Checkout\Exception\CompanyOrderLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyOrderNotPermittedException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyPeriodLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanySuspendedException;
+use Thelia\Domain\Company\Checkout\Exception\CompanyWithoutBillingAddressException;
 use Thelia\Domain\Company\Checkout\Service\CompanySpendingJudge;
 use Thelia\Domain\Company\CompanyPermission;
 use Thelia\Domain\Company\DTO\CompanyMembership;
@@ -101,6 +102,36 @@ final class CompanySpendingJudgeTest extends TestCase
         self::assertSame('company-suspended', $refusals[0]->violationCode());
     }
 
+    public function testACompanyWithoutBillingAddressPlacesNothingEvenForARoleThatMayOrder(): void
+    {
+        $refusals = $this->judge->refusalsFor($this->membership(billingAddress: false), '1.000000', $this->spent('0'));
+
+        self::assertCount(1, $refusals);
+        self::assertInstanceOf(CompanyWithoutBillingAddressException::class, $refusals[0]);
+        self::assertSame('company-without-billing-address', $refusals[0]->violationCode());
+    }
+
+    public function testACompanyWithoutBillingAddressIsToldWhateverTheLimitsAndBeforeAMissingPermission(): void
+    {
+        $refusals = $this->judge->refusalsFor($this->membership(orderLimit: '1.000000', permissions: [], billingAddress: false), '600.000000', $this->spent('0'));
+
+        self::assertCount(1, $refusals);
+        self::assertInstanceOf(CompanyWithoutBillingAddressException::class, $refusals[0]);
+        self::assertInstanceOf(CompanyWithoutBillingAddressException::class, $this->judge->refusalsFor($this->membership(billingAddress: false), null, $this->spent('0'))[0]);
+    }
+
+    public function testASuspendedCompanyIsToldBeforeAMissingBillingAddress(): void
+    {
+        $refusals = $this->judge->refusalsFor($this->membership(active: false, billingAddress: false), '1.000000', $this->spent('0'));
+
+        self::assertInstanceOf(CompanySuspendedException::class, $refusals[0]);
+    }
+
+    public function testACompanyWithABillingAddressIsNotRefusedForIt(): void
+    {
+        self::assertSame([], $this->judge->refusalsFor($this->membership(billingAddress: true), '1.000000', $this->spent('0')));
+    }
+
     public function testARoleWithoutThePermissionToOrderPlacesNothing(): void
     {
         $refusals = $this->judge->refusalsFor($this->membership(permissions: [CompanyPermission::ORDER_VIEW_OWN]), '1.000000', $this->spent('0'));
@@ -143,7 +174,7 @@ final class CompanySpendingJudgeTest extends TestCase
     /**
      * @param list<string>|null $permissions
      */
-    private function membership(bool $active = true, ?string $orderLimit = null, ?string $periodLimit = null, ?string $period = null, ?array $permissions = null): CompanyMembership
+    private function membership(bool $active = true, ?string $orderLimit = null, ?string $periodLimit = null, ?string $period = null, ?array $permissions = null, bool $billingAddress = true): CompanyMembership
     {
         return new CompanyMembership(
             companyId: 3,
@@ -151,6 +182,7 @@ final class CompanySpendingJudgeTest extends TestCase
             roleCode: 'buyer',
             permissions: $permissions ?? [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN],
             companyActive: $active,
+            companyHasBillingAddress: $billingAddress,
             orderLimit: $orderLimit,
             periodLimit: $periodLimit,
             period: $period,

@@ -28,6 +28,7 @@ use Thelia\Domain\Company\Checkout\Exception\CompanyOrderLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyOrderNotPermittedException;
 use Thelia\Domain\Company\Checkout\Exception\CompanyPeriodLimitExceededException;
 use Thelia\Domain\Company\Checkout\Exception\CompanySuspendedException;
+use Thelia\Domain\Company\Checkout\Exception\CompanyWithoutBillingAddressException;
 use Thelia\Domain\Company\Checkout\Service\CompanySpendingJudge;
 use Thelia\Domain\Company\Checkout\Service\CompanySpendingReader;
 use Thelia\Model\Cart;
@@ -173,6 +174,13 @@ final class OrderSpendingLimitStepTest extends OrderCompanyTestCase
         $this->facade->suspend($company);
 
         self::assertInstanceOf(CompanySuspendedException::class, $this->refusalOf($this->cartOf($buyer, '1')));
+    }
+
+    public function testACompanyWithoutBillingAddressPlacesNothing(): void
+    {
+        $buyer = $this->buyerOf($this->company(withBillingAddress: false));
+
+        self::assertInstanceOf(CompanyWithoutBillingAddressException::class, $this->refusalOf($this->cartOf($buyer, '1')));
     }
 
     public function testARoleWithoutThePermissionToOrderPlacesNothing(): void
