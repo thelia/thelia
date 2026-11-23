@@ -1044,6 +1044,7 @@ return [
     'Name of the active mailing template' => 'Name of the active mailing template',
     'Name of the cart cookie' => 'Name of the cart cookie',
     'Name of the delivery view in the current PDF template (without extension)' => 'Name of the delivery view in the current PDF template (without extension)',
+    'Name of the picking slip view in the current PDF template (without extension)' => 'Name of the picking slip view in the current PDF template (without extension)',
     'Name of the graphic driver used by the Imagine library (see https://imagine.readthedocs.org)' => 'Name of the graphic driver used by the Imagine library (see https://imagine.readthedocs.org)',
     'Name of the invoice view in the current PDF template (without extension)' => 'Name of the invoice view in the current PDF template (without extension)',
     'Name of the template view returned when an obsolete (or inactive) product URL is invoked' => 'Name of the template view returned when an obsolete (or inactive) product URL is invoked',

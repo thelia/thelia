@@ -925,6 +925,7 @@ return [
     'Name of the active mailing template' => 'Nom du modèle d\'e-mail actif',
     'Name of the cart cookie' => 'Nom du cookie de stockage du panier',
     'Name of the delivery view in the current PDF template (without extension)' => 'Nom de la vue de la livraison dans le modèle PDF en cours (sans extension)',
+    'Name of the picking slip view in the current PDF template (without extension)' => 'Nom de la vue du bon de préparation dans le modèle PDF en cours (sans extension)',
     'Name of the graphic driver used by the Imagine library (see https://imagine.readthedocs.org)' => 'Nom du pilote graphique utilisé par la bibliothèque Imagine (voir https://imagine.readthedocs.org)',
     'Name of the invoice view in the current PDF template (without extension)' => 'Nom de la vue de la facture dans le modèle PDF en cours (sans extension)',
     'Name of the template view returned when an obsolete (or inactive) product URL is invoked' => 'Nom de la page du modèle retournée lorsqu\'une URL obsolète (ou inactive) est invoquée',

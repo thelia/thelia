@@ -26,11 +26,14 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
 
     private ?string $previousMaxOrders = null;
 
+    private ?string $previousTemplateName = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->previousMaxOrders = ConfigQuery::read(PickingSlipPdfService::CONFIG_MAX_ORDERS);
+        $this->previousTemplateName = ConfigQuery::read(PickingSlipPdfService::CONFIG_TEMPLATE);
     }
 
     protected function tearDown(): void
@@ -43,6 +46,13 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
             ConfigQuery::resetCache();
         } else {
             ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, $this->previousMaxOrders);
+        }
+
+        if (null === $this->previousTemplateName) {
+            ConfigQuery::create()->filterByName(PickingSlipPdfService::CONFIG_TEMPLATE)->delete();
+            ConfigQuery::resetCache();
+        } else {
+            ConfigQuery::write(PickingSlipPdfService::CONFIG_TEMPLATE, $this->previousTemplateName);
         }
 
         parent::tearDown();
@@ -136,6 +146,47 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
         $this->expectExceptionMessage('The active PDF theme has no preparation document.');
 
         $this->service()->render([$order->getId()]);
+    }
+
+    /**
+     * The view is named by `pdf_preparation_file`, as `pdf_invoice_file` names the invoice: a theme that
+     * renames it is printed, and the file downloaded starts with that name.
+     */
+    public function testTheViewNamedInTheConfigurationIsPrintedAndNamesTheFile(): void
+    {
+        $this->installPickingSlipTheme();
+        $directory = THELIA_TEMPLATE_DIR.'pdf/'.$this->fixtureTheme;
+        rename($directory.'/preparation.html.twig', $directory.'/pick-list.html.twig');
+        ConfigQuery::write(PickingSlipPdfService::CONFIG_TEMPLATE, 'pick-list');
+        $order = $this->createFixtureFactory()->order();
+
+        self::assertTrue($this->service()->isAvailable(), 'the renamed view is found');
+
+        $slip = $this->service()->render([$order->getId()]);
+
+        self::assertSame(1, $this->pageCount($slip->content));
+        self::assertSame('pick-list-'.$order->getRef().'.pdf', $slip->fileName);
+    }
+
+    public function testAViewNamedInTheConfigurationThatTheThemeLacksIsNamedInTheMessage(): void
+    {
+        $this->installPickingSlipTheme();
+        ConfigQuery::write(PickingSlipPdfService::CONFIG_TEMPLATE, 'pick-list');
+        $order = $this->createFixtureFactory()->order();
+
+        self::assertFalse($this->service()->isAvailable(), 'the theme has preparation, not pick-list');
+
+        $this->expectException(PickingSlipException::class);
+        $this->expectExceptionMessage('The active PDF theme has no pick-list document.');
+
+        $this->service()->render([$order->getId()]);
+    }
+
+    public function testAnEmptyConfigurationKeepsThePreparationView(): void
+    {
+        ConfigQuery::write(PickingSlipPdfService::CONFIG_TEMPLATE, ' ');
+
+        self::assertSame('preparation', $this->service()->templateName());
     }
 
     public function testTheTemplateReceivesTheLocaleOfTheShopDefaultLanguage(): void

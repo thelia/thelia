@@ -39,6 +39,9 @@ final readonly class PickingSlipPdfService
 {
     public const string DOCUMENT = 'preparation';
 
+    /** Name of the configuration variable that names the picking slip view of the PDF theme, as `pdf_invoice_file` does for the invoice. */
+    public const string CONFIG_TEMPLATE = 'pdf_preparation_file';
+
     /** Name of the configuration variable that overrides the size limit of a batch. */
     public const string CONFIG_MAX_ORDERS = 'picking_slip_max_orders';
 
@@ -91,10 +94,12 @@ final readonly class PickingSlipPdfService
 
         $pdfTemplate = $this->templateHelper->getActivePdfTemplate();
 
+        $templateName = $this->templateName();
+
         try {
-            $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), self::DOCUMENT);
+            $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $templateName);
         } catch (ResourceNotFoundException) {
-            throw PickingSlipException::missingTemplate(self::DOCUMENT);
+            throw PickingSlipException::missingTemplate($templateName);
         }
 
         $parser->setTemplateDefinition($pdfTemplate, true);
@@ -105,15 +110,15 @@ final readonly class PickingSlipPdfService
 
         $html = SaleUnitConfigScope::runFor(
             $saleUnitId,
-            static fn (): string => $parser->render(self::DOCUMENT, ['order_ids' => $foundIds, 'picking_slip_locale' => $locale]),
+            static fn (): string => $parser->render($templateName, ['order_ids' => $foundIds, 'picking_slip_locale' => $locale]),
         );
 
         $fileName = 1 === \count($orders)
-            ? \sprintf('%s-%s.pdf', self::DOCUMENT, $orders[0]->getRef())
-            : \sprintf('%s-%s.pdf', self::DOCUMENT, (new \DateTimeImmutable())->format('Y-m-d'));
+            ? \sprintf('%s-%s.pdf', $templateName, $orders[0]->getRef())
+            : \sprintf('%s-%s.pdf', $templateName, (new \DateTimeImmutable())->format('Y-m-d'));
 
         $pdfEvent = new PdfEvent($html);
-        $pdfEvent->setTemplateName(self::DOCUMENT);
+        $pdfEvent->setTemplateName($templateName);
         $pdfEvent->setLang(strtolower(substr($locale, 0, 2)));
         $pdfEvent->setFileName(pathinfo($fileName, \PATHINFO_FILENAME));
 
@@ -139,12 +144,23 @@ final readonly class PickingSlipPdfService
         $themePath = $this->templateHelper->getActivePdfTemplate()->getAbsolutePath();
 
         foreach ($this->parserResolver->getParsers() as $parser) {
-            if ($parser->supportTemplateRender($themePath, self::DOCUMENT)) {
+            if ($parser->supportTemplateRender($themePath, $this->templateName())) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * The view of the PDF theme the picking slip is rendered with, and the start of its file name: the
+     * configuration variable when it holds a name, `preparation` otherwise.
+     */
+    public function templateName(): string
+    {
+        $configured = trim((string) ConfigQuery::read(self::CONFIG_TEMPLATE, self::DOCUMENT));
+
+        return '' !== $configured ? $configured : self::DOCUMENT;
     }
 
     /**

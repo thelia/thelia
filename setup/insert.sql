@@ -139,7 +139,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW()),
 (129, 'subscription_retry_attempts', '3', 0, 0, NOW(), NOW()),
 (130, 'subscription_retry_interval_days', '2', 0, 0, NOW(), NOW()),
-(131, 'customer_dormant_after_days', '180', 0, 0, NOW(), NOW())
+(131, 'customer_dormant_after_days', '180', 0, 0, NOW(), NOW()),
+(132, 'pdf_preparation_file', 'preparation', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2429,6 +2430,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'cs_CZ', NULL, NULL, NULL, NULL),
     (130, 'cs_CZ', NULL, NULL, NULL, NULL),
     (131, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (132, 'cs_CZ', NULL, NULL, NULL, NULL),
     (1, 'de_DE', 'Verfügbaren Lagerbestand prüfen (1) oder ignorieren (0) beim Anzeigen und Änderung der bestellte Menge', NULL, NULL, NULL),
     (2, 'de_DE', 'Name der aktiven Front Office Template', NULL, NULL, NULL),
     (3, 'de_DE', 'Name der aktiven Back Office Template', NULL, NULL, NULL),
@@ -2536,6 +2538,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'de_DE', 'Anzahl abgelehnter Abbuchungen einer Rate, nach der ein Abonnement ausgesetzt wird (3 bei ungültigem Wert)', NULL, NULL, NULL),
     (130, 'de_DE', 'Tage zwischen zwei Abbuchungen einer abgelehnten Rate eines Abonnements (2 bei ungültigem Wert)', NULL, NULL, NULL),
     (131, 'de_DE', NULL, NULL, NULL, NULL),
+    (132, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -2643,6 +2646,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'en_US', 'Number of declined charges of an installment after which a subscription is suspended (3 when invalid)', NULL, NULL, NULL),
     (130, 'en_US', 'Days between two charges of a declined installment of a subscription (2 when invalid)', NULL, NULL, NULL),
     (131, 'en_US', 'Days without an order after which a customer is dormant in the customer reports (180 when invalid)', NULL, NULL, NULL),
+    (132, 'en_US', 'Name of the picking slip view in the current PDF template (without extension)', NULL, NULL, NULL),
     (1, 'es_ES', 'Comprobar disponibilidad de stock de producto (1) o ignorar (0) cuando se muestra o cambia cantidad en pedido', NULL, NULL, NULL),
     (2, 'es_ES', 'Nombre de la plantilla activa de recepción', NULL, NULL, NULL),
     (3, 'es_ES', 'Nombe de la plantilla del administrador activo', NULL, NULL, NULL),
@@ -2750,6 +2754,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'es_ES', 'Número de cobros rechazados de una cuota tras el cual se suspende una suscripción (3 si no es válido)', NULL, NULL, NULL),
     (130, 'es_ES', 'Días entre dos cobros de una cuota rechazada de una suscripción (2 si no es válido)', NULL, NULL, NULL),
     (131, 'es_ES', NULL, NULL, NULL, NULL),
+    (132, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -2857,6 +2862,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'fr_FR', 'Nombre de prélèvements refusés d\'une échéance au-delà duquel un abonnement est suspendu (3 si invalide)', NULL, NULL, NULL),
     (130, 'fr_FR', 'Jours entre deux prélèvements d\'une échéance refusée d\'un abonnement (2 si invalide)', NULL, NULL, NULL),
     (131, 'fr_FR', 'Jours sans commande après lesquels un client est dormant dans les rapports clients (180 si invalide)', NULL, NULL, NULL),
+    (132, 'fr_FR', 'Nom de la vue du bon de préparation dans le modèle PDF en cours (sans extension)', NULL, NULL, NULL),
     (1, 'it_IT', NULL, NULL, NULL, NULL),
     (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2964,6 +2970,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'it_IT', NULL, NULL, NULL, NULL),
     (130, 'it_IT', NULL, NULL, NULL, NULL),
     (131, 'it_IT', NULL, NULL, NULL, NULL),
+    (132, 'it_IT', NULL, NULL, NULL, NULL),
     (1, 'nl_NL', NULL, NULL, NULL, NULL),
     (2, 'nl_NL', NULL, NULL, NULL, NULL),
     (3, 'nl_NL', NULL, NULL, NULL, NULL),
@@ -3071,6 +3078,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, 'nl_NL', 'Aantal geweigerde afschrijvingen van een termijn waarna een abonnement wordt opgeschort (3 bij een ongeldige waarde)', NULL, NULL, NULL),
     (130, 'nl_NL', 'Dagen tussen twee afschrijvingen van een geweigerde termijn van een abonnement (2 bij een ongeldige waarde)', NULL, NULL, NULL),
     (131, 'nl_NL', NULL, NULL, NULL, NULL),
+    (132, 'nl_NL', NULL, NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),
     (3, 'ru_RU', 'Имя активного шаблона админки', NULL, NULL, NULL),
@@ -3177,7 +3185,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (128, 'ru_RU', 'Кто видит цены магазина: visible, logged_in (только авторизованные клиенты) или on_request (без цены, кнопка запроса)', NULL, NULL, NULL),
     (129, 'ru_RU', 'Число отклонённых списаний платежа, после которого подписка приостанавливается (3 при неверном значении)', NULL, NULL, NULL),
     (130, 'ru_RU', 'Дней между двумя списаниями отклонённого платежа подписки (2 при неверном значении)', NULL, NULL, NULL),
-    (131, 'ru_RU', NULL, NULL, NULL, NULL)
+    (131, 'ru_RU', NULL, NULL, NULL, NULL),
+    (132, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
 -- Insert I18n front hooks

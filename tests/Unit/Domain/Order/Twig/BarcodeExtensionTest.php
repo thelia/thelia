@@ -72,6 +72,16 @@ final class BarcodeExtensionTest extends TestCase
         self::assertNotSame($extension->code128DataUri('A1'), $extension->code128DataUri('A2'));
     }
 
+    /**
+     * An order reference with an accent cannot be a Code 128: no barcode, rather than an error that would stop
+     * the whole batch, or bars a scanner would read as another reference.
+     */
+    public function testAValueOutsideAsciiHasNoBarcode(): void
+    {
+        self::assertNull((new BarcodeExtension())->code128DataUri('CMD-ÉTÉ-2026'));
+        self::assertNull((new BarcodeExtension())->code128DataUri('订单-42'));
+    }
+
     public function testAnEmptyValueIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);

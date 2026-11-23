@@ -395,4 +395,23 @@ JOIN `hook` ON `hook`.`code` = `missing`.`code` AND `hook`.`type` = 3
 JOIN (SELECT DISTINCT `locale` FROM `lang`) AS `lang`
 WHERE NOT EXISTS (SELECT 1 FROM `hook_i18n` WHERE `hook_i18n`.`id` = `hook`.`id` AND `hook_i18n`.`locale` = `lang`.`locale`);
 
+-- ---------------------------------------------------------------------
+-- Name of the picking slip view in the PDF template
+--
+-- `pdf_preparation_file` names the picking slip view of the PDF template, as
+-- `pdf_invoice_file` and `pdf_delivery_file` name the two other documents, and
+-- starts the name of the file downloaded. INSERT IGNORE leaves a value a shop
+-- already wrote. Replaying the script changes nothing.
+-- ---------------------------------------------------------------------
+
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('pdf_preparation_file', 'preparation', 0, 0, NOW(), NOW());
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`)
+SELECT `config`.`id`, 'en_US', 'Name of the picking slip view in the current PDF template (without extension)', NULL, NULL, NULL
+FROM `config` WHERE `config`.`name` = 'pdf_preparation_file'
+UNION ALL
+SELECT `config`.`id`, 'fr_FR', 'Nom de la vue du bon de préparation dans le modèle PDF en cours (sans extension)', NULL, NULL, NULL
+FROM `config` WHERE `config`.`name` = 'pdf_preparation_file';
+
 SET FOREIGN_KEY_CHECKS = 1;

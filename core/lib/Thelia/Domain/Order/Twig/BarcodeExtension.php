@@ -37,15 +37,23 @@ final class BarcodeExtension extends AbstractExtension
      * (`<img src="{{ barcode_code128(order.ref) }}" alt="{{ order.ref }}">`), the form dompdf draws. The SVG has
      * no text under the bars: the template prints the value itself.
      *
+     * Null for a value Code 128 cannot encode, a character outside ASCII ("Ä-2026"): no barcode is drawn rather than
+     * one a scanner would read as another value, and the template, which prints the value in clear, still renders,
+     * the other documents of a batch with it.
+     *
      * @param float $barWidth width of the narrowest bar, in SVG units
      * @param int   $height   height of the bars, in SVG units
      *
      * @throws \InvalidArgumentException when the value is empty
      */
-    public function code128DataUri(string $value, float $barWidth = 2.0, int $height = 40): string
+    public function code128DataUri(string $value, float $barWidth = 2.0, int $height = 40): ?string
     {
         if ('' === $value) {
             throw new \InvalidArgumentException('A barcode cannot encode an empty value.');
+        }
+
+        if (1 !== preg_match('/^[\x00-\x7F]+$/', $value)) {
+            return null;
         }
 
         $svg = (new BarcodeGeneratorSVG())->getBarcode($value, BarcodeGenerator::TYPE_CODE_128, $barWidth, $height);

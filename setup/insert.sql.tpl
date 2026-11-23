@@ -139,7 +139,8 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (128, 'price_display_mode', 'visible', 0, 0, NOW(), NOW()),
 (129, 'subscription_retry_attempts', '3', 0, 0, NOW(), NOW()),
 (130, 'subscription_retry_interval_days', '2', 0, 0, NOW(), NOW()),
-(131, 'customer_dormant_after_days', '180', 0, 0, NOW(), NOW())
+(131, 'customer_dormant_after_days', '180', 0, 0, NOW(), NOW()),
+(132, 'pdf_preparation_file', 'preparation', 0, 0, NOW(), NOW())
 
 ;
 
@@ -2429,7 +2430,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (128, '{{ locale }}', {{ intl('Who sees the prices of the shop: visible, logged_in (identified customers only) or on_request (no price, a request button)', locale) }}, NULL, NULL, NULL),
     (129, '{{ locale }}', {{ intl('Number of declined charges of an installment after which a subscription is suspended (3 when invalid)', locale) }}, NULL, NULL, NULL),
     (130, '{{ locale }}', {{ intl('Days between two charges of a declined installment of a subscription (2 when invalid)', locale) }}, NULL, NULL, NULL),
-    (131, '{{ locale }}', {{ intl('Days without an order after which a customer is dormant in the customer reports (180 when invalid)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (131, '{{ locale }}', {{ intl('Days without an order after which a customer is dormant in the customer reports (180 when invalid)', locale) }}, NULL, NULL, NULL),
+    (132, '{{ locale }}', {{ intl('Name of the picking slip view in the current PDF template (without extension)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
