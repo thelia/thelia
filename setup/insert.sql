@@ -919,7 +919,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1528, 'gift-wrapping.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1529, 'product-association-type.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1530, 'product-association-type.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1531, 'tag.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(1531, 'tag.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1532, 'product.combinations-table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1533, 'product.combinations-table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert pdf hooks
@@ -5638,6 +5640,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'cs_CZ', NULL, NULL, NULL),
     (1530, 'cs_CZ', NULL, NULL, NULL),
     (1531, 'cs_CZ', NULL, NULL, NULL),
+    (1532, 'cs_CZ', NULL, NULL, NULL),
+    (1533, 'cs_CZ', NULL, NULL, NULL),
     (1000, 'de_DE', 'Kategorie - Inhalt', NULL, NULL),
     (1001, 'de_DE', 'Inhalt - Inhalt', NULL, NULL),
     (1002, 'de_DE', 'Ordner - Inhalt', NULL, NULL),
@@ -6166,6 +6170,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'de_DE', NULL, NULL, NULL),
     (1530, 'de_DE', NULL, NULL, NULL),
     (1531, 'de_DE', NULL, NULL, NULL),
+    (1532, 'de_DE', NULL, NULL, NULL),
+    (1533, 'de_DE', NULL, NULL, NULL),
     (1000, 'en_US', 'Category - content', NULL, NULL),
     (1001, 'en_US', 'Content - content', NULL, NULL),
     (1002, 'en_US', 'Folder - content', NULL, NULL),
@@ -6694,6 +6700,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'en_US', 'Product association type - table header', NULL, NULL),
     (1530, 'en_US', 'Product association type - table row', NULL, NULL),
     (1531, 'en_US', 'Tag - delete form', NULL, NULL),
+    (1532, 'en_US', 'Product - combinations table header', NULL, NULL),
+    (1533, 'en_US', 'Product - combinations table row', NULL, NULL),
     (1000, 'es_ES', 'Categoría - contenido', NULL, NULL),
     (1001, 'es_ES', 'Contenido - contenido', NULL, NULL),
     (1002, 'es_ES', 'Carpeta - contenido', NULL, NULL),
@@ -7222,6 +7230,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'es_ES', NULL, NULL, NULL),
     (1530, 'es_ES', NULL, NULL, NULL),
     (1531, 'es_ES', NULL, NULL, NULL),
+    (1532, 'es_ES', NULL, NULL, NULL),
+    (1533, 'es_ES', NULL, NULL, NULL),
     (1000, 'fr_FR', 'Catégorie - contenu', NULL, NULL),
     (1001, 'fr_FR', 'Contenu - contenu', NULL, NULL),
     (1002, 'fr_FR', 'Dossier - contenu', NULL, NULL),
@@ -7750,6 +7760,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'fr_FR', NULL, NULL, NULL),
     (1530, 'fr_FR', NULL, NULL, NULL),
     (1531, 'fr_FR', NULL, NULL, NULL),
+    (1532, 'fr_FR', NULL, NULL, NULL),
+    (1533, 'fr_FR', NULL, NULL, NULL),
     (1000, 'it_IT', NULL, NULL, NULL),
     (1001, 'it_IT', NULL, NULL, NULL),
     (1002, 'it_IT', NULL, NULL, NULL),
@@ -8278,6 +8290,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'it_IT', NULL, NULL, NULL),
     (1530, 'it_IT', NULL, NULL, NULL),
     (1531, 'it_IT', NULL, NULL, NULL),
+    (1532, 'it_IT', NULL, NULL, NULL),
+    (1533, 'it_IT', NULL, NULL, NULL),
     (1000, 'nl_NL', NULL, NULL, NULL),
     (1001, 'nl_NL', NULL, NULL, NULL),
     (1002, 'nl_NL', NULL, NULL, NULL),
@@ -8806,6 +8820,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1529, 'nl_NL', NULL, NULL, NULL),
     (1530, 'nl_NL', NULL, NULL, NULL),
     (1531, 'nl_NL', NULL, NULL, NULL),
+    (1532, 'nl_NL', NULL, NULL, NULL),
+    (1533, 'nl_NL', NULL, NULL, NULL),
     (1000, 'ru_RU', 'Категория - содержимое', NULL, NULL),
     (1001, 'ru_RU', 'Контент - содержимое', NULL, NULL),
     (1002, 'ru_RU', 'Папка - содержимое', NULL, NULL),
@@ -9333,7 +9349,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1528, 'ru_RU', NULL, NULL, NULL),
     (1529, 'ru_RU', NULL, NULL, NULL),
     (1530, 'ru_RU', NULL, NULL, NULL),
-    (1531, 'ru_RU', NULL, NULL, NULL)
+    (1531, 'ru_RU', NULL, NULL, NULL),
+    (1532, 'ru_RU', NULL, NULL, NULL),
+    (1533, 'ru_RU', NULL, NULL, NULL)
 ;
 
 -- Insert I18n pdf hooks

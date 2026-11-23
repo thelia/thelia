@@ -27,7 +27,10 @@ final class BackOfficeHookSeedTest extends TestCase
 {
     private const int BACK_OFFICE = 2;
 
-    private const string UPDATE_SCRIPT = '3.3.0.sql';
+    /**
+     * The update scripts that add back-office hooks to a shop installed before them.
+     */
+    private const array UPDATE_SCRIPTS = ['3.3.0.sql', '3.4.1.sql'];
 
     /**
      * The back-office hooks the seed declared up to 3.2.0 end at 1426; the range goes on to 1999 (2000 and up hold
@@ -49,8 +52,30 @@ final class BackOfficeHookSeedTest extends TestCase
         yield 'button next to the sheet navigation' => ['customer-edit.actions', 0];
     }
 
+    /**
+     * The column the combinations grid of a product documents for modules: its header and its cell.
+     *
+     * @return iterable<string, array{string, int}>
+     */
+    public static function combinationsGridHooks(): iterable
+    {
+        yield 'header of a module column' => ['product.combinations-table-header', 0];
+        yield 'cell of a module column' => ['product.combinations-table-row', 0];
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function updateScripts(): iterable
+    {
+        foreach (self::UPDATE_SCRIPTS as $script) {
+            yield $script => [$script];
+        }
+    }
+
     #[DataProvider('customerSheetHooks')]
-    public function testTheFreshInstallSeedsTheHooksTheCustomerSheetOffersToModules(string $code, int $block): void
+    #[DataProvider('combinationsGridHooks')]
+    public function testTheFreshInstallSeedsTheHooksTheBackOfficeOffersToModules(string $code, int $block): void
     {
         $hooks = $this->hooksSeededBy($this->freshInstallSeed());
 
@@ -64,7 +89,7 @@ final class BackOfficeHookSeedTest extends TestCase
      */
     public function testTheUpdateAddsTheBackOfficeHooksTheFreshInstallSeeds(): void
     {
-        $added = $this->hooksAddedByTheUpdate();
+        $added = $this->hooksAddedByTheUpdates();
         $seeded = $this->hooksSeededBy($this->freshInstallSeed(), self::FIRST_ADDED_ID, self::LAST_BACK_OFFICE_ID);
 
         self::assertArrayHasKey('customer.tab', $added, 'The update no longer adds the back-office hooks: this test has lost its subject.');
@@ -73,7 +98,7 @@ final class BackOfficeHookSeedTest extends TestCase
         ksort($seeded);
         self::assertSame($seeded, $added, 'The update and the fresh install do not add the same back-office hooks, or not with the same block flag.');
 
-        $titled = $this->hooksTitledByTheUpdate();
+        $titled = $this->hooksTitledByTheUpdates();
         ksort($titled);
         self::assertSame(array_keys($added), array_keys($titled), 'The update gives a title to other hooks than the ones it adds.');
     }
@@ -83,9 +108,10 @@ final class BackOfficeHookSeedTest extends TestCase
      * update stopped halfway is run again: the hook goes in only when no
      * back-office hook has its code, a title only for a language it has none in.
      */
-    public function testTheUpdateAddsAHookAndItsTitlesOnlyWhenMissing(): void
+    #[DataProvider('updateScripts')]
+    public function testTheUpdateAddsAHookAndItsTitlesOnlyWhenMissing(string $script): void
     {
-        [$hooks, $titles] = $this->hookStatementsOfTheUpdate();
+        [$hooks, $titles] = $this->hookStatementsOf($script);
 
         self::assertMatchesRegularExpression('/WHERE\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+`hook`\s+WHERE\s+`hook`\.`code`\s*=\s*`missing`\.`code`\s+AND\s+`hook`\.`type`\s*=\s*2\s*\)/i', $hooks);
         self::assertMatchesRegularExpression('/WHERE\s+NOT\s+EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+`hook_i18n`\s+WHERE\s+`hook_i18n`\.`id`\s*=\s*`hook`\.`id`\s+AND\s+`hook_i18n`\.`locale`\s*=\s*`lang`\.`locale`\s*\)/i', $titles);
@@ -112,37 +138,50 @@ final class BackOfficeHookSeedTest extends TestCase
     /**
      * @return array<string, int> code => block flag
      */
-    private function hooksAddedByTheUpdate(): array
+    private function hooksAddedByTheUpdates(): array
     {
-        preg_match_all("/SELECT '([a-z0-9_.-]+)'(?: AS `code`)?, (\d)/", $this->hookStatementsOfTheUpdate()[0], $rows, \PREG_SET_ORDER);
+        $added = [];
 
-        return array_combine(array_column($rows, 1), array_map(intval(...), array_column($rows, 2)));
+        foreach (self::UPDATE_SCRIPTS as $script) {
+            preg_match_all("/SELECT '([a-z0-9_.-]+)'(?: AS `code`)?, (\d)/", $this->hookStatementsOf($script)[0], $rows, \PREG_SET_ORDER);
+            $addedByTheScript = array_combine(array_column($rows, 1), array_map(intval(...), array_column($rows, 2)));
+
+            self::assertSame([], array_intersect_key($added, $addedByTheScript), \sprintf('%s adds a back-office hook an earlier update already adds.', $script));
+            $added += $addedByTheScript;
+        }
+
+        return $added;
     }
 
     /**
      * @return array<string, string> code => English title
      */
-    private function hooksTitledByTheUpdate(): array
+    private function hooksTitledByTheUpdates(): array
     {
-        preg_match_all("/SELECT '([a-z0-9_.-]+)'(?: AS `code`)?, '((?:[^']|'')+)'/", $this->hookStatementsOfTheUpdate()[1], $rows, \PREG_SET_ORDER);
+        $titled = [];
 
-        return array_combine(array_column($rows, 1), array_column($rows, 2));
+        foreach (self::UPDATE_SCRIPTS as $script) {
+            preg_match_all("/SELECT '([a-z0-9_.-]+)'(?: AS `code`)?, '((?:[^']|'')+)'/", $this->hookStatementsOf($script)[1], $rows, \PREG_SET_ORDER);
+            $titled += array_combine(array_column($rows, 1), array_column($rows, 2));
+        }
+
+        return $titled;
     }
 
     /**
-     * The INSERT into `hook` and the INSERT into `hook_i18n` of the update.
+     * The INSERT into `hook` and the INSERT into `hook_i18n` of an update script.
      *
      * @return array{string, string}
      */
-    private function hookStatementsOfTheUpdate(): array
+    private function hookStatementsOf(string $script): array
     {
-        $sql = (string) file_get_contents($this->setupDirectory().'/update/sql/'.self::UPDATE_SCRIPT);
+        $sql = (string) file_get_contents($this->setupDirectory().'/update/sql/'.$script);
         $statements = array_map('trim', explode(';', preg_replace('/^\s*--.*$/m', '', $sql) ?? $sql));
         $hooks = array_values(array_filter($statements, static fn (string $statement): bool => 1 === preg_match('/^INSERT\s+INTO\s+`hook`\s/i', $statement)));
         $titles = array_values(array_filter($statements, static fn (string $statement): bool => 1 === preg_match('/^INSERT\s+INTO\s+`hook_i18n`\s/i', $statement)));
 
-        self::assertCount(1, $hooks, \sprintf('%s should add the back-office hooks in one statement.', self::UPDATE_SCRIPT));
-        self::assertCount(1, $titles, \sprintf('%s should add the titles of the back-office hooks in one statement.', self::UPDATE_SCRIPT));
+        self::assertCount(1, $hooks, \sprintf('%s should add the back-office hooks in one statement.', $script));
+        self::assertCount(1, $titles, \sprintf('%s should add the titles of the back-office hooks in one statement.', $script));
 
         return [$hooks[0], $titles[0]];
     }
