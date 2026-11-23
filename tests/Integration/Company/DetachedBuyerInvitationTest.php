@@ -67,6 +67,42 @@ final class DetachedBuyerInvitationTest extends CompanyDomainTestCase
         self::assertNull($this->buyerRow($invited), 'The detached buyer is a buyer of the company again.');
     }
 
+    public function testAnInvitationSentBeforeTheDetachmentDoesNotLetTheSamePersonBackInUnderANewAccount(): void
+    {
+        $clock = new MockClock('2026-11-18 10:00:00');
+        $service = $this->service($clock);
+
+        $company = $this->company();
+        $administrator = $this->buyerOf($company, CompanyRoleCode::ADMINISTRATOR);
+        $invited = $this->customer('leaver@acme.test');
+
+        $first = $service->createToken($company, 'leaver@acme.test', CompanyRoleCode::BUYER, $administrator, null, null, null);
+        $clock->sleep(60);
+        $resent = $service->createToken($company, 'leaver@acme.test', CompanyRoleCode::BUYER, $administrator, null, null, null);
+
+        $service->accept($first, $invited);
+        self::assertNotNull($this->buyerRow($invited));
+
+        $this->facade->detach($invited);
+        $this->reader->forget((int) $invited->getId());
+        self::assertNull($this->buyerRow($invited));
+
+        // The detached person moves the old account to another address and opens a new one under the invited address.
+        $invited->setEmail('elsewhere@acme.test')->save($this->getPropelConnection());
+        $newAccount = $this->customer('leaver@acme.test');
+
+        $rejoined = true;
+
+        try {
+            $service->accept($resent, $newAccount);
+        } catch (InvalidCompanyInvitationException) {
+            $rejoined = false;
+        }
+
+        self::assertFalse($rejoined, 'The detached person rejoined the company with the invitation sent before the detachment.');
+        self::assertNull($this->buyerRow($newAccount), 'The detached person is a buyer of the company again.');
+    }
+
     private function service(MockClock $clock): CompanyInvitationService
     {
         $window = static fn (): RateLimiterFactory => new RateLimiterFactory(

@@ -712,6 +712,7 @@
     <column description="SHA-256 of the invitation token, in hexadecimal; the key makes an invitation usable once, whatever became of the buyer it took in" name="fingerprint" primaryKey="true" required="true" size="64" type="CHAR" />
     <column name="company_id" required="true" type="INTEGER" />
     <column defaultValue="NULL" description="the account the invitation took in; NULL once that account is deleted" name="customer_id" type="INTEGER" />
+    <column description="SHA-256 of the address the invitation was sent to, lowercased, in hexadecimal: the earlier join of an address is found whatever address its account holds now" name="addressee" required="true" size="64" type="CHAR" />
     <column name="used_at" required="true" type="DATETIME" />
     <foreign-key foreignTable="company" name="fk_company_invitation_use_company_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="company_id" />
@@ -724,6 +725,10 @@
     </index>
     <index name="idx_company_invitation_use_customer_id">
       <index-column name="customer_id" />
+    </index>
+    <index name="idx_company_invitation_use_company_id_addressee">
+      <index-column name="company_id" />
+      <index-column name="addressee" />
     </index>
   </table>
   <table name="price_list" namespace="Thelia\Model">

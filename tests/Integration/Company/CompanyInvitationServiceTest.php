@@ -521,10 +521,11 @@ final class CompanyInvitationServiceTest extends CompanyDomainTestCase
 
         // The other acceptance commits its use when this one writes its own: both read the invitation as unused.
         $clock = $this->clockThatRuns(2, fn () => $this->getPropelConnection()->exec(\sprintf(
-            "INSERT INTO `company_invitation_use` (`fingerprint`, `company_id`, `customer_id`, `used_at`) VALUES ('%s', %d, %d, NOW())",
+            "INSERT INTO `company_invitation_use` (`fingerprint`, `company_id`, `customer_id`, `addressee`, `used_at`) VALUES ('%s', %d, %d, '%s', NOW())",
             $fingerprint,
             (int) $company->getId(),
             (int) $winner->getId(),
+            hash('sha256', 'race@acme.test'),
         )));
 
         try {
