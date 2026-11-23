@@ -95,6 +95,8 @@ return [
     'Product - clone form' => 'Product - clone form',
     'Product - combinations tab bottom' => 'Product - combinations tab bottom',
     'Product - combinations tab top' => 'Product - combinations tab top',
+    'Product - combinations table header' => 'Product - combinations table header',
+    'Product - combinations table row' => 'Product - combinations table row',
     'Product - SEO update form' => 'Product - SEO update form',
     'Product - update form' => 'Product - update form',
     'Product association type - bottom' => 'Product association type - bottom',

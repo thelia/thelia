@@ -919,7 +919,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1528, 'gift-wrapping.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1529, 'product-association-type.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1530, 'product-association-type.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1531, 'tag.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(1531, 'tag.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1532, 'product.combinations-table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1533, 'product.combinations-table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 -- Insert pdf hooks
@@ -3201,7 +3203,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1528, '{{ locale }}', {{ intl('Gift wrapping - table row', locale) }}, NULL, NULL),
     (1529, '{{ locale }}', {{ intl('Product association type - table header', locale) }}, NULL, NULL),
     (1530, '{{ locale }}', {{ intl('Product association type - table row', locale) }}, NULL, NULL),
-    (1531, '{{ locale }}', {{ intl('Tag - delete form', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (1531, '{{ locale }}', {{ intl('Tag - delete form', locale) }}, NULL, NULL),
+    (1532, '{{ locale }}', {{ intl('Product - combinations table header', locale) }}, NULL, NULL),
+    (1533, '{{ locale }}', {{ intl('Product - combinations table row', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
