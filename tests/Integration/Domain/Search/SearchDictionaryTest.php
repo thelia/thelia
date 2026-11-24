@@ -19,6 +19,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Search\Contract\SearchEngineInterface;
 use Thelia\Domain\Search\Contract\SearchScope;
 use Thelia\Domain\Search\Dictionary\DictionarySearchTermExpander;
 use Thelia\Domain\Search\Dictionary\SearchDictionary;
@@ -275,21 +276,23 @@ final class SearchDictionaryTest extends IntegrationTestCase
 
     public function testSynonymsApplyWithoutAnEngineAndFollowEveryWrite(): void
     {
-        self::assertFalse($this->search()->hasEngine());
+        $search = $this->searchThrough([]);
+
+        self::assertFalse($search->hasEngine());
 
         $event = $this->synonym('tel', ['Telephone', 'mobile', 'tel']);
 
-        self::assertSame(['telephone', 'mobile'], $this->search()->expand('Tel', 'en_US'));
+        self::assertSame(['telephone', 'mobile'], $search->expand('Tel', 'en_US'));
         self::assertSame("telephone\nmobile", SearchSynonymQuery::create()->findPk($event->getSynonym()?->getId())?->getSynonyms());
 
         $this->dispatcher()->dispatch($event->setSynonyms(['smartphone'])->setBidirectional(true), TheliaEvents::SEARCH_SYNONYM_UPDATE);
 
-        self::assertSame(['smartphone'], $this->search()->expand('tel', 'en_US'));
-        self::assertSame(['tel'], $this->search()->expand('smartphone', 'en_US'));
+        self::assertSame(['smartphone'], $search->expand('tel', 'en_US'));
+        self::assertSame(['tel'], $search->expand('smartphone', 'en_US'));
 
         $this->dispatcher()->dispatch($event, TheliaEvents::SEARCH_SYNONYM_TOGGLE);
 
-        self::assertSame([], $this->search()->expand('tel', 'en_US'));
+        self::assertSame([], $search->expand('tel', 'en_US'));
     }
 
     public function testSynonymsReachTheEngineAndFindTheProductsOfTheirEquivalents(): void
@@ -297,14 +300,7 @@ final class SearchDictionaryTest extends IntegrationTestCase
         $product = $this->fixtures->product($this->fixtures->category(), $this->fixtures->taxRule(), $this->fixtures->currency());
         $engine = new InMemorySearchEngine();
         $engine->index([new SearchDocument('product', $product->getId(), 'en_US', SearchScope::Shop, true, ['title' => 'Smart mobile'])]);
-        $search = new SearchService(
-            new SearchEngineRegistry([$engine]),
-            new SearchDocumentProviders([new ProductDocumentProvider()]),
-            [],
-            [],
-            new NullLogger(),
-            [new DictionarySearchTermExpander(static::getContainer()->get(SearchDictionary::class))],
-        );
+        $search = $this->searchThrough([$engine]);
 
         self::assertSame([], $search->search(new SearchQuery('tel', 'en_US', ['product']))?->idsOf('product'));
 
@@ -507,6 +503,21 @@ final class SearchDictionaryTest extends IntegrationTestCase
     private function search(): SearchService
     {
         return static::getContainer()->get(SearchService::class);
+    }
+
+    /**
+     * @param list<SearchEngineInterface> $engines
+     */
+    private function searchThrough(array $engines): SearchService
+    {
+        return new SearchService(
+            new SearchEngineRegistry($engines),
+            new SearchDocumentProviders([new ProductDocumentProvider()]),
+            [],
+            [],
+            new NullLogger(),
+            [new DictionarySearchTermExpander(static::getContainer()->get(SearchDictionary::class))],
+        );
     }
 
     private function importer(): SearchDictionaryImporter
