@@ -40,9 +40,10 @@ final class QueryCountingClient
     public function __construct(
         private readonly ConnectionInterface $connection,
         private readonly string $baseUrl,
+        ?HttpClientInterface $http = null,
     ) {
         // A measure targets a disposable shop, often behind a local certificate.
-        $this->http = HttpClient::create(['verify_peer' => false, 'verify_host' => false, 'max_redirects' => 0, 'timeout' => 600]);
+        $this->http = $http ?? HttpClient::create(['verify_peer' => false, 'verify_host' => false, 'max_redirects' => 0, 'timeout' => 600]);
     }
 
     public function questions(): int
@@ -90,6 +91,45 @@ final class QueryCountingClient
     }
 
     /**
+     * Saves a form of the shop as it stands, as a person who opens it and clicks save would: the
+     * form page is read first and not counted, then only the post is counted. The post must
+     * redirect to the path given in $expectedLocation, which is how a back-office save tells a
+     * success from a refusal (both redirect).
+     *
+     * @param array<string, string> $fields values sent in place of the ones the form holds
+     */
+    public function submit(string $formPath, string $action, array $fields, string $expectedLocation, string $session = 'anonymous'): PageMeasure
+    {
+        [$actionUrl, $body] = $this->readForm($session, $formPath, $action, $fields);
+
+        $cost = $this->readingCost();
+        $before = $this->questions();
+        $response = $this->http->request('POST', $actionUrl, [
+            'headers' => $this->headers($session) + ['Origin' => $this->origin(), 'Referer' => $this->url($formPath), 'Content-Type' => 'application/x-www-form-urlencoded'],
+            'body' => $body,
+        ]);
+        $status = $response->getStatusCode();
+        $size = \strlen($response->getContent(false));
+        $after = $this->questions();
+        $location = $response->getHeaders(false)['location'][0] ?? '';
+        $this->keepCookies($session, $response->getHeaders(false));
+
+        if (302 !== $status || parse_url($location, \PHP_URL_PATH) !== $expectedLocation) {
+            throw new \RuntimeException(\sprintf('Posting %s did not save: %d, redirected to "%s" instead of %s.', $action, $status, $location, $expectedLocation));
+        }
+
+        $info = $response->getInfo();
+
+        return new PageMeasure(
+            status: $status,
+            queries: $after - $before - $cost,
+            firstByteSeconds: (float) ($info['starttransfer_time'] ?? $info['total_time'] ?? 0.0),
+            totalSeconds: (float) ($info['total_time'] ?? 0.0),
+            bytes: $size,
+        );
+    }
+
+    /**
      * Signs a session in through the form of the shop, as a visitor would: the form page gives the
      * hidden fields and the CSRF token, the post carries the Origin of the shop.
      *
@@ -97,29 +137,11 @@ final class QueryCountingClient
      */
     public function signIn(string $session, string $formPath, string $action, array $fields): void
     {
-        $page = $this->http->request('GET', $this->url($formPath), ['headers' => $this->headers($session)]);
-        $html = $page->getContent(false);
-        $this->keepCookies($session, $page->getHeaders(false));
+        [$actionUrl, $body] = $this->readForm($session, $formPath, $action, $fields);
 
-        $values = [];
-        $form = (new Crawler($html, $this->url($formPath)))->filterXPath(\sprintf('//form[@action="%s"]', $action));
-        if (0 === $form->count()) {
-            throw new \RuntimeException(\sprintf('No form posting to %s on %s.', $action, $formPath));
-        }
-        foreach ($form->filterXPath('.//input[@name]') as $input) {
-            if (!$input instanceof \DOMElement) {
-                continue;
-            }
-            $type = strtolower($input->getAttribute('type'));
-            if (\in_array($type, ['checkbox', 'radio'], true) && !$input->hasAttribute('checked')) {
-                continue;
-            }
-            $values[$input->getAttribute('name')] = $input->getAttribute('value');
-        }
-
-        $response = $this->http->request('POST', $this->url($action), [
-            'headers' => $this->headers($session) + ['Origin' => $this->origin(), 'Referer' => $this->url($formPath)],
-            'body' => array_merge($values, $fields),
+        $response = $this->http->request('POST', $actionUrl, [
+            'headers' => $this->headers($session) + ['Origin' => $this->origin(), 'Referer' => $this->url($formPath), 'Content-Type' => 'application/x-www-form-urlencoded'],
+            'body' => $body,
         ]);
         $status = $response->getStatusCode();
         $location = $response->getHeaders(false)['location'][0] ?? '';
@@ -128,6 +150,37 @@ final class QueryCountingClient
         if (302 !== $status || str_contains($location, $formPath)) {
             throw new \RuntimeException(\sprintf('Signing the %s session in failed: %d %s.', $session, $status, $location));
         }
+    }
+
+    /**
+     * Reads the form of a page whose action starts with $action: the URL it posts to, and the
+     * encoded body of what it holds (hidden fields and CSRF token, text, selected options, checked
+     * boxes), $fields replacing the values of the same name.
+     *
+     * @param array<string, string> $fields
+     *
+     * @return array{string, string}
+     */
+    private function readForm(string $session, string $formPath, string $action, array $fields): array
+    {
+        $page = $this->http->request('GET', $this->url($formPath), ['headers' => $this->headers($session)]);
+        $html = $page->getContent(false);
+        $this->keepCookies($session, $page->getHeaders(false));
+
+        $nodes = (new Crawler($html, $this->url($formPath)))->filterXPath(\sprintf('//form[starts-with(@action, "%s")]', $action));
+        if (0 === $nodes->count()) {
+            throw new \RuntimeException(\sprintf('No form posting to %s on %s.', $action, $formPath));
+        }
+        $form = $nodes->first()->form();
+
+        $pairs = [];
+        foreach (array_merge($form->getValues(), $fields) as $name => $value) {
+            foreach ((array) $value as $item) {
+                $pairs[] = rawurlencode((string) $name).'='.rawurlencode((string) $item);
+            }
+        }
+
+        return [$form->getUri(), implode('&', $pairs)];
     }
 
     private function url(string $path): string

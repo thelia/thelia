@@ -28,6 +28,7 @@ use Thelia\Core\TheliaKernel;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Test\Volume\Measure\MeasurePlan;
 use Thelia\Test\Volume\Measure\MeasureReport;
+use Thelia\Test\Volume\Measure\PageMeasure;
 use Thelia\Test\Volume\Measure\QueryCountingClient;
 use Thelia\Test\Volume\VolumeDatasetFingerprint;
 use Thelia\Test\Volume\VolumeDatasetGenerator;
@@ -106,11 +107,14 @@ final class MeasureVolumeCommand extends Command
 
         $io->section(\sprintf('Pages (%d calls each after a warm-up)', $runs));
         foreach ($plan->pages as $page) {
+            $call = null === $page['submit']
+                ? static fn (): PageMeasure => $client->measure($page['path'], $page['session'])
+                : static fn (): PageMeasure => $client->submit($page['path'], $page['submit']['action'], $page['submit']['fields'], $page['submit']['expect'], $page['session']);
             // The first call pays the warm-up of caches a running shop keeps warm: left out.
-            $client->measure($page['path'], $page['session']);
+            $call();
             $measures = [];
             for ($run = 0; $run < $runs; ++$run) {
-                $measures[] = $client->measure($page['path'], $page['session']);
+                $measures[] = $call();
             }
             $report->addPage($page, $measures);
         }

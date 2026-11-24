@@ -9,6 +9,9 @@
 #
 # A page is called once to warm up, then --runs times: its query count must be the same at
 # every call. The session of a page is anonymous unless it names one of the sign_in entries.
+# A page with a submit entry measures the save of its form, unchanged: the page is read and not
+# counted, the post is counted and must redirect to the expect path (a refused save redirects
+# elsewhere). Saving the product changes its update date, nothing else.
 
 sign_in:
   customer:
@@ -37,6 +40,11 @@ pages:
   - { name: admin-products, area: back-office, path: /admin/products, session: admin }
   - { name: admin-products-last-page, area: back-office, path: '/admin/products?page={admin_products_last_page}', session: admin }
   - { name: admin-product, area: back-office, path: '/admin/products/update?product_id={product_id}', session: admin }
+  - name: admin-product-save
+    area: back-office
+    path: '/admin/products/update?product_id={product_id}'
+    session: admin
+    submit: { action: /admin/products/save, fields: { save_mode: close }, expect: /admin/products }
   - { name: admin-orders, area: back-office, path: /admin/orders, session: admin }
   - { name: admin-orders-last-page, area: back-office, path: '/admin/orders?page={admin_orders_last_page}', session: admin }
   - { name: admin-order, area: back-office, path: '/admin/order/update/{order_id}', session: admin }

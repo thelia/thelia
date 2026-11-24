@@ -24,7 +24,7 @@ namespace Thelia\Test\Volume\Measure;
  */
 final class MeasureReport
 {
-    /** @var list<array{name: string, area: string, path: string, session: string, status: int, queries: list<int>, steady: int, stable: bool, firstByteMedian: float, totalMedian: float, bytes: int}> */
+    /** @var list<array{name: string, area: string, path: string, session: string, submit: array{action: string, fields: array<string, string>, expect: string}|null, status: int, queries: list<int>, steady: int, stable: bool, firstByteMedian: float, totalMedian: float, bytes: int}> */
     private array $pages = [];
 
     /** @var list<array{name: string, command: string, seconds: float, exitCode: int}> */
@@ -39,8 +39,8 @@ final class MeasureReport
     }
 
     /**
-     * @param array{name: string, area: string, path: string, session: string} $page
-     * @param list<PageMeasure>                                                $runs
+     * @param array{name: string, area: string, path: string, session: string, submit: array{action: string, fields: array<string, string>, expect: string}|null} $page
+     * @param list<PageMeasure>                                                                                                                                   $runs
      */
     public function addPage(array $page, array $runs): void
     {
@@ -66,7 +66,7 @@ final class MeasureReport
     }
 
     /**
-     * @return list<array{name: string, area: string, path: string, session: string, status: int, queries: list<int>, steady: int, stable: bool, firstByteMedian: float, totalMedian: float, bytes: int}>
+     * @return list<array{name: string, area: string, path: string, session: string, submit: array{action: string, fields: array<string, string>, expect: string}|null, status: int, queries: list<int>, steady: int, stable: bool, firstByteMedian: float, totalMedian: float, bytes: int}>
      */
     public function pages(): array
     {

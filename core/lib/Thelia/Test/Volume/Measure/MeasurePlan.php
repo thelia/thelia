@@ -19,13 +19,16 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * The pages and the long jobs a measure campaign covers, read from a YAML file, with their
  * placeholders ({product_url}, {customer_email}...) replaced by values read from the dataset.
+ *
+ * A page with a submit entry measures the save of its form instead of its display: the page is
+ * read to fill the form, and only the post is counted.
  */
 final readonly class MeasurePlan
 {
     /**
-     * @param array<string, array{form: string, action: string, fields: array<string, string>}> $signIns
-     * @param list<array{name: string, area: string, path: string, session: string}>            $pages
-     * @param list<array{name: string, command: list<string>}>                                  $jobs
+     * @param array<string, array{form: string, action: string, fields: array<string, string>}>                                                                         $signIns
+     * @param list<array{name: string, area: string, path: string, session: string, submit: array{action: string, fields: array<string, string>, expect: string}|null}> $pages
+     * @param list<array{name: string, command: list<string>}>                                                                                                          $jobs
      */
     public function __construct(
         public array $signIns,
@@ -43,15 +46,15 @@ final readonly class MeasurePlan
             throw new \InvalidArgumentException(\sprintf('No measure plan at %s.', $file));
         }
 
-        /** @var array{sign_in?: array<string, array{form: string, action: string, fields?: array<string, string>}>, pages?: list<array{name: string, area?: string, path: string, session?: string}>, jobs?: list<array{name: string, command: list<string>}>} $data */
+        /** @var array{sign_in?: array<string, array{form: string, action: string, fields?: array<string, string>}>, pages?: list<array{name: string, area?: string, path: string, session?: string, submit?: array{action: string, fields?: array<string, string>, expect: string}}>, jobs?: list<array{name: string, command: list<string>}>} $data */
         $data = Yaml::parseFile($file);
 
         return self::fromArray($data, $placeholders);
     }
 
     /**
-     * @param array{sign_in?: array<string, array{form: string, action: string, fields?: array<string, string>}>, pages?: list<array{name: string, area?: string, path: string, session?: string}>, jobs?: list<array{name: string, command: list<string>}>} $data
-     * @param array<string, string|int>                                                                                                                                                                                                                      $placeholders
+     * @param array{sign_in?: array<string, array{form: string, action: string, fields?: array<string, string>}>, pages?: list<array{name: string, area?: string, path: string, session?: string, submit?: array{action: string, fields?: array<string, string>, expect: string}}>, jobs?: list<array{name: string, command: list<string>}>} $data
+     * @param array<string, string|int>                                                                                                                                                                                                                                                                                                      $placeholders
      */
     public static function fromArray(array $data, array $placeholders): self
     {
@@ -82,7 +85,15 @@ final readonly class MeasurePlan
             if ('anonymous' !== $session && !isset($signIns[$session])) {
                 throw new \InvalidArgumentException(\sprintf('The page %s needs the session %s, which the plan does not sign in.', $page['name'], $session));
             }
-            $pages[] = ['name' => $page['name'], 'area' => $page['area'] ?? 'front', 'path' => $replace($page['path']), 'session' => $session];
+            $submit = null;
+            if (isset($page['submit'])) {
+                $submit = [
+                    'action' => $replace($page['submit']['action']),
+                    'fields' => array_map($replace, $page['submit']['fields'] ?? []),
+                    'expect' => $replace($page['submit']['expect']),
+                ];
+            }
+            $pages[] = ['name' => $page['name'], 'area' => $page['area'] ?? 'front', 'path' => $replace($page['path']), 'session' => $session, 'submit' => $submit];
         }
 
         $jobs = [];

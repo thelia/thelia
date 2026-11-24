@@ -7,7 +7,7 @@ a disposable shop, never a live one.
 | Command | What it does |
 |---|---|
 | `thelia:test:volume:generate` | Writes a category tree, products with combinations, features, images, translations and prices, customers with an address, and orders. Refuses `APP_ENV=prod`, and a database holding orders it did not write unless `--force`. |
-| `thelia:test:volume:measure` | Calls each page of [`pages.yaml`](pages.yaml) on the running shop and counts the queries its database receives, then times the long jobs (exports). |
+| `thelia:test:volume:measure` | Calls each page of [`pages.yaml`](pages.yaml) on the running shop and counts the queries its database receives, saves a product sheet of the back office as it stands, then times the long jobs (exports). |
 | `thelia:test:volume:purge` | Deletes the dataset, and only it. `--dry-run` counts first. |
 
 ## What is measured
@@ -16,6 +16,13 @@ The main measure is the **number of database queries per page**. It does not dep
 or the load, and it is what predicts how a page holds as the catalogue grows: a page whose count
 stays flat holds, a page whose count grows with the number of products, orders or customers does not.
 Times (time to first byte, total) depend on the machine and are given as an order of magnitude.
+
+A page of the plan can also measure the save of its form (`submit`): the page is read to fill the
+form and is not counted, then the post is counted. The plan saves the newest generated product
+from its back-office sheet, unchanged, and the save must redirect to the product list, which is how
+the back office tells a saved sheet from a refused one. Each save changes the update date and the
+version of that product, so the fingerprint of the dataset differs after a campaign; the query
+counts do not.
 
 The count is read from the database server itself (`SHOW GLOBAL STATUS LIKE 'Questions'`) before
 and after each call, so it is exact only while nothing else talks to the database server. Each page

@@ -20,7 +20,7 @@ use Thelia\Test\Volume\Measure\PageMeasure;
 
 final class MeasureReportTest extends TestCase
 {
-    private const PAGE = ['name' => 'product', 'area' => 'front', 'path' => '/p.html', 'session' => 'anonymous'];
+    private const PAGE = ['name' => 'product', 'area' => 'front', 'path' => '/p.html', 'session' => 'anonymous', 'submit' => null];
 
     public function testThePageCountIsItsFewestQueriesAndACallAboveIsFlagged(): void
     {

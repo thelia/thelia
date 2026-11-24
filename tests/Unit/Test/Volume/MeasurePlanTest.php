@@ -31,9 +31,25 @@ final class MeasurePlanTest extends TestCase
         ], ['customer_email' => 'volume-customer-1@example.com', 'product_url' => '/oak-chair-1.html', 'export_ref' => 'thelia.export.orders']);
 
         self::assertSame(['email' => 'volume-customer-1@example.com'], $plan->signIns['customer']['fields']);
-        self::assertSame(['name' => 'product', 'area' => 'front', 'path' => '/oak-chair-1.html', 'session' => 'anonymous'], $plan->pages[0]);
+        self::assertSame(['name' => 'product', 'area' => 'front', 'path' => '/oak-chair-1.html', 'session' => 'anonymous', 'submit' => null], $plan->pages[0]);
         self::assertSame('customer', $plan->pages[1]['session']);
         self::assertSame(['export', 'thelia.export.orders'], $plan->jobs[0]['command']);
+    }
+
+    public function testASubmitEntryKeepsItsActionFieldsAndExpectedRedirect(): void
+    {
+        $plan = MeasurePlan::fromArray([
+            'sign_in' => ['admin' => ['form' => '/admin/login', 'action' => '/admin/checklogin']],
+            'pages' => [[
+                'name' => 'admin-product-save',
+                'path' => '/admin/products/update?product_id={product_id}',
+                'session' => 'admin',
+                'submit' => ['action' => '/admin/products/save', 'fields' => ['save_mode' => 'close'], 'expect' => '/admin/products'],
+            ]],
+        ], ['product_id' => 42]);
+
+        self::assertSame('/admin/products/update?product_id=42', $plan->pages[0]['path']);
+        self::assertSame(['action' => '/admin/products/save', 'fields' => ['save_mode' => 'close'], 'expect' => '/admin/products'], $plan->pages[0]['submit']);
     }
 
     public function testAPlaceholderTheDatasetDoesNotGiveIsRefused(): void
@@ -59,6 +75,7 @@ final class MeasurePlanTest extends TestCase
         ]);
 
         self::assertGreaterThanOrEqual(10, \count($plan->pages));
+        self::assertNotEmpty(array_filter($plan->pages, static fn (array $page): bool => null !== $page['submit']));
         self::assertSame(['customer', 'admin'], array_keys($plan->signIns));
     }
 }
