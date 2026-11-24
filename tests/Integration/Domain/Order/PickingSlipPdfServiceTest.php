@@ -121,9 +121,10 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
         $this->installPickingSlipTheme();
 
         $this->expectException(PickingSlipException::class);
-        $this->expectExceptionMessage('200 orders at most, 201 were requested');
+        $limit = PickingSlipPdfService::DEFAULT_MAX_ORDERS;
+        $this->expectExceptionMessage(\sprintf('%d orders at most, %d were requested', $limit, $limit + 1));
 
-        $this->service()->render(range(1, 201));
+        $this->service()->render(range(1, $limit + 1));
     }
 
     public function testTheLimitComesFromTheConfiguration(): void

@@ -45,7 +45,11 @@ final readonly class PickingSlipPdfService
     /** Name of the configuration variable that overrides the size limit of a batch. */
     public const string CONFIG_MAX_ORDERS = 'picking_slip_max_orders';
 
-    public const int DEFAULT_MAX_ORDERS = 200;
+    /**
+     * Dompdf takes nearly all the time of a batch, and more than in proportion: with five lines an order, 50 orders take
+     * under 10 s and 100 MB, 200 orders a minute and 256 MB, past the 30 s PHP stops a request at by default.
+     */
+    public const int DEFAULT_MAX_ORDERS = 50;
 
     public function __construct(
         private ParserResolver $parserResolver,
