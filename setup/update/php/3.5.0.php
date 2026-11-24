@@ -20,7 +20,7 @@ use Thelia\Model\OrderPaymentTransaction;
 use Thelia\Model\OrderQuery;
 use Thelia\Tools\TerminalText;
 
-// 3.4.0 brings the payment journal, which refunds read to know what an order collected.
+// The payment journal came with 3.4.0, and refunds read it to know what an order collected.
 // Orders paid before it have none: each paid, processing or sent order without a journal
 // gets the capture it was paid with, its total under the reference the provider gave it.
 // Refunded and cancelled orders are left alone: what they collected was given back, or
@@ -79,7 +79,7 @@ do {
             ->setPspReference($reference)
             ->setPaymentModuleId($order->getPaymentModuleId())
             ->setActorType(OrderHistoryActorType::SYSTEM->value)
-            ->setActorLabel('Thelia 3.4.0 update')
+            ->setActorLabel('Thelia 3.5.0 update')
             ->setCreatedAt($order->getInvoiceDate() ?? $order->getCreatedAt())
             ->save();
     }

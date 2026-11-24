@@ -122,6 +122,6 @@ final class LegacyPaymentJournalUpdateTest extends ActionIntegrationTestCase
         // What Update::updateToVersion() hands the PHP scripts of setup/update/php.
         $database = new Database(Propel::getConnection(OrderTableMap::DATABASE_NAME));
 
-        include \dirname(__DIR__, 3).'/setup/update/php/3.4.0.php';
+        include \dirname(__DIR__, 3).'/setup/update/php/3.5.0.php';
     }
 }
