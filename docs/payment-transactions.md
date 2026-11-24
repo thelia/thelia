@@ -572,9 +572,11 @@ no journal either, and the screens must render an empty one without error.
   capture right, the capture right alone).
 - `tests/Integration/Domain/Payment/PaymentRefundServiceTest.php` — refunds
   through the module or recorded by hand, the bounds, the repeat guard, the
-  configuration of the sale unit, the comment, the refund in full only.
+  configuration of the sale unit, the comment, the refund in full only, an order
+  paid by FreeOrder that has nothing to refund.
 - `tests/Http/BackOffice/OrderRefundBackOfficeTest.php` — the refund dialog, its
-  mode, its refusals and its right, the manual record of a pending refund.
+  mode, its refusals and its right, the manual record of a pending refund, the
+  lock of its button once sent and the banner of a refund that went through.
 - `tests/Api/Admin/OrderPaymentReferenceApiTest.php` — the transaction reference
   and the payment module of an order with a journal are not changed by the API.
 - `tests/Integration/Domain/Payment/AuthorizedOrderStockTest.php` — an order on

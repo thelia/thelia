@@ -53,6 +53,7 @@ Not released yet.
 - The core calls a payment module about a refund (`supportsRefund()`, `refundsOnlyInFull()`, `refund()`) with the configuration of the sale unit the order was placed on (`PaymentModuleLocator::forOrder()`), as it does for a capture or a release; the journal lines a refund writes, and the status change they trigger, are announced with that configuration too.
 - `OrderPaymentTransactionEvent::isReplay()` tells a line announced again from its first announcement.
 - Back-office theme: a pending line of the payment journal offers, under the right that made the movement (the refund right for a refund, the capture right otherwise), to record the outcome read at the provider.
+- Back-office theme: the refund dialog disables its button once sent, so a double click sends one refund, and a refund that went through is confirmed by a banner with its amount and the reference of the provider (the amount alone when it was recorded outside the provider); a refund left pending or refused by the answer of the module shows on its line of the journal only.
 
 ## Behaviour changes
 
