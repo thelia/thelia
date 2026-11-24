@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Payment;
 
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderPaymentRefundEvent;
 use Thelia\Core\Event\Order\OrderRefundedEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -36,6 +37,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderPaymentTransactionQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Payment\DeferredCapturePaymentModule;
@@ -363,6 +365,52 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         self::assertSame('0.000000', $this->totals->forOrder((int) $order->getId())->refundable());
     }
 
+    public function testAnOrderPaidByFreeOrderIsNotRefundedThroughItsModule(): void
+    {
+        // FreeOrder cannot give money back: the refusal comes before the amount is read, so
+        // asking for everything or for a part is refused alike, and nothing is written.
+        $order = $this->freeOrderPaid();
+        $journalBefore = OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())->count();
+
+        self::assertFalse($this->service->supportsRefund($order));
+
+        foreach ([null, 10.0] as $amount) {
+            try {
+                $this->service->refund($order, $amount, RefundReason::Goodwill);
+                self::fail('FreeOrder does not refund through its provider.');
+            } catch (RefundNotSupportedException $refused) {
+                self::assertStringContainsString('FreeOrder', $refused->getMessage());
+            }
+        }
+
+        self::assertSame($journalBefore, OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())->count());
+        self::assertSame('0.000000', $this->totals->forOrder((int) $order->getId())->refundable());
+        self::assertSame(OrderStatus::CODE_PAID, $this->statusOf($order));
+        self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
+    }
+
+    public function testARefundRecordedByHandOnAnOrderPaidByFreeOrderIsRefusedForWantOfCollectedMoney(): void
+    {
+        // The order cost nothing: its zero capture leaves nothing to give back, so even a
+        // refund written by hand is refused, whatever the amount, and the order stays paid.
+        $order = $this->freeOrderPaid();
+        $journalBefore = OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())->count();
+
+        foreach ([null, 10.0] as $amount) {
+            try {
+                $this->service->recordOfflineRefund($order, $amount, RefundReason::Goodwill, 'Nothing was paid');
+                self::fail('Nothing was collected, nothing can be refunded.');
+            } catch (InvalidPaymentAmountException $refused) {
+                self::assertStringContainsString('nothing collected is left to refund', $refused->getMessage());
+            }
+        }
+
+        self::assertSame($journalBefore, OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())->count());
+        self::assertSame(0, OrderPaymentTransactionQuery::create()->filterByOrderId($order->getId())->filterByTypeEnum(PaymentTransactionType::REFUND)->count());
+        self::assertSame(OrderStatus::CODE_PAID, $this->statusOf($order));
+        self::assertSame([], DeferredCapturePaymentModule::$refundCalls);
+    }
+
     public function testTheBackOfficeAndTheApiRefundThroughTheEvent(): void
     {
         $order = $this->paidOrder(100);
@@ -402,6 +450,17 @@ final class PaymentRefundServiceTest extends ActionIntegrationTestCase
         $order = $this->factory->order(null, ['postage' => $total, 'paymentModuleCode' => DeferredCapturePaymentModule::getModuleCode()]);
         $this->recorder->recordAuthorization($order, $total, 'AUTH-'.$order->getId(), moduleCode: DeferredCapturePaymentModule::getModuleCode());
         $this->getService(PaymentCaptureService::class)->capture($order);
+        self::assertSame(OrderStatus::CODE_PAID, $this->statusOf($order));
+
+        return $order;
+    }
+
+    private function freeOrderPaid(): Order
+    {
+        $order = $this->factory->order(null, ['paymentModuleCode' => 'FreeOrder']);
+        $event = new OrderEvent($order);
+        $event->setStatus(OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PAID)?->getId() ?? throw new \RuntimeException('The paid status is not seeded.'));
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
         self::assertSame(OrderStatus::CODE_PAID, $this->statusOf($order));
 
         return $order;
