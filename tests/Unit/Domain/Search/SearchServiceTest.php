@@ -92,13 +92,14 @@ final class SearchServiceTest extends TestCase
         self::assertCount(SearchQuery::MAX_ALTERNATIVE_TERMS, $alternatives);
     }
 
-    public function testTheAlternativeTermsOfASearchAreThoseOfTheRewrittenTerm(): void
+    public function testTheTermsOfASearchAreTheRewrittenTermAndItsEquivalentsOnly(): void
     {
-        $service = $this->service(null, rewriters: [$this->rewriter('tlphone', 'telephone')], expanders: [$this->expander(['telephone' => ['mobile', 'tlphone'], 'tlphone' => ['typo']])]);
+        $service = $this->service(null, rewriters: [$this->rewriter('tlphone', 'telephone'), $this->rewriter('the', '')], expanders: [$this->expander(['telephone' => ['mobile'], 'tlphone' => ['typo']])]);
 
-        self::assertSame(['telephone', 'mobile'], $service->alternativeTermsOf(' tlphone ', 'en_US'));
-        self::assertSame(['mobile', 'tlphone'], $service->alternativeTermsOf('telephone', 'en_US'));
-        self::assertSame([], $service->alternativeTermsOf('chair', 'en_US'));
+        self::assertSame(['telephone', 'mobile'], $service->termsOf(' tlphone ', 'en_US'));
+        self::assertSame(['telephone', 'mobile'], $service->termsOf('telephone', 'en_US'));
+        self::assertSame(['chair'], $service->termsOf('chair', 'en_US'));
+        self::assertSame([], $service->termsOf('the', 'en_US'));
     }
 
     public function testAFailingExpanderIsLeftOutAndLogged(): void
