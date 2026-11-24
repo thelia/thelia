@@ -52,9 +52,12 @@ final readonly class StockActionDiagnostics
             return [];
         }
 
+        // The triggers a status change reads (OrderStatusActionRunner::actionsFor()): a stock
+        // action fired by the edit of an order decides nothing, so it neither wins nor loses.
         $actions = OrderStatusActionQuery::create()
             ->filterByActionType(AdjustStockAction::getType())
             ->filterByActive(true)
+            ->filterByTriggerType([OrderStatusActionTrigger::ENTER->value, OrderStatusActionTrigger::TRANSITION->value], Criteria::IN)
             ->orderByPosition()
             ->orderById()
             ->find()

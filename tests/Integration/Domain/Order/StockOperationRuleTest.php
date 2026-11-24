@@ -337,6 +337,19 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         self::assertArrayNotHasKey($customFirst->getId(), $overriddenActions);
     }
 
+    public function testAStockActionFiredByAnOrderEditNeitherOverridesNorIsOverridden(): void
+    {
+        $onEdit = $this->stockAction(OrderStatusActionTrigger::EDIT, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_NONE, 1);
+        $onEnter = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_DECREASE, 2);
+        $onEditAfter = $this->stockAction(OrderStatusActionTrigger::EDIT, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_INCREASE, 3);
+
+        $overriddenActions = $this->getService(StockActionDiagnostics::class)->overriddenActions();
+
+        self::assertArrayNotHasKey($onEditAfter->getId(), $overriddenActions, 'No status change reads an action fired by an order edit: none wins over it.');
+        self::assertNotContains($onEdit->getId(), $overriddenActions);
+        self::assertArrayNotHasKey($onEnter->getId(), $overriddenActions);
+    }
+
     public function testARefusedPayloadIsRecordedOnceTheStatusChangeIsCommittedAndNotWhenTheChangeIsRefused(): void
     {
         $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, 'drop_table');
