@@ -537,6 +537,13 @@ readonly class FilterService
         }
 
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
+
+        // Several categories checked (a shopper widening the listing) have no single set of
+        // choice_filter rows to obey: every filter is offered, as outside any category.
+        if (\is_array($categoryId)) {
+            return ['rows' => [], 'template_id' => null];
+        }
+
         $category = CategoryQuery::create()->findPk(key: $categoryId);
 
         // A category closed to the visitor is as good as absent: its facets are not described either.
