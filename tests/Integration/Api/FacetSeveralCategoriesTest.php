@@ -22,7 +22,8 @@ use Thelia\Test\IntegrationTestCase;
 /**
  * A shopper who checks a second category widens the listing; the facets that accompany it are
  * read on both. No single category rules them then, so every filter is offered, as outside any
- * category, instead of the request failing on a list of categories where one was expected.
+ * category, instead of the request failing on a list of categories where one was expected. A
+ * single category keeps obeying its own rules.
  *
  * Catalogue: AISLE-A holds a product of brand Local, AISLE-B one of brand Remote.
  */
@@ -49,11 +50,12 @@ final class FacetSeveralCategoriesTest extends IntegrationTestCase
         self::assertSame(['Local' => 1, 'Remote' => 1], $this->counts($facets, 'brand'));
     }
 
-    public function testOneCheckedCategoryKeepsItsOwnFacets(): void
+    public function testOneCheckedCategoryStillObeysItsOwnRules(): void
     {
+        // Unchanged: a single category nobody gave filter rules to describes no facet.
         $facets = $this->facets([[$this->aisleA]]);
 
-        self::assertSame(['Local' => 1], $this->counts($facets, 'brand'));
+        self::assertSame([], $this->counts($facets, 'brand'));
     }
 
     /**
