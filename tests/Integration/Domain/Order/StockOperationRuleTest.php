@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Domain\Order;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\GetStockUpdateOperationOnOrderStatusChangeEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -411,6 +412,35 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
 
         self::assertSame(7.0, $this->stockOf($productSaleElements));
         self::assertSame(['stock' => 'decrease', 'stock_action_id' => null], $this->stockOfLastStatusLine($order));
+    }
+
+    /**
+     * A console command or a scheduled task changes a status without any HTTP request: the
+     * stock action decides all the same.
+     */
+    public function testAStockActionDecidesAStatusChangeMadeWithoutAnHttpRequest(): void
+    {
+        $action = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_NONE);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_PAID);
+        $requestStack = $this->getService(RequestStack::class);
+        $requests = [];
+
+        while (null !== ($request = $requestStack->pop())) {
+            array_unshift($requests, $request);
+        }
+
+        try {
+            $this->moveOrderTo($order, OrderStatus::CODE_REFUNDED);
+        } finally {
+            foreach ($requests as $request) {
+                $requestStack->push($request);
+            }
+        }
+
+        self::assertNotSame([], $requests, 'The test had no request to take away: it proves nothing.');
+        self::assertSame(10.0, $this->stockOf($productSaleElements));
+        self::assertSame(['stock' => 'none', 'stock_action_id' => $action->getId()], $this->stockOfLastStatusLine($order));
     }
 
     private function stockIsManagedOnOrderCreation(bool $managed): void
