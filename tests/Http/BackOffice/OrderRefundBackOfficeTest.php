@@ -92,14 +92,29 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertCount(5, $crawler->filter('[data-testid="order-payment-refund-reason"] option'));
     }
 
+    public function testTheRefundFormLocksItsSubmitButtonOnceSent(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $order = $this->paidOrder(100);
+
+        $form = $this->sheet($order)->filter('[data-testid="order-payment-refund-form"]');
+
+        self::assertSame('bo-submit-once', $form->attr('data-controller'));
+        self::assertStringContainsString('submit->bo-submit-once#lock', (string) $form->attr('data-action'));
+        self::assertStringContainsString('pageshow@window->bo-submit-once#unlock', (string) $form->attr('data-action'));
+    }
+
     public function testAFullRefundFromTheDialogRefundsTheOrderAndIsLogged(): void
     {
         $this->loginAs($this->factory->admin());
         $order = $this->paidOrder(100);
 
-        $this->postRefund($order, ['amount' => '', 'reason' => 'returned', 'comment' => 'Parcel came back']);
+        $crawler = $this->postRefund($order, ['amount' => '', 'reason' => 'returned', 'comment' => 'Parcel came back']);
 
         $line = OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())[0];
+        $banner = $crawler->filter('[data-testid="bo-flash-success"]')->text('');
+        self::assertStringContainsString('100.00', $banner, 'The banner says how much was given back.');
+        self::assertStringContainsString('REF-'.$line->getId(), $banner, 'The banner gives the reference the provider returned.');
         self::assertTrue($line->isSucceeded());
         self::assertSame('100.000000', $line->getAmount());
         self::assertSame(OrderStatus::CODE_REFUNDED, OrderQuery::create()->findPk($order->getId())->getOrderStatus()->getCode());
@@ -189,6 +204,25 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         self::assertSame(1, AdminLogQuery::create()->filterByMessage('%refund of 40.00 %failed: Refund window closed%', Criteria::LIKE)->count(), 'The refusal of the provider is written to the administration log.');
     }
 
+    public function testARefundThatDidNotGoThroughShowsNoSuccessBanner(): void
+    {
+        $this->loginAs($this->factory->admin());
+        $refused = $this->paidOrder(100);
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentOperationResult::failed('05', 'Refund declined');
+
+        $crawler = $this->postRefund($refused, ['amount' => '40', 'reason' => 'other']);
+
+        self::assertCount(0, $crawler->filter('[data-testid="bo-flash-success"]'), 'A refusal returned as a result shows on the line of the journal only.');
+        self::assertStringContainsString('Refund declined', $crawler->filter('[data-testid="order-payment-line"][data-payment-type="refund"]')->text(''));
+
+        $waiting = $this->paidOrder(100);
+        DeferredCapturePaymentModule::$nextRefundAnswer = PaymentOperationResult::pending('REF-SILENT');
+
+        $crawler = $this->postRefund($waiting, ['amount' => '40', 'reason' => 'other']);
+
+        self::assertCount(0, $crawler->filter('[data-testid="bo-flash-success"]'), 'A refund the provider has not confirmed is not announced.');
+    }
+
     public function testAnOrderWhoseModuleCannotRefundOffersToRecordARefundMadeOutsideIt(): void
     {
         $this->loginAs($this->factory->admin());
@@ -202,6 +236,10 @@ final class OrderRefundBackOfficeTest extends WebIntegrationTestCase
         $crawler = $this->postRefund($order, ['amount' => '100', 'reason' => 'cancellation', 'comment' => 'Bank transfer']);
 
         $line = OrderPaymentTransactionQuery::create()->findJournal((int) $order->getId())[0];
+        $banner = $crawler->filter('[data-testid="bo-flash-success"]')->text('');
+        self::assertStringContainsString('100.00', $banner);
+        self::assertStringNotContainsString((string) $line->getPspReference(), $banner, 'The reference of a refund recorded by hand is made up here: it is not shown.');
+        self::assertStringNotContainsString('offline-', $banner);
         self::assertSame(PaymentRefundService::ERROR_CODE_OFFLINE, $line->getErrorCode());
         self::assertStringContainsString('Refund made outside the provider', $crawler->filter('[data-testid="order-payment-line"][data-payment-type="refund"]')->text());
         self::assertCount(0, $crawler->filter('[data-payment-type="refund"] [data-testid="order-payment-line-error"]'));
