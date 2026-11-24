@@ -74,26 +74,17 @@ final readonly class SearchService
     }
 
     /**
-     * The terms a search of $term looks for besides $term itself, as the engine path does:
-     * the term rewritten, then the equivalents of the rewritten term.
-     *
      * @return list<string>
      */
-    public function alternativeTermsOf(string $term, ?string $locale): array
+    public function termsOf(string $term, ?string $locale): array
     {
-        $term = trim($term);
-        $rewritten = trim($this->rewrite($term, $locale));
+        $rewritten = trim($this->rewrite(trim($term), $locale));
 
         if ('' === $rewritten) {
             return [];
         }
 
-        $alternatives = array_filter(
-            array_unique([$rewritten, ...$this->expand($rewritten, $locale)]),
-            static fn (string $alternative): bool => $alternative !== $term,
-        );
-
-        return \array_slice(array_values($alternatives), 0, SearchQuery::MAX_ALTERNATIVE_TERMS);
+        return [$rewritten, ...$this->expand($rewritten, $locale)];
     }
 
     public function rewrite(string $term, ?string $locale): string
