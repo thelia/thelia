@@ -316,7 +316,7 @@ journal moves a paid order to `refunded`, through the transition graph, as it
 moves it to `paid` after a capture. A partial refund leaves the order as it is.
 Giving money back is a right of its own, `admin.order.payment-refund`.
 
-Orders paid before 3.4.0 get their capture from the update (`setup/update/php/3.4.0.php`):
+Orders paid before 3.4.0 get their capture from the update (`setup/update/php/3.5.0.php`):
 the order total, its `transaction_ref`, the shop as author. Without it they would
 hold nothing refundable.
 
@@ -528,7 +528,8 @@ full only, the amount is the whole and read only.
 A fresh install creates the table and seeds the status and the right
 (`setup/thelia.sql`, `setup/insert.sql`). An installed shop gets them from
 `setup/update/sql/3.4.0.sql`: the table, the status appended after the
-existing ones, the rights with their titles. `setup/update/php/3.4.0.php` then
+existing ones, the capture right with its titles. The refund right comes with
+`setup/update/sql/3.5.0.sql`, and `setup/update/php/3.5.0.php` then
 writes for each order paid, processing or sent (or in a status equivalent to one
 of them) without a journal the capture it was paid with, so that what it
 collected can be refunded; the other orders keep their transaction reference and

@@ -435,6 +435,9 @@ DEALLOCATE PREPARE create_table_statement;
 -- ---------------------------------------------------------------------
 -- Giving money back is a right of its own, distinct from editing orders and from
 -- taking money. It is granted to no profile. Replaying the script changes nothing.
+--
+-- setup/update/php/3.5.0.php then writes the capture of each order paid before the
+-- payment journal of 3.4.0, so that what it collected can be refunded.
 -- ---------------------------------------------------------------------
 
 INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
