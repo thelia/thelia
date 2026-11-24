@@ -25,6 +25,7 @@ use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
+use Thelia\Tools\RedirectUrl;
 use Thelia\Tools\URL;
 
 final readonly class SearchRedirectTargets
@@ -93,8 +94,7 @@ final readonly class SearchRedirectTargets
     public static function isInternalPath(string $path): bool
     {
         return str_starts_with($path, '/')
-            && !str_starts_with($path, '//')
-            && !str_contains($path, '\\')
-            && 1 !== preg_match('/[\x00-\x20\x7F]/', $path);
+            && !str_contains($path, ' ')
+            && RedirectUrl::isSafe($path, '');
     }
 }
