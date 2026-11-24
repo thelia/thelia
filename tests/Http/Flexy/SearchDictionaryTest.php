@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Search\Dictionary\SearchRedirectTargetType;
 use Thelia\Domain\Search\Event\SearchSynonymWriteEvent;
 use Thelia\Domain\Search\Event\SearchTermRedirectWriteEvent;
+use Thelia\Domain\Search\SearchIndexingQueue;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\SearchTermRedirect;
@@ -72,6 +73,7 @@ final class SearchDictionaryTest extends WebIntegrationTestCase
             ->setTerm('mobilephone')
             ->setSynonyms(['smartphone']);
         $this->getService('event_dispatcher')->dispatch($event, TheliaEvents::SEARCH_SYNONYM_CREATE);
+        $this->indexTheFixtures();
 
         $this->dropRequestsWithoutSession();
         $this->assertPageRenders('/search?query=mobilephone');
@@ -99,11 +101,17 @@ final class SearchDictionaryTest extends WebIntegrationTestCase
     {
         $factory = $this->createFixtureFactory();
         $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['title' => 'Wildcard dictionary lamp']);
+        $this->indexTheFixtures();
 
         $this->dropRequestsWithoutSession();
         $this->assertPageRenders('/search?query='.rawurlencode('_ildcard dictionary'));
 
         self::assertStringNotContainsString('Wildcard dictionary lamp', (string) $this->client->getResponse()->getContent());
+    }
+
+    private function indexTheFixtures(): void
+    {
+        $this->getService(SearchIndexingQueue::class)->flush();
     }
 
     private function dropRequestsWithoutSession(): void
