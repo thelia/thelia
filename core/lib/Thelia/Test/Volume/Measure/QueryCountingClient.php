@@ -41,6 +41,7 @@ final class QueryCountingClient
         private readonly ConnectionInterface $connection,
         private readonly string $baseUrl,
         ?HttpClientInterface $http = null,
+        private readonly int $settleMicroseconds = 100_000,
     ) {
         // A measure targets a disposable shop, often behind a local certificate.
         $this->http = $http ?? HttpClient::create(['verify_peer' => false, 'verify_host' => false, 'max_redirects' => 0, 'timeout' => 600]);
@@ -71,23 +72,47 @@ final class QueryCountingClient
 
     public function measure(string $path, string $session = 'anonymous'): PageMeasure
     {
-        $cost = $this->readingCost();
+        $this->readingCost();
         $before = $this->questions();
         $response = $this->http->request('GET', $this->url($path), ['headers' => $this->headers($session)]);
         $status = $response->getStatusCode();
         $size = \strlen($response->getContent(false));
-        $after = $this->questions();
+        $queries = $this->queriesSince($before);
         $this->keepCookies($session, $response->getHeaders(false));
 
         $info = $response->getInfo();
 
         return new PageMeasure(
             status: $status,
-            queries: $after - $before - $cost,
+            queries: $queries,
             firstByteSeconds: (float) ($info['starttransfer_time'] ?? $info['total_time'] ?? 0.0),
             totalSeconds: (float) ($info['total_time'] ?? 0.0),
             bytes: $size,
         );
+    }
+
+    /**
+     * The statements received since the reading $before, once the shop has finished with the call.
+     * A server that sends the response before the end of the request (PHP-FPM runs the terminate
+     * listeners after fastcgi_finish_request()) still queries after the client has the body: the
+     * counter is read again until it only moves by its own readings.
+     */
+    private function queriesSince(int $before): int
+    {
+        $cost = $this->readingCost();
+        $readings = 1;
+        $last = $this->questions();
+        for ($attempt = 0; $attempt < 50; ++$attempt) {
+            usleep($this->settleMicroseconds);
+            $next = $this->questions();
+            if ($next - $last === $cost) {
+                break;
+            }
+            $last = $next;
+            ++$readings;
+        }
+
+        return $last - $before - $readings * $cost;
     }
 
     /**
@@ -102,7 +127,7 @@ final class QueryCountingClient
     {
         [$actionUrl, $body] = $this->readForm($session, $formPath, $action, $fields);
 
-        $cost = $this->readingCost();
+        $this->readingCost();
         $before = $this->questions();
         $response = $this->http->request('POST', $actionUrl, [
             'headers' => $this->headers($session) + ['Origin' => $this->origin(), 'Referer' => $this->url($formPath), 'Content-Type' => 'application/x-www-form-urlencoded'],
@@ -110,7 +135,7 @@ final class QueryCountingClient
         ]);
         $status = $response->getStatusCode();
         $size = \strlen($response->getContent(false));
-        $after = $this->questions();
+        $queries = $this->queriesSince($before);
         $location = $response->getHeaders(false)['location'][0] ?? '';
         $this->keepCookies($session, $response->getHeaders(false));
 
@@ -122,7 +147,7 @@ final class QueryCountingClient
 
         return new PageMeasure(
             status: $status,
-            queries: $after - $before - $cost,
+            queries: $queries,
             firstByteSeconds: (float) ($info['starttransfer_time'] ?? $info['total_time'] ?? 0.0),
             totalSeconds: (float) ($info['total_time'] ?? 0.0),
             bytes: $size,

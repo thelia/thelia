@@ -25,7 +25,9 @@ version of that product, so the fingerprint of the dataset differs after a campa
 counts do not.
 
 The count is read from the database server itself (`SHOW GLOBAL STATUS LIKE 'Questions'`) before
-and after each call, so it is exact only while nothing else talks to the database server. Each page
+and after each call, so it is exact only while nothing else talks to the database server. After a
+call the counter is read again until it only moves by its own readings: behind PHP-FPM, the shop
+sends the response before the end of the request and may still query the database afterwards. Each page
 is called once to warm up, then `--runs` times. Its count is the fewest queries over those calls: a
 cache that expires during the measure (one kept for a minute adds a few queries once a minute) costs
 one call more, not the steady state of the page. Every call is kept in the JSON file.

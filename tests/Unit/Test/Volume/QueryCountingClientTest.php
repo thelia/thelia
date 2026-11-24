@@ -48,8 +48,9 @@ final class QueryCountingClientTest extends TestCase
                 return new MockResponse('', ['http_code' => 302, 'response_headers' => ['Location' => '/admin/products?page=1']]);
             },
         ]);
-        // Counter readings: three pairs to learn what a reading costs (1), then before and after the post.
-        $client = new QueryCountingClient($this->counter([10, 11, 20, 21, 30, 31, 100, 140]), 'https://shop.test', $http);
+        // Counter readings: three pairs to learn what a reading costs (1), then before and after the
+        // post, and one more reading that only moves by itself.
+        $client = new QueryCountingClient($this->counter([10, 11, 20, 21, 30, 31, 100, 140, 141]), 'https://shop.test', $http, 0);
 
         $measure = $client->submit('/admin/products/update?product_id=7', '/admin/products/save', ['save_mode' => 'close'], '/admin/products', 'admin');
 
@@ -70,11 +71,23 @@ final class QueryCountingClientTest extends TestCase
             new MockResponse(self::FORM_PAGE),
             new MockResponse('', ['http_code' => 302, 'response_headers' => ['Location' => '/admin/products/update?product_id=7']]),
         ]);
-        $client = new QueryCountingClient($this->counter([10, 11, 20, 21, 30, 31, 100, 140]), 'https://shop.test', $http);
+        $client = new QueryCountingClient($this->counter([10, 11, 20, 21, 30, 31, 100, 140, 141]), 'https://shop.test', $http, 0);
 
         $this->expectExceptionMessage('did not save');
 
         $client->submit('/admin/products/update?product_id=7', '/admin/products/save', [], '/admin/products', 'admin');
+    }
+
+    public function testAQueryTheShopSendsAfterTheResponseIsCounted(): void
+    {
+        $http = new MockHttpClient([
+            new MockResponse('<html></html>'),
+        ]);
+        // After the body: 139 (the page's 38 and the reading), then 141 (a terminate listener
+        // queried once more), then 142, which only moves by the reading itself.
+        $client = new QueryCountingClient($this->counter([10, 11, 20, 21, 30, 31, 100, 139, 141, 142]), 'https://shop.test', $http, 0);
+
+        self::assertSame(39, $client->measure('/')->queries);
     }
 
     /**
