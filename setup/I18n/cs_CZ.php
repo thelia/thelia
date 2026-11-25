@@ -48,4 +48,9 @@ return [
     '{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}' => '{% if recipient == "shop" %}Předplatné {{ subscription_ref }} pozastaveno po {{ failure_count }} neúspěšných platbách{% else %}Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} je pozastaveno{% endif %}',
     'Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled' => 'Vaše předplatné {{ subscription_ref }} na {{ config("store_name") }} bylo zrušeno',
     'Join {{ company_name }} on {{ config("store_name") }}' => 'Připojte se k {{ company_name }} na {{ config("store_name") }}',
+    'New quote request {{ quote_ref }} on {{ config("store_name") }}' => 'Nový požadavek na nabídku {{ quote_ref }} na {{ config("store_name") }}',
+    'Your quote {{ quote_ref }} on {{ config("store_name") }}' => 'Vaše nabídka {{ quote_ref }} na {{ config("store_name") }}',
+    'Counter-proposal on quote {{ quote_ref }} on {{ config("store_name") }}' => 'Protinávrh k nabídce {{ quote_ref }} na {{ config("store_name") }}',
+    'Quote {{ quote_ref }} accepted on {{ config("store_name") }}' => 'Nabídka {{ quote_ref }} přijata na {{ config("store_name") }}',
+    'Quote {{ quote_ref }} rejected on {{ config("store_name") }}' => 'Nabídka {{ quote_ref }} zamítnuta na {{ config("store_name") }}',
 ];

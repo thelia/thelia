@@ -76,7 +76,7 @@ final class CompanyBuyersActionsTest extends CompanyAccountTestCase
     public function testTheRolesOfferedAreTheOnesTheManagerHoldsThemselves(): void
     {
         $company = $this->company();
-        $this->roleOf('manager', [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::BUYER_MANAGE]);
+        $this->roleOf('manager', [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::QUOTE_REQUEST, CompanyPermission::BUYER_MANAGE]);
         $manager = $this->buyer($company, 'manager');
         $this->buyer($company, CompanyRoleCode::ADMINISTRATOR);
         $this->signInAs($manager);
@@ -93,7 +93,7 @@ final class CompanyBuyersActionsTest extends CompanyAccountTestCase
     public function testABuyerWhoHoldsMoreThanTheManagerIsShownButNotEditable(): void
     {
         $company = $this->company();
-        $this->roleOf('manager', [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::BUYER_MANAGE]);
+        $this->roleOf('manager', [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::QUOTE_REQUEST, CompanyPermission::BUYER_MANAGE]);
         $manager = $this->buyer($company, 'manager');
         $this->buyer($company, CompanyRoleCode::ADMINISTRATOR);
         $this->signInAs($manager);
@@ -172,7 +172,7 @@ final class CompanyBuyersActionsTest extends CompanyAccountTestCase
     {
         ConfigQuery::write('store_email', 'shop@test.com');
         $company = $this->company();
-        $this->roleOf('manager', [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::BUYER_MANAGE]);
+        $this->roleOf('manager', [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::QUOTE_REQUEST, CompanyPermission::BUYER_MANAGE]);
         $manager = $this->buyer($company, 'manager');
         $this->buyer($company, CompanyRoleCode::ADMINISTRATOR);
         $this->signInAs($manager);

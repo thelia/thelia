@@ -196,7 +196,7 @@ final class CompanyFrontApiTest extends CompanyApiTestCase
 
     public function testAManagerCannotGiveARoleAboveTheirOwn(): void
     {
-        $this->roleOf('manager', $this->first, ['order.place', 'order.view_own', 'buyer.manage']);
+        $this->roleOf('manager', $this->first, ['order.place', 'order.view_own', 'buyer.manage', 'quote.request']);
         $manager = $this->buyerOf($this->first, 'manager');
         $link = CompanyCustomerQuery::create()->findOneByCustomerId($this->buyer->getId());
         $token = $this->token($manager);
@@ -209,7 +209,7 @@ final class CompanyFrontApiTest extends CompanyApiTestCase
 
     public function testAManagerCannotRaiseTheLimitsAboveTheirOwn(): void
     {
-        $this->roleOf('manager', $this->first, ['order.place', 'order.view_own', 'buyer.manage']);
+        $this->roleOf('manager', $this->first, ['order.place', 'order.view_own', 'buyer.manage', 'quote.request']);
         $manager = $this->buyerOf($this->first, 'manager', '300', '1000', 'month');
         $link = CompanyCustomerQuery::create()->findOneByCustomerId($this->buyer->getId());
         $token = $this->token($manager);

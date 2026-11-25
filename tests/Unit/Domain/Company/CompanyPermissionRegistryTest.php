@@ -24,7 +24,7 @@ final class CompanyPermissionRegistryTest extends TestCase
     public function testItListsTheCorePermissionsAndTheOnesOfTheModules(): void
     {
         $registry = new CompanyPermissionRegistry([
-            $this->provider(['quote.request' => 'Request a quote']),
+            $this->provider(['invoice.download' => 'Download the invoices']),
             $this->provider(['catalog.export' => 'Export the catalog']),
         ]);
 
@@ -42,21 +42,21 @@ final class CompanyPermissionRegistryTest extends TestCase
             self::assertArrayHasKey($core, $all);
         }
 
-        self::assertSame('Request a quote', $all['quote.request']);
+        self::assertSame('Download the invoices', $all['invoice.download']);
         self::assertSame('Export the catalog', $all['catalog.export']);
-        self::assertTrue($registry->isKnown('quote.request'));
+        self::assertTrue($registry->isKnown('invoice.download'));
         self::assertFalse($registry->isKnown('nothing.at.all'));
     }
 
     public function testAModuleCannotRedefineACorePermissionAndTheFirstModuleKeepsItsCode(): void
     {
         $registry = new CompanyPermissionRegistry([
-            $this->provider([CompanyPermission::BUYER_MANAGE => 'Everything', 'quote.request' => 'First']),
-            $this->provider(['quote.request' => 'Second']),
+            $this->provider([CompanyPermission::BUYER_MANAGE => 'Everything', 'invoice.download' => 'First']),
+            $this->provider(['invoice.download' => 'Second']),
         ]);
 
         self::assertSame(CompanyPermission::labels()[CompanyPermission::BUYER_MANAGE], $registry->all()[CompanyPermission::BUYER_MANAGE]);
-        self::assertSame('First', $registry->all()['quote.request']);
+        self::assertSame('First', $registry->all()['invoice.download']);
     }
 
     public function testWithoutAnyModuleOnlyTheCorePermissionsAreKnown(): void

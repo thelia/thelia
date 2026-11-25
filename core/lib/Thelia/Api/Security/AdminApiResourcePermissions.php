@@ -101,6 +101,9 @@ use Thelia\Api\Resource\ProductSaleElements;
 use Thelia\Api\Resource\ProductSaleElementsProductImage;
 use Thelia\Api\Resource\ProductSaleElementsProductVideo;
 use Thelia\Api\Resource\ProductVideo;
+use Thelia\Api\Resource\Quote;
+use Thelia\Api\Resource\QuoteItem;
+use Thelia\Api\Resource\QuoteRevision;
 use Thelia\Api\Resource\Sale;
 use Thelia\Api\Resource\SaleUnit;
 use Thelia\Api\Resource\SaleUnitConfig;
@@ -215,6 +218,10 @@ final readonly class AdminApiResourcePermissions
         ProductSaleElementsProductImage::class => AdminResources::PRODUCT,
         ProductSaleElementsProductVideo::class => AdminResources::PRODUCT,
         ProductVideo::class => AdminResources::PRODUCT,
+        // A quote, its revisions and their lines: one right, the one that opens the quote screens.
+        Quote::class => AdminResources::QUOTE,
+        QuoteItem::class => AdminResources::QUOTE,
+        QuoteRevision::class => AdminResources::QUOTE,
         Sale::class => AdminResources::SALES,
         CatalogPriceRule::class => AdminResources::CATALOG_PRICE_RULE,
         SaleUnit::class => AdminResources::SALE_UNIT,

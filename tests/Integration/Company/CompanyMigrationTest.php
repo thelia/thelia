@@ -44,8 +44,8 @@ final class CompanyMigrationTest extends IntegrationTestCase
     /** What the fresh install seeds, which the block must give a shop that updates. */
     private const SHIPPED_ROLES = [
         'approver' => '["order.view_own","order.view_company","order.approve"]',
-        'buyer' => '["order.place","order.view_own"]',
-        'company_admin' => '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit"]',
+        'buyer' => '["order.place","order.view_own","quote.request"]',
+        'company_admin' => '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit","quote.request"]',
     ];
 
     /**

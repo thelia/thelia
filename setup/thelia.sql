@@ -887,6 +887,235 @@ CREATE TABLE `company_departure`
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
 
 -- ---------------------------------------------------------------------
+-- quote
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `quote`;
+
+CREATE TABLE `quote`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(45) NOT NULL COMMENT 'the reference shown to the buyer and the shop, allocated when the quote is created',
+    `customer_id` INTEGER NOT NULL COMMENT 'the account the quote was requested by, or created for',
+    `company_id` INTEGER COMMENT 'the company the quote was requested for, NULL for a customer alone; kept when the company is deleted',
+    `state` VARCHAR(16) NOT NULL COMMENT 'draft, requested, quoted, countered, accepted, rejected, expired or ordered',
+    `current_revision` INTEGER DEFAULT 1 NOT NULL COMMENT 'the number of the revision the quote stands at',
+    `currency_id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) COMMENT 'the language of the buyer, frozen when the quote is sent',
+    `buyer_comment` TEXT COMMENT 'what the buyer wrote when they asked for the quote',
+    `needed_by` DATE COMMENT 'the day the buyer needs the goods by',
+    `valid_until` DATE COMMENT 'the last day the quote can be accepted',
+    `sent_at` DATETIME COMMENT 'when the quote was last sent to the buyer',
+    `reminded_at` DATETIME COMMENT 'when the shop last reminded the buyer of the quote',
+    `coupon_dropped` TINYINT DEFAULT 0 NOT NULL COMMENT 'the coupon of the cart the quote was requested from was dropped: 1 once the buyer was told',
+    `invoice_address_id` INTEGER,
+    `delivery_address_id` INTEGER,
+    `delivery_module_id` INTEGER COMMENT 'the carrier the shop picked with the postage it negotiated',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_ref` (`ref`),
+    INDEX `idx_quote_state` (`state`),
+    INDEX `idx_quote_customer_id` (`customer_id`),
+    INDEX `idx_quote_company_id` (`company_id`),
+    INDEX `idx_quote_valid_until` (`valid_until`),
+    INDEX `idx_quote_currency_id` (`currency_id`),
+    INDEX `idx_quote_invoice_address_id` (`invoice_address_id`),
+    INDEX `idx_quote_delivery_address_id` (`delivery_address_id`),
+    INDEX `idx_quote_delivery_module_id` (`delivery_module_id`),
+    CONSTRAINT `fk_quote_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_quote_invoice_address_id`
+        FOREIGN KEY (`invoice_address_id`)
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_delivery_address_id`
+        FOREIGN KEY (`delivery_address_id`)
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- quote_revision
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `quote_revision`;
+
+CREATE TABLE `quote_revision`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_id` INTEGER NOT NULL,
+    `number` INTEGER NOT NULL COMMENT '1 is the request of the buyer, each sending of the shop adds one',
+    `author` VARCHAR(16) NOT NULL COMMENT 'customer or admin: who wrote the revision',
+    `admin_id` INTEGER COMMENT 'the administrator who wrote the revision, NULL when the buyer did or once the administrator is deleted',
+    `state` VARCHAR(16) NOT NULL COMMENT 'draft while it can be changed, sent once it is final',
+    `merchant_note` TEXT COMMENT 'what the shop wrote to the buyer with the revision',
+    `discount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the discount on the whole revision, taxes included',
+    `postage` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT 'the postage of the revision, taxes excluded',
+    `total_untaxed` DECIMAL(16,6) COMMENT 'the total without taxes, frozen when the revision is sent',
+    `total_taxed` DECIMAL(16,6) COMMENT 'the total with taxes, frozen when the revision is sent',
+    `items_untaxed` DECIMAL(16,6) COMMENT 'the total of the lines without taxes, frozen when the revision is sent',
+    `items_tax` DECIMAL(16,6) COMMENT 'the taxes on the lines, frozen when the revision is sent',
+    `postage_tax` DECIMAL(16,6) COMMENT 'the taxes on the postage, frozen when the revision is sent',
+    `reverse_charge` TINYINT COMMENT '1 when the buyer owes the VAT himself (reverse charge), frozen when the revision is sent',
+    `valid_until` DATE COMMENT 'the last day the revision can be accepted: chosen by the shop on a draft, kept as it was when the revision is sent',
+    `delivery_module_id` INTEGER COMMENT 'the carrier the revision proposes with its postage',
+    `sent_at` DATETIME COMMENT 'when the revision was sent',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_revision_quote_id_number` (`quote_id`, `number`),
+    INDEX `idx_quote_revision_admin_id` (`admin_id`),
+    INDEX `idx_quote_revision_delivery_module_id` (`delivery_module_id`),
+    CONSTRAINT `fk_quote_revision_quote_id`
+        FOREIGN KEY (`quote_id`)
+        REFERENCES `quote` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_revision_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_revision_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- quote_revision_address
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `quote_revision_address`;
+
+CREATE TABLE `quote_revision_address`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_revision_id` INTEGER NOT NULL,
+    `kind` VARCHAR(16) NOT NULL COMMENT 'invoice or delivery',
+    `firstname` VARCHAR(255),
+    `lastname` VARCHAR(255),
+    `company` VARCHAR(255),
+    `address1` VARCHAR(255),
+    `address2` VARCHAR(255),
+    `address3` VARCHAR(255),
+    `zipcode` VARCHAR(10),
+    `city` VARCHAR(255),
+    `country_id` INTEGER COMMENT 'kept when the country is deleted: the title below stays',
+    `country_title` VARCHAR(255) COMMENT 'the name of the country in the language of the quote when the revision was sent',
+    `vat_number` VARCHAR(20) COMMENT 'the VAT number of the address when the revision was sent',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_revision_address_quote_revision_id_kind` (`quote_revision_id`, `kind`),
+    INDEX `idx_quote_revision_address_country_id` (`country_id`),
+    CONSTRAINT `fk_quote_revision_address_quote_revision_id`
+        FOREIGN KEY (`quote_revision_id`)
+        REFERENCES `quote_revision` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_revision_address_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- quote_item
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `quote_item`;
+
+CREATE TABLE `quote_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_revision_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `product_id` INTEGER COMMENT 'kept when the product is deleted: the line stays readable through its labels',
+    `product_sale_elements_id` INTEGER,
+    `product_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_ref` VARCHAR(255) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `quantity` DOUBLE NOT NULL,
+    `catalog_price` DECIMAL(16,6) NOT NULL COMMENT 'the catalogue price of one unit without taxes when the line was written',
+    `price` DECIMAL(16,6) NOT NULL COMMENT 'the price of one unit without taxes the line proposes',
+    `tax_rule_id` INTEGER,
+    `tax_rule_title` VARCHAR(255),
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_quote_item_quote_revision_id` (`quote_revision_id`),
+    INDEX `idx_quote_item_product_id` (`product_id`),
+    INDEX `idx_quote_item_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_quote_item_tax_rule_id` (`tax_rule_id`),
+    CONSTRAINT `fk_quote_item_quote_revision_id`
+        FOREIGN KEY (`quote_revision_id`)
+        REFERENCES `quote_revision` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_item_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_item_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_item_tax_rule_id`
+        FOREIGN KEY (`tax_rule_id`)
+        REFERENCES `tax_rule` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
+-- quote_item_request
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `quote_item_request`;
+
+CREATE TABLE `quote_item_request`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_item_id` INTEGER NOT NULL,
+    `quantity` DOUBLE COMMENT 'the quantity the buyer asks for, NULL when they leave it as it is',
+    `price` DECIMAL(16,6) COMMENT 'the price of one unit without taxes the buyer asks for, NULL when they leave it as it is',
+    `created_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_item_request_quote_item_id` (`quote_item_id`),
+    CONSTRAINT `fk_quote_item_request_quote_item_id`
+        FOREIGN KEY (`quote_item_id`)
+        REFERENCES `quote_item` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
+
+-- ---------------------------------------------------------------------
 -- price_list
 -- ---------------------------------------------------------------------
 
@@ -1230,6 +1459,7 @@ CREATE TABLE `order`
     `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices',
     `company_id` INTEGER COMMENT 'the company the order was placed for, frozen when it was placed: NULL for an order of a customer alone, kept when the buyer leaves the company',
     `placed_by_customer_id` INTEGER COMMENT 'the account that placed the order, NULL once that account is deleted; customer_id stays the owner of the order',
+    `quote_id` INTEGER COMMENT 'the quote the order was placed from, NULL for an ordinary order; a quote gives one order at most',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -1238,6 +1468,7 @@ CREATE TABLE `order`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     UNIQUE INDEX `invoice_ref_UNIQUE` (`invoice_ref`),
+    UNIQUE INDEX `uk_order_quote_id` (`quote_id`),
     INDEX `idx_order_currency_id` (`currency_id`),
     INDEX `idx_order_customer_id` (`customer_id`),
     INDEX `idx_order_invoice_date` (`invoice_date`),
@@ -1316,6 +1547,11 @@ CREATE TABLE `order`
     CONSTRAINT `fk_order_placed_by_customer_id`
         FOREIGN KEY (`placed_by_customer_id`)
         REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_order_quote_id`
+        FOREIGN KEY (`quote_id`)
+        REFERENCES `quote` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -2612,6 +2848,9 @@ CREATE TABLE `cart`
     `delivery_date` DATE COMMENT 'the delivery day the buyer picked for the selected carrier, NULL while they picked none',
     `delivery_slot_id` INTEGER COMMENT 'the slot of that day the buyer picked, when the carrier offers slots',
     `sale_unit_id` INTEGER COMMENT 'the sale unit the cart was last priced and stocked for, NULL for a national cart',
+    `quote_id` INTEGER COMMENT 'the quote the cart carries the accepted revision of, NULL for an ordinary cart',
+    `quote_revision` INTEGER COMMENT 'the number of the accepted revision of the quote',
+    `set_aside_cart_id` INTEGER COMMENT 'the ordinary cart of the buyer, set aside while the cart of a quote takes its place',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -2624,6 +2863,8 @@ CREATE TABLE `cart`
     INDEX `idx_cart_currency_id` (`currency_id`),
     INDEX `idx_cart_sale_unit_id` (`sale_unit_id`),
     INDEX `idx_cart_customer_payment_method_id` (`customer_payment_method_id`),
+    INDEX `idx_cart_quote_id` (`quote_id`),
+    INDEX `idx_cart_set_aside_cart_id` (`set_aside_cart_id`),
     CONSTRAINT `fk_cart_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -2672,6 +2913,16 @@ CREATE TABLE `cart`
     CONSTRAINT `fk_cart_customer_payment_method_id`
         FOREIGN KEY (`customer_payment_method_id`)
         REFERENCES `customer_payment_method` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_cart_quote_id`
+        FOREIGN KEY (`quote_id`)
+        REFERENCES `quote` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_cart_set_aside_cart_id`
+        FOREIGN KEY (`set_aside_cart_id`)
+        REFERENCES `cart` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -2757,6 +3008,7 @@ CREATE TABLE `cart_item`
     `reserved_since` DATETIME COMMENT 'the moment the line was first held since its last release; a hold is never pushed back past a bound from it',
     `price_list_id` INTEGER COMMENT 'the price list whose line priced this line; no foreign key, so that the trace outlives the list and the cart is priced again once the list is gone',
     `subscription_plan_id` INTEGER COMMENT 'the subscription plan the line is bought on; NULL: a one-off purchase',
+    `quote_item_id` INTEGER COMMENT 'the line of a quote the line carries the frozen price of; NULL for an ordinary line',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -2768,6 +3020,7 @@ CREATE TABLE `cart_item`
     INDEX `idx_cart_item_offered_by_coupon_id` (`offered_by_coupon_id`),
     INDEX `idx_cart_item_price_list_id` (`price_list_id`),
     INDEX `fk_cart_item_subscription_plan_id_idx` (`subscription_plan_id`),
+    INDEX `idx_cart_item_quote_item_id` (`quote_item_id`),
     CONSTRAINT `fk_cart_item_cart_id`
         FOREIGN KEY (`cart_id`)
         REFERENCES `cart` (`id`)
@@ -2786,6 +3039,11 @@ CREATE TABLE `cart_item`
     CONSTRAINT `fk_cart_item_subscription_plan_id`
         FOREIGN KEY (`subscription_plan_id`)
         REFERENCES `subscription_plan` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_cart_item_quote_item_id`
+        FOREIGN KEY (`quote_item_id`)
+        REFERENCES `quote_item` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8mb4' COLLATE='utf8mb4_general_ci' ROW_FORMAT=DYNAMIC;
@@ -5720,6 +5978,7 @@ CREATE TABLE `order_version`
     `customer_group_display_taxed_price` TINYINT DEFAULT 1 NOT NULL COMMENT 'the customer group display mode when the order was placed: 1 taxed prices, 0 untaxed prices',
     `company_id` INTEGER COMMENT 'the company the order was placed for, frozen when it was placed: NULL for an order of a customer alone, kept when the buyer leaves the company',
     `placed_by_customer_id` INTEGER COMMENT 'the account that placed the order, NULL once that account is deleted; customer_id stays the owner of the order',
+    `quote_id` INTEGER COMMENT 'the quote the order was placed from, NULL for an ordinary order; a quote gives one order at most',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
