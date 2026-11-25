@@ -94,7 +94,7 @@ final readonly class SearchRedirectTargets
     public static function isInternalPath(string $path): bool
     {
         return str_starts_with($path, '/')
-            && 1 !== preg_match('/\s/u', $path)
+            && 0 === preg_match('/\s/u', $path)
             && RedirectUrl::isSafe($path, '');
     }
 }
