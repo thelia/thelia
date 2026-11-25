@@ -18,7 +18,7 @@ namespace Thelia\Domain\Order\Exception;
  * The transition graph configured in the back office does not allow an order
  * to go from its current status to the requested one.
  */
-final class OrderStatusTransitionRefusedException extends OrderException
+class OrderStatusTransitionRefusedException extends OrderException
 {
     public const TRANSITION_REFUSED = 300;
 
@@ -26,9 +26,10 @@ final class OrderStatusTransitionRefusedException extends OrderException
         private readonly string $orderRef,
         private readonly string $fromStatusCode,
         private readonly string $toStatusCode,
+        ?string $message = null,
     ) {
         parent::__construct(
-            \sprintf(
+            $message ?? \sprintf(
                 'Order %s cannot go from status "%s" to status "%s": this transition is not allowed.',
                 $orderRef,
                 $fromStatusCode,

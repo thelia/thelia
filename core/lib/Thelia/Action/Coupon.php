@@ -40,11 +40,14 @@ use Thelia\Domain\Promotion\Coupon\Service\OfferedCartLineService;
 use Thelia\Domain\Promotion\Coupon\Service\OrderCouponUsageManager;
 use Thelia\Domain\Promotion\Coupon\Type\CouponAbstract;
 use Thelia\Domain\Promotion\Coupon\Type\CouponInterface;
+use Thelia\Domain\Quote\Cart\QuoteCartGuard;
+use Thelia\Domain\Quote\Cart\QuoteCartLockedException;
 use Thelia\Domain\Shipping\ProductRule\ProductShippingRuleQuoter;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddressQuery;
 use Thelia\Model\CartItemQuery;
+use Thelia\Model\CartQuery;
 use Thelia\Model\Coupon as CouponModel;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCountryQuery;
@@ -85,6 +88,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         protected OfferedCartLineService $offeredCartLineService,
         protected ?ProductShippingRuleQuoter $productShippingRuleQuoter = null,
         ?CouponExclusionWriter $couponExclusionWriter = null,
+        protected ?QuoteCartGuard $quoteCartGuard = null,
     ) {
         // Last and optional so that a module building the action itself keeps its call.
         $this->couponExclusionWriter = $couponExclusionWriter ?? new CouponExclusionWriter();
@@ -172,9 +176,19 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon condition is about to be consumed.
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
+     *
+     * @throws QuoteCartLockedException when the cart of the session is the cart of a quote
      */
     public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
+        // The cart the session holds, if it holds one: a refusal does not create a cart.
+        $sessionCartId = $this->getSession()?->get(Session::SESSION_CART_ID_NAME);
+        $sessionCart = null === $sessionCartId ? null : CartQuery::create()->findPk($sessionCartId);
+
+        if ($sessionCart instanceof Cart) {
+            $this->quoteCartGuard?->refuseCoupon($sessionCart);
+        }
+
         $totalDiscount = 0;
 
         $coupon = $this->couponFactory->buildCouponFromCode($event->getCode());
@@ -208,6 +222,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $this->couponManager->invalidateCurrentCoupons();
 
         $cart = $session->getSessionCart($dispatcher);
+
+        // The discount of a quote is the one that was agreed: no promotion prices it again, and none
+        // puts a gift on its lines.
+        if ($this->quoteCartGuard?->isQuoteCart($cart)) {
+            return;
+        }
 
         if (null !== $cart) {
             // Put the offered lines in line with what the kept promotions ask for,
@@ -453,7 +473,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $cart = $this->getSession()?->getSessionCart($this->dispatcher);
 
-        if ($cart instanceof Cart && $this->couponManager->isCouponRemovingPostage($cart)) {
+        if ($cart instanceof Cart && !$this->quoteCartGuard?->isQuoteCart($cart) && $this->couponManager->isCouponRemovingPostage($cart)) {
             // The coupon offers the carrier; the surcharges of the products stay due.
             $surcharge = $this->surchargeLeftByTheCoupon($cart);
 
@@ -471,6 +491,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
+        // An order placed from a quote carries the discount of the quote, never a coupon.
+        if (null !== $event->getOrder()->getQuoteId()) {
+            return;
+        }
+
         $consumedCoupons = $this->couponManager->getCouponsKept();
 
         if ([] === $consumedCoupons) {

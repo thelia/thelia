@@ -31,6 +31,8 @@ use Thelia\Domain\Checkout\Exception\GiftMessageTooLongException;
 use Thelia\Domain\Checkout\Exception\UnknownGiftWrappingException;
 use Thelia\Domain\Payment\Exception\PaymentMethodNotOwnedException;
 use Thelia\Domain\Payment\Exception\StoredMethodNotSelectableException;
+use Thelia\Domain\Quote\Cart\QuoteCartGuard;
+use Thelia\Domain\Quote\Cart\QuoteCartLockedException;
 use Thelia\Domain\Shipping\DeliveryDate\Service\DeliveryDateSelection;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
@@ -48,6 +50,7 @@ final readonly class CartFacade
         // Defaulted so that a caller building the facade by hand with the arguments it
         // took before delivery dates keeps working; the container always passes it.
         private ?DeliveryDateSelection $deliveryDateSelection = null,
+        private ?QuoteCartGuard $quoteCartGuard = null,
     ) {
     }
 
@@ -186,10 +189,17 @@ final readonly class CartFacade
 
     /**
      * Reset all delivery data for a given cart.
+     *
+     * @throws QuoteCartLockedException when the lines are to be emptied and the cart is the cart of a quote
      */
     public function reset(bool $resetCartItems = false): void
     {
         $cart = $this->cartRetriever->fromSession();
+
+        if ($resetCartItems) {
+            $this->quoteCartGuard?->refuseLineChange($cart);
+        }
+
         $cart->setDeliveryModuleId(null)
             ->setAddressDeliveryId(null)
             ->setAddressInvoiceId(null)

@@ -48,6 +48,9 @@ use Thelia\Model\SubscriptionPlanQuery;
  * installment costs in the currency of the cart, or nothing while the plan has a trial (the
  * first installment is charged when the trial ends). The prices of the groups, the rules and
  * the operations of the catalog do not apply to it.
+ *
+ * A line of a quote (it names the line of the quote it holds the price of) is priced by nobody
+ * but the quote: it is neither written, nor compared, nor counted as a price that moved.
  */
 final readonly class CartLinePricer
 {
@@ -154,7 +157,8 @@ final readonly class CartLinePricer
      */
     private function resolve(iterable $lines, Currency $currency, ?Customer $customer, bool $bundleLinesOnly = false): array
     {
-        $lines = array_values([...$lines]);
+        // The line of a quote holds the price the shop and the buyer agreed on: nothing prices it again.
+        $lines = array_values(array_filter([...$lines], static fn (CartItem $line): bool => null === $line->getQuoteItemId()));
         $bundlePrices = $this->bundleLinePricesOf($lines, $currency, $customer);
         $otherLines = array_filter(
             $lines,

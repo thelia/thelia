@@ -19,6 +19,7 @@ use Thelia\Domain\Legal\CompanyIdentifier;
 use Thelia\Domain\Localization\Service\EuropeanUnionCountries;
 use Thelia\Domain\Taxation\Enum\VatExemptionMode;
 use Thelia\Domain\Taxation\Enum\VatExemptionState;
+use Thelia\Model\Address;
 use Thelia\Model\Cart;
 use Thelia\Model\CartAddress;
 use Thelia\Model\ConfigQuery;
@@ -65,6 +66,20 @@ final class VatExemptionResolver implements ResetInterface
 
     public function stateForCart(Cart $cart): VatExemptionState
     {
+        return $this->stateForInvoiceAddress($cart->getCartAddressRelatedByAddressInvoiceId());
+    }
+
+    /**
+     * Whether a buyer invoiced at this address accounts for the VAT himself: the rule of the cart,
+     * asked of the address alone, for what is not a cart yet.
+     */
+    public function isExemptedForInvoiceAddress(Address|CartAddress|null $invoiceAddress): bool
+    {
+        return VatExemptionState::EXEMPTED === $this->stateForInvoiceAddress($invoiceAddress);
+    }
+
+    public function stateForInvoiceAddress(Address|CartAddress|null $invoiceAddress): VatExemptionState
+    {
         if (VatExemptionMode::VERIFIED_VAT_NUMBER !== VatExemptionMode::fromShopConfiguration()) {
             return VatExemptionState::NOT_APPLICABLE;
         }
@@ -75,9 +90,7 @@ final class VatExemptionResolver implements ResetInterface
             return VatExemptionState::NOT_APPLICABLE;
         }
 
-        $invoiceAddress = $cart->getCartAddressRelatedByAddressInvoiceId();
-
-        if (!$invoiceAddress instanceof CartAddress || '' === trim((string) $invoiceAddress->getVatNumber())) {
+        if (null === $invoiceAddress || '' === trim((string) $invoiceAddress->getVatNumber())) {
             return VatExemptionState::NOT_APPLICABLE;
         }
 
