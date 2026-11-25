@@ -1,6 +1,6 @@
 {
-  "about": "Performance budget of the storefront audit (setup/audit/lighthouse.mjs). Each page fails the lighthouse workflow when the median of its runs is worse than its reference value moved by the tolerance of the metric and preset: lower for a score, higher for a time, a shift, a weight or a request count. The reference is a measure of the workflow itself, written here by hand with its date and commit: it is raised when an improvement is acquired, never rewritten from the last run.",
-  "toleranceBasis": "2026-11-17, four measures of the same served storefront (core commits 155cbe071, af9ed4f3b, a496c7463 and 19201dc07, which differ only in the workflow, Flexy dev-main bf04b3b4d) on GitHub runners; the reference is their median. Desktop: performance moved by 3 points and FCP and LCP by 5 % at most, except the LCP of the product page, which is its lazily loaded first gallery image and arrives early or late (0.83 to 1.49 s). Mobile, simulated by Lighthouse on a slow 4G, moved by steps: up to 16 points of performance, 54 % of FCP and 92 % of LCP, so its times only catch a gross regression. Accessibility, best practices, SEO, CLS, TBT, weight (under 0.2 %) and requests did not move on either preset: they hold the tight thresholds.",
+  "about": "Performance budget of the storefront audit (setup/audit/lighthouse.mjs). Each page fails the lighthouse workflow when the median of its runs is worse than its reference value moved by the tolerance of the metric and preset: lower for a score, higher for a time, a shift, a weight or a request count. A tolerance written `\"assert\": false`, with its reason, keeps the metric measured and published without a threshold: it moves too much between two measures of the same code to tell a regression from the noise. The reference is a measure of the workflow itself, written here by hand with its date and commit: it is raised when an improvement is acquired, never rewritten from the last run.",
+  "toleranceBasis": "2026-11-17, four measures of the same served storefront (core commits 155cbe071, af9ed4f3b, a496c7463 and 19201dc07 of pull request #4341 before its rebase on main of 2026-11-25, which differ only in the workflow, Flexy dev-main bf04b3b4d) on GitHub runners; the reference is their median. Desktop: performance moved by 3 points and FCP and LCP by 5 % at most, except the LCP of the product page, which is its lazily loaded first gallery image and arrives early or late (0.83 to 1.49 s). Accessibility, best practices, SEO, CLS, TBT, weight (under 0.2 %) and requests did not move on either preset, except the mobile CLS of the product page (see below): they hold the tight thresholds. 2026-11-25, seven measures of that same storefront (the four above, 04c8610b8 without its degraded category page, 5358485ae and 3065f15e9), 21 runs per page: the mobile times do not spread around a value, they jump between two. Lighthouse simulates the slow 4G of the mobile preset from the trace it records, and puts into the simulated path to the first paint the Google Fonts files (fonts.gstatic.com, fetched from the internet) that finished before the real paint, which they do or not from one run to the next. Runs where none had finished: mobile FCP median 1.68 s (52 runs); runs where all seven had: 3.18 s (91 runs). Between two medians of 3 runs the mobile FCP moves by up to 92 %, the mobile LCP by up to 100 % (117 % on the product page) and the mobile performance score by up to 13 points (29 on the product page), and resampling the 21 runs shows that a median of 15 runs per page would still leave gaps of up to 62 %. The mobile CLS of the product page is 0.928 or 0 from one run to the next (0 to 0.928 between two medians): its gallery images, without dimensions, shift the page or not before Lighthouse stops recording. Over the seven, the desktop FCP and LCP moved by 25 % at most (680 to 848 ms on /a-propos.html), inside their tolerance of 25 % plus 100 ms. More runs do not settle it, so these metrics are published without a threshold until the fonts are served by the theme and the first gallery image is loaded eagerly with its dimensions.",
   "tolerance": {
     "desktop": {
       "performance": {
@@ -39,7 +39,8 @@
     },
     "mobile": {
       "performance": {
-        "absolute": 25
+        "assert": false,
+        "reason": "It is computed from the simulated times, FCP and LCP first, and moves with them: up to 13 points between two medians of the same code, 29 on the product page (2026-11-25, see setup/audit/lighthouse-budget.json)."
       },
       "accessibility": {
         "absolute": 2
@@ -51,10 +52,12 @@
         "absolute": 2
       },
       "first-contentful-paint": {
-        "relative": 1.5
+        "assert": false,
+        "reason": "It jumps between two values from one run to the next: the Google Fonts files, fetched from the internet, finish before or after the real first paint, and Lighthouse only counts them in its simulated slow 4G when they finish before (2026-11-25: up to 92 % between two medians of the same code, see setup/audit/lighthouse-budget.json)."
       },
       "largest-contentful-paint": {
-        "relative": 1.5
+        "assert": false,
+        "reason": "It jumps with the FCP between two values from one run to the next: the Google Fonts files, fetched from the internet, finish before or after the real first paint, and Lighthouse only counts them in its simulated slow 4G when they finish before (2026-11-25: up to 100 %, 117 % on the product page, between two medians of the same code, see setup/audit/lighthouse-budget.json)."
       },
       "cumulative-layout-shift": {
         "absolute": 0.05
@@ -74,9 +77,17 @@
   "pageTolerance": {
     "desktop": {
       "/barbara-1.html": {
-        "reason": "The largest element is the first gallery image, loaded lazily: it is painted early or late from one run to the next.",
         "largest-contentful-paint": {
-          "relative": 1.0
+          "assert": false,
+          "reason": "The largest element is the first gallery image, loaded lazily: it is painted early or late from one run to the next, 0.83 to 1.49 s between two medians of the same code (2026-11-17)."
+        }
+      }
+    },
+    "mobile": {
+      "/barbara-1.html": {
+        "cumulative-layout-shift": {
+          "assert": false,
+          "reason": "The gallery images have no dimensions and shift the page or not before Lighthouse stops recording: 0.928 or 0 from one run to the next, 0 to 0.928 between two medians of the same code (2026-11-25, see setup/audit/lighthouse-budget.json). Its threshold, the worse value plus 0.05, could catch nothing."
         }
       }
     }
