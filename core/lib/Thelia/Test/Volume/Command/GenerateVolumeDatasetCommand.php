@@ -142,8 +142,8 @@ final class GenerateVolumeDatasetCommand extends Command
         ));
 
         $io->section('Rows');
-        $io->table(['Table', 'Rows'], array_map(
-            static fn (string $table, int $rows): array => [$table, number_format($rows)],
+        $io->table(['Table', 'Rows', 'Digest'], array_map(
+            static fn (string $table, int $rows): array => [$table, number_format($rows), $fingerprint->tables[$table] ?? ''],
             array_keys($fingerprint->rows),
             array_values($fingerprint->rows),
         ));

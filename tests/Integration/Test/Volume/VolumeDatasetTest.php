@@ -99,7 +99,12 @@ final class VolumeDatasetTest extends IntegrationTestCase
 
         self::assertSame($first->rows, $second->rows);
         self::assertSame($first->digest, $second->digest);
+        self::assertSame($first->tables, $second->tables);
         self::assertNotSame($first->digest, $other->digest);
+        // Each table has its own digest, so that two datasets that differ say where.
+        self::assertSame(array_keys($first->rows), array_keys($first->tables));
+        self::assertNotSame($first->tables['product_category'], $other->tables['product_category']);
+        self::assertSame($first->tables['template'], $other->tables['template']);
     }
 
     public function testThePurgeLeavesTheShopAsItWasAndKeepsItsOwnRows(): void

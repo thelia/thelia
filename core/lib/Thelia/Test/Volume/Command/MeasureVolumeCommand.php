@@ -97,7 +97,7 @@ final class MeasureVolumeCommand extends Command
             'database' => $this->scalar($connection, 'SELECT VERSION()'),
             'baseUrl' => $baseUrl,
             'runs' => $runs,
-            'dataset' => ['fingerprint' => $fingerprint->digest, 'options' => $manifest->options(), 'rows' => $fingerprint->rows, 'generationSeconds' => $manifest->durations()],
+            'dataset' => ['fingerprint' => $fingerprint->digest, 'options' => $manifest->options(), 'rows' => $fingerprint->rows, 'tables' => $fingerprint->tables, 'generationSeconds' => $manifest->durations()],
         ]);
 
         $client = new QueryCountingClient($connection, $baseUrl);

@@ -19,16 +19,19 @@ use Propel\Runtime\Connection\ConnectionInterface;
 /**
  * A digest of every row a volume dataset wrote, table by table in a fixed order, each table sorted
  * by its key. Two datasets with the same digest hold the same rows: it is how two generations with
- * the same options are shown to be identical, and how a report names the dataset it measured.
+ * the same options are shown to be identical, and how a report names the dataset it measured. The
+ * digest of each table says which tables differ when two datasets do.
  */
 final readonly class VolumeDatasetFingerprint
 {
     /**
-     * @param array<string, int> $rows rows read, per table
+     * @param array<string, int>    $rows   rows read, per table
+     * @param array<string, string> $tables digest of the rows of each table
      */
     public function __construct(
         public string $digest,
         public array $rows,
+        public array $tables = [],
     ) {
     }
 
@@ -39,6 +42,7 @@ final readonly class VolumeDatasetFingerprint
 
         $context = hash_init('sha256');
         $rows = [];
+        $tables = [];
         foreach (VolumeDatasetTables::TABLES as $table => [, , $orderBy]) {
             $condition = VolumeDatasetTables::condition($manifest, $table);
             if (null === $condition) {
@@ -48,14 +52,18 @@ final readonly class VolumeDatasetFingerprint
             $statement = $connection->prepare(\sprintf('SELECT * FROM `%s` WHERE %s ORDER BY %s', $table, $condition[0], $orderBy));
             $statement->execute($condition[1]);
             $count = 0;
+            $tableContext = hash_init('sha256');
             hash_update($context, $table."\n");
             while (false !== $row = $statement->fetch(\PDO::FETCH_NUM)) {
-                hash_update($context, json_encode($row, \JSON_THROW_ON_ERROR)."\n");
+                $line = json_encode($row, \JSON_THROW_ON_ERROR)."\n";
+                hash_update($context, $line);
+                hash_update($tableContext, $line);
                 ++$count;
             }
             $rows[$table] = $count;
+            $tables[$table] = hash_final($tableContext);
         }
 
-        return new self(hash_final($context), $rows);
+        return new self(hash_final($context), $rows, $tables);
     }
 }
