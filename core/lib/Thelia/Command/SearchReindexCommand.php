@@ -34,6 +34,7 @@ use Thelia\Domain\Search\Contract\SearchableDocumentProviderInterface;
 use Thelia\Domain\Search\Contract\SearchEngineInterface;
 use Thelia\Domain\Search\Message\IndexDocument;
 use Thelia\Domain\Search\SearchDocumentProviders;
+use Thelia\Domain\Search\SearchDocumentWalk;
 use Thelia\Domain\Search\SearchEngineRegistry;
 use Thelia\Domain\Search\SearchIndexer;
 use Thelia\Domain\Search\SearchIndexingQueue;
@@ -221,20 +222,8 @@ class SearchReindexCommand extends ContainerAwareCommand
         $progress = new ProgressBar($output, $provider instanceof CountableDocumentProviderInterface ? $provider->countAfter($cursor) : 0);
         $progress->start();
 
-        while (true) {
+        foreach (SearchDocumentWalk::batches($provider, $cursor, $batchSize) as $ids) {
             $lock->refresh();
-            $ids = $provider->idsAfter($cursor, $batchSize);
-
-            if ([] === $ids) {
-                break;
-            }
-
-            $ascending = $ids;
-            sort($ascending);
-
-            if ($ascending !== $ids || $ids[0] <= $cursor) {
-                throw new UnorderedDocumentIdentifiersException(\sprintf('The search document provider %s returns identifiers after #%d that are not in ascending order or not after it, the run cannot tell where it stopped.', $provider::class, $cursor));
-            }
 
             if ($queue) {
                 foreach (array_chunk($ids, SearchIndexingQueue::IDS_PER_MESSAGE) as $chunk) {
