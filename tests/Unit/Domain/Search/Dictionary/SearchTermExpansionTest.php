@@ -183,6 +183,8 @@ final class SearchTermExpansionTest extends TestCase
         yield 'control character' => ["/promo\r\nLocation: https://evil.example", false];
         yield 'tabulation' => ["/\t/evil.example", false];
         yield 'space' => ['/ /evil.example', false];
+        yield 'trailing tabulation' => ["/promo\t", false];
+        yield 'trailing line break' => ["/promo\n", false];
         yield 'empty' => ['', false];
         yield 'encoded slashes' => ['/%2F%2Fevil.example', true];
         yield 'encoded backslash' => ['/%5Cevil.example', true];
