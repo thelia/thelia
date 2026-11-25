@@ -155,3 +155,21 @@ export async function expectContentFitsViewport(page: Page, context: string): Pr
 
   expect.soft(overflowing, `${context} sticks out of a ${page.viewportSize()?.width}px viewport`).toEqual([]);
 }
+
+/**
+ * Each field is entirely inside the viewport: a table that scrolls in its own box keeps the page itself
+ * from growing wider, so the width of the page says nothing about a field the buyer has to scroll to.
+ */
+export async function expectFieldsInViewport(page: Page, fields: Locator, context: string): Promise<void> {
+  const count = await fields.count();
+  expect(count, `${context}: no field to measure`).toBeGreaterThan(0);
+  const viewportWidth = await page.evaluate(() => document.documentElement.clientWidth);
+
+  for (let index = 0; index < count; index++) {
+    const box = await fields.nth(index).boundingBox();
+    expect(box, `${context}: field ${index} is not rendered`).not.toBeNull();
+    expect.soft(box!.x, `${context}: field ${index} starts left of the viewport`).toBeGreaterThanOrEqual(0);
+    expect.soft(box!.x + box!.width, `${context}: field ${index} ends beyond the ${viewportWidth}px viewport`).toBeLessThanOrEqual(viewportWidth);
+    expect.soft(box!.width, `${context}: field ${index} is too narrow to type in`).toBeGreaterThanOrEqual(80);
+  }
+}
