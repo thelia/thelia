@@ -185,6 +185,8 @@ final class SearchTermExpansionTest extends TestCase
         yield 'space' => ['/ /evil.example', false];
         yield 'trailing tabulation' => ["/promo\t", false];
         yield 'trailing line break' => ["/promo\n", false];
+        yield 'space in a path that is not valid UTF-8' => ["/\xff /evil", false];
+        yield 'no-break space' => ["/promo\u{00A0}/evil", false];
         yield 'empty' => ['', false];
         yield 'encoded slashes' => ['/%2F%2Fevil.example', true];
         yield 'encoded backslash' => ['/%5Cevil.example', true];
