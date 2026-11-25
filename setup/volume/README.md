@@ -36,8 +36,10 @@ one call more, not the steady state of the page. Every call is kept in the JSON 
 
 The same options on the same starting database write the same dataset, down to its identifiers and
 dates: every random choice comes from one generator seeded by `--seed`, every date is counted back
-from `--base-date`. The command prints a fingerprint of the rows it wrote; two generations with the
-same fingerprint hold the same data.
+from `--base-date`. The command prints a fingerprint of the rows it wrote, and the digest of each
+table; two generations with the same fingerprint hold the same data. Two fresh installs can number
+their modules in another order: the generated orders then point at other identifiers for the same
+payment and delivery modules, and only the digest of the `order` table differs.
 
 - Products are spread over the leaves of the category tree unevenly, as in a real catalogue: a few
   categories hold many products. One product in five is also in a second category.
