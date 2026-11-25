@@ -7,6 +7,7 @@
 //       Writes the Lighthouse CI assertions of a preset from setup/audit/lighthouse-budget.json.
 //   node setup/audit/lighthouse.mjs summary --preset desktop --results .lighthouseci [--markdown file] [--json file]
 //       [--date d] [--version v] [--commit c] [--theme t] [--machine m]: what the figures are of, for the record
+//       [--budget file]: to say which published metrics hold no threshold
 //       Checks that every page of the template was measured as itself, and prints the medians.
 //
 // Run `lhci collect` and `lhci assert` from the directory that holds the generated files: Lighthouse CI
@@ -126,6 +127,27 @@ export function threshold(metric, reference, tolerance) {
   return 'higher' === metric.better ? reference - margin : reference + margin;
 }
 
+/** Tolerance of a metric on a page: its own, with its reason, or the one of the preset. */
+function toleranceOf(budget, preset, path, metric) {
+  return budget.pageTolerance?.[preset]?.[path]?.[metric.key] ?? budget.tolerance?.[preset]?.[metric.key];
+}
+
+/**
+ * Metrics of a preset that are measured and published but hold no threshold (`"assert": false`): they move
+ * too much between two measures of the same code to tell a regression from the noise.
+ */
+export function unassertedFor(budget, preset, paths) {
+  const unasserted = [];
+  for (const metric of METRICS) {
+    const pages = paths.filter((path) => false === toleranceOf(budget, preset, path, metric)?.assert);
+    if (!pages.length) continue;
+    const reasons = [...new Set(pages.map((path) => toleranceOf(budget, preset, path, metric).reason))];
+    unasserted.push({ metric: metric.key, label: metric.label, pages: pages.length === paths.length ? 'all' : pages, reasons });
+  }
+
+  return unasserted;
+}
+
 /** Lighthouse CI assertions of a preset: one entry per page, matched on the exact URL. */
 export function assertionsFor(budget, preset) {
   const reference = budget.reference?.[preset];
@@ -142,9 +164,12 @@ export function assertionsFor(budget, preset) {
     for (const metric of METRICS) {
       const value = reference.pages[path][metric.key];
       if (typeof value !== 'number') fail(`no ${preset} reference of ${metric.key} for ${path} in ${budget.file}`);
-      // A page can carry its own tolerance for a metric, with the reason written next to it.
-      const tolerance = budget.pageTolerance?.[preset]?.[path]?.[metric.key] ?? budget.tolerance?.[preset]?.[metric.key];
+      const tolerance = toleranceOf(budget, preset, path, metric);
       if (!tolerance) fail(`no ${preset} tolerance of ${metric.key} in ${budget.file}`);
+      if (false === tolerance.assert) {
+        if (!tolerance.reason) fail(`the ${preset} ${metric.key} of ${path} is not asserted without a reason in ${budget.file}`);
+        continue;
+      }
       const limit = threshold(metric, value, tolerance);
       assertions[metric.assertion] = 'score' === metric.unit
         ? ['error', { minScore: Math.max(0, Math.min(1, limit / 100)), aggregationMethod: 'median' }]
@@ -221,7 +246,7 @@ function format(metric, value) {
   }
 }
 
-function markdown(preset, environment, pages) {
+function markdown(preset, environment, pages, unasserted) {
   const header = ['Page', ...METRICS.map((metric) => metric.label)];
   const lines = [
     `### ${preset}`,
@@ -235,6 +260,13 @@ function markdown(preset, environment, pages) {
   ];
   for (const [path, values] of Object.entries(pages)) {
     lines.push(`| \`${path}\` | ${METRICS.map((metric) => format(metric, values[metric.key])).join(' | ')} |`);
+  }
+  if (unasserted.length) {
+    lines.push('', 'Published without a threshold, as they move too much between two measures of the same code:');
+    for (const { label, pages: measured, reasons } of unasserted) {
+      const where = 'all' === measured ? 'every page' : measured.map((path) => `\`${path}\``).join(', ');
+      lines.push(`- ${label}, ${where}: ${reasons.join(' ')}`);
+    }
   }
 
   return `${lines.join('\n')}\n`;
@@ -250,7 +282,9 @@ function summary(options) {
     .map((file) => JSON.parse(readFileSync(resolve(directory, file), 'utf8')));
   if (!lhrs.length) fail(`no Lighthouse result in ${directory}`);
 
-  const { pages, problems } = summarize(lhrs, templatePaths(template), runs);
+  const paths = templatePaths(template);
+  const { pages, problems } = summarize(lhrs, paths, runs);
+  const unasserted = unassertedFor(readBudget(options.budget), preset, paths);
   const first = lhrs[0];
   const environment = {
     preset,
@@ -265,10 +299,10 @@ function summary(options) {
     benchmarkIndex: median(lhrs.map((lhr) => lhr.environment?.benchmarkIndex)),
   };
 
-  const document = { ...environment, pages };
+  const document = { ...environment, pages, unasserted: unasserted.map(({ label, ...rest }) => rest) };
   if (options.json) write(options.json, `${JSON.stringify(document, null, 2)}\n`);
-  if (options.markdown) write(options.markdown, markdown(preset, environment, pages));
-  console.log(markdown(preset, environment, pages));
+  if (options.markdown) write(options.markdown, markdown(preset, environment, pages, unasserted));
+  console.log(markdown(preset, environment, pages, unasserted));
   // The block to paste in lighthouse-budget.json when a better result is accepted as the new reference.
   console.log(`Reference values of this run (${preset}):\n${JSON.stringify({ measured: { date: environment.date, commit: environment.commit, theme: environment.theme, machine: environment.machine, lighthouse: environment.lighthouse, runs }, pages }, null, 2)}`);
 
