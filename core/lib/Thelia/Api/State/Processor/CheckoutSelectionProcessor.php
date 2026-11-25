@@ -45,6 +45,7 @@ use Thelia\Domain\Checkout\Exception\DestinationRestrictedException;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidDeliveryException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
+use Thelia\Domain\Checkout\Exception\QuoteDeliveryImposedException;
 use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Order\Exception\StockShortageException;
 use Thelia\Domain\Payment\Exception\CustomerPaymentMethodException;
@@ -109,12 +110,14 @@ final readonly class CheckoutSelectionProcessor implements ProcessorInterface
         } catch (InvalidDeliveryException $refusal) {
             if (!$data instanceof CheckoutDeliveryDateInput
                 && !$refusal instanceof DeliveryExcludedByProductException
-                && !$refusal instanceof DestinationRestrictedException) {
+                && !$refusal instanceof DestinationRestrictedException
+                && !$refusal instanceof QuoteDeliveryImposedException) {
                 throw $refusal;
             }
 
-            // A refused day, a carrier a product of the cart refuses, or an address the
-            // products of the cart cannot ship to, is answered in the shape a refused
+            // A refused day, a carrier a product of the cart refuses, an address the
+            // products of the cart cannot ship to, or a carrier or an address other than the
+            // ones of the quote the cart carries, is answered in the shape a refused
             // placement is, so the client branches on the same codes either way.
             return new JsonResponse(
                 CheckoutValidationOutput::ofDomainViolations([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $refusal)])->toArray(),

@@ -42,6 +42,11 @@ return static function (ContainerConfigurator $container): void {
         // Captures of an authorized payment through the admin API, per minute and
         // per administrator account.
         ->set('env(THELIA_API_RATE_LIMIT_ORDER_CAPTURE)', '10')
+        // Requests for a quote and counter-proposals on a quote, per hour and per account. Asking
+        // for a quote copies a whole cart into the database, and a counter-proposal calls the shop
+        // back to the quote: a buyer does either a handful of times a day, and a script far more.
+        ->set('env(THELIA_API_RATE_LIMIT_QUOTE_REQUEST)', '10')
+        ->set('env(THELIA_API_RATE_LIMIT_QUOTE_COUNTER_OFFER)', '30')
         // Addresses and CIDR ranges exempt from the limits that are not about
         // logging in, comma separated. Meant for a synchronisation that
         // legitimately calls faster than a browser does.

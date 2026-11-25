@@ -40,10 +40,10 @@ final readonly class CustomerGetCollectionExtension implements QueryCollectionEx
             return;
         }
 
-        // The orders and the addresses of the account, and the buyers of a company, are bounded by
-        // what a buyer reaches through the company, not by the customer alone: asking for both
-        // would empty the list.
-        if (CompanyAccountOwnershipExtension::handles($resourceClass, $operation) || CompanyFrontScopeExtension::handles($resourceClass, $operation)) {
+        // The orders and the addresses of the account, the quotes, and the buyers of a company, are
+        // bounded by what a buyer reaches through the company, not by the customer alone: asking for
+        // both would empty the list.
+        if (CompanyAccountOwnershipExtension::handles($resourceClass, $operation) || CompanyFrontScopeExtension::handles($resourceClass, $operation) || QuoteOwnershipExtension::handles($resourceClass, $operation)) {
             return;
         }
 

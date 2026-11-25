@@ -28,6 +28,13 @@ use Thelia\Domain\Payment\Exception\InstantPaymentRefusedException;
 use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
 use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
 use Thelia\Domain\Payment\Exception\StoredMethodRefusedException;
+use Thelia\Domain\Quote\Cart\QuoteCartLockedException;
+use Thelia\Domain\Quote\Exception\QuoteAlreadyOrderedException;
+use Thelia\Domain\Quote\Exception\QuoteCurrencyUnavailableException;
+use Thelia\Domain\Quote\Exception\QuoteException;
+use Thelia\Domain\Quote\Exception\QuoteLinesUnavailableException;
+use Thelia\Domain\Quote\Exception\QuoteTransitionRefusedException;
+use Thelia\Domain\Quote\Exception\UnknownQuoteException;
 use Thelia\Domain\Subscription\Exception\SubscriptionActionRefusedException;
 use Thelia\Domain\Subscription\Exception\SubscriptionException;
 use Thelia\Domain\Subscription\Exception\SubscriptionTransitionRefusedException;
@@ -91,6 +98,20 @@ return static function (ContainerConfigurator $container): void {
             SubscriptionActionRefusedException::class => 409,
             SubscriptionTransitionRefusedException::class => 409,
             SubscriptionException::class => 422,
+            // A quote that does not exist, or that the caller may not read, is not found. What the
+            // state of a quote does not allow (answer one that is not waiting, change a cart
+            // whose prices are settled, order a quote twice) is a state of the resource, not a
+            // malformed request; any other refusal of the quote facade (an invalid line, a revision
+            // that is no longer the current one, a line the shop no longer sells) is a request the
+            // shop cannot take. The reason of the refusal is in the body (QuoteProblemNormalizer).
+            // Each subclass is named before QuoteException, the parent they share.
+            UnknownQuoteException::class => 404,
+            QuoteTransitionRefusedException::class => 409,
+            QuoteCartLockedException::class => 409,
+            QuoteAlreadyOrderedException::class => 409,
+            QuoteLinesUnavailableException::class => 422,
+            QuoteCurrencyUnavailableException::class => 422,
+            QuoteException::class => 422,
         ],
         'defaults' => [
             'pagination_client_items_per_page' => true,
