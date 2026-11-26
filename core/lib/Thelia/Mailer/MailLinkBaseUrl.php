@@ -16,10 +16,12 @@ namespace Thelia\Mailer;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\SaleUnitQuery;
+use Thelia\Tools\ShopUrl;
 
 /**
  * The address the links of an e-mail are built on.
@@ -35,13 +37,17 @@ use Thelia\Model\SaleUnitQuery;
  * to the one the visitor uses. Any other host is replaced by the address the shop is
  * configured with: the domain of the language of the mail, else `url_site`.
  *
- * A shop that declares no address at all leaves nothing to check the host against: its
- * links keep following the request, and a warning names the setting to fill in.
+ * A shop with no `url_site` is served on the address its router builds links on outside
+ * a request (`DEFAULT_URI`), unless that address names the machine itself (localhost, a
+ * loopback IP). A shop that declares neither leaves nothing to check the host against:
+ * its links keep following the request, and a warning names the setting to fill in.
  */
 final readonly class MailLinkBaseUrl
 {
     public function __construct(
         private LoggerInterface $logger = new NullLogger(),
+        #[Autowire('%router.request_context.base_url%')]
+        private string $defaultUri = '',
     ) {
     }
 
@@ -79,7 +85,7 @@ final readonly class MailLinkBaseUrl
 
     private function isDeclaredHost(string $host): bool
     {
-        $urls = [ConfigQuery::getConfiguredShopUrl()];
+        $urls = [$this->shopUrl()];
 
         if (ConfigQuery::isMultiDomainActivated()) {
             foreach (LangQuery::create()->find() as $lang) {
@@ -108,7 +114,7 @@ final readonly class MailLinkBaseUrl
             $candidates[] = (string) LangQuery::create()->findOneByLocale($locale)?->getUrl();
         }
 
-        $candidates[] = (string) ConfigQuery::getConfiguredShopUrl();
+        $candidates[] = $this->shopUrl();
 
         foreach ($candidates as $url) {
             $url = rtrim(trim($url), '/');
@@ -120,6 +126,20 @@ final readonly class MailLinkBaseUrl
         }
 
         return null;
+    }
+
+    /**
+     * `url_site`, else `DEFAULT_URI` when it does not name the machine itself.
+     */
+    private function shopUrl(): string
+    {
+        $configured = (string) ConfigQuery::getConfiguredShopUrl();
+
+        if ('' !== trim($configured)) {
+            return $configured;
+        }
+
+        return ShopUrl::nonLocal($this->defaultUri) ?? '';
     }
 
     private static function hostOf(string $url): ?string
