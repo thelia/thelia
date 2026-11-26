@@ -30,6 +30,7 @@ use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\NewnessFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PriceFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\PromoFilter;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\RatingFilter;
+use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\SelectedValuesTrait;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\CheckboxType;
 use Thelia\Api\Bridge\Propel\Filter\CustomFilters\Filters\Type\DeltaType;
 use Thelia\Api\Resource\Filter;
@@ -48,6 +49,8 @@ use Thelia\Model\ProductQuery;
 
 readonly class FilterService
 {
+    use SelectedValuesTrait;
+
     public function __construct(
         #[AutowireIterator('api.thelia.filter')]
         private readonly iterable $filters,
@@ -539,9 +542,24 @@ readonly class FilterService
         $categoryId = $this->retrieveFilterValue(theliaFilterNames: CategoryFilter::getFilterName(), tfilters: $tfilters);
 
         // Several categories checked (a shopper widening the listing) have no single set of
-        // choice_filter rows to obey: every filter is offered, as outside any category.
+        // choice_filter rows to obey: every filter is offered, as outside any category. The
+        // categories are counted as the listing filters on them (CategoryFilter): without
+        // duplicates and without those closed to the visitor.
         if (\is_array($categoryId)) {
-            return ['rows' => [], 'template_id' => null];
+            $categoryIds = array_values(array_diff(
+                array_map(intval(...), $this->flattenSelectedValues($categoryId)),
+                $this->closedCategoryIds(),
+            ));
+
+            if ([] === $categoryIds) {
+                return null;
+            }
+
+            if (\count($categoryIds) > 1) {
+                return ['rows' => [], 'template_id' => null];
+            }
+
+            $categoryId = $categoryIds[0];
         }
 
         $category = CategoryQuery::create()->findPk(key: $categoryId);
