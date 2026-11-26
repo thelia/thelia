@@ -158,13 +158,14 @@ final readonly class PickingSlipPdfService
 
     /**
      * The view of the PDF theme the picking slip is rendered with, and the start of its file name: the
-     * configuration variable when it holds a name, `preparation` otherwise.
+     * configuration variable when it holds a plain name (letters, digits, `-`, `_`), `preparation` otherwise,
+     * so that no path reaches the file `pdf:render` writes.
      */
     public function templateName(): string
     {
         $configured = trim((string) ConfigQuery::read(self::CONFIG_TEMPLATE, self::DOCUMENT));
 
-        return '' !== $configured ? $configured : self::DOCUMENT;
+        return 1 === preg_match('/^[A-Za-z0-9_-]+$/', $configured) ? $configured : self::DOCUMENT;
     }
 
     /**

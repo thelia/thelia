@@ -81,7 +81,8 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
         $slip = $this->service()->render([$second->getId(), $first->getId()]);
 
         self::assertSame(2, $this->pageCount($slip->content));
-        self::assertSame('preparation-'.date('Y-m-d').'.pdf', $slip->fileName);
+        // The day the batch is printed: either side of a midnight the test may straddle.
+        self::assertContains($slip->fileName, ['preparation-'.date('Y-m-d').'.pdf', 'preparation-'.date('Y-m-d', strtotime('-1 day')).'.pdf']);
         self::assertSame(2, $slip->orderCount);
     }
 
@@ -190,6 +191,18 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
         self::assertSame('preparation', $this->service()->templateName());
     }
 
+    /**
+     * The name starts the file `pdf:render` writes and the download: a path in it would write elsewhere.
+     */
+    public function testANameThatIsAPathKeepsThePreparationView(): void
+    {
+        foreach (['../../picking', 'sub/picking', 'pick list', 'picking.html'] as $name) {
+            ConfigQuery::write(PickingSlipPdfService::CONFIG_TEMPLATE, $name);
+
+            self::assertSame('preparation', $this->service()->templateName(), $name);
+        }
+    }
+
     public function testTheTemplateReceivesTheLocaleOfTheShopDefaultLanguage(): void
     {
         $this->installPickingSlipTheme();
@@ -252,8 +265,10 @@ final class PickingSlipPdfServiceTest extends IntegrationTestCase
         ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, '7');
         self::assertSame(7, $this->service()->maxOrders());
 
-        ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, '0');
-        self::assertSame(PickingSlipPdfService::DEFAULT_MAX_ORDERS, $this->service()->maxOrders());
+        foreach (['0', '', '-3', 'many'] as $value) {
+            ConfigQuery::write(PickingSlipPdfService::CONFIG_MAX_ORDERS, $value);
+            self::assertSame(PickingSlipPdfService::DEFAULT_MAX_ORDERS, $this->service()->maxOrders(), $value);
+        }
     }
 
     private function service(): PickingSlipPdfService
