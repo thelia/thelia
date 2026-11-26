@@ -35,6 +35,10 @@ Not released yet.
 - Company accounts add a constructor argument with no default to two services: `Thelia\Action\Customer::__construct()` takes `Thelia\Domain\Company\CompanyFacade` last, and `Thelia\Domain\Order\Service\OrderFactory::__construct()` takes `Thelia\Domain\Company\Checkout\CompanyOrderAttacher` last. A subclass that declares its own constructor passes them on to the parent.
 - Company accounts change three Flexy components and one form. `FlexyBundle\Components\Forms\Address\Base::__construct()` takes `Thelia\Domain\Addressing\Service\AddressAccess` last, `FlexyBundle\Components\Forms\Address\Account::__construct()` takes `AddressAccess` and `FlexyBundle\Service\CompanyAccount` last, `FlexyBundle\Components\Layouts\AccountOrders\Base::__construct()` takes an optional `CompanyAccount`, and `FlexyBundle\Form\AddressEditForm` gains a constructor that takes the translator after the arguments of `AddressCreateForm`. A child theme that overrides one of them passes the new arguments on to the parent.
 
+## Fixed
+
+- The links of the e-mails (choosing a new password, for a customer or an administrator, confirming an account, leaving the newsletter) are built on the address of the shop, `url_site`, or the domain of the language of the mail when `one_domain_foreach_lang` is on, whenever the page that sent the mail was reached on a host the shop does not declare: its address, the domain of a language or of an active sale unit, or any host once `framework.trusted_hosts` is set. A shop with no address configured keeps building them on the host of the request, and logs a warning that names `url_site` (`Thelia\Mailer\MailLinkBaseUrl`).
+
 # 3.4.1
 
 Not released yet.
