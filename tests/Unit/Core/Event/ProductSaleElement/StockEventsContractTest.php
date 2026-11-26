@@ -16,6 +16,7 @@ namespace Thelia\Tests\Unit\Core\Event\ProductSaleElement;
 
 use PHPUnit\Framework\TestCase;
 use Thelia\Core\Event\ProductSaleElement\LowStockReachedEvent;
+use Thelia\Core\Event\ProductSaleElement\SaleUnitStockChangedEvent;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
 use Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,6 +28,7 @@ final class StockEventsContractTest extends TestCase
     {
         self::assertSame('thelia.pse.stock_changed', TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED);
         self::assertSame('thelia.pse.low_stock_reached', TheliaEvents::PRODUCT_SALE_ELEMENTS_LOW_STOCK_REACHED);
+        self::assertSame('thelia.sale_unit.stock_changed', TheliaEvents::SALE_UNIT_STOCK_CHANGED);
     }
 
     public function testAStockChangeCarriesTheLevelsBeforeAndAfter(): void
@@ -38,6 +40,17 @@ final class StockEventsContractTest extends TestCase
         self::assertSame(42, $event->getChanges()[0]->productSaleElementsId);
         self::assertSame(22.0, $event->getChanges()[0]->previousQuantity);
         self::assertSame(19.0, $event->getChanges()[0]->newQuantity);
+        self::assertNull($event->getChanges()[0]->saleUnitId, 'A change built as before is a change of the national counter.');
+    }
+
+    public function testAChangeOfTheStockOfASaleUnitNamesTheUnit(): void
+    {
+        $change = new StockLevelChange(productSaleElementsId: 42, previousQuantity: 10.0, newQuantity: 4.0, saleUnitId: 3);
+        $event = new SaleUnitStockChangedEvent(changes: [$change]);
+
+        self::assertSame([$change], $event->getChanges());
+        self::assertSame(3, $event->getChanges()[0]->saleUnitId);
+        self::assertTrue($change->onSaleUnitStock());
     }
 
     public function testTheLowStockEventCarriesTheQuantityAndTheThreshold(): void
@@ -47,5 +60,7 @@ final class StockEventsContractTest extends TestCase
         self::assertSame(42, $event->getProductSaleElementsId());
         self::assertSame(19.0, $event->getQuantity());
         self::assertSame(20.0, $event->getThreshold());
+        self::assertNull($event->getSaleUnitId());
+        self::assertSame(3, (new LowStockReachedEvent(productSaleElementsId: 42, quantity: 4.0, threshold: 5.0, saleUnitId: 3))->getSaleUnitId());
     }
 }

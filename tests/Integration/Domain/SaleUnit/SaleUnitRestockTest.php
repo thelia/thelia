@@ -17,10 +17,14 @@ namespace Thelia\Tests\Integration\Domain\SaleUnit;
 use Thelia\Action\OrderReturn as OrderReturnAction;
 use Thelia\Core\Event\OrderReturn\OrderReturnEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
+use Thelia\Core\Event\ProductSaleElement\SaleUnitStockChangedEvent;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChange;
+use Thelia\Core\Event\ProductSaleElement\StockLevelChangedEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
+use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\SaleUnitProductSaleElementsTableMap;
@@ -38,17 +42,21 @@ use Thelia\Model\SaleUnit;
 use Thelia\Model\SaleUnitProductSaleElementsQuery;
 use Thelia\Test\ActionIntegrationTestCase;
 use Thelia\Tests\Support\Order\MovesOrders;
+use Thelia\Tests\Support\Order\PlacesBundleOrders;
+use Thelia\Tests\Support\Stock\TestCallerTransaction;
 
 /**
  * Stock taken from a sale unit goes back to that sale unit: a cancellation, a
  * received return and an adjustment the merchant configured on a transition all
  * follow the rule the checkout decremented by. The order's unit gets the quantity
  * back when it keeps a row for the sale element, the shared national counter
- * otherwise.
+ * otherwise. Each movement is told to the listeners of the stock it moved: the
+ * stock of the unit on its own event, the national counter on the event it always had.
  */
 final class SaleUnitRestockTest extends ActionIntegrationTestCase
 {
     use MovesOrders;
+    use PlacesBundleOrders;
 
     private const NATIONAL_STOCK = 50.0;
     private const UNIT_STOCK = 10.0;
@@ -61,6 +69,12 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
     /** @var list<array{0: string, 1: callable}> */
     private array $registeredListeners = [];
 
+    /** @var list<StockLevelChange> */
+    private array $toldOnTheSaleUnits = [];
+
+    /** @var list<StockLevelChange> */
+    private array $toldNationally = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -68,6 +82,16 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
         $product = $this->factory->product($this->factory->category(), $this->factory->taxRule(), $this->factory->currency());
         $this->productSaleElements = $this->factory->productSaleElement($product, ['quantity' => self::NATIONAL_STOCK]);
         $this->saleUnit = $this->factory->saleUnit();
+
+        $this->getService(TestCallerTransaction::class)->ignoreTheLevelsOpenOn($this->getPropelConnection());
+        $this->toldOnTheSaleUnits = [];
+        $this->toldNationally = [];
+        $this->listen(TheliaEvents::SALE_UNIT_STOCK_CHANGED, function (SaleUnitStockChangedEvent $event): void {
+            $this->toldOnTheSaleUnits = [...$this->toldOnTheSaleUnits, ...$event->getChanges()];
+        });
+        $this->listen(TheliaEvents::PRODUCT_SALE_ELEMENTS_STOCK_CHANGED, function (StockLevelChangedEvent $event): void {
+            $this->toldNationally = [...$this->toldNationally, ...$event->getChanges()];
+        });
     }
 
     protected function tearDown(): void
@@ -78,10 +102,29 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
         $this->registeredListeners = [];
 
         $this->getService(SaleUnitActivityChecker::class)->reset();
+        $this->getService(SaleUnitContext::class)->reset();
+        $this->getService(TestCallerTransaction::class)->reset();
         ConfigQuery::resetCache();
         OrderReturnStatusQuery::resetCache();
 
         parent::tearDown();
+    }
+
+    public function testAnOrderPlacedOnTheSaleUnitTakesFromItsStockAndTellsIt(): void
+    {
+        $listener = static fn (ManageStockOnCreationEvent $event) => $event->setManageStock(true);
+        $this->listen(TheliaEvents::getModuleEvent(TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK, 'Cheque'), $listener);
+        $this->factory->saleUnitProductSaleElements($this->saleUnit, $this->productSaleElements, self::UNIT_STOCK);
+        $this->getService(SaleUnitContext::class)->setSaleUnit($this->saleUnit);
+        [$customer, $currency, $lang] = $this->aBuyer();
+        $cart = $this->aCart($customer, $currency);
+        $this->factory->cartItem($cart, $this->productSaleElements->getProduct(), $this->productSaleElements, ['quantity' => self::ORDERED, 'price' => '10.000000', 'promoPrice' => '10.000000']);
+
+        $this->placeOrder($cart, $customer, $currency, $lang);
+
+        self::assertSame(self::UNIT_STOCK - self::ORDERED, $this->unitStock());
+        self::assertSame(self::NATIONAL_STOCK, $this->nationalStock());
+        $this->assertToldOnTheSaleUnitOnly(self::UNIT_STOCK, self::UNIT_STOCK - self::ORDERED);
     }
 
     public function testCancellingAPaidOrderGivesTheStockBackToItsSaleUnit(): void
@@ -93,6 +136,7 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::UNIT_STOCK + self::ORDERED, $this->unitStock(), 'The cancelled quantity goes back to the unit it was sold from.');
         self::assertSame(self::NATIONAL_STOCK, $this->nationalStock(), 'The national counter did not sell it and gets nothing back.');
+        $this->assertToldOnTheSaleUnitOnly(self::UNIT_STOCK, self::UNIT_STOCK + self::ORDERED);
     }
 
     public function testCancellingTheOrderOfAUnitWithoutItsOwnRowGivesTheStockBackNationally(): void
@@ -103,6 +147,8 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::NATIONAL_STOCK + self::ORDERED, $this->nationalStock(), 'No unit row: the national counter sold it, it gets it back.');
         self::assertNull($this->unitRow(), 'No unit row is made up along the way.');
+        self::assertEquals([new StockLevelChange($this->productSaleElements->getId(), self::NATIONAL_STOCK, self::NATIONAL_STOCK + self::ORDERED)], $this->toldNationally);
+        self::assertSame([], $this->toldOnTheSaleUnits);
     }
 
     public function testPayingAnOrderWhoseStockWasNotTakenAtCreationTakesItFromItsSaleUnit(): void
@@ -118,6 +164,7 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::UNIT_STOCK - self::ORDERED, $this->unitStock());
         self::assertSame(self::NATIONAL_STOCK, $this->nationalStock());
+        $this->assertToldOnTheSaleUnitOnly(self::UNIT_STOCK, self::UNIT_STOCK - self::ORDERED);
     }
 
     public function testAnAdjustmentOnATransitionPutsTheStockBackInItsSaleUnit(): void
@@ -130,6 +177,7 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::UNIT_STOCK + self::ORDERED, $this->unitStock());
         self::assertSame(self::NATIONAL_STOCK, $this->nationalStock());
+        $this->assertToldOnTheSaleUnitOnly(self::UNIT_STOCK, self::UNIT_STOCK + self::ORDERED);
     }
 
     public function testAnAdjustmentOnATransitionTakesTheStockFromItsSaleUnit(): void
@@ -142,6 +190,7 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::UNIT_STOCK - self::ORDERED, $this->unitStock());
         self::assertSame(self::NATIONAL_STOCK, $this->nationalStock());
+        $this->assertToldOnTheSaleUnitOnly(self::UNIT_STOCK, self::UNIT_STOCK - self::ORDERED);
     }
 
     public function testAReceivedReturnGoesBackToTheSaleUnitOfItsOrder(): void
@@ -162,6 +211,7 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::UNIT_STOCK + 2.0, $this->unitStock(), 'The two units received go back to the unit the order was placed on.');
         self::assertSame(self::NATIONAL_STOCK, $this->nationalStock());
+        $this->assertToldOnTheSaleUnitOnly(self::UNIT_STOCK, self::UNIT_STOCK + 2.0);
     }
 
     public function testANationalOrderStillRestocksTheNationalCounter(): void
@@ -173,6 +223,20 @@ final class SaleUnitRestockTest extends ActionIntegrationTestCase
 
         self::assertSame(self::NATIONAL_STOCK + self::ORDERED, $this->nationalStock());
         self::assertSame(self::UNIT_STOCK, $this->unitStock(), 'A unit row is never touched by an order placed on no unit.');
+        self::assertSame([], $this->toldOnTheSaleUnits);
+    }
+
+    /**
+     * The movement reached the listeners of the stock of the unit, with the unit, and nothing was
+     * told of the national counter, which did not move.
+     */
+    private function assertToldOnTheSaleUnitOnly(float $before, float $after): void
+    {
+        self::assertEquals(
+            [new StockLevelChange($this->productSaleElements->getId(), $before, $after, $this->saleUnit->getId())],
+            $this->toldOnTheSaleUnits,
+        );
+        self::assertSame([], $this->toldNationally);
     }
 
     private function orderOf(?SaleUnit $saleUnit, string $statusCode): Order

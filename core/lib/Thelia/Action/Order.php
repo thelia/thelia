@@ -654,7 +654,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             )
             : [];
 
-        /** @var array<int, StockLevelChange> $changes one per sale element, from the stock before the first line to the stock after the last */
+        /** @var array<string, StockLevelChange> $changes one per stock (a sale unit's own, or the national counter), from before the first line to after the last */
         $changes = [];
         /** @var array<int, list<StockMovement|null>> $componentMovementsByPack what the take of each component did, by the line of its pack */
         $componentMovementsByPack = [];
@@ -673,11 +673,13 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ? $this->updateSaleUnitQuantity($order, $orderProduct, $operationEvent, $reserved)
                 : $this->updateNationalQuantity($orderProduct, $operationEvent, $checkAvailableStock, $reserved);
 
-            if (null !== $movement && !$movement->onSaleUnitStock()) {
-                $changes[$movement->productSaleElementsId] = new StockLevelChange(
+            if (null !== $movement) {
+                $key = $movement->saleUnitId.':'.$movement->productSaleElementsId;
+                $changes[$key] = new StockLevelChange(
                     $movement->productSaleElementsId,
-                    isset($changes[$movement->productSaleElementsId]) ? $changes[$movement->productSaleElementsId]->previousQuantity : $movement->previousQuantity,
+                    isset($changes[$key]) ? $changes[$key]->previousQuantity : $movement->previousQuantity,
                     $movement->newQuantity,
+                    $movement->saleUnitId,
                 );
             }
 
@@ -812,7 +814,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @return StockMovement|null what a decrease did to the stock of the unit
+     * @return StockMovement|null what an increase or a decrease did to the stock of the unit
      *
      * @throws TheliaProcessException when the sale unit has not enough stock left to take the order again
      */
@@ -827,9 +829,14 @@ class Order extends BaseAction implements EventSubscriberInterface
         $connection = Propel::getConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
         if ($operationEvent->getOperation() === $operationEvent::INCREASE_STOCK) {
-            $this->stockDecrementer?->increment($productSaleElementsId, $quantity, $connection, $order->getSaleUnitId());
+            if (null === $this->stockDecrementer) {
+                return null;
+            }
 
-            return null;
+            $this->stockDecrementer->increment($productSaleElementsId, $quantity, $connection, $order->getSaleUnitId());
+            $level = $this->stockDecrementer->levelsAfterPutBack([$productSaleElementsId => $quantity], $connection, $order->getSaleUnitId())[0] ?? null;
+
+            return null === $level ? null : new StockMovement($productSaleElementsId, $level->saleUnitId, $level->previousQuantity, $level->newQuantity);
         }
 
         if ($operationEvent->getOperation() !== $operationEvent::DECREASE_STOCK) {

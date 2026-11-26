@@ -461,27 +461,25 @@ readonly class OrderFacade
     }
 
     /**
-     * Tells the listeners what the order did to the stock of each sale element it moved (the
-     * shared counter: the own stock of a sale unit is not a level of the sale element). One
-     * change per sale element, from what it was before the first line to what it is after the
-     * last. The order is placed whatever the listeners do: a failure is logged, not thrown.
+     * Tells the listeners what the order did to each stock it moved: the shared counter of a sale
+     * element, or the own stock of the sale unit (told on its own event). One change per stock,
+     * from what it was before the first line to what it is after the last. The order is placed
+     * whatever the listeners do: a failure is logged, not thrown.
      *
      * @param list<StockMovement> $stockMovements
      */
     private function announceStockChanges(EventDispatcherInterface $dispatcher, array $stockMovements): void
     {
-        /** @var array<int, StockLevelChange> $changes */
+        /** @var array<string, StockLevelChange> $changes */
         $changes = [];
 
         foreach ($stockMovements as $movement) {
-            if ($movement->onSaleUnitStock()) {
-                continue;
-            }
-
-            $changes[$movement->productSaleElementsId] = new StockLevelChange(
+            $key = $movement->saleUnitId.':'.$movement->productSaleElementsId;
+            $changes[$key] = new StockLevelChange(
                 $movement->productSaleElementsId,
-                isset($changes[$movement->productSaleElementsId]) ? $changes[$movement->productSaleElementsId]->previousQuantity : $movement->previousQuantity,
+                isset($changes[$key]) ? $changes[$key]->previousQuantity : $movement->previousQuantity,
                 $movement->newQuantity,
+                $movement->saleUnitId,
             );
         }
 
