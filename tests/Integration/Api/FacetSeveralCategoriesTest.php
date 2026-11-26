@@ -58,6 +58,14 @@ final class FacetSeveralCategoriesTest extends IntegrationTestCase
         self::assertSame([], $this->counts($facets, 'brand'));
     }
 
+    public function testTheSameCategoryCheckedTwiceObeysItsOwnRules(): void
+    {
+        // The listing narrows to one category once the duplicate is dropped: its facets must too.
+        $facets = $this->facets([[$this->aisleA, $this->aisleA]]);
+
+        self::assertSame([], $this->counts($facets, 'brand'));
+    }
+
     /**
      * @param array<mixed> $categorySelection the value of `tfilters[category]`, as the query string carries it
      *
