@@ -14,9 +14,12 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Mailer;
 
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mime\Email;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Mailer\MailLinkBaseUrl;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\LangQuery;
@@ -91,6 +94,46 @@ final class MailLinkBaseUrlTest extends IntegrationTestCase
         self::assertStringContainsString('://unconfigured.example/password/reset/reset-token-3', (string) $email->getHtmlBody());
     }
 
+    public function testWithoutAShopAddressTheLinksLeadToTheDefaultUri(): void
+    {
+        ConfigQuery::write('url_site', '');
+
+        $baseUrl = (new MailLinkBaseUrl(new NullLogger(), self::SHOP_URL.'/'))
+            ->resolve(Request::create('http://elsewhere.example/'), 'en_US');
+
+        self::assertSame(self::SHOP_URL, $baseUrl);
+    }
+
+    public function testWithoutAShopAddressTheHostOfTheDefaultUriIsKept(): void
+    {
+        ConfigQuery::write('url_site', '');
+
+        $baseUrl = (new MailLinkBaseUrl(new NullLogger(), self::SHOP_URL))
+            ->resolve(Request::create('http://shop.example/'), 'en_US');
+
+        self::assertNull($baseUrl);
+    }
+
+    public function testADefaultUriOnTheMachineItselfIsNotAShopAddress(): void
+    {
+        ConfigQuery::write('url_site', '');
+
+        $baseUrl = (new MailLinkBaseUrl(new NullLogger(), 'http://localhost'))
+            ->resolve(Request::create('http://unconfigured.example/'), 'en_US');
+
+        self::assertNull($baseUrl);
+    }
+
+    public function testTheShopAddressComesBeforeTheDefaultUri(): void
+    {
+        ConfigQuery::write('url_site', self::SHOP_URL);
+
+        $baseUrl = (new MailLinkBaseUrl(new NullLogger(), 'https://other.example'))
+            ->resolve(Request::create('http://other.example/'), 'en_US');
+
+        self::assertSame(self::SHOP_URL, $baseUrl);
+    }
+
     private function renderLostPasswordMail(string $token): Email
     {
         $customer = $this->factory->customer($this->factory->customerTitle());
@@ -107,7 +150,7 @@ final class MailLinkBaseUrlTest extends IntegrationTestCase
         return $email;
     }
 
-    private function mainRequest(): \Symfony\Component\HttpFoundation\Request
+    private function mainRequest(): Request
     {
         $request = $this->getService(RequestStack::class)->getMainRequest();
         self::assertNotNull($request);
