@@ -64,8 +64,17 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
                 throw new InvalidReferenceQuantityException(\sprintf('A reference is at most %d characters long.', self::MAX_REFERENCE_LENGTH));
             }
 
-            if (is_nan($line->quantity) || QuantityScale::micro($line->quantity) <= 0) {
-                throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" must be greater than zero.', $reference));
+            // Bounded as a float first: beyond what an integer holds, the millionths wrap around.
+            if (is_nan($line->quantity) || $line->quantity <= 0) {
+                throw self::notAboveZero($reference);
+            }
+
+            if ($line->quantity > self::MAX_QUANTITY) {
+                throw self::aboveTheMaximum($reference);
+            }
+
+            if (QuantityScale::micro($line->quantity) <= 0) {
+                throw self::notAboveZero($reference);
             }
 
             $key = $reference."\0".($line->productSaleElementsId ?? '');
@@ -87,10 +96,20 @@ final readonly class ReferenceQuantityLines implements \Countable, \IteratorAggr
     private static function boundedQuantity(string $reference, float $current, float $added): float
     {
         if (QuantityScale::micro($added) > QuantityScale::micro(self::MAX_QUANTITY) - QuantityScale::micro($current)) {
-            throw new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" is at most %d.', $reference, self::MAX_QUANTITY));
+            throw self::aboveTheMaximum($reference);
         }
 
         return self::sum($current, $added);
+    }
+
+    private static function notAboveZero(string $reference): InvalidReferenceQuantityException
+    {
+        return new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" must be greater than zero.', $reference));
+    }
+
+    private static function aboveTheMaximum(string $reference): InvalidReferenceQuantityException
+    {
+        return new InvalidReferenceQuantityException(\sprintf('The quantity of reference "%s" is at most %d.', $reference, self::MAX_QUANTITY));
     }
 
     private static function sum(float $quantity, float $other): float

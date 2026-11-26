@@ -146,6 +146,27 @@ final class ReferenceQuantityLinesTest extends TestCase
         new ReferenceQuantityLines([new ReferenceQuantity('A', 600_000), new ReferenceQuantity('A', 600_000)]);
     }
 
+    /**
+     * @return iterable<string, array{float, string}>
+     */
+    public static function quantitiesBeyondTheMillionthsAnIntegerHolds(): iterable
+    {
+        yield 'a negative quantity whose millionths wrap to one' => [-18446744073708.551616, '/greater than zero/'];
+        yield 'a huge quantity whose millionths wrap to one' => [18446744073710.551616, '/at most 999999/'];
+        yield 'a huge quantity whose millionths wrap below zero' => [1e13, '/at most 999999/'];
+        yield 'an infinite quantity' => [\INF, '/at most 999999/'];
+        yield 'a negative infinite quantity' => [-\INF, '/greater than zero/'];
+    }
+
+    #[DataProvider('quantitiesBeyondTheMillionthsAnIntegerHolds')]
+    public function testAQuantityBeyondTheMillionthsAnIntegerHoldsIsRefused(float $quantity, string $message): void
+    {
+        $this->expectException(InvalidReferenceQuantityException::class);
+        $this->expectExceptionMessageMatches($message);
+
+        new ReferenceQuantityLines([new ReferenceQuantity('FLOUR', $quantity)]);
+    }
+
     public function testAReferenceOfTheMaximumLengthIsKeptWhateverItsCharacters(): void
     {
         $accented = str_repeat('é', ReferenceQuantityLines::MAX_REFERENCE_LENGTH);
