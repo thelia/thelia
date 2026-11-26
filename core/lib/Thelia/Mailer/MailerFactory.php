@@ -40,6 +40,7 @@ use Thelia\Model\LangQuery;
 use Thelia\Model\Message;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Tools\URL;
 
 /**
  * Class MailerFactory.
@@ -71,6 +72,7 @@ class MailerFactory
         #[Autowire(service: 'mailer.transports')]
         private readonly TransportInterface $transport,
         private readonly ?SaleUnitConfigService $saleUnitConfig = null,
+        private readonly ?MailLinkBaseUrl $linkBaseUrl = null,
     ) {
     }
 
@@ -551,7 +553,15 @@ class MailerFactory
 
             $this->setupMessageHeaders($email, $from, $to, $cc, $bcc, $replyTo);
 
-            $message->buildMessage($parser, $email);
+            // A mail is read away from the page that sent it: its links are built on the
+            // address of the shop, not on a host the request was addressed to.
+            $linkBaseUrl = ($this->linkBaseUrl ?? new MailLinkBaseUrl())->resolve($request, $locale);
+
+            if (null === $linkBaseUrl) {
+                $message->buildMessage($parser, $email);
+            } else {
+                URL::getInstance()->withBaseUrl($linkBaseUrl, static fn () => $message->buildMessage($parser, $email));
+            }
 
             return $email;
         } finally {
