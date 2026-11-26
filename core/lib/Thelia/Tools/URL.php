@@ -43,6 +43,9 @@ class URL
     /** @var string a cache for the base URL scheme */
     private ?string $baseUrlScheme = null;
 
+    /** While set, the address every absolute URL is built on, whatever the request says. */
+    private ?string $pinnedBaseUrl = null;
+
     public function __construct(?RouterInterface $router = null, ?RewritingUrlMemoizer $memoizer = null, private readonly ?RequestStack $requestStack = null)
     {
         // Allow singleton style calls once instantiated.
@@ -92,6 +95,10 @@ class URL
      */
     public function getBaseUrl(bool $scheme_only = false): string
     {
+        if (null !== $this->pinnedBaseUrl) {
+            return $scheme_only ? self::schemeAndHostOf($this->pinnedBaseUrl) : $this->pinnedBaseUrl;
+        }
+
         // The request being served is the only source that is right from the first line of the
         // dispatch: the router context is filled from the request by RouterListener, and the
         // rewriting runs before that, so a url built during routing (the language switch
@@ -123,6 +130,37 @@ class URL
         }
 
         return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
+    }
+
+    /**
+     * Runs $callback with every absolute URL built on $baseUrl (scheme, host and folder of
+     * the shop) instead of the address of the request being served. For what is read away
+     * from the page that built it, an e-mail: its links must not follow a Host header.
+     *
+     * @template T
+     *
+     * @param callable(): T $callback
+     *
+     * @return T
+     */
+    public function withBaseUrl(string $baseUrl, callable $callback): mixed
+    {
+        $previous = $this->pinnedBaseUrl;
+        $this->pinnedBaseUrl = rtrim($baseUrl, '/');
+
+        try {
+            return $callback();
+        } finally {
+            $this->pinnedBaseUrl = $previous;
+        }
+    }
+
+    private static function schemeAndHostOf(string $url): string
+    {
+        $parts = parse_url($url);
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+
+        return \sprintf('%s://%s%s', $parts['scheme'] ?? 'http', $parts['host'] ?? '', $port);
     }
 
     /**
