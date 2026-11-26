@@ -73,6 +73,7 @@ $longOptions = [
     'database_name:',
     'database_user:',
     'database_password:',
+    'url:',
 ];
 
 // getopt() drops whatever it does not recognise and leaves every value at its
@@ -90,6 +91,20 @@ if (null !== $unrecognized = findUnrecognizedArgument($argv, $longOptions)) {
     fwrite(STDERR, "ERROR: unrecognized option: {$unrecognized}\n\n");
     fwrite(STDERR, usage());
     exit(1);
+}
+
+// The address the shop is served on, kept as `url_site`: the e-mails build their links on
+// it. Without --url, DEFAULT_URI gives it when it names more than the machine itself (the
+// `http://localhost` shipped in .env says nothing about where the shop is served).
+if (isset($options['url'])) {
+    $shopUrl = Thelia\Tools\ShopUrl::absolute(\is_string($options['url']) ? $options['url'] : '');
+
+    if (null === $shopUrl) {
+        fwrite(STDERR, "ERROR: --url must be an absolute http or https address, such as https://www.example.com.\n");
+        exit(1);
+    }
+} else {
+    $shopUrl = Thelia\Tools\ShopUrl::nonLocal((string) ($_SERVER['DEFAULT_URI'] ?? ''));
 }
 
 $host     = $options['database_host']     ?? $_SERVER['DATABASE_HOST']     ?? '';
@@ -260,6 +275,11 @@ $adminEmail = trim((string) ($options['admin_email'] ?? ''));
 if ('' !== $adminEmail && '' === trim((string) $setup->getConfig('store_notification_emails'))) {
     echo "Setting the shop notification address to {$adminEmail}...\n";
     $setup->setConfig('store_notification_emails', $adminEmail);
+}
+
+if (null !== $shopUrl && '' === trim((string) $setup->getConfig('url_site'))) {
+    echo "Setting the shop address to {$shopUrl}...\n";
+    $setup->setConfig('url_site', $shopUrl);
 }
 
 // Pre-copy templates from vendor to templates/ so the kernel can boot.
@@ -573,6 +593,8 @@ function usage(): string
               --admin_first_name=NAME  Administrator first name
               --admin_last_name=NAME   Administrator last name
               --admin_email=EMAIL      Administrator e-mail
+              --url=URL                Address the shop is served on, such as https://www.example.com
+                                       (default: DEFAULT_URI, unless it is localhost or a loopback IP)
 
         TXT;
 }
