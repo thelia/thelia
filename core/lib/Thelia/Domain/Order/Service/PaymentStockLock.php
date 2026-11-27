@@ -82,7 +82,7 @@ final readonly class PaymentStockLock
         $rows = array_values(array_unique($rows));
         sort($rows);
 
-        return new StatusStockPlan($previousStatusId, $newStatus, $operation, $rows);
+        return new StatusStockPlan($previousStatusId, $newStatus, $operation, $rows, $order->getPaymentModuleId(), $order->getDeliveryModuleId());
     }
 
     /**

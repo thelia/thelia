@@ -17,6 +17,7 @@ namespace Thelia\Tests\Integration\Domain\Order;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\GetStockUpdateOperationOnOrderStatusChangeEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\Catalog\Stock\StockSettings;
@@ -479,6 +480,26 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
 
         self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($order->getId())->count());
+    }
+
+    public function testAStatusChangeThatAlsoChangesTheCarrierDecidesTheStockOnTheNewCarrier(): void
+    {
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::write('check_available_stock', '1');
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_NONE, limits: [AdjustStockAction::FIELD_DELIVERY_MODULES => ['VirtualProductDelivery']]);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_NOT_PAID);
+        $newCarrierId = (int) ModuleQuery::create()->findOneByCode('VirtualProductDelivery')?->getId();
+
+        // As the admin API does when one call changes the carrier and the status.
+        $event = (new OrderEvent($order))
+            ->setStatus($this->orderStatus(OrderStatus::CODE_PAID)->getId())
+            ->writeWithStatus(static function () use ($order, $newCarrierId): void {
+                OrderQuery::create()->filterById($order->getId())->update(['DeliveryModuleId' => $newCarrierId]);
+            });
+        $this->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
+
+        self::assertSame(10.0, $this->stockOf($productSaleElements), 'The order now delivered by the carrier of the action follows the action.');
     }
 
     public function testTheDecisionOfAFailedStatusChangeIsNotHandedToAnotherObjectOfTheSameOrder(): void

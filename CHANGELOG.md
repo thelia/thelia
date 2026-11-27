@@ -68,6 +68,7 @@ Not released yet.
 - The fixed rule of the core no longer moves a stock that an earlier stock action of the order already moved: an order whose stock an action left in place when it was paid (to take it out when shipped) puts nothing back when it is cancelled before shipping, and an order whose stock an action kept out takes nothing more when it is paid. The `status_changed` line keeps what the rule would have done when the stock moved otherwise (`rule_stock`), and `Thelia\Domain\Order\StatusAction\StockRuleDeparture` sums these lines to hold the rule back. A shop without a stock action sees no difference.
 - The module codes of a stock action limit are compared as the modules spell them: `cheque` names the module `Cheque`.
 - A payment confirmed twice at the same moment no longer records a failure of a stock action for the second confirmation, which found the order paid already and changed nothing.
+- A status change that also moves the order to another payment or delivery module (the admin API writes both in one call) decides its stock on the new module: the operation worked out before the lock of the order (`StatusStockPlan`) is asked again when the modules of the order changed in between. `StatusStockPlan::__construct()` takes the payment and delivery module ids as two optional last arguments, and `StatusStockPlan::operationFor()` the order as an optional last argument.
 
 ## Behaviour changes
 

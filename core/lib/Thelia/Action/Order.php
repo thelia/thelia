@@ -506,7 +506,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $operation = null === $stockPlan || null === $order->getId()
                 ? null
-                : $stockPlan->operationFor($currentStatusId, $statusIdAsRead, $newStatus);
+                : $stockPlan->operationFor($currentStatusId, $statusIdAsRead, $newStatus, $order);
 
             $stockChanges = $this->updateQuantity($order, $newStatus, $dispatcher, $operation);
 
