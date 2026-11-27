@@ -227,9 +227,15 @@ final readonly class OrderHistoryRecorder
 
         $payload = ['from' => $fromStatusCode, 'to' => $toStatusCode];
 
-        if (null !== $stockDecision && ($stockDecision->movesStock() || null !== $stockDecision->actionId)) {
+        if (null !== $stockDecision && ($stockDecision->movesStock() || null !== $stockDecision->actionId || $stockDecision->departsFromTheRule())) {
             $payload['stock'] = $stockDecision->operationName();
             $payload['stock_action_id'] = $stockDecision->actionId;
+        }
+
+        // What the fixed rule would have done, kept when the stock moved otherwise: the
+        // later status changes of the order read it to know what is really out of stock.
+        if (null !== $stockDecision && $stockDecision->departsFromTheRule()) {
+            $payload['rule_stock'] = $stockDecision->ruleOperationName();
         }
 
         $this->record(

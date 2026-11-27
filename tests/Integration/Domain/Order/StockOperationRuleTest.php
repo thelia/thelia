@@ -27,10 +27,12 @@ use Thelia\Domain\Order\StatusAction\StockActionDiagnostics;
 use Thelia\Domain\Order\StatusAction\StockOperationSimulator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusAction;
 use Thelia\Model\OrderStatusActionFailureQuery;
@@ -224,6 +226,81 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         $this->moveOrderTo($order, OrderStatus::CODE_PAID);
 
         self::assertSame(7.0, $this->stockOf($productSaleElements));
+    }
+
+    public function testTheCoreRuleDoesNotPutBackAStockAStockActionLeftInPlace(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_NONE);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_NOT_PAID);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(10.0, $this->stockOf($productSaleElements), 'The stock never left when the order was paid: its cancellation has nothing to put back.');
+        self::assertSame(['stock' => 'none', 'stock_action_id' => null], $this->stockOfLastStatusLine($order));
+    }
+
+    public function testAStockTakenOutWhenShippedIsPutBackOnlyByTheCancellationOfAShippedOrder(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_NONE);
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_SENT, AdjustStockAction::OPERATION_DECREASE);
+        $canceledBeforeShipping = $this->createProductSaleElements(10);
+        $canceledOnceShipped = $this->createProductSaleElements(10);
+        $beforeShipping = $this->orderOf($canceledBeforeShipping, 3, OrderStatus::CODE_NOT_PAID);
+        $onceShipped = $this->orderOf($canceledOnceShipped, 3, OrderStatus::CODE_NOT_PAID);
+
+        $this->moveOrderTo($beforeShipping, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($beforeShipping, OrderStatus::CODE_CANCELED);
+        $this->moveOrderTo($onceShipped, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($onceShipped, OrderStatus::CODE_SENT);
+        self::assertSame(7.0, $this->stockOf($canceledOnceShipped), 'The stock leaves when the order ships.');
+        $this->moveOrderTo($onceShipped, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(10.0, $this->stockOf($canceledBeforeShipping), 'Canceled before shipping: nothing was taken out.');
+        self::assertSame(10.0, $this->stockOf($canceledOnceShipped), 'Canceled once shipped: the stock taken when shipping comes back.');
+    }
+
+    public function testTheCoreRuleDoesNotTakeOutAgainAStockAStockActionKeptOut(): void
+    {
+        $this->stockIsManagedOnOrderCreation(true);
+        $this->factory->orderStatus(['code' => 'awaiting_transfer']);
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, 'awaiting_transfer', AdjustStockAction::OPERATION_NONE);
+        $productSaleElements = $this->createProductSaleElements(10);
+        // Read again, as a request does: the object the factory inserted keeps its versions off.
+        $orderId = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_NOT_PAID)->getId();
+        OrderTableMap::clearInstancePool();
+        $order = OrderQuery::create()->findPk($orderId);
+        self::assertNotNull($order);
+
+        $this->moveOrderTo($order, 'awaiting_transfer');
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(10.0, $this->stockOf($productSaleElements), 'The stock taken when the order was placed stayed out: paying takes nothing more.');
+    }
+
+    public function testTheOrderHistoryKeepsWhatTheCoreRuleWouldHaveDoneWhenTheStockMovedOtherwise(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_NONE);
+        $order = $this->orderOf($this->createProductSaleElements(10), 3, OrderStatus::CODE_NOT_PAID);
+        $byCoreRule = $this->orderOf($this->createProductSaleElements(10), 3, OrderStatus::CODE_PAID);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+        $this->moveOrderTo($byCoreRule, OrderStatus::CODE_CANCELED);
+
+        self::assertSame('decrease', $this->lastStatusLine($order)['rule_stock'] ?? null);
+        self::assertArrayNotHasKey('rule_stock', $this->lastStatusLine($byCoreRule), 'The stock moved as the rule says: nothing to keep.');
+    }
+
+    public function testTheSimulationAnnouncesTheStockTheCoreRuleHoldsBack(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, AdjustStockAction::OPERATION_NONE);
+        $order = $this->orderOf($this->createProductSaleElements(10), 3, OrderStatus::CODE_NOT_PAID);
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        $decision = $this->getService(StockOperationSimulator::class)->simulate($order, $this->orderStatus(OrderStatus::CODE_CANCELED));
+
+        self::assertSame(['none', null], [$decision->operationName(), $decision->actionId]);
     }
 
     public function testTheSimulationAnnouncesWhatTheStatusChangeThenDoes(): void
@@ -511,6 +588,14 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
      */
     private function stockOfLastStatusLine(Order $order): array
     {
+        return array_intersect_key($this->lastStatusLine($order), ['stock' => true, 'stock_action_id' => true]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function lastStatusLine(Order $order): array
+    {
         $line = OrderHistoryQuery::create()
             ->filterByOrderId($order->getId())
             ->filterByEventType(OrderHistoryEventType::STATUS_CHANGED->value)
@@ -518,7 +603,7 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
             ->findOne();
         self::assertNotNull($line);
 
-        return array_intersect_key($line->getDecodedPayload(), ['stock' => true, 'stock_action_id' => true]);
+        return $line->getDecodedPayload();
     }
 
     private function stockOf(ProductSaleElements $productSaleElements): float

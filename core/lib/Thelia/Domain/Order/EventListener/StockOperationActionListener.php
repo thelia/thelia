@@ -23,6 +23,7 @@ use Thelia\Domain\Order\StatusAction\OrderStatusActionRunner;
 use Thelia\Domain\Order\StatusAction\RefusedStockPayload;
 use Thelia\Domain\Order\StatusAction\StockOperationActionResolver;
 use Thelia\Domain\Order\StatusAction\StockOperationDecision;
+use Thelia\Domain\Order\StatusAction\StockRuleDeparture;
 use Thelia\Model\Order;
 
 /**
@@ -45,9 +46,13 @@ final class StockOperationActionListener implements ResetInterface
     /** @var \WeakMap<Order, list<RefusedStockPayload>> the payloads refused by the last decision, not recorded yet */
     private \WeakMap $refusedPayloadsByOrder;
 
+    /** @var \WeakMap<Order, int> what the fixed rule had decided before the stock actions were read */
+    private \WeakMap $ruleOperationByOrder;
+
     public function __construct(
         private readonly StockOperationActionResolver $resolver,
         private readonly OrderStatusActionRunner $runner,
+        private readonly StockRuleDeparture $ruleDeparture,
     ) {
         $this->reset();
     }
@@ -59,11 +64,13 @@ final class StockOperationActionListener implements ResetInterface
     public function applyStockAction(GetStockUpdateOperationOnOrderStatusChangeEvent $event): void
     {
         $order = $event->getOrder();
+        $ruleOperation = $event->getOperation();
         $resolution = $this->resolver->resolve($order, $event->getNewOrderStatus());
 
         // A simulation writes nothing, a refused payload included.
         if (!$event->isSimulation()) {
             unset($this->refusedPayloadsByOrder[$order]);
+            $this->ruleOperationByOrder[$order] = $ruleOperation;
 
             if ([] !== $resolution->refusedPayloads) {
                 $this->refusedPayloadsByOrder[$order] = $resolution->refusedPayloads;
@@ -71,6 +78,12 @@ final class StockOperationActionListener implements ResetInterface
         }
 
         if (null === $resolution->decision) {
+            // No stock action covers this change: the fixed rule decides, unless a stock
+            // action of an earlier change already moved the stock it is about to move.
+            if ($this->ruleDeparture->holdsBack($order, $ruleOperation)) {
+                $event->setOperation($event::DO_NOTHING);
+            }
+
             return;
         }
 
@@ -89,7 +102,13 @@ final class StockOperationActionListener implements ResetInterface
             return;
         }
 
-        $this->decisionByOrder[$event->getOrder()] = new StockOperationDecision($event->getOperation(), $event->getDecidingActionId());
+        $order = $event->getOrder();
+        $this->decisionByOrder[$order] = new StockOperationDecision(
+            $event->getOperation(),
+            $event->getDecidingActionId(),
+            $this->ruleOperationByOrder[$order] ?? null,
+        );
+        unset($this->ruleOperationByOrder[$order]);
     }
 
     /**
@@ -126,5 +145,6 @@ final class StockOperationActionListener implements ResetInterface
     {
         $this->decisionByOrder = new \WeakMap();
         $this->refusedPayloadsByOrder = new \WeakMap();
+        $this->ruleOperationByOrder = new \WeakMap();
     }
 }
