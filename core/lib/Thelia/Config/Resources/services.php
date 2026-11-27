@@ -82,6 +82,9 @@ return static function (ContainerConfigurator $configurator, ContainerBuilder $c
             [
                 THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
                 THELIA_LIB.'/Config/**/*.php',
+                // Implements an interface of an optional package: reflecting it without the package fails the
+                // scan. security.php declares it, when the package is there.
+                THELIA_LIB.'/Core/Security/Showcase/*.php',
             ],
         )
         ->autowire()

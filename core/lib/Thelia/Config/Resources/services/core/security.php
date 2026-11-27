@@ -14,10 +14,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use OpenStudio\UxShowcaseBundle\Access\ShowcaseAccessInterface;
 use Thelia\Controller\Api\RefreshTokenController;
 use Thelia\Core\Security\RefreshToken\AuthenticationSuccessSubscriber;
 use Thelia\Core\Security\RefreshToken\RefreshTokenService;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Security\Showcase\AdministratorShowcaseAccess;
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
 use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 
@@ -47,4 +49,12 @@ return static function (ContainerConfigurator $container): void {
         ])
         ->public()
         ->tag('controller.service_arguments');
+
+    // The access of the component showcase for the administrators of the back office, named by the shop in
+    // `ux_showcase.access.service`. Declared only when the package is installed: the class implements one of its
+    // interfaces, and the container could not reflect it without it.
+    if (interface_exists(ShowcaseAccessInterface::class)) {
+        $services->set(AdministratorShowcaseAccess::class)
+            ->args([service(SecurityContext::class), '%kernel.debug%']);
+    }
 };
