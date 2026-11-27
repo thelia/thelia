@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 /**
  * Whether an optional guardrail can run at this moment, and why not when it cannot: what the back office
  * shows next to its name. It is computed from the connections and the settings, never from a call.
- *
- * @internal
  */
 #[Exclude]
 final readonly class GuardrailAvailability

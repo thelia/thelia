@@ -65,6 +65,7 @@ Not released yet.
 ## Fixed
 
 - The links of the e-mails (choosing a new password, for a customer or an administrator, confirming an account, leaving the newsletter) are built on the address of the shop, `url_site`, or the domain of the language of the mail when `one_domain_foreach_lang` is on, whenever the page that sent the mail was reached on a host the shop does not declare: its address, the domain of a language or of an active sale unit, or any host once `framework.trusted_hosts` is set. A shop with no `url_site` builds them on `DEFAULT_URI` unless it names the machine itself (localhost, a loopback IP); a shop with neither keeps building them on the host of the request, and logs a warning that names `url_site` (`Thelia\Mailer\MailLinkBaseUrl`).
+- `AiGuardrailAvailabilityInterface` and `GuardrailAvailability` are no longer `@internal`: a guardrail of a module implements them to tell the back office it cannot run, and the debug class loader no longer logs a deprecation for it (TheliaCMS `ReferenceFileGuardrail`).
 
 # 3.4.1
 
