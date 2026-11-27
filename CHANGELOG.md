@@ -310,6 +310,7 @@ Fourth minor of the 3.x line. 435 commits since 3.3.0. The version number follow
 
 ## Performance
 
+- A volume dataset and a measure of how the shop holds with it, for tests only (`setup/volume/README.md`). `thelia:test:volume:generate` writes a category tree, products with combinations, features, images, translations and a price in every currency, customers with an address and orders, by multi-row inserts and with identifiers and dates of its own, so the same options on the same database write the same rows (it prints their fingerprint); it refuses `APP_ENV=prod`, and a database holding orders it did not write unless `--force`. `thelia:test:volume:purge` deletes the identifier ranges the dataset recorded in `meta_data` (`volume_dataset`) and its image files, nothing else, `--dry-run` counting first. `thelia:test:volume:measure` calls the pages of `setup/volume/pages.yaml` on a running shop, signed in as a customer and an administrator where a page needs it, counts the queries the database server received for each (`Questions`, the fewest over the calls after a warm-up one), times them and the exports, writes the campaign to JSON and fails with `--compare` when a page gives another count than a previous campaign.
 - The cart lines `attr()` serves (`offered_*`, `line_total_*`) read the products of the cart in one query, tax rule and title included, and take the ones the Propel instance pool already holds as they are instead of reading them again.
 
 ## Behaviour changes
