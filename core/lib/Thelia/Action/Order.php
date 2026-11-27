@@ -506,7 +506,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $operation = null === $stockPlan || null === $order->getId()
                 ? null
-                : $stockPlan->operationFor($currentStatusId, $statusIdAsRead, $newStatus);
+                : $stockPlan->operationFor($currentStatusId, $statusIdAsRead, $newStatus, $order);
 
             $stockChanges = $this->updateQuantity($order, $newStatus, $dispatcher, $operation);
 
@@ -523,6 +523,10 @@ class Order extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (\Throwable $exception) {
             $con->rollBack();
+            // The stock and the lines written before the failure are rolled back in the
+            // database, not in the instances Propel keeps: a later read would meet them.
+            ProductSaleElementsTableMap::clearInstancePool();
+            OrderProductTableMap::clearInstancePool();
 
             throw $this->conflictOr($exception);
         }
@@ -743,7 +747,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /* Check if we have enough stock: what the sale element may still sell, below zero included when it sells there */
             if ($checkAvailableStock && null !== $ceiling && $quantity > SellableStock::leftOf($ceiling, $reservedByOtherCarts)) {
-                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
+                throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock');
             }
 
             $offset = -$quantity;
@@ -850,7 +854,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 reservedByOtherCarts: $checkAvailableStock ? $reservedByOtherCarts : 0.0,
             );
         } catch (TheliaProcessException $shortage) {
-            throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock 2', previous: $shortage);
+            throw new TheliaProcessException($orderProduct->getProductSaleElementsRef().' : Not enough stock', previous: $shortage);
         }
     }
 

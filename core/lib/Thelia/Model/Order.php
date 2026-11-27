@@ -1044,8 +1044,16 @@ class Order extends BaseOrder
 
     public function isStockStillGovernedByCreation(EventDispatcherInterface $dispatcher): bool
     {
-        // Only until the order first holds a status that does not stand for "not paid": a stay
-        // on hold for capture, a status equivalent to not_paid, is no status change here.
+        return !$this->hasChangedStatusSinceCreation() && $this->isStockManagedOnOrderCreation($dispatcher);
+    }
+
+    /**
+     * Whether the order ever held a status that does not stand for "not paid", read from its
+     * versions: a stay on hold for capture, a status equivalent to not_paid, is no status change
+     * here. Until then, the stock it took at creation (or did not take) is still what decides.
+     */
+    public function hasChangedStatusSinceCreation(): bool
+    {
         $statusIds = OrderVersionQuery::create()
             ->filterById($this->getId())
             ->select([OrderVersionTableMap::COL_STATUS_ID])
@@ -1055,11 +1063,11 @@ class Order extends BaseOrder
 
         foreach (OrderStatusQuery::create()->findPks($statusIds) as $status) {
             if (!$status->isNotPaid(true)) {
-                return false;
+                return true;
             }
         }
 
-        return $this->isStockManagedOnOrderCreation($dispatcher);
+        return false;
     }
 
     protected function getCart(): ?Cart

@@ -50,8 +50,9 @@ final readonly class InstallmentOrderStockListener implements EventSubscriberInt
         return [
             // After the listeners that decide for the virtual product (VirtualProductDelivery at 128).
             TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE => ['leaveTheStockOfAPlacedInstallment', 64],
-            // After the core decided the operation (Action\Order at 128).
-            TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE => ['leaveTheStockOfAVirtualInstallment', 64],
+            // After the core decided the operation (Action\Order at 128) and the stock actions
+            // of the order statuses (64), whose decision it overrides.
+            TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE => ['leaveTheStockOfAVirtualInstallment', 32],
         ];
     }
 
@@ -79,7 +80,10 @@ final readonly class InstallmentOrderStockListener implements EventSubscriberInt
         }
 
         if (1 === (int) $subscription->getProductSaleElements()?->getProduct()?->getVirtual()) {
-            $event->setOperation($event::DO_NOTHING);
+            // No stock action chose what is applied: the order history must not name one.
+            $event
+                ->setOperation($event::DO_NOTHING)
+                ->setDecidingActionId(null);
         }
     }
 }

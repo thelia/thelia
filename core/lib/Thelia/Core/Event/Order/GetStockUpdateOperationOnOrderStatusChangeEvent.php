@@ -29,11 +29,18 @@ class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
 
     protected $operation = self::DO_NOTHING;
 
+    /** The order status action that chose the operation, null while the fixed rule of the core decides. */
+    protected ?int $decidingActionId = null;
+
     /**
-     * StockUpdateOnOrderStatusChangeEvent constructor.
+     * @param bool $simulation true when the operation is only asked for, to show it in the back office:
+     *                         no stock moves afterwards, and a listener must not write anything
      */
-    public function __construct(protected Order $order, protected OrderStatus $newOrderStatus)
-    {
+    public function __construct(
+        protected Order $order,
+        protected OrderStatus $newOrderStatus,
+        protected bool $simulation = false,
+    ) {
     }
 
     public function getOrder(): Order
@@ -59,5 +66,25 @@ class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
         $this->operation = $operation;
 
         return $this;
+    }
+
+    public function getDecidingActionId(): ?int
+    {
+        return $this->decidingActionId;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setDecidingActionId(?int $decidingActionId): self
+    {
+        $this->decidingActionId = $decidingActionId;
+
+        return $this;
+    }
+
+    public function isSimulation(): bool
+    {
+        return $this->simulation;
     }
 }

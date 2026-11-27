@@ -15,13 +15,22 @@ declare(strict_types=1);
 namespace Thelia\Tests\Integration\Controller\Front;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\Exception\OrderStatusTransitionRefusedException;
 use Thelia\Domain\Order\Service\OrderStatusTransitionWriter;
+use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusAction;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Module\BasePaymentModuleController;
 use Thelia\Test\IntegrationTestCase;
 
@@ -97,6 +106,70 @@ final class BasePaymentModuleControllerTest extends IntegrationTestCase
         }
 
         self::assertSame($notPaid->getId(), OrderQuery::create()->findPk($order->getId())->getStatusId());
+    }
+
+    /**
+     * The confirmation of a gateway is a status change like another: the stock action the
+     * merchant set on it decides, here in a shop that takes its stock at shipping and leaves
+     * it alone at payment.
+     */
+    public function testAPaymentConfirmationLeavesTheStockToTheStockActionOfTheStatusChange(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $product = $factory->product($factory->category(), $factory->taxRule(), $factory->currency());
+        $productSaleElements = $factory->productSaleElement($product, ['quantity' => 10]);
+        $order = $factory->order();
+        $factory->orderProduct($order, [
+            'productRef' => $product->getRef(),
+            'productSaleElementsRef' => $productSaleElements->getRef(),
+            'productSaleElementsId' => $productSaleElements->getId(),
+            'quantity' => 3.0,
+        ]);
+        $paid = OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_PAID);
+        self::assertNotNull($paid);
+        $action = (new OrderStatusAction())
+            ->setTriggerType(OrderStatusActionTrigger::ENTER->value)
+            ->setToStatusId($paid->getId())
+            ->setActionType(AdjustStockAction::getType())
+            ->setDecodedPayload([AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_NONE])
+            ->setPosition(1)
+            ->setActive(true);
+        $action->save();
+
+        // The stock of the order is left for its payment: without the action, the fixed rule
+        // of the core takes it when the gateway confirms.
+        $dispatcher = $this->getService(EventDispatcherInterface::class);
+        $manageStockEvent = TheliaEvents::getModuleEvent(TheliaEvents::MODULE_PAYMENT_MANAGE_STOCK, 'Cheque');
+        $stockLeftForThePayment = static function (ManageStockOnCreationEvent $event): void {
+            $event->setManageStock(false);
+        };
+        $dispatcher->addListener($manageStockEvent, $stockLeftForThePayment, -1024);
+
+        try {
+            $this->controller()->confirmPayment($dispatcher, (int) $order->getId());
+        } finally {
+            $dispatcher->removeListener($manageStockEvent, $stockLeftForThePayment);
+        }
+
+        self::assertSame($paid->getId(), OrderQuery::create()->findPk($order->getId())->getStatusId());
+        self::assertSame(
+            10.0,
+            (float) ProductSaleElementsQuery::create()
+                ->filterById($productSaleElements->getId())
+                ->select(ProductSaleElementsTableMap::COL_QUANTITY)
+                ->findOne(),
+            'The payment took no stock: the action leaves it as it is.',
+        );
+
+        $statusLine = OrderHistoryQuery::create()
+            ->filterByOrderId($order->getId())
+            ->filterByEventType(OrderHistoryEventType::STATUS_CHANGED->value)
+            ->findOne();
+        self::assertNotNull($statusLine);
+        self::assertSame(
+            ['stock' => 'none', 'stock_action_id' => $action->getId()],
+            array_intersect_key($statusLine->getDecodedPayload(), ['stock' => true, 'stock_action_id' => true]),
+        );
     }
 
     private function urlOfRedirect(callable $redirect): string
