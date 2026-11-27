@@ -67,6 +67,7 @@ Not released yet.
 - The `status_changed` line of the order history carries the stock operation applied (`stock`: `increase`, `decrease` or `none`) and the action that chose it (`stock_action_id`, null for the core rule), when the stock moved or a stock action decided. `GetStockUpdateOperationOnOrderStatusChangeEvent` carries the deciding action (`getDecidingActionId()`, `setDecidingActionId()`).
 - The fixed rule of the core no longer moves a stock that an earlier stock action of the order already moved: an order whose stock an action left in place when it was paid (to take it out when shipped) puts nothing back when it is cancelled before shipping, and an order whose stock an action kept out takes nothing more when it is paid. The `status_changed` line keeps what the rule would have done when the stock moved otherwise (`rule_stock`), and `Thelia\Domain\Order\StatusAction\StockRuleDeparture` sums these lines to hold the rule back. A shop without a stock action sees no difference.
 - The module codes of a stock action limit are compared as the modules spell them: `cheque` names the module `Cheque`.
+- A payment confirmed twice at the same moment no longer records a failure of a stock action for the second confirmation, which found the order paid already and changed nothing.
 
 ## Behaviour changes
 

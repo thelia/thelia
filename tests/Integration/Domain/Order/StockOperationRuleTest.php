@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\GetStockUpdateOperationOnOrderStatusChangeEvent;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Domain\Catalog\Stock\StockSettings;
 use Thelia\Domain\Order\Enum\OrderHistoryEventType;
 use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
 use Thelia\Domain\Order\EventListener\StockOperationActionListener;
@@ -464,6 +465,20 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         }
 
         self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($refused->getId())->count());
+    }
+
+    public function testAPaymentConfirmedTwiceRecordsNoFailureForAChangeThatDidNotHappen(): void
+    {
+        ConfigQuery::write(StockSettings::RESERVATION_ENABLED, '1');
+        ConfigQuery::write('check_available_stock', '1');
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_PAID, 'drop_table');
+        $order = $this->orderOf($this->createProductSaleElements(10), 3, OrderStatus::CODE_NOT_PAID);
+        // A first confirmation paid the order while this one was on its way.
+        OrderQuery::create()->filterById($order->getId())->update(['StatusId' => $this->orderStatus(OrderStatus::CODE_PAID)->getId()]);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_PAID);
+
+        self::assertSame(0, OrderStatusActionFailureQuery::create()->filterByOrderId($order->getId())->count());
     }
 
     public function testTheDecisionOfAFailedStatusChangeIsNotHandedToAnotherObjectOfTheSameOrder(): void

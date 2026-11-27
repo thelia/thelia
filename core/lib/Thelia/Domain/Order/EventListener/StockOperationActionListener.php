@@ -125,6 +125,12 @@ final class StockOperationActionListener implements ResetInterface
         $refusedPayloads = $this->refusedPayloadsByOrder[$order] ?? [];
         unset($this->refusedPayloadsByOrder[$order]);
 
+        // Another request moved the order to this status first: this change did not happen,
+        // and the payloads read for it were never applied.
+        if (null !== $event->getPreviousStatusId() && $event->getPreviousStatusId() === $event->getStatus()) {
+            return;
+        }
+
         foreach ($refusedPayloads as $refusedPayload) {
             $this->runner->recordFailure($refusedPayload->action, $order, $refusedPayload->message);
         }
