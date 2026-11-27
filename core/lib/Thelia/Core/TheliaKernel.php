@@ -186,6 +186,8 @@ class TheliaKernel extends Kernel
     /**
      * The bundles the core registers itself, before the ones config/bundles.php of the project adds.
      *
+     * @internal
+     *
      * @return array<class-string, array<string, bool>>
      */
     protected function coreBundles(): array
@@ -209,6 +211,9 @@ class TheliaKernel extends Kernel
         return $contents;
     }
 
+    /**
+     * @internal overridden by the tests that simulate a shop without the showcase package
+     */
     protected function isShowcaseInstalled(): bool
     {
         return class_exists(self::SHOWCASE_BUNDLE);
