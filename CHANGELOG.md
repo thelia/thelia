@@ -66,6 +66,7 @@ Not released yet.
 - `Thelia\Domain\Order\StatusAction\StockOperationSimulator::simulate()` tells which stock operation moving an order to a status would apply, and which action chose it, without moving anything: it dispatches the same event flagged as a simulation (`GetStockUpdateOperationOnOrderStatusChangeEvent::isSimulation()`), so it announces what the core rule, the stock actions and any module would decide. `Thelia\Domain\Order\StatusAction\StockActionDiagnostics` lists the stock actions an earlier one always overrides, across a custom status and the canonical status it is equivalent to, and the modules of a limit that are gone.
 - The `status_changed` line of the order history carries the stock operation applied (`stock`: `increase`, `decrease` or `none`) and the action that chose it (`stock_action_id`, null for the core rule), when the stock moved or a stock action decided. `GetStockUpdateOperationOnOrderStatusChangeEvent` carries the deciding action (`getDecidingActionId()`, `setDecidingActionId()`).
 - The fixed rule of the core no longer moves a stock that an earlier stock action of the order already moved: an order whose stock an action left in place when it was paid (to take it out when shipped) puts nothing back when it is cancelled before shipping, and an order whose stock an action kept out takes nothing more when it is paid. The `status_changed` line keeps what the rule would have done when the stock moved otherwise (`rule_stock`), and `Thelia\Domain\Order\StatusAction\StockRuleDeparture` sums these lines to hold the rule back. A shop without a stock action sees no difference.
+- The module codes of a stock action limit are compared as the modules spell them: `cheque` names the module `Cheque`.
 
 ## Behaviour changes
 
@@ -78,6 +79,7 @@ Not released yet.
 - `AdjustStockAction::describePayload()` returns three fields (`operation`, with the new value `none`, then `payment_modules` and `delivery_modules`), and the runner no longer calls `AdjustStockAction::execute()` on a status change: the stock moves through the decision of the core.
 - A listener of `TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE` also runs for every simulation of the back office (`StockOperationSimulator`): it has to check `isSimulation()` and write nothing then. An event built with the two-argument constructor counts as a real status change.
 - The payload a stock action refuses is recorded as a failure of the action once the status change is committed (`ORDER_UPDATE_STATUS`, priority 126), not during the decision, where the row would sit in the transaction of the change. A status change that is refused records nothing.
+- `Thelia\Domain\Subscription\EventListener\InstallmentOrderStockListener` listens to `ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE` at priority 32 (it was 64, the priority of the stock actions), and clears the deciding action when it leaves the stock of a virtual installment alone: the order history no longer names a stock action for it.
 
 ## Breaking changes
 

@@ -321,7 +321,22 @@ final readonly class AdjustStockAction implements OrderStatusActionInterface
             }
         }
 
-        return array_values(array_unique(array_map(trim(...), $codes)));
+        if ([] === $codes) {
+            return [];
+        }
+
+        // A code is compared as the module spells it: "cheque" names the module "Cheque". A
+        // code no module answers to is kept as written, and the action is told it names a gone module.
+        $installedCodes = [];
+
+        foreach (ModuleQuery::create()->select(['Code'])->find()->getData() as $installedCode) {
+            $installedCodes[strtolower((string) $installedCode)] = (string) $installedCode;
+        }
+
+        return array_values(array_unique(array_map(
+            static fn (string $code): string => $installedCodes[strtolower(trim($code))] ?? trim($code),
+            $codes,
+        )));
     }
 
     /**

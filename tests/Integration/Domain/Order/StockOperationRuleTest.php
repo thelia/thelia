@@ -303,6 +303,21 @@ final class StockOperationRuleTest extends ActionIntegrationTestCase
         self::assertSame(['none', null], [$decision->operationName(), $decision->actionId]);
     }
 
+    public function testAStockActionLimitNamesAModuleWhateverTheCaseOfItsCode(): void
+    {
+        $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_CANCELED, AdjustStockAction::OPERATION_NONE, limits: [AdjustStockAction::FIELD_PAYMENT_MODULES => ['cheque']]);
+        $productSaleElements = $this->createProductSaleElements(10);
+        $order = $this->orderOf($productSaleElements, 3, OrderStatus::CODE_PAID);
+
+        $this->moveOrderTo($order, OrderStatus::CODE_CANCELED);
+
+        self::assertSame(10.0, $this->stockOf($productSaleElements), 'The action limited to "cheque" applies to the order paid by Cheque.');
+        self::assertSame(
+            [AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_NONE, AdjustStockAction::FIELD_PAYMENT_MODULES => ['Cheque']],
+            $this->getService(AdjustStockAction::class)->normalizePayload([AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_NONE, AdjustStockAction::FIELD_PAYMENT_MODULES => ['cheque']]),
+        );
+    }
+
     public function testTheSimulationAnnouncesWhatTheStatusChangeThenDoes(): void
     {
         $leaveAlone = $this->stockAction(OrderStatusActionTrigger::ENTER, null, OrderStatus::CODE_REFUNDED, AdjustStockAction::OPERATION_NONE);

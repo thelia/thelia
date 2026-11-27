@@ -14,9 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Subscription;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
+use Thelia\Domain\Order\Enum\OrderHistoryEventType;
+use Thelia\Domain\Order\Enum\OrderStatusActionTrigger;
+use Thelia\Domain\Order\StatusAction\Effect\AdjustStockAction;
 use Thelia\Domain\Subscription\Enum\ActorType;
 use Thelia\Domain\Subscription\Enum\BillingOutcome;
 use Thelia\Domain\Subscription\Enum\PeriodUnit;
@@ -26,7 +30,10 @@ use Thelia\Domain\Subscription\Enum\SubscriptionStatus;
 use Thelia\Domain\Subscription\SubscriptionBillingLock;
 use Thelia\Domain\Subscription\SubscriptionInstallmentBiller;
 use Thelia\Domain\Subscription\SubscriptionLifecycle;
+use Thelia\Model\OrderHistoryQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatusAction;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Subscription;
 use Thelia\Model\SubscriptionHistoryQuery;
@@ -428,6 +435,38 @@ final class SubscriptionInstallmentBillerTest extends ActionIntegrationTestCase
 
         self::assertCount(2, $this->installmentOrdersOf($subscription));
         self::assertSame(10.0, (float) ProductSaleElementsQuery::create()->findPk($this->saleElementsOf($product)->getId())?->getQuantity());
+    }
+
+    public function testTheHistoryOfAVirtualInstallmentNamesNoStockActionItsSubscriptionOverrode(): void
+    {
+        RecurringTestPaymentModule::$managesStockOnCreation = false;
+        $takeOut = (new OrderStatusAction())
+            ->setTriggerType(OrderStatusActionTrigger::ENTER->value)
+            ->setToStatusId(OrderStatusQuery::getPaidStatus()->getId())
+            ->setActionType(AdjustStockAction::getType())
+            ->setDecodedPayload([AdjustStockAction::FIELD_OPERATION => AdjustStockAction::OPERATION_DECREASE])
+            ->setPosition(1)
+            ->setActive(true);
+        $takeOut->save();
+        [$subscription, $product] = $this->aSubscription(stock: 10, virtual: true);
+
+        $this->moveTo('2028-02-29 10:00:00');
+        self::assertSame(BillingOutcome::Paid, $this->biller()->bill((int) $subscription->getId()));
+
+        [$installmentOrder] = $this->installmentOrdersOf($subscription);
+        $paidLine = OrderHistoryQuery::create()
+            ->filterByOrderId($installmentOrder->getId())
+            ->filterByEventType(OrderHistoryEventType::STATUS_CHANGED->value)
+            ->orderById(Criteria::DESC)
+            ->findOne();
+
+        self::assertSame(10.0, (float) ProductSaleElementsQuery::create()->findPk($this->saleElementsOf($product)->getId())?->getQuantity());
+        self::assertNotNull($paidLine);
+        self::assertSame(
+            ['stock' => 'none', 'stock_action_id' => null],
+            array_intersect_key($paidLine->getDecodedPayload(), ['stock' => true, 'stock_action_id' => true]),
+            'The subscription left the stock alone, not the stock action.',
+        );
     }
 
     public function testTheInstallmentsOfAPhysicalProductTakeTheStockWhenTheModuleLeavesItToThePayment(): void
