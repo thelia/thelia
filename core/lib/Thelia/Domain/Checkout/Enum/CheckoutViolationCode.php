@@ -126,6 +126,32 @@ enum CheckoutViolationCode: string
     case CartQuantitiesAdjusted = 'cart-quantities-adjusted';
 
     /**
+     * The shop only sells through quotes, and this cart is no quote: a quote has to be asked
+     * for, and accepted, before anything is ordered.
+     */
+    case QuoteRequired = 'quote-required';
+
+    /**
+     * The quote of this cart already gave its order, to this cart or to another one: a quote
+     * gives one order at most.
+     */
+    case QuoteAlreadyOrdered = 'quote-already-ordered';
+
+    /**
+     * The quote of this cart can no longer be ordered as it was accepted: a line of it is no longer
+     * sold, its currency is gone, the cart is not what was accepted any more, or the quote is no
+     * longer in a state that gives an order. The quote stays as it was and nothing is ordered.
+     */
+    case QuoteNoLongerOrderable = 'quote-no-longer-orderable';
+
+    /**
+     * The cart of a quote ships with the carrier and to the address the quote was agreed with:
+     * the choice that was made is another one. Details: `field` is `deliveryModule` or
+     * `deliveryAddress`.
+     */
+    case QuoteDeliveryImposed = 'quote-delivery-imposed';
+
+    /**
      * A refusal of the checkout that names no family of its own — a module's step, or a
      * core exception a later version has not given a code to yet.
      */

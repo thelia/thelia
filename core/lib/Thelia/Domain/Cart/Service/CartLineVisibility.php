@@ -147,7 +147,11 @@ final readonly class CartLineVisibility
      */
     public function removeHiddenLines(Cart $cart): array
     {
-        $hiddenLines = $this->hiddenLinesOf($cart);
+        // A line of a quote is not taken out behind the buyer's back: it stays, and the order refuses it.
+        $hiddenLines = array_values(array_filter(
+            $this->hiddenLinesOf($cart),
+            static fn (CartItem $line): bool => null === $line->getQuoteItemId(),
+        ));
 
         if ([] === $hiddenLines) {
             return [];

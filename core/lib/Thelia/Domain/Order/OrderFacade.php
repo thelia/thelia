@@ -59,6 +59,7 @@ use Thelia\Domain\Order\Service\VirtualProductHandler;
 use Thelia\Domain\Payment\Enum\OrderPaymentPartState;
 use Thelia\Domain\Payment\Exception\PaymentCompositionRefusedException;
 use Thelia\Domain\Payment\OrderPaymentComposer;
+use Thelia\Domain\Quote\Acceptance\QuotePlacement;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitAvailableStock;
 use Thelia\Domain\SaleUnit\Stock\SaleUnitStockResolver;
@@ -116,6 +117,7 @@ readonly class OrderFacade
         private ?StockLevelAnnouncer $stockLevelAnnouncer = null,
         private ?CompanyPlacementGuard $companyPlacement = null,
         private ?CompanyBillingAddressImposer $companyBillingAddress = null,
+        private ?QuotePlacement $quotePlacement = null,
     ) {
         // A facade built without them sells as a shop that does not reserve its stock.
         $this->sellableStock = $sellableStock ?? new SellableStock(new NoReservedQuantity(), new SaleUnitAvailableStock($saleUnitContext, $saleUnitStockResolver));
@@ -188,6 +190,7 @@ readonly class OrderFacade
 
         /** @var list<StockMovement> $stockMovements what the order took from the stock, for the event sent once it is committed */
         $stockMovements = [];
+        $quoteBeingOrdered = null;
 
         try {
             // First of all, before the transaction reads anything it does not lock: its view of the
@@ -198,6 +201,9 @@ readonly class OrderFacade
             }
 
             $this->refuseACartThatHasAlreadyBeenOrdered($cart, $connection, $stockRowsToLock);
+
+            // The quote the cart carries, locked and judged before anything else of this transaction reads.
+            $quoteBeingOrdered = $this->quotePlacement?->begin($cart, $connection);
 
             // What the other carts hold of those rows, read once, now that they are locked: the
             // guard of every take and the preorder of every line stand on it.
@@ -244,7 +250,13 @@ readonly class OrderFacade
             }
 
             $placedOrder->setStatusId(OrderStatusQuery::getNotPaidStatus()?->getId());
-            $placedOrder->save($connection);
+
+            try {
+                $placedOrder->save($connection);
+            } catch (\Throwable $failure) {
+                // A second order for the quote, which the database refused: said as the quote says it.
+                throw $this->quotePlacement?->refusalOf($failure) ?? $failure;
+            }
 
             if ($vatExempted) {
                 $this->freezeExemptedVat($placedOrder, $cart, $taxCountry, $quotedPostageTax, $connection);
@@ -433,6 +445,11 @@ readonly class OrderFacade
                 ->setDisableVersioning(true)
                 ->save($connection);
 
+            // With the order, in its transaction: a refusal anywhere above leaves the quote accepted.
+            if (null !== $quoteBeingOrdered) {
+                $this->quotePlacement->markOrdered($quoteBeingOrdered, $connection);
+            }
+
             $this->orderTransactionManager->commit($connection);
 
             if ($recordConsentAnswers) {
@@ -456,6 +473,10 @@ readonly class OrderFacade
         // Once the order is committed, never inside its transaction: a listener that reads
         // the stock, writes, or fails must meet the stock as the order left it.
         $this->announceStockChanges($dispatcher, $stockMovements);
+
+        if (null !== $quoteBeingOrdered) {
+            $this->quotePlacement->announce($quoteBeingOrdered, $dispatcher);
+        }
 
         return $placedOrder;
     }

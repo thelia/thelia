@@ -44,6 +44,9 @@ final class CompanyPermission
     /** Edit the details of the company. */
     public const COMPANY_EDIT = 'company.edit';
 
+    /** Ask for a quote, answer one with a counter-proposal and turn one down. */
+    public const QUOTE_REQUEST = 'quote.request';
+
     /**
      * What a customer who belongs to no company may do: an ordinary account places orders and
      * reads its own.
@@ -67,6 +70,7 @@ final class CompanyPermission
             self::ADDRESS_MANAGE_SHARED => 'Manage the shared addresses',
             self::BUYER_MANAGE => 'Manage the buyers of the company',
             self::COMPANY_EDIT => 'Edit the company',
+            self::QUOTE_REQUEST => 'Ask for quotes',
         ];
     }
 }

@@ -266,11 +266,11 @@ DEALLOCATE PREPARE add_foreign_key_statement;
 -- only when no such row exists, so a role an administrator already created or
 -- edited keeps its permissions. Their titles are read back by code.
 INSERT INTO `company_role` (`code`, `company_id`, `permissions`, `created_at`, `updated_at`)
-SELECT 'company_admin', NULL, '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit"]', NOW(), NOW() FROM DUAL
+SELECT 'company_admin', NULL, '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit","quote.request"]', NOW(), NOW() FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `company_role` WHERE `code` = 'company_admin' AND `company_id` IS NULL);
 
 INSERT INTO `company_role` (`code`, `company_id`, `permissions`, `created_at`, `updated_at`)
-SELECT 'buyer', NULL, '["order.place","order.view_own"]', NOW(), NOW() FROM DUAL
+SELECT 'buyer', NULL, '["order.place","order.view_own","quote.request"]', NOW(), NOW() FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `company_role` WHERE `code` = 'buyer' AND `company_id` IS NULL);
 
 INSERT INTO `company_role` (`code`, `company_id`, `permissions`, `created_at`, `updated_at`)
@@ -454,5 +454,501 @@ INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `descripti
     (@payment_refund_resource_id, 'it_IT', 'Rimborso del pagamento dell\'ordine', NULL, NULL, NULL),
     (@payment_refund_resource_id, 'nl_NL', 'Terugbetaling van de orderbetaling', NULL, NULL, NULL),
     (@payment_refund_resource_id, 'ru_RU', 'Возврат оплаты заказа', NULL, NULL, NULL);
+
+-- ---------------------------------------------------------------------
+-- Negotiated quotes
+--
+-- A buyer asks for a quote on a cart; the shop answers with revisions, line by
+-- line, and the buyer accepts one, counters it or turns it down (`quote`,
+-- `quote_revision`, `quote_item`, `quote_item_request`). An accepted quote is
+-- paid through a cart that carries it (`cart.quote_id`, `cart_item.quote_item_id`,
+-- `cart.set_aside_cart_id` for the ordinary cart set aside meanwhile) and gives at
+-- most one order (`order.quote_id`, unique). A shop that never gets a quote is
+-- untouched: every new column is nullable and no row is rewritten. The quote
+-- mode starts disabled.
+--
+-- Replayable: each table is created through PREPARE/EXECUTE only when it is
+-- missing, each column, index and foreign key is added only when missing, and
+-- each setting, message and resource is inserted only when its name is unknown.
+-- ---------------------------------------------------------------------
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote');
+SET @statement := IF(@create_table, 'CREATE TABLE `quote`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `ref` VARCHAR(45) NOT NULL COMMENT \'the reference shown to the buyer and the shop, allocated when the quote is created\',
+    `customer_id` INTEGER NOT NULL COMMENT \'the account the quote was requested by, or created for\',
+    `company_id` INTEGER COMMENT \'the company the quote was requested for, NULL for a customer alone; kept when the company is deleted\',
+    `state` VARCHAR(16) NOT NULL COMMENT \'draft, requested, quoted, countered, accepted, rejected, expired or ordered\',
+    `current_revision` INTEGER DEFAULT 1 NOT NULL COMMENT \'the number of the revision the quote stands at\',
+    `currency_id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) COMMENT \'the language of the buyer, frozen when the quote is sent\',
+    `buyer_comment` TEXT COMMENT \'what the buyer wrote when they asked for the quote\',
+    `needed_by` DATE COMMENT \'the day the buyer needs the goods by\',
+    `valid_until` DATE COMMENT \'the last day the quote can be accepted\',
+    `sent_at` DATETIME COMMENT \'when the quote was last sent to the buyer\',
+    `reminded_at` DATETIME COMMENT \'when the shop last reminded the buyer of the quote\',
+    `coupon_dropped` TINYINT DEFAULT 0 NOT NULL COMMENT \'the coupon of the cart the quote was requested from was dropped: 1 once the buyer was told\',
+    `invoice_address_id` INTEGER,
+    `delivery_address_id` INTEGER,
+    `delivery_module_id` INTEGER COMMENT \'the carrier the shop picked with the postage it negotiated\',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_ref` (`ref`),
+    INDEX `idx_quote_state` (`state`),
+    INDEX `idx_quote_customer_id` (`customer_id`),
+    INDEX `idx_quote_company_id` (`company_id`),
+    INDEX `idx_quote_valid_until` (`valid_until`),
+    INDEX `idx_quote_currency_id` (`currency_id`),
+    INDEX `idx_quote_invoice_address_id` (`invoice_address_id`),
+    INDEX `idx_quote_delivery_address_id` (`delivery_address_id`),
+    INDEX `idx_quote_delivery_module_id` (`delivery_module_id`),
+    CONSTRAINT `fk_quote_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_company_id`
+        FOREIGN KEY (`company_id`)
+        REFERENCES `company` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_quote_invoice_address_id`
+        FOREIGN KEY (`invoice_address_id`)
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_delivery_address_id`
+        FOREIGN KEY (`delivery_address_id`)
+        REFERENCES `address` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision');
+SET @statement := IF(@create_table, 'CREATE TABLE `quote_revision`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_id` INTEGER NOT NULL,
+    `number` INTEGER NOT NULL COMMENT \'1 is the request of the buyer, each sending of the shop adds one\',
+    `author` VARCHAR(16) NOT NULL COMMENT \'customer or admin: who wrote the revision\',
+    `admin_id` INTEGER COMMENT \'the administrator who wrote the revision, NULL when the buyer did or once the administrator is deleted\',
+    `state` VARCHAR(16) NOT NULL COMMENT \'draft while it can be changed, sent once it is final\',
+    `merchant_note` TEXT COMMENT \'what the shop wrote to the buyer with the revision\',
+    `discount` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT \'the discount on the whole revision, taxes included\',
+    `postage` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL COMMENT \'the postage of the revision, taxes excluded\',
+    `total_untaxed` DECIMAL(16,6) COMMENT \'the total without taxes, frozen when the revision is sent\',
+    `total_taxed` DECIMAL(16,6) COMMENT \'the total with taxes, frozen when the revision is sent\',
+    `items_untaxed` DECIMAL(16,6) COMMENT \'the total of the lines without taxes, frozen when the revision is sent\',
+    `items_tax` DECIMAL(16,6) COMMENT \'the taxes on the lines, frozen when the revision is sent\',
+    `postage_tax` DECIMAL(16,6) COMMENT \'the taxes on the postage, frozen when the revision is sent\',
+    `reverse_charge` TINYINT COMMENT \'1 when the buyer owes the VAT himself (reverse charge), frozen when the revision is sent\',
+    `valid_until` DATE COMMENT \'the last day the revision can be accepted: chosen by the shop on a draft, kept as it was when the revision is sent\',
+    `delivery_module_id` INTEGER COMMENT \'the carrier the revision proposes with its postage\',
+    `sent_at` DATETIME COMMENT \'when the revision was sent\',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_revision_quote_id_number` (`quote_id`, `number`),
+    INDEX `idx_quote_revision_admin_id` (`admin_id`),
+    INDEX `idx_quote_revision_delivery_module_id` (`delivery_module_id`),
+    CONSTRAINT `fk_quote_revision_quote_id`
+        FOREIGN KEY (`quote_id`)
+        REFERENCES `quote` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_revision_admin_id`
+        FOREIGN KEY (`admin_id`)
+        REFERENCES `admin` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_revision_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+-- A revision table written by an earlier form of this script: the columns that freeze a revision
+-- and the validity and carrier of a draft are added in the same order.
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `COLUMN_NAME` = 'items_untaxed');
+SET @statement := IF(@add_column, 'ALTER TABLE `quote_revision` ADD COLUMN `items_untaxed` DECIMAL(16,6) COMMENT ''the total of the lines without taxes, frozen when the revision is sent'' AFTER `total_taxed`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `COLUMN_NAME` = 'items_tax');
+SET @statement := IF(@add_column, 'ALTER TABLE `quote_revision` ADD COLUMN `items_tax` DECIMAL(16,6) COMMENT ''the taxes on the lines, frozen when the revision is sent'' AFTER `items_untaxed`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `COLUMN_NAME` = 'postage_tax');
+SET @statement := IF(@add_column, 'ALTER TABLE `quote_revision` ADD COLUMN `postage_tax` DECIMAL(16,6) COMMENT ''the taxes on the postage, frozen when the revision is sent'' AFTER `items_tax`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `COLUMN_NAME` = 'reverse_charge');
+SET @statement := IF(@add_column, 'ALTER TABLE `quote_revision` ADD COLUMN `reverse_charge` TINYINT COMMENT ''1 when the buyer owes the VAT himself (reverse charge), frozen when the revision is sent'' AFTER `postage_tax`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `COLUMN_NAME` = 'valid_until');
+SET @statement := IF(@add_column, 'ALTER TABLE `quote_revision` ADD COLUMN `valid_until` DATE COMMENT ''the last day the revision can be accepted: chosen by the shop on a draft, kept as it was when the revision is sent'' AFTER `reverse_charge`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `COLUMN_NAME` = 'delivery_module_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `quote_revision` ADD COLUMN `delivery_module_id` INTEGER COMMENT ''the carrier the revision proposes with its postage'' AFTER `valid_until`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `INDEX_NAME` = 'idx_quote_revision_delivery_module_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `quote_revision` ADD INDEX `idx_quote_revision_delivery_module_id` (`delivery_module_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision' AND `CONSTRAINT_NAME` = 'fk_quote_revision_delivery_module_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `quote_revision` ADD CONSTRAINT `fk_quote_revision_delivery_module_id` FOREIGN KEY (`delivery_module_id`) REFERENCES `module` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_revision_address');
+SET @statement := IF(@create_table, 'CREATE TABLE `quote_revision_address`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_revision_id` INTEGER NOT NULL,
+    `kind` VARCHAR(16) NOT NULL COMMENT \'invoice or delivery\',
+    `firstname` VARCHAR(255),
+    `lastname` VARCHAR(255),
+    `company` VARCHAR(255),
+    `address1` VARCHAR(255),
+    `address2` VARCHAR(255),
+    `address3` VARCHAR(255),
+    `zipcode` VARCHAR(10),
+    `city` VARCHAR(255),
+    `country_id` INTEGER COMMENT \'kept when the country is deleted: the title below stays\',
+    `country_title` VARCHAR(255) COMMENT \'the name of the country in the language of the quote when the revision was sent\',
+    `vat_number` VARCHAR(20) COMMENT \'the VAT number of the address when the revision was sent\',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_revision_address_quote_revision_id_kind` (`quote_revision_id`, `kind`),
+    INDEX `idx_quote_revision_address_country_id` (`country_id`),
+    CONSTRAINT `fk_quote_revision_address_quote_revision_id`
+        FOREIGN KEY (`quote_revision_id`)
+        REFERENCES `quote_revision` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_revision_address_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_item');
+SET @statement := IF(@create_table, 'CREATE TABLE `quote_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_revision_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `product_id` INTEGER COMMENT \'kept when the product is deleted: the line stays readable through its labels\',
+    `product_sale_elements_id` INTEGER,
+    `product_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_ref` VARCHAR(255) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `quantity` DOUBLE NOT NULL,
+    `catalog_price` DECIMAL(16,6) NOT NULL COMMENT \'the catalogue price of one unit without taxes when the line was written\',
+    `price` DECIMAL(16,6) NOT NULL COMMENT \'the price of one unit without taxes the line proposes\',
+    `tax_rule_id` INTEGER,
+    `tax_rule_title` VARCHAR(255),
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_quote_item_quote_revision_id` (`quote_revision_id`),
+    INDEX `idx_quote_item_product_id` (`product_id`),
+    INDEX `idx_quote_item_product_sale_elements_id` (`product_sale_elements_id`),
+    INDEX `idx_quote_item_tax_rule_id` (`tax_rule_id`),
+    CONSTRAINT `fk_quote_item_quote_revision_id`
+        FOREIGN KEY (`quote_revision_id`)
+        REFERENCES `quote_revision` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_quote_item_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_item_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_quote_item_tax_rule_id`
+        FOREIGN KEY (`tax_rule_id`)
+        REFERENCES `tax_rule` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @create_table := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'quote_item_request');
+SET @statement := IF(@create_table, 'CREATE TABLE `quote_item_request`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `quote_item_id` INTEGER NOT NULL,
+    `quantity` DOUBLE COMMENT \'the quantity the buyer asks for, NULL when they leave it as it is\',
+    `price` DECIMAL(16,6) COMMENT \'the price of one unit without taxes the buyer asks for, NULL when they leave it as it is\',
+    `created_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_quote_item_request_quote_item_id` (`quote_item_id`),
+    CONSTRAINT `fk_quote_item_request_quote_item_id`
+        FOREIGN KEY (`quote_item_id`)
+        REFERENCES `quote_item` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET=\'utf8mb4\' COLLATE=\'utf8mb4_general_ci\' ROW_FORMAT=DYNAMIC;', 'DO 0');
+PREPARE create_table_statement FROM @statement;
+EXECUTE create_table_statement;
+DEALLOCATE PREPARE create_table_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'quote_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD COLUMN `quote_id` INTEGER COMMENT ''the quote the cart carries the accepted revision of, NULL for an ordinary cart'' AFTER `sale_unit_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'quote_revision');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD COLUMN `quote_revision` INTEGER COMMENT ''the number of the accepted revision of the quote'' AFTER `quote_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `COLUMN_NAME` = 'set_aside_cart_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart` ADD COLUMN `set_aside_cart_id` INTEGER COMMENT ''the ordinary cart of the buyer, set aside while the cart of a quote takes its place'' AFTER `quote_revision`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_quote_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_quote_id` (`quote_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `INDEX_NAME` = 'idx_cart_set_aside_cart_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart` ADD INDEX `idx_cart_set_aside_cart_id` (`set_aside_cart_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `CONSTRAINT_NAME` = 'fk_cart_quote_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `cart` ADD CONSTRAINT `fk_cart_quote_id` FOREIGN KEY (`quote_id`) REFERENCES `quote` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart' AND `CONSTRAINT_NAME` = 'fk_cart_set_aside_cart_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `cart` ADD CONSTRAINT `fk_cart_set_aside_cart_id` FOREIGN KEY (`set_aside_cart_id`) REFERENCES `cart` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `COLUMN_NAME` = 'quote_item_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `cart_item` ADD COLUMN `quote_item_id` INTEGER COMMENT ''the line of a quote the line carries the frozen price of; NULL for an ordinary line'' AFTER `subscription_plan_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `INDEX_NAME` = 'idx_cart_item_quote_item_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `cart_item` ADD INDEX `idx_cart_item_quote_item_id` (`quote_item_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'cart_item' AND `CONSTRAINT_NAME` = 'fk_cart_item_quote_item_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `cart_item` ADD CONSTRAINT `fk_cart_item_quote_item_id` FOREIGN KEY (`quote_item_id`) REFERENCES `quote_item` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `COLUMN_NAME` = 'quote_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order` ADD COLUMN `quote_id` INTEGER COMMENT ''the quote the order was placed from, NULL for an ordinary order; a quote gives one order at most'' AFTER `placed_by_customer_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_column := (SELECT COUNT(*) = 0 FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order_version' AND `COLUMN_NAME` = 'quote_id');
+SET @statement := IF(@add_column, 'ALTER TABLE `order_version` ADD COLUMN `quote_id` INTEGER COMMENT ''the quote the order was placed from, NULL for an ordinary order; a quote gives one order at most'' AFTER `placed_by_customer_id`', 'DO 0');
+PREPARE add_column_statement FROM @statement;
+EXECUTE add_column_statement;
+DEALLOCATE PREPARE add_column_statement;
+
+SET @add_index := (SELECT COUNT(*) = 0 FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `INDEX_NAME` = 'uk_order_quote_id');
+SET @statement := IF(@add_index, 'ALTER TABLE `order` ADD UNIQUE INDEX `uk_order_quote_id` (`quote_id`)', 'DO 0');
+PREPARE add_index_statement FROM @statement;
+EXECUTE add_index_statement;
+DEALLOCATE PREPARE add_index_statement;
+
+SET @add_foreign_key := (SELECT COUNT(*) = 0 FROM `information_schema`.`TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'order' AND `CONSTRAINT_NAME` = 'fk_order_quote_id');
+SET @statement := IF(@add_foreign_key, 'ALTER TABLE `order` ADD CONSTRAINT `fk_order_quote_id` FOREIGN KEY (`quote_id`) REFERENCES `quote` (`id`) ON UPDATE RESTRICT ON DELETE SET NULL', 'DO 0');
+PREPARE add_foreign_key_statement FROM @statement;
+EXECUTE add_foreign_key_statement;
+DEALLOCATE PREPARE add_foreign_key_statement;
+
+-- Settings. INSERT IGNORE leaves a value a shop already wrote.
+INSERT IGNORE INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+    ('quote_mode', 'disabled', 0, 0, NOW(), NOW()),
+    ('quote_validity_days', '30', 0, 0, NOW(), NOW()),
+    ('quote_ref_format', 'QUO%08d', 0, 0, NOW(), NOW());
+
+SET @quote_mode_config_id := (SELECT `id` FROM `config` WHERE `name` = 'quote_mode');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@quote_mode_config_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@quote_mode_config_id, 'de_DE', 'Wie Käufer Angebote anfragen: disabled (keine Angebote), alongside (ein Angebot oder eine sofortige Bestellung) oder only (Bestellung nur über ein Angebot)', NULL, NULL, NULL),
+    (@quote_mode_config_id, 'en_US', 'How buyers ask for quotes: disabled (no quote), alongside (a quote or an immediate order) or only (an order only through a quote)', NULL, NULL, NULL),
+    (@quote_mode_config_id, 'es_ES', 'Cómo piden presupuesto los compradores: disabled (sin presupuesto), alongside (un presupuesto o un pedido inmediato) o only (pedido solo mediante un presupuesto)', NULL, NULL, NULL),
+    (@quote_mode_config_id, 'fr_FR', 'Comment les acheteurs demandent un devis : disabled (aucun devis), alongside (un devis ou une commande immédiate) ou only (commande uniquement par un devis)', NULL, NULL, NULL),
+    (@quote_mode_config_id, 'it_IT', 'Come gli acquirenti richiedono un preventivo: disabled (nessun preventivo), alongside (un preventivo o un ordine immediato) o only (ordine solo tramite un preventivo)', NULL, NULL, NULL),
+    (@quote_mode_config_id, 'nl_NL', 'Hoe kopers een offerte aanvragen: disabled (geen offertes), alongside (een offerte of een directe bestelling) of only (bestellen alleen via een offerte)', NULL, NULL, NULL),
+    (@quote_mode_config_id, 'ru_RU', 'Как покупатели запрашивают коммерческое предложение: disabled (без предложений), alongside (предложение или немедленный заказ) или only (заказ только через предложение)', NULL, NULL, NULL);
+
+SET @quote_validity_days_config_id := (SELECT `id` FROM `config` WHERE `name` = 'quote_validity_days');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@quote_validity_days_config_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'de_DE', 'Tage, die ein Angebot nach dem Versand gültig bleibt (30, wenn ungültig)', NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'en_US', 'Days a quote stays valid after it is sent (30 when invalid)', NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'es_ES', 'Días de validez de un presupuesto tras su envío (30 si no es válido)', NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'fr_FR', 'Jours de validité d''un devis après son envoi (30 si invalide)', NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'it_IT', 'Giorni di validità di un preventivo dopo l''invio (30 se non valido)', NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'nl_NL', 'Dagen dat een offerte geldig blijft na verzending (30 indien ongeldig)', NULL, NULL, NULL),
+    (@quote_validity_days_config_id, 'ru_RU', 'Срок действия коммерческого предложения после отправки в днях (30, если значение недопустимо)', NULL, NULL, NULL);
+
+SET @quote_ref_format_config_id := (SELECT `id` FROM `config` WHERE `name` = 'quote_ref_format');
+
+INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@quote_ref_format_config_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'de_DE', 'Format der Referenz eines Angebots, ein printf-Muster für die Folgenummer (QUO%08d, wenn ungültig)', NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'en_US', 'Format of the reference of a quote, a printf pattern for its sequence number (QUO%08d when invalid)', NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'es_ES', 'Formato de la referencia de un presupuesto, un patrón printf para su número de secuencia (QUO%08d si no es válido)', NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'fr_FR', 'Format de la référence d''un devis, un motif printf pour son numéro de séquence (QUO%08d si invalide)', NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'it_IT', 'Formato del riferimento di un preventivo, un modello printf per il suo numero di sequenza (QUO%08d se non valido)', NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'nl_NL', 'Formaat van de referentie van een offerte, een printf-patroon voor het volgnummer (QUO%08d indien ongeldig)', NULL, NULL, NULL),
+    (@quote_ref_format_config_id, 'ru_RU', 'Формат номера коммерческого предложения, шаблон printf для порядкового номера (QUO%08d, если значение недопустимо)', NULL, NULL, NULL);
+
+-- The back office needs the resource to exist before a profile can be granted it.
+INSERT IGNORE INTO `resource` (`code`, `created_at`, `updated_at`) VALUES
+    ('admin.quote', NOW(), NOW());
+
+SET @quote_resource_id := (SELECT `id` FROM `resource` WHERE `code` = 'admin.quote');
+
+INSERT IGNORE INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@quote_resource_id, 'cs_CZ', NULL, NULL, NULL, NULL),
+    (@quote_resource_id, 'de_DE', 'Angebote', NULL, NULL, NULL),
+    (@quote_resource_id, 'en_US', 'Quotes', NULL, NULL, NULL),
+    (@quote_resource_id, 'es_ES', 'Presupuestos', NULL, NULL, NULL),
+    (@quote_resource_id, 'fr_FR', 'Devis', NULL, NULL, NULL),
+    (@quote_resource_id, 'it_IT', 'Preventivi', NULL, NULL, NULL),
+    (@quote_resource_id, 'nl_NL', 'Offertes', NULL, NULL, NULL),
+    (@quote_resource_id, 'ru_RU', 'Коммерческие предложения', NULL, NULL, NULL);
+
+-- The e-mails of the quote exchange.
+INSERT IGNORE INTO `message` (`name`, `secured`, `text_template_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+    ('quote_requested', NULL, 'quote_requested.txt', 'quote_requested.html', NOW(), NOW()),
+    ('quote_sent', NULL, 'quote_sent.txt', 'quote_sent.html', NOW(), NOW()),
+    ('quote_countered', NULL, 'quote_countered.txt', 'quote_countered.html', NOW(), NOW()),
+    ('quote_accepted', NULL, 'quote_accepted.txt', 'quote_accepted.html', NOW(), NOW()),
+    ('quote_rejected', NULL, 'quote_rejected.txt', 'quote_rejected.html', NOW(), NOW());
+
+SET @quote_requested_message_id := (SELECT `id` FROM `message` WHERE `name` = 'quote_requested');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@quote_requested_message_id, 'cs_CZ', NULL, 'Nový požadavek na nabídku {{ quote_ref }} na {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'de_DE', 'Nachricht an die Shop-Verantwortlichen, wenn ein Käufer ein Angebot anfragt', 'Neue Angebotsanfrage {{ quote_ref }} bei {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'en_US', 'Message sent to the shop managers when a buyer asks for a quote', 'New quote request {{ quote_ref }} on {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'es_ES', 'Mensaje enviado a los gestores de la tienda cuando un comprador pide un presupuesto', 'Nueva solicitud de presupuesto {{ quote_ref }} en {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'fr_FR', 'Message envoyé aux gestionnaires de la boutique quand un acheteur demande un devis', 'Nouvelle demande de devis {{ quote_ref }} sur {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'it_IT', 'Messaggio inviato ai gestori del negozio quando un acquirente richiede un preventivo', 'Nuova richiesta di preventivo {{ quote_ref }} su {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'nl_NL', 'Bericht aan de winkelbeheerders wanneer een koper een offerte aanvraagt', 'Nieuwe offerteaanvraag {{ quote_ref }} bij {{ config("store_name") }}'),
+    (@quote_requested_message_id, 'ru_RU', 'Сообщение, отправляемое менеджерам магазина, когда покупатель запрашивает коммерческое предложение', 'Новый запрос коммерческого предложения {{ quote_ref }} в {{ config("store_name") }}');
+
+SET @quote_sent_message_id := (SELECT `id` FROM `message` WHERE `name` = 'quote_sent');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@quote_sent_message_id, 'cs_CZ', NULL, 'Vaše nabídka {{ quote_ref }} na {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'de_DE', 'Nachricht an den Kunden, wenn der Shop ein Angebot sendet', 'Ihr Angebot {{ quote_ref }} bei {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'en_US', 'Message sent to the customer when the shop sends a quote', 'Your quote {{ quote_ref }} on {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'es_ES', 'Mensaje enviado al cliente cuando la tienda le envía un presupuesto', 'Su presupuesto {{ quote_ref }} en {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'fr_FR', 'Message envoyé au client quand la boutique lui envoie un devis', 'Votre devis {{ quote_ref }} sur {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'it_IT', 'Messaggio inviato al cliente quando il negozio gli invia un preventivo', 'Il tuo preventivo {{ quote_ref }} su {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'nl_NL', 'Bericht aan de klant wanneer de winkel een offerte verstuurt', 'Uw offerte {{ quote_ref }} bij {{ config("store_name") }}'),
+    (@quote_sent_message_id, 'ru_RU', 'Сообщение, отправляемое клиенту, когда магазин присылает коммерческое предложение', 'Ваше коммерческое предложение {{ quote_ref }} в {{ config("store_name") }}');
+
+SET @quote_countered_message_id := (SELECT `id` FROM `message` WHERE `name` = 'quote_countered');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@quote_countered_message_id, 'cs_CZ', NULL, 'Protinávrh k nabídce {{ quote_ref }} na {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'de_DE', 'Nachricht an die Shop-Verantwortlichen, wenn ein Käufer ein Angebot mit einem Gegenvorschlag beantwortet', 'Gegenvorschlag zum Angebot {{ quote_ref }} bei {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'en_US', 'Message sent to the shop managers when a buyer counters a quote', 'Counter-proposal on quote {{ quote_ref }} on {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'es_ES', 'Mensaje enviado a los gestores de la tienda cuando un comprador responde a un presupuesto con una contraoferta', 'Contraoferta sobre el presupuesto {{ quote_ref }} en {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'fr_FR', 'Message envoyé aux gestionnaires de la boutique quand un acheteur conteste un devis par une contre-proposition', 'Contre-proposition sur le devis {{ quote_ref }} sur {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'it_IT', 'Messaggio inviato ai gestori del negozio quando un acquirente risponde a un preventivo con una controproposta', 'Controproposta sul preventivo {{ quote_ref }} su {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'nl_NL', 'Bericht aan de winkelbeheerders wanneer een koper op een offerte antwoordt met een tegenvoorstel', 'Tegenvoorstel op offerte {{ quote_ref }} bij {{ config("store_name") }}'),
+    (@quote_countered_message_id, 'ru_RU', 'Сообщение, отправляемое менеджерам магазина, когда покупатель отвечает на предложение встречным предложением', 'Встречное предложение по коммерческому предложению {{ quote_ref }} в {{ config("store_name") }}');
+
+SET @quote_accepted_message_id := (SELECT `id` FROM `message` WHERE `name` = 'quote_accepted');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@quote_accepted_message_id, 'cs_CZ', NULL, 'Nabídka {{ quote_ref }} přijata na {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'de_DE', 'Nachricht an die Shop-Verantwortlichen, wenn ein Käufer ein Angebot annimmt', 'Angebot {{ quote_ref }} angenommen bei {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'en_US', 'Message sent to the shop managers when a buyer accepts a quote', 'Quote {{ quote_ref }} accepted on {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'es_ES', 'Mensaje enviado a los gestores de la tienda cuando un comprador acepta un presupuesto', 'Presupuesto {{ quote_ref }} aceptado en {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'fr_FR', 'Message envoyé aux gestionnaires de la boutique quand un acheteur accepte un devis', 'Devis {{ quote_ref }} accepté sur {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'it_IT', 'Messaggio inviato ai gestori del negozio quando un acquirente accetta un preventivo', 'Preventivo {{ quote_ref }} accettato su {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'nl_NL', 'Bericht aan de winkelbeheerders wanneer een koper een offerte accepteert', 'Offerte {{ quote_ref }} geaccepteerd bij {{ config("store_name") }}'),
+    (@quote_accepted_message_id, 'ru_RU', 'Сообщение, отправляемое менеджерам магазина, когда покупатель принимает коммерческое предложение', 'Коммерческое предложение {{ quote_ref }} принято в {{ config("store_name") }}');
+
+SET @quote_rejected_message_id := (SELECT `id` FROM `message` WHERE `name` = 'quote_rejected');
+
+INSERT IGNORE INTO `message_i18n` (`id`, `locale`, `title`, `subject`) VALUES
+    (@quote_rejected_message_id, 'cs_CZ', NULL, 'Nabídka {{ quote_ref }} zamítnuta na {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'de_DE', 'Nachricht an die Shop-Verantwortlichen, wenn ein Käufer ein Angebot ablehnt', 'Angebot {{ quote_ref }} abgelehnt bei {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'en_US', 'Message sent to the shop managers when a buyer turns a quote down', 'Quote {{ quote_ref }} rejected on {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'es_ES', 'Mensaje enviado a los gestores de la tienda cuando un comprador rechaza un presupuesto', 'Presupuesto {{ quote_ref }} rechazado en {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'fr_FR', 'Message envoyé aux gestionnaires de la boutique quand un acheteur refuse un devis', 'Devis {{ quote_ref }} refusé sur {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'it_IT', 'Messaggio inviato ai gestori del negozio quando un acquirente rifiuta un preventivo', 'Preventivo {{ quote_ref }} rifiutato su {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'nl_NL', 'Bericht aan de winkelbeheerders wanneer een koper een offerte afwijst', 'Offerte {{ quote_ref }} afgewezen bij {{ config("store_name") }}'),
+    (@quote_rejected_message_id, 'ru_RU', 'Сообщение, отправляемое менеджерам магазина, когда покупатель отклоняет коммерческое предложение', 'Коммерческое предложение {{ quote_ref }} отклонено в {{ config("store_name") }}');
 
 SET FOREIGN_KEY_CHECKS = 1;

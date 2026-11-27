@@ -236,7 +236,7 @@ final class PersonalDataTest extends AddressTestCase
             'active' => true,
         ], $section['company']);
         self::assertSame(CompanyRoleCode::BUYER, $section['role']);
-        self::assertSame(['order.place', 'order.view_own'], $section['permissions']);
+        self::assertSame(['order.place', 'order.view_own', 'quote.request'], $section['permissions']);
         self::assertSame('500.000000', $section['order_limit']);
         self::assertSame('2000.000000', $section['period_limit']);
         self::assertSame('month', $section['period']);

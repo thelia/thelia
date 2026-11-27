@@ -268,7 +268,7 @@ final class CompanyFacadeTest extends CompanyDomainTestCase
         self::assertNotNull($membership, 'The answer of before the attachment is not the one given now.');
         self::assertSame($company->getId(), $membership->companyId);
         self::assertSame(CompanyRoleCode::BUYER, $membership->roleCode);
-        self::assertSame([CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN], $membership->permissions);
+        self::assertSame([CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::QUOTE_REQUEST], $membership->permissions);
         self::assertSame('500.000000', $membership->orderLimit);
         self::assertSame('2000.500000', $membership->periodLimit);
         self::assertSame('month', $membership->period);

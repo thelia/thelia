@@ -203,6 +203,19 @@ return static function (ContainerConfigurator $container): void {
                 'limit' => '%env(int:THELIA_API_RATE_LIMIT_ORDER_CAPTURE)%',
                 'interval' => '1 minute',
             ],
+            // What an account writes on the quotes of the shop, per hour: asking for a quote copies a
+            // whole cart into the database, and a counter-proposal wakes the shop up. The figures come
+            // from the environment (see parameters/api_rate_limit.php).
+            'front_quote_request' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_QUOTE_REQUEST)%',
+                'interval' => '1 hour',
+            ],
+            'front_quote_counter_offer' => [
+                'policy' => 'sliding_window',
+                'limit' => '%env(int:THELIA_API_RATE_LIMIT_QUOTE_COUNTER_OFFER)%',
+                'interval' => '1 hour',
+            ],
             // A guest order tracking link is the only thing standing between a stranger
             // and someone else's order, and it names the order by a small number, so a
             // caller who cannot guess the signature can still try. Both windows are

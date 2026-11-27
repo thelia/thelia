@@ -30,7 +30,7 @@ export default defineConfig({
     {
       name: 'chromium',
       // The customer-group, price-list and company specs have their own projects below (1440 desktop, 390 mobile).
-      testIgnore: /(customer-groups|price-lists|company)-.*\.spec\.ts/,
+      testIgnore: /(customer-groups|price-lists|company|quote)-.*\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
@@ -69,6 +69,18 @@ export default defineConfig({
       name: 'company-a11y',
       testMatch: /company-mobile-a11y\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // Quotes: the mode of the shop, the negotiation between a buyer and the merchant, expiry and isolation, 1440 desktop.
+      name: 'quote-desktop-1440',
+      testMatch: /quote-(mode|negotiation|expiry|security)\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      // The quote screens at 390 px (the spec opens the back-office at 1440 px itself): layout and accessibility scan.
+      name: 'quote-mobile-a11y',
+      testMatch: /quote-mobile-a11y\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } },
     },
   ],
 });

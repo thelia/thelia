@@ -140,7 +140,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (129, 'subscription_retry_attempts', '3', 0, 0, NOW(), NOW()),
 (130, 'subscription_retry_interval_days', '2', 0, 0, NOW(), NOW()),
 (131, 'customer_dormant_after_days', '180', 0, 0, NOW(), NOW()),
-(132, 'pdf_preparation_file', 'preparation', 0, 0, NOW(), NOW())
+(132, 'pdf_preparation_file', 'preparation', 0, 0, NOW(), NOW()),
+(133, 'quote_mode', 'disabled', 0, 0, NOW(), NOW()),
+(134, 'quote_validity_days', '30', 0, 0, NOW(), NOW()),
+(135, 'quote_ref_format', 'QUO%08d', 0, 0, NOW(), NOW())
 
 ;
 
@@ -1012,8 +1015,8 @@ INSERT INTO `customer_group`(`id`, `code`, `position`, `is_default`, `discount`,
 (1, 'default', 1, 1, 0.000000, 1, NOW(), NOW());
 
 INSERT INTO `company_role`(`id`, `code`, `company_id`, `permissions`, `created_at`, `updated_at`) VALUES
-(1, 'company_admin', NULL, '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit"]', NOW(), NOW()),
-(2, 'buyer', NULL, '["order.place","order.view_own"]', NOW(), NOW()),
+(1, 'company_admin', NULL, '["order.place","order.view_own","order.view_company","address.manage_shared","buyer.manage","company.edit","quote.request"]', NOW(), NOW()),
+(2, 'buyer', NULL, '["order.place","order.view_own","quote.request"]', NOW(), NOW()),
 (3, 'approver', NULL, '["order.view_own","order.view_company","order.approve"]', NOW(), NOW());
 
 INSERT INTO `currency` (`id`, `code`, `isocode_numeric`, `symbol`, `format`, `rate`, `visible`, `position`, `by_default`, `created_at`, `updated_at`)
@@ -2296,7 +2299,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (70, 'admin.pricing', NOW(), NOW()),
 (71, 'admin.subscription', NOW(), NOW()),
 (72, 'admin.company', NOW(), NOW()),
-(73, 'admin.order.payment-refund', NOW(), NOW())
+(73, 'admin.order.payment-refund', NOW(), NOW()),
+(74, 'admin.quote', NOW(), NOW())
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
@@ -2316,7 +2320,12 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (14, 'subscription_payment_failed', NULL, NULL, 'subscription_payment_failed.txt', NULL, 'subscription_payment_failed.html', NOW(), NOW()),
 (15, 'subscription_suspended', NULL, NULL, 'subscription_suspended.txt', NULL, 'subscription_suspended.html', NOW(), NOW()),
 (16, 'subscription_cancelled', NULL, NULL, 'subscription_cancelled.txt', NULL, 'subscription_cancelled.html', NOW(), NOW()),
-(17, 'company_invitation', NULL, NULL, 'company_invitation.txt', NULL, 'company_invitation.html', NOW(), NOW())
+(17, 'company_invitation', NULL, NULL, 'company_invitation.txt', NULL, 'company_invitation.html', NOW(), NOW()),
+(18, 'quote_requested', NULL, NULL, 'quote_requested.txt', NULL, 'quote_requested.html', NOW(), NOW()),
+(19, 'quote_sent', NULL, NULL, 'quote_sent.txt', NULL, 'quote_sent.html', NOW(), NOW()),
+(20, 'quote_countered', NULL, NULL, 'quote_countered.txt', NULL, 'quote_countered.html', NOW(), NOW()),
+(21, 'quote_accepted', NULL, NULL, 'quote_accepted.txt', NULL, 'quote_accepted.html', NOW(), NOW()),
+(22, 'quote_rejected', NULL, NULL, 'quote_rejected.txt', NULL, 'quote_rejected.html', NOW(), NOW())
 ;
 
 /**
@@ -2432,7 +2441,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (129, '{{ locale }}', {{ intl('Number of declined charges of an installment after which a subscription is suspended (3 when invalid)', locale) }}, NULL, NULL, NULL),
     (130, '{{ locale }}', {{ intl('Days between two charges of a declined installment of a subscription (2 when invalid)', locale) }}, NULL, NULL, NULL),
     (131, '{{ locale }}', {{ intl('Days without an order after which a customer is dormant in the customer reports (180 when invalid)', locale) }}, NULL, NULL, NULL),
-    (132, '{{ locale }}', {{ intl('Name of the picking slip view in the current PDF template (without extension)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (132, '{{ locale }}', {{ intl('Name of the picking slip view in the current PDF template (without extension)', locale) }}, NULL, NULL, NULL),
+    (133, '{{ locale }}', {{ intl('How buyers ask for quotes: disabled (no quote), alongside (a quote or an immediate order) or only (an order only through a quote)', locale) }}, NULL, NULL, NULL),
+    (134, '{{ locale }}', {{ intl('Days a quote stays valid after it is sent (30 when invalid)', locale) }}, NULL, NULL, NULL),
+    (135, '{{ locale }}', {{ intl('Format of the reference of a quote, a printf pattern for its sequence number (QUO%08d when invalid)', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4189,7 +4201,8 @@ INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `p
     (70, '{{ locale }}', {{ intl('Pricing', locale) }}, NULL, NULL, NULL),
     (71, '{{ locale }}', {{ intl('Subscriptions', locale) }}, NULL, NULL, NULL),
     (72, '{{ locale }}', {{ intl('Companies', locale) }}, NULL, NULL, NULL),
-    (73, '{{ locale }}', {{ intl('Order payment refund', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
+    (73, '{{ locale }}', {{ intl('Order payment refund', locale) }}, NULL, NULL, NULL),
+    (74, '{{ locale }}', {{ intl('Quotes', locale) }}, NULL, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;
@@ -4213,7 +4226,12 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
     (14, '{{ locale }}', {{ intl('Message sent to the customer when the charge of an installment of its subscription fails', locale) }}, {{ intl('Payment failed for your subscription {{ subscription_ref }} on {{ config("store_name") }}', locale) }}, NULL, NULL),
     (15, '{{ locale }}', {{ intl('Message sent to the customer, and to the shop, when a subscription is suspended', locale) }}, {{ intl('{% if recipient == "shop" %}Subscription {{ subscription_ref }} suspended after {{ failure_count }} failed charges{% else %}Your subscription {{ subscription_ref }} on {{ config("store_name") }} is suspended{% endif %}', locale) }}, NULL, NULL),
     (16, '{{ locale }}', {{ intl('Message sent to the customer when a subscription is cancelled', locale) }}, {{ intl('Your subscription {{ subscription_ref }} on {{ config("store_name") }} is cancelled', locale) }}, NULL, NULL),
-    (17, '{{ locale }}', {{ intl('Invitation to join a company, sent to the person invited', locale) }}, {{ intl('Join {{ company_name }} on {{ config("store_name") }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
+    (17, '{{ locale }}', {{ intl('Invitation to join a company, sent to the person invited', locale) }}, {{ intl('Join {{ company_name }} on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (18, '{{ locale }}', {{ intl('Message sent to the shop managers when a buyer asks for a quote', locale) }}, {{ intl('New quote request {{ quote_ref }} on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (19, '{{ locale }}', {{ intl('Message sent to the customer when the shop sends a quote', locale) }}, {{ intl('Your quote {{ quote_ref }} on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (20, '{{ locale }}', {{ intl('Message sent to the shop managers when a buyer counters a quote', locale) }}, {{ intl('Counter-proposal on quote {{ quote_ref }} on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (21, '{{ locale }}', {{ intl('Message sent to the shop managers when a buyer accepts a quote', locale) }}, {{ intl('Quote {{ quote_ref }} accepted on {{ config("store_name") }}', locale) }}, NULL, NULL),
+    (22, '{{ locale }}', {{ intl('Message sent to the shop managers when a buyer turns a quote down', locale) }}, {{ intl('Quote {{ quote_ref }} rejected on {{ config("store_name") }}', locale) }}, NULL, NULL){% if not loop.last %},{% endif %}
 
 {% endfor %}
 ;

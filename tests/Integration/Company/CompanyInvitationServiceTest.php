@@ -272,7 +272,7 @@ final class CompanyInvitationServiceTest extends CompanyDomainTestCase
     public function testAnIssuerCannotGiveARoleAboveTheirOwn(): void
     {
         $company = $this->company();
-        $this->roleOf('manager', $company, [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::BUYER_MANAGE]);
+        $this->roleOf('manager', $company, [CompanyPermission::ORDER_PLACE, CompanyPermission::ORDER_VIEW_OWN, CompanyPermission::QUOTE_REQUEST, CompanyPermission::BUYER_MANAGE]);
         $manager = $this->buyerOf($company, 'manager');
 
         foreach ([CompanyRoleCode::ADMINISTRATOR, CompanyRoleCode::APPROVER] as $above) {

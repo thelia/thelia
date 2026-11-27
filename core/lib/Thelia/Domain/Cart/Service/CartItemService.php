@@ -22,6 +22,8 @@ use Thelia\Domain\Cart\DTO\CartItemUpdateQuantityDTO;
 use Thelia\Domain\Cart\EventBuilder\CartEventBuilder;
 use Thelia\Domain\Cart\Exception\InvalidCartException;
 use Thelia\Domain\Cart\Exception\NotEnoughStockException;
+use Thelia\Domain\Quote\Cart\QuoteCartGuard;
+use Thelia\Domain\Quote\Cart\QuoteCartLockedException;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\CartItem;
 
@@ -31,15 +33,19 @@ readonly class CartItemService
         private EventDispatcherInterface $eventDispatcher,
         private CartEventBuilder $cartEventBuilder,
         private PostageHandler $postageHandler,
+        private ?QuoteCartGuard $quoteCartGuard = null,
     ) {
     }
 
     /**
-     * @throws InvalidCartException when the cart wrote no line: nothing prices the sale
-     *                              element, so there is no price to put on a line
+     * @throws InvalidCartException     when the cart wrote no line: nothing prices the sale
+     *                                  element, so there is no price to put on a line
+     * @throws QuoteCartLockedException when the cart is the cart of a quote
      */
     public function addItem(CartItemAddDTO $cartAddDTO): CartItem
     {
+        $this->quoteCartGuard?->refuseLineChange($cartAddDTO->getCart());
+
         $cartEvent = $this->cartEventBuilder->buildEvent($cartAddDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
 
@@ -54,8 +60,13 @@ readonly class CartItemService
         return $cartItem;
     }
 
+    /**
+     * @throws QuoteCartLockedException when the cart is the cart of a quote
+     */
     public function deleteItem(CartItemDeleteDTO $cartDeleteItemDTO): void
     {
+        $this->quoteCartGuard?->refuseLineChange($cartDeleteItemDTO->getCart());
+
         $cartEvent = $this->cartEventBuilder->buildEvent($cartDeleteItemDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_DELETEITEM);
         $this->postageHandler->handlePostageOnCart($cartDeleteItemDTO->getCart());
@@ -63,9 +74,12 @@ readonly class CartItemService
 
     /**
      * @throws NotEnoughStockException
+     * @throws QuoteCartLockedException when the cart is the cart of a quote
      */
     public function updateQuantityItem(CartItemUpdateQuantityDTO $cartItemUpdateQuantityDTO): CartItem
     {
+        $this->quoteCartGuard?->refuseLineChange($cartItemUpdateQuantityDTO->getCart());
+
         $cartEvent = $this->cartEventBuilder->buildEvent($cartItemUpdateQuantityDTO);
         $this->eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_UPDATEITEM);
         $this->postageHandler->handlePostageOnCart($cartItemUpdateQuantityDTO->getCart());

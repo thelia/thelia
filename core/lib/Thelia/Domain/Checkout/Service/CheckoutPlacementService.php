@@ -17,19 +17,27 @@ namespace Thelia\Domain\Checkout\Service;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Lock\LockFactory;
+use Thelia\Core\Translation\Translator;
 use Thelia\Domain\Checkout\CheckoutFacade;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementRequest;
 use Thelia\Domain\Checkout\DTO\CheckoutPlacementResult;
 use Thelia\Domain\Checkout\DTO\CheckoutViolation;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\DTO\PaymentAction;
+use Thelia\Domain\Checkout\Enum\CheckoutViolationCode;
 use Thelia\Domain\Checkout\Exception\CheckoutPlacementInProgressException;
 use Thelia\Domain\Checkout\Exception\CheckoutRefusedException;
 use Thelia\Domain\Checkout\Exception\DeliverySlotFullException;
+use Thelia\Domain\Checkout\Exception\QuoteDeliveryImposedException;
+use Thelia\Domain\Checkout\Exception\QuoteRequiredException;
 use Thelia\Domain\Checkout\Exception\UnknownConsentException;
 use Thelia\Domain\Company\Checkout\CompanySpendingStepProvider;
 use Thelia\Domain\Company\Checkout\Exception\CompanyOrderRefusedException;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
+use Thelia\Domain\Quote\Cart\QuoteCartDeliveryGuard;
+use Thelia\Domain\Quote\Cart\QuoteCartGuard;
+use Thelia\Domain\Quote\Exception\QuoteAlreadyOrderedException;
+use Thelia\Domain\Quote\Exception\QuoteException;
 use Thelia\Model\CheckoutStep;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
@@ -95,6 +103,8 @@ final readonly class CheckoutPlacementService
         private ConsentAnswerRecorder $consentAnswerRecorder,
         private SubmittedConsentAnswers $submittedConsentAnswers,
         private LockFactory $lockFactory,
+        private ?QuoteCartGuard $quoteCartGuard = null,
+        private ?QuoteCartDeliveryGuard $quoteDeliveryGuard = null,
     ) {
     }
 
@@ -141,6 +151,29 @@ final readonly class CheckoutPlacementService
                 return $this->resultOf($alreadyPlaced, PaymentAction::none(), alreadyPlaced: true);
             }
 
+            // A shop that only sells through quotes places no ordinary cart: said with the rest of the
+            // refusals, so that a caller answers it as it answers any other.
+            try {
+                $this->quoteCartGuard?->refuseAnOrdinaryCartWhenQuotesAreRequired($cart);
+            } catch (QuoteRequiredException $refusal) {
+                throw new CheckoutRefusedException([CheckoutViolation::fromRefusal(CheckoutStep::CODE_PAYMENT, $refusal)], previous: $refusal);
+            }
+
+            // The cart of a quote ships the way the quote says: a carrier or an address it was left
+            // with that is not the quote's is refused here, once both are chosen (a missing one is
+            // the delivery step's refusal, below).
+            if (null !== $cart->getDeliveryModuleId() && null !== $cart->getAddressDeliveryId()) {
+                try {
+                    $this->quoteDeliveryGuard?->refuseAnotherDelivery(
+                        $cart,
+                        $cart->getDeliveryModuleId(),
+                        $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId(),
+                    );
+                } catch (QuoteDeliveryImposedException $imposed) {
+                    throw new CheckoutRefusedException([CheckoutViolation::fromRefusal(CheckoutStep::CODE_DELIVERY, $imposed)], previous: $imposed);
+                }
+            }
+
             // The delivery of a cart with nothing to ship is the one question the buyer is
             // never asked and the order cannot be written without. The tunnel of a theme
             // settles it as the buyer walks past the step; a caller with no steps to walk
@@ -173,6 +206,16 @@ final readonly class CheckoutPlacementService
                 // judged again once it was written, on what the buyer's other orders had used up
                 // meanwhile, and rolled back. Answered like every other refusal.
                 throw new CheckoutRefusedException([CheckoutViolation::fromRefusal(CompanySpendingStepProvider::CODE, $refused)], previous: $refused);
+            } catch (QuoteAlreadyOrderedException $already) {
+                // The quote of this cart gave its order to another cart: answered like every other
+                // refusal, with a code of its own to branch on.
+                throw new CheckoutRefusedException([new CheckoutViolation(CheckoutStep::CODE_PAYMENT, CheckoutViolationCode::QuoteAlreadyOrdered->value, Translator::getInstance()->trans($already->getMessage()))], previous: $already);
+            } catch (QuoteException $refused) {
+                // The quote of this cart can no longer be ordered as it was accepted (a line no longer
+                // sold, a currency gone, a cart that is not the accepted one, a state that gives no
+                // order): the order was rolled back and the quote left as it was. Answered like every
+                // other refusal, with a code of its own to branch on.
+                throw new CheckoutRefusedException([new CheckoutViolation(CheckoutStep::CODE_PAYMENT, CheckoutViolationCode::QuoteNoLongerOrderable->value, Translator::getInstance()->trans($refused->getMessage()))], previous: $refused);
             } catch (CartAlreadyOrderedException $race) {
                 // Another node wrote the order between the re-read above and the insert:
                 // the lock this request holds is local to the server it runs on, and the

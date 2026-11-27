@@ -314,8 +314,8 @@ final class CompanySchemaTest extends IntegrationTestCase
     public function testTheThreeRolesEveryCompanyMayGiveAreShippedWithTheirPermissions(): void
     {
         $expected = [
-            'company_admin' => ['order.place', 'order.view_own', 'order.view_company', 'address.manage_shared', 'buyer.manage', 'company.edit'],
-            'buyer' => ['order.place', 'order.view_own'],
+            'company_admin' => ['order.place', 'order.view_own', 'order.view_company', 'address.manage_shared', 'buyer.manage', 'company.edit', 'quote.request'],
+            'buyer' => ['order.place', 'order.view_own', 'quote.request'],
             'approver' => ['order.view_own', 'order.view_company', 'order.approve'],
         ];
 

@@ -126,6 +126,7 @@ class AdminResources
     public const PRICING = 'admin.pricing';
     public const SUBSCRIPTION = 'admin.subscription';
     public const COMPANY = 'admin.company';
+    public const QUOTE = 'admin.quote';
 
     /**
      * Create a new AdminRessources instance.

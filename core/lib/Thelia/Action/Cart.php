@@ -59,6 +59,9 @@ use Thelia\Domain\Catalog\Stock\StockReservationService;
 use Thelia\Domain\Pricing\BundleEffectivePriceSource;
 use Thelia\Domain\Pricing\PriceList\ApplicablePriceLists;
 use Thelia\Domain\Pricing\PricingActivityChecker;
+use Thelia\Domain\Quote\Cart\QuoteCartGuard;
+use Thelia\Domain\Quote\Cart\QuoteCartLockedException;
+use Thelia\Domain\Quote\Cart\QuoteCartSwitcher;
 use Thelia\Domain\SaleUnit\Cart\CartLineChange;
 use Thelia\Domain\SaleUnit\Pricing\SaleUnitPricingActivityChecker;
 use Thelia\Domain\SaleUnit\SaleUnitContext;
@@ -121,6 +124,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         protected ?CartQuantityReconciler $cartQuantityReconciler = null,
         protected ?ApplicablePriceLists $applicablePriceLists = null,
         protected ?AddressAccess $addressAccess = null,
+        protected ?QuoteCartGuard $quoteCartGuard = null,
+        protected ?QuoteCartSwitcher $quoteCartSwitcher = null,
     ) {
     }
 
@@ -283,10 +288,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      * @throws ProductWithoutPriceException when nothing prices the sale element, so no line can be written
+     * @throws QuoteCartLockedException     when the cart is the cart of a quote
      */
     public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getCart();
+        $this->quoteCartGuard?->refuseLineChange($cart);
         $append = $event->getAppend();
         $quantity = $event->getQuantity();
 
@@ -379,11 +386,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete specify article present into cart.
+     *
+     * @throws QuoteCartLockedException when the cart is the cart of a quote
      */
     public function deleteItem(CartEvent $event): void
     {
         if (null !== $cartItemId = $event->getCartItemId()) {
             $cart = $event->getCart();
+            $this->quoteCartGuard?->refuseLineChange($cart);
 
             $cartItem = CartItemQuery::create()
                 ->filterByCartId($cart->getId())
@@ -423,6 +433,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = $event->getCart();
         $cartId = (int) $cart->getId();
+
+        // The buyer who gives the cart of a quote up gets back the cart that was set aside for it.
+        if ($this->quoteCartGuard?->isQuoteCart($cart) && $this->sessionHolds($cart)) {
+            $this->quoteCartSwitcher?->restoreSetAside(null, $cart);
+        }
         $held = $this->stockReservation?->heldLinesOf($cartId) ?? [];
 
         $cart->delete();
@@ -438,11 +453,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @throws PropelException
      * @throws NotEnoughStockException
      * @throws ProductNotAvailableException when the quantity of a line the visitor no longer sees would grow
+     * @throws QuoteCartLockedException     when the cart is the cart of a quote
      */
     public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ((null !== $cartItemId = $event->getCartItemId()) && (null !== $quantity = $event->getQuantity())) {
             $cart = $event->getCart();
+            $this->quoteCartGuard?->refuseLineChange($cart);
 
             $cartItem = CartItemQuery::create()
                 ->filterByCartId($cart->getId())
@@ -497,6 +514,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function updateCartPrices(CartModel $cart, CurrencyModel $currency): void
     {
+        // The prices of a quote are in the currency it was written in: the cart stays there.
+        if ($this->quoteCartGuard?->isQuoteCart($cart)) {
+            return;
+        }
+
         $this->refreshCartItemPrices($cart, $currency);
 
         // update the currency cart
@@ -998,6 +1020,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 continue;
             }
 
+            // The line of a quote is what the shop and the buyer agreed on: the unit does not touch it.
+            if (null !== $cartItem->getQuoteItemId()) {
+                continue;
+            }
+
             $productSaleElements = $cartItem->getProductSaleElements();
 
             if (null === $productSaleElements) {
@@ -1237,6 +1264,20 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     protected function manageCartDuplicationAtCustomerLogin(CartModel $cart, EventDispatcherInterface $dispatcher): CartModel
     {
+        // The cart of a quote is never copied (the copy would be an ordinary cart, priced from the
+        // catalog) and never handed back to a session that did not ask for it: a buyer who left it,
+        // or never ordered it, signs in on their own cart, the one that was set aside for the quote
+        // or else an empty one. The quote stays accepted, and its cart is built again when the buyer
+        // goes back to pay it.
+        if ($this->quoteCartGuard?->isQuoteCart($cart)) {
+            $buyer = $this->getSession()->getCustomerUser();
+            $setAside = $buyer instanceof CustomerModel && $cart->getCustomerId() === $buyer->getId()
+                ? $this->quoteCartSwitcher?->restoreSetAside(null, $cart)
+                : null;
+
+            return $setAside ?? $this->dispatchNewCart($dispatcher);
+        }
+
         /** @var CustomerModel $customer */
         if (null !== $customer = $this->getSession()->getCustomerUser()) {
             // Check if we have to duplicate the existing cart.
@@ -1376,6 +1417,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function createEmptyCart(CartCreateEvent $cartCreateEvent): void
     {
+        // A buyer who leaves the cart of a quote (ordered, or paid) finds the cart that was set aside
+        // for it, not an empty one.
+        $setAside = $this->quoteCartSwitcher?->restoreSetAside();
+
+        if (null !== $setAside) {
+            $cartCreateEvent->setCart($setAside);
+
+            return;
+        }
+
         $cart = new CartModel();
 
         $cart->setCurrency($this->getSession()->getCurrency(true));
@@ -1456,6 +1507,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_CLEAR => ['clear', 128],
             TheliaEvents::CHANGE_DEFAULT_CURRENCY => ['updateCart', 128],
         ];
+    }
+
+    private function sessionHolds(CartModel $cart): bool
+    {
+        $request = $this->requestStack->getMainRequest();
+
+        return null !== $request && $request->hasSession() && (int) $request->getSession()->get(Session::SESSION_CART_ID_NAME) === (int) $cart->getId();
     }
 
     protected function getSession(): Session

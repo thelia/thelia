@@ -15,7 +15,10 @@ declare(strict_types=1);
 namespace Thelia\Tests\Api\Contract;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Thelia\Model\Currency;
 use Thelia\Model\CustomerList;
+use Thelia\Model\Quote;
+use Thelia\Model\QuoteRevision;
 use Thelia\Test\ApiTestCase;
 
 /**
@@ -146,6 +149,72 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
     }
 
     /**
+     * The quotes of the account, their revisions and the answers to them: an account only.
+     */
+    #[DataProvider('quoteOperations')]
+    public function testQuoteOperationsRejectAnonymousAccess(string $method, string $path, string $format): void
+    {
+        $response = $this->jsonRequest($method, '/api/front/account/quotes'.str_replace('{id}', '1', $path), ['cartId' => 1, 'revision' => 1, 'lines' => []], format: $format);
+
+        self::assertSame(401, $response->getStatusCode(), \sprintf('%s /front/account/quotes%s must demand an account.', $method, $path));
+    }
+
+    /**
+     * A quote that exists answers "not found" to an account it does not belong to, on every
+     * operation: the answer of a number that was never issued.
+     */
+    #[DataProvider('quoteOperationsOnAQuote')]
+    public function testQuoteOperationsAnswerNotFoundToAnAccountThatDoesNotOwnTheQuote(string $method, string $path, string $format): void
+    {
+        $factory = $this->createFixtureFactory();
+        $owner = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $other = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $quote = (new Quote())
+            ->setRef('CONTRACT'.bin2hex(random_bytes(4)))
+            ->setCustomerId($owner->getId())
+            ->setState('quoted')
+            ->setCurrentRevision(1)
+            ->setCurrencyId(Currency::getDefaultCurrency()->getId());
+        $quote->save($this->getPropelConnection());
+        (new QuoteRevision())
+            ->setQuoteId($quote->getId())
+            ->setNumber(1)
+            ->setAuthor('customer')
+            ->setState('sent')
+            ->setDiscount('0.000000')
+            ->setPostage('0.000000')
+            ->save($this->getPropelConnection());
+        $uri = '/api/front/account/quotes'.str_replace('{id}', (string) $quote->getId(), $path);
+        $body = ['cartId' => 1, 'revision' => 1, 'lines' => []];
+
+        self::assertContains($this->jsonRequest($method, $uri, $body, $this->authenticateAsCustomer($owner), $format)->getStatusCode(), [200, 422, 409], 'The owner reaches it.');
+        self::assertSame(404, $this->jsonRequest($method, $uri, $body, $this->authenticateAsCustomer($other), $format)->getStatusCode(), \sprintf('%s %s must answer "not found" to an account that does not own the quote.', $method, $uri));
+    }
+
+    /**
+     * The list of quotes is bounded to the caller, not only each quote read by its number.
+     */
+    public function testTheListOfQuotesHoldsTheQuotesOfTheCallerOnly(): void
+    {
+        $factory = $this->createFixtureFactory();
+        $owner = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $other = $factory->customer($factory->customerTitle(), ['password' => 'password']);
+        $quote = (new Quote())
+            ->setRef('CONTRACT'.bin2hex(random_bytes(4)))
+            ->setCustomerId($owner->getId())
+            ->setState('quoted')
+            ->setCurrentRevision(1)
+            ->setCurrencyId(Currency::getDefaultCurrency()->getId());
+        $quote->save($this->getPropelConnection());
+
+        $owned = json_decode((string) $this->jsonRequest('GET', '/api/front/account/quotes', token: $this->authenticateAsCustomer($owner))->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        $foreign = json_decode((string) $this->jsonRequest('GET', '/api/front/account/quotes', token: $this->authenticateAsCustomer($other))->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertSame([$quote->getId()], array_column($owned['hydra:member'], 'id'));
+        self::assertSame([], $foreign['hydra:member']);
+    }
+
+    /**
      * The orders and the addresses of the account are read through the company as well: still an
      * account only.
      */
@@ -167,6 +236,34 @@ final class FrontResourceAuthorizationContractTest extends ApiTestCase
 
         self::assertSame(404, $response->getStatusCode());
         self::assertStringNotContainsString('Acme', (string) $response->getContent());
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function quoteOperations(): iterable
+    {
+        yield 'list' => ['GET', '', 'json'];
+        yield 'read' => ['GET', '/{id}', 'json'];
+        yield 'revisions' => ['GET', '/{id}/revisions', 'json'];
+        yield 'revision' => ['GET', '/{id}/revisions/1', 'json'];
+        yield 'request' => ['POST', '', 'json'];
+        yield 'counter-proposal' => ['POST', '/{id}/counter-offer', 'json'];
+        yield 'acceptance' => ['POST', '/{id}/accept', 'json'];
+        yield 'refusal' => ['POST', '/{id}/reject', 'json'];
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function quoteOperationsOnAQuote(): iterable
+    {
+        yield 'read' => ['GET', '/{id}', 'json'];
+        yield 'revisions' => ['GET', '/{id}/revisions', 'json'];
+        yield 'revision' => ['GET', '/{id}/revisions/1', 'json'];
+        yield 'counter-proposal' => ['POST', '/{id}/counter-offer', 'json'];
+        yield 'acceptance' => ['POST', '/{id}/accept', 'json'];
+        yield 'refusal' => ['POST', '/{id}/reject', 'json'];
     }
 
     /**

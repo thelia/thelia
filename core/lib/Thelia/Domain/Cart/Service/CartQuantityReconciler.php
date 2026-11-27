@@ -40,7 +40,7 @@ use Thelia\Model\ProductSaleElements;
  *
  * A line a promotion offers is not sold: it is left to the promotion. So is the gift of
  * a free product coupon, an ordinary line priced at zero by the discount, which only the
- * session of the buyer knows to be the gift.
+ * session of the buyer knows to be the gift. So is a line of a quote, whose quantity was agreed.
  */
 final readonly class CartQuantityReconciler
 {
@@ -71,7 +71,8 @@ final readonly class CartQuantityReconciler
             ->find();
 
         foreach ($lines as $line) {
-            if (1 === (int) $line->getIsOffered() || \in_array((int) $line->getId(), $gifts, true)) {
+            // The quantity of a line of a quote is the one the shop and the buyer agreed on.
+            if (1 === (int) $line->getIsOffered() || null !== $line->getQuoteItemId() || \in_array((int) $line->getId(), $gifts, true)) {
                 continue;
             }
 

@@ -67,6 +67,8 @@ readonly class OrderFactory
         $order->setCurrencyRate($currency->getRate());
         $order->setLangId($language->getId());
         $order->setCartId($cart->getId());
+        // The quote the cart carries, which gives one order at most; null for an ordinary cart.
+        $order->setQuoteId($cart->getQuoteId());
         $order->setDiscount($cart->getDiscount());
         $this->snapshotPricing($order, $cart, $currency, $customer);
         // The company the buyer places this order for, frozen with it: a buyer who changes

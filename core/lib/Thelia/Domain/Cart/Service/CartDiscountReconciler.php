@@ -20,6 +20,7 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Domain\Promotion\Coupon\Service\CouponManager;
+use Thelia\Domain\Quote\Cart\QuoteCartInspector;
 use Thelia\Domain\Shipping\Service\PostageHandler;
 use Thelia\Model\Cart;
 use Thelia\Model\Coupon;
@@ -49,6 +50,7 @@ final readonly class CartDiscountReconciler
         private PostageHandler $postageHandler,
         private RequestStack $requestStack,
         private EventDispatcherInterface $dispatcher,
+        private ?QuoteCartInspector $quoteCartInspector = null,
     ) {
     }
 
@@ -74,7 +76,9 @@ final readonly class CartDiscountReconciler
         // The lines were just written: the cart must not answer with the ones it held.
         $cart->clearCartItems();
 
-        if ($this->aSessionHoldsThisCart($cart)) {
+        if ($this->isTheCartOfAQuote($cart)) {
+            // The discount of a quote is the one that was agreed: no promotion prices it again.
+        } elseif ($this->aSessionHoldsThisCart($cart)) {
             $this->dispatcher->dispatch(new CartEvent($cart), TheliaEvents::CART_LINES_REPRICED);
         } elseif ($discountIsThePromotionsOwn && $this->aPromotionAppliesOnItsOwn()) {
             $cart
@@ -107,6 +111,11 @@ final readonly class CartDiscountReconciler
         }
 
         return (int) $request->getSession()->get(Session::SESSION_CART_ID_NAME) === (int) $cart->getId();
+    }
+
+    private function isTheCartOfAQuote(Cart $cart): bool
+    {
+        return $this->quoteCartInspector?->isQuoteCart($cart) ?? false;
     }
 
     private function aPromotionAppliesOnItsOwn(): bool

@@ -158,7 +158,7 @@ final class CompanyInvitationApiTest extends CompanyApiTestCase
     {
         $this->skipUnlessTheMailTemplateShipsTheInvitation();
 
-        $this->roleOf('manager', $this->company, ['order.place', 'order.view_own', 'buyer.manage']);
+        $this->roleOf('manager', $this->company, ['order.place', 'order.view_own', 'buyer.manage', 'quote.request']);
         $manager = $this->buyerOf($this->company, 'manager', '300');
         $access = $this->token($manager);
 

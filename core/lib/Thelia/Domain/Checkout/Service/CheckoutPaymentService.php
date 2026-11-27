@@ -33,6 +33,8 @@ use Thelia\Domain\Checkout\DTO\OrderPaymentOutcome;
 use Thelia\Domain\Checkout\DTO\OrderPaymentRequest;
 use Thelia\Domain\Checkout\Exception\GuestCheckoutNotAllowedException;
 use Thelia\Domain\Checkout\Exception\InvalidPaymentException;
+use Thelia\Domain\Checkout\Exception\QuoteDeliveryImposedException;
+use Thelia\Domain\Checkout\Exception\QuoteRequiredException;
 use Thelia\Domain\Customer\Service\CustomerGroupPaymentPolicy;
 use Thelia\Domain\Module\Payment\PaymentCartContext;
 use Thelia\Domain\Order\Exception\CartAlreadyOrderedException;
@@ -46,6 +48,9 @@ use Thelia\Domain\Payment\Exception\StoredMethodPaymentRateLimitedException;
 use Thelia\Domain\Payment\OrderPaymentComposer;
 use Thelia\Domain\Payment\Service\OrderPaymentPartSettlement;
 use Thelia\Domain\Payment\StoredPaymentMethodPayment;
+use Thelia\Domain\Quote\Cart\QuoteCartDeliveryGuard;
+use Thelia\Domain\Quote\Cart\QuoteCartGuard;
+use Thelia\Domain\Quote\Cart\QuoteOrderSlot;
 use Thelia\Domain\Subscription\SubscriptionCartGuard;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Cart;
@@ -77,6 +82,9 @@ readonly class CheckoutPaymentService
         private RequestStack $requestStack,
         private CartGuard $cartGuard,
         private ?SubscriptionCartGuard $subscriptionCartGuard = null,
+        private ?QuoteCartGuard $quoteCartGuard = null,
+        private ?QuoteOrderSlot $quoteOrderSlot = null,
+        private ?QuoteCartDeliveryGuard $quoteDeliveryGuard = null,
     ) {
     }
 
@@ -118,12 +126,25 @@ readonly class CheckoutPaymentService
      * @throws StoredMethodPaymentRateLimitedException when the customer already paid with a stored method too often this hour
      * @throws PaymentCompositionRefusedException      when the instant payment means of the cart and the payment module chosen cannot make up one payment
      * @throws CartAlreadyOrderedException             when this very cart was turned into an order by another request
+     * @throws QuoteRequiredException                  when the shop only sells through quotes and this cart is no quote
+     * @throws QuoteDeliveryImposedException           when the cart of a quote ships with another carrier or to another address than its quote
      * @throws TheliaProcessException                  when nothing answered ORDER_PAY with an order
      * @throws \Exception
      */
     public function payAndReturnOutcome(OrderPaymentRequest $request): OrderPaymentOutcome
     {
         $cart = $request->cart;
+
+        // A shop that only sells through quotes places no ordinary cart, whatever the path to here.
+        $this->quoteCartGuard?->refuseAnOrdinaryCartWhenQuotesAreRequired($cart);
+
+        // The cart of a quote ships the way the quote says, whatever carrier the caller names and
+        // whatever address the cart was left with.
+        $this->quoteDeliveryGuard?->refuseAnotherDelivery(
+            $cart,
+            $request->deliveryModuleId,
+            $cart->getCartAddressRelatedByAddressDeliveryId()?->getAddressId(),
+        );
 
         $this->refuseAGuestTheShopNoLongerAllows($cart);
 
@@ -165,6 +186,10 @@ readonly class CheckoutPaymentService
             // placement, which then finds a cart with no order standing on it.
             $unpaidOrder->setCancelled($this->dispatcher);
         }
+
+        // The cart of a quote that was ordered before and cancelled since (this very attempt, or a
+        // payment that failed): the new order names the quote in its place.
+        $this->quoteOrderSlot?->releaseFromCancelledOrders($cart);
 
         $newOrder = (new Order())
             ->setDeliveryOrderAddressId($request->deliveryAddressId)
