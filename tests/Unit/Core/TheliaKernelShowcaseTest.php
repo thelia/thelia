@@ -31,7 +31,7 @@ final class TheliaKernelShowcaseTest extends TestCase
             self::markTestSkipped('The component showcase is not installed.');
         }
 
-        self::assertContains(self::SHOWCASE_BUNDLE, $this->bundleClasses(new Kernel('test', false)));
+        self::assertArrayHasKey(self::SHOWCASE_BUNDLE, $this->coreBundles(new Kernel('test', false)));
     }
 
     public function testTheShowcaseBundleIsLeftOutWhenThePackageIsAbsent(): void
@@ -43,14 +43,17 @@ final class TheliaKernelShowcaseTest extends TestCase
             }
         };
 
-        self::assertNotContains(self::SHOWCASE_BUNDLE, $this->bundleClasses($kernel));
+        self::assertArrayNotHasKey(self::SHOWCASE_BUNDLE, $this->coreBundles($kernel));
     }
 
     /**
-     * @return list<class-string>
+     * What the core registers, not what config/bundles.php of the application adds: a Flex recipe may write
+     * the showcase there, as it does on a fresh install without a lock file.
+     *
+     * @return array<class-string, array<string, bool>>
      */
-    private function bundleClasses(Kernel $kernel): array
+    private function coreBundles(Kernel $kernel): array
     {
-        return array_map(static fn (object $bundle): string => $bundle::class, iterator_to_array($kernel->registerBundles(), false));
+        return (new \ReflectionMethod($kernel, 'coreBundles'))->invoke($kernel);
     }
 }

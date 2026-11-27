@@ -170,6 +170,26 @@ class TheliaKernel extends Kernel
 
     public function registerBundles(): iterable
     {
+        $contents = $this->coreBundles();
+
+        if (file_exists(THELIA_ROOT.'config/bundles.php')) {
+            $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
+        }
+
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
+    }
+
+    /**
+     * The bundles the core registers itself, before the ones config/bundles.php of the project adds.
+     *
+     * @return array<class-string, array<string, bool>>
+     */
+    protected function coreBundles(): array
+    {
         $contents = [
             TheliaBundle::class => ['all' => true],
             // The MCP server of the core. Registered here and not left to the Flex recipe of the bundle, which
@@ -181,20 +201,12 @@ class TheliaKernel extends Kernel
         // The component showcase, when the shop installs it (it is a development tool, `require-dev`). Registered
         // here for the same reason as the MCP server: config/bundles.php of a project is written once, by the Flex
         // recipe of the skeleton, and a shop created before the package would never get the line. A project that
-        // lists the bundle itself, to restrict it to some environments, has the last word below.
+        // lists the bundle itself, to restrict it to some environments, has the last word in registerBundles().
         if ($this->isShowcaseInstalled()) {
             $contents[self::SHOWCASE_BUNDLE] = ['all' => true];
         }
 
-        if (file_exists(THELIA_ROOT.'config/bundles.php')) {
-            $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
-        }
-
-        foreach ($contents as $class => $envs) {
-            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
-                yield new $class();
-            }
-        }
+        return $contents;
     }
 
     protected function isShowcaseInstalled(): bool
