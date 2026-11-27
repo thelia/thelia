@@ -35,6 +35,7 @@ use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\Cart;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
+use Thelia\Model\CatalogRestriction;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Consent;
 use Thelia\Model\ConsentQuery;
@@ -341,6 +342,14 @@ final class CheckoutApiTest extends ApiTestCase
 
         self::assertSame(409, $refused->getStatusCode(), (string) $refused->getContent());
         self::assertStringContainsString('prices of your cart have changed', (string) $refused->getContent());
+        $verdict = $this->decode($refused);
+        self::assertFalse($verdict['ready']);
+        $violation = $this->theViolation($verdict['violations'], CheckoutViolationCode::CartPricesChanged->value);
+        self::assertSame('cart', $violation['stepCode']);
+        self::assertSame(
+            [(int) CartItemQuery::create()->filterByCartId($cartId)->findOne($this->getPropelConnection())?->getId()],
+            $violation['details']['cartItemIds'],
+        );
         self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
         self::assertSame(
             8.0,
@@ -352,6 +361,40 @@ final class CheckoutApiTest extends ApiTestCase
 
         self::assertJsonResponseSuccessful($placed);
         self::assertCount(1, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
+    }
+
+    /**
+     * A line the buyer may no longer see between the filling of the cart and its placement:
+     * refused as a 422 in the shape of the verdict, naming the line, and no order is written.
+     */
+    public function testPlacingACartWhoseLineBecameInvisibleToTheBuyerIsRefusedNamingTheLine(): void
+    {
+        $checkout = $this->readyCheckout();
+        $factory = $this->createFixtureFactory();
+        $token = $this->authenticateAsCustomer($checkout['customer']);
+        $cartId = $checkout['cart']->getId();
+        $this->walkTheSelections($cartId, $checkout, $token);
+        $group = $factory->customerGroup('checkout-api-restricted');
+        $factory->assignCustomerGroup($checkout['customer'], $group);
+        $other = $factory->product($factory->category(), $factory->taxRule(), $factory->currency(), ['baseQuantity' => 10]);
+        (new CatalogRestriction())
+            ->setCustomerGroupId($group->getId())
+            ->setProductId($other->getId())
+            ->setMode('allow')
+            ->save($this->getPropelConnection());
+
+        $refused = $this->jsonRequest('POST', $this->url($cartId, 'place'), token: $token);
+
+        self::assertSame(422, $refused->getStatusCode(), (string) $refused->getContent());
+        $verdict = $this->decode($refused);
+        self::assertFalse($verdict['ready']);
+        $violation = $this->theViolation($verdict['violations'], CheckoutViolationCode::CartLineUnavailable->value);
+        self::assertSame(
+            [(int) CartItemQuery::create()->filterByCartId($cartId)->findOne($this->getPropelConnection())?->getId()],
+            $violation['details']['cartItemIds'],
+        );
+        self::assertSame([(int) $checkout['product']->getId()], $violation['details']['productIds']);
+        self::assertCount(0, OrderQuery::create()->filterByCartId($cartId)->find($this->getPropelConnection()));
     }
 
     /**
