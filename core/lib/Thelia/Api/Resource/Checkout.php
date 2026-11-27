@@ -212,7 +212,10 @@ use Thelia\Api\State\Provider\CheckoutValidationProvider;
                     ),
                     '403' => new OpenApiResponse(description: 'The shop no longer allows this cart to be ordered without an account.'),
                     '404' => new OpenApiResponse(description: 'No such cart — the same answer for a cart of another account.'),
-                    '409' => new OpenApiResponse(description: 'Another request is placing this very cart, or the shop no longer holds what the cart asks for — the message names the product. Both are worth retrying; nothing else that goes wrong while placing is answered with a 409.'),
+                    '409' => new OpenApiResponse(
+                        description: 'Another request is placing this very cart, or the shop no longer holds what the cart asks for — the message names the product. Or the price of lines moved since the cart was filled: the lines are priced again and the body is the one GET .../validation answers with, a `cart-prices-changed` violation whose `details.cartItemIds` lists the lines. All are worth retrying; nothing else that goes wrong while placing is answered with a 409.',
+                        content: new \ArrayObject(['application/json' => ['example' => self::PRICES_CHANGED_EXAMPLE]]),
+                    ),
                     '422' => new OpenApiResponse(
                         description: 'The cart still has something to settle, a mandatory consent included: the body is the one GET .../validation answers with. A body that does not say what a consent answer says — a missing `code`, an `accepted` that is not a boolean, the same consent answered twice — is refused with the standard error payload instead.',
                         content: new \ArrayObject(['application/json' => ['example' => self::VALIDATION_EXAMPLE]]),
@@ -236,6 +239,18 @@ final class Checkout
      * two keys are a published contract, and a refused placement answers with the very
      * same body a verdict does — so this is what documents them.
      */
+    private const PRICES_CHANGED_EXAMPLE = [
+        'ready' => false,
+        'violations' => [
+            [
+                'stepCode' => 'cart',
+                'code' => 'cart-prices-changed',
+                'message' => 'The prices of your cart have changed. Please review your cart before paying.',
+                'details' => ['cartItemIds' => [4512]],
+            ],
+        ],
+    ];
+
     private const VALIDATION_EXAMPLE = [
         'ready' => false,
         'violations' => [
