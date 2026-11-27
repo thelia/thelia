@@ -18,8 +18,6 @@ namespace Thelia\Domain\Ai\Guardrail;
  * Implemented by the guardrails that depend on a connection, so that the back office can tell the merchant
  * "this one cannot run: connect Mistral" without calling anything. A guardrail that does not implement it
  * is taken as usable.
- *
- * @internal
  */
 interface AiGuardrailAvailabilityInterface
 {
