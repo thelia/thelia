@@ -121,8 +121,12 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
             // The lines were priced again before the refusal: the cart now reads the prices
             // the buyer will pay, and the same request, posted again, is placed on them. A
             // conflict with the state of the cart rather than a malformed request, like the
-            // stock below; the message is the core's own, with no amount in it.
-            throw new ConflictHttpException($pricesChanged->getMessage(), $pricesChanged);
+            // stock below, answered in the shape of the validation so that a front reads the
+            // code and the lines that moved rather than a sentence.
+            return $this->refusalResponse(
+                new CheckoutRefusedException([CheckoutViolation::fromRefusal(CheckoutStep::CODE_CART, $pricesChanged)], previous: $pricesChanged),
+                Response::HTTP_CONFLICT,
+            );
         } catch (StockReservationRateLimitedException $tooOften) {
             // Defence: the placement itself holds nothing (the steps before it do, and answer 429),
             // but a module that holds stock while it places an order answers the same way.
@@ -162,11 +166,11 @@ final readonly class CheckoutPlacementProcessor implements ProcessorInterface
      * a client has one payload to read and one list of codes to branch on, whether it
      * asked before placing or found out while placing.
      */
-    private function refusalResponse(CheckoutRefusedException $refusal): JsonResponse
+    private function refusalResponse(CheckoutRefusedException $refusal, int $status = Response::HTTP_UNPROCESSABLE_ENTITY): JsonResponse
     {
         return new JsonResponse(
             CheckoutValidationOutput::ofDomainViolations($refusal->violations)->toArray(),
-            Response::HTTP_UNPROCESSABLE_ENTITY,
+            $status,
         );
     }
 

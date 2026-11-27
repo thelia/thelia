@@ -63,6 +63,7 @@ Not released yet.
 - The account API answers 404, no longer 403, for an order or an address of another customer (`/api/front/account/orders/{id}`, `/api/front/account/addresses/{id}`): what the caller cannot reach reads as missing. These two resources are scoped by `Thelia\Api\Bridge\Propel\Extension\CompanyAccountOwnershipExtension` instead of the generic customer filter, also for the reads a theme makes in-process.
 - The reads of an address by the checkout, the delivery, the cart and the account (`ShippingFacade`, the `OrderDelivery` and `OrderPayment` forms, the `Address` and `Delivery` loops, `BaseFrontController`) go through `Thelia\Domain\Addressing\Service\AddressAccess`: with a customer in context, an address of another customer is not found.
 - `bin/install` writes the address of the shop (`url_site`), which a fresh install used to leave empty: the new `--url` option gives it (an address that is not absolute http or https stops the install before anything is created), else `DEFAULT_URI` when it names more than the machine itself. The install command without `--url` and with the `http://localhost` shipped in `.env` leaves it empty, as before.
+- Placing an order through the checkout API (`POST /api/front/account/checkout/{cartId}/place`) when the price of lines moved still answers 409, now with the body of `GET .../validation`: a `cart-prices-changed` violation whose `details.cartItemIds` names the lines, instead of a bare error message.
 
 ## Breaking changes
 
