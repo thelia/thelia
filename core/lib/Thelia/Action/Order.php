@@ -523,6 +523,10 @@ class Order extends BaseAction implements EventSubscriberInterface
             $con->commit();
         } catch (\Throwable $exception) {
             $con->rollBack();
+            // The stock and the lines written before the failure are rolled back in the
+            // database, not in the instances Propel keeps: a later read would meet them.
+            ProductSaleElementsTableMap::clearInstancePool();
+            OrderProductTableMap::clearInstancePool();
 
             throw $this->conflictOr($exception);
         }

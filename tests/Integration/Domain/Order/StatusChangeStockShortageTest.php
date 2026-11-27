@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace Thelia\Tests\Integration\Domain\Order;
 
+use Propel\Runtime\Propel;
 use Thelia\Core\Event\Payment\ManageStockOnCreationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Domain\SaleUnit\SaleUnitActivityChecker;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderQuery;
@@ -84,6 +86,27 @@ final class StatusChangeStockShortageTest extends ActionIntegrationTestCase
         $this->assertThePaymentIsRefused($order, $short->getRef().' : Not enough stock');
     }
 
+    public function testARefusedStatusChangeKeepsInMemoryNoStockItRolledBack(): void
+    {
+        $taken = $this->createProductSaleElements(10.0);
+        $short = $this->createProductSaleElements(1.0);
+        $order = $this->orderOf($taken, null);
+        $this->addLine($order, $short);
+        // As in a request or a command: the tests read without the pool of instances.
+        Propel::enableInstancePooling();
+
+        try {
+            $this->assertThePaymentIsRefused($order, $short->getRef().' : Not enough stock');
+
+            self::assertNull(
+                ProductSaleElementsTableMap::getInstanceFromPool((string) $taken->getId()),
+                'The stock written on the first line before the refusal is rolled back: no later read may meet it in memory.',
+            );
+        } finally {
+            Propel::disableInstancePooling();
+        }
+    }
+
     private function assertThePaymentIsRefused(Order $order, string $expectedMessage): void
     {
         try {
@@ -136,6 +159,25 @@ final class StatusChangeStockShortageTest extends ActionIntegrationTestCase
         $order->clearOrderProducts();
 
         return $order;
+    }
+
+    private function addLine(Order $order, ProductSaleElements $productSaleElements): void
+    {
+        (new OrderProduct())
+            ->setOrderId($order->getId())
+            ->setProductRef('REF-'.$productSaleElements->getId())
+            ->setProductSaleElementsRef((string) $productSaleElements->getRef())
+            ->setProductSaleElementsId($productSaleElements->getId())
+            ->setTitle('A second product')
+            ->setQuantity(self::ORDERED)
+            ->setPrice('10.000000')
+            ->setPromoPrice('10.000000')
+            ->setWasNew(0)
+            ->setWasInPromo(0)
+            ->setVirtual(0)
+            ->save($this->getPropelConnection());
+
+        $order->clearOrderProducts();
     }
 
     private function createProductSaleElements(float $quantity): ProductSaleElements
