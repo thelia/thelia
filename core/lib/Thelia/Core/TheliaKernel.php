@@ -110,6 +110,11 @@ class TheliaKernel extends Kernel
 
     public const THELIA_VERSION = '3.5.0';
 
+    /** Not imported: the package is optional, and the class is named whether it is installed or not. */
+    private const SHOWCASE_BUNDLE = 'OpenStudio\\UxShowcaseBundle\\OpenStudioUxShowcaseBundle';
+
+    private const SHOWCASE_ROUTE_PREFIX = '/_showcase';
+
     protected SchemaLocator $propelSchemaLocator;
     protected PropelInitService $propelInitService;
     protected ParserResolver $parserResolver;
@@ -173,6 +178,14 @@ class TheliaKernel extends Kernel
             McpBundle::class => ['all' => true],
         ];
 
+        // The component showcase, when the shop installs it (it is a development tool, `require-dev`). Registered
+        // here for the same reason as the MCP server: config/bundles.php of a project is written once, by the Flex
+        // recipe of the skeleton, and a shop created before the package would never get the line. A project that
+        // lists the bundle itself, to restrict it to some environments, has the last word below.
+        if ($this->isShowcaseInstalled()) {
+            $contents[self::SHOWCASE_BUNDLE] = ['all' => true];
+        }
+
         if (file_exists(THELIA_ROOT.'config/bundles.php')) {
             $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
         }
@@ -182,6 +195,11 @@ class TheliaKernel extends Kernel
                 yield new $class();
             }
         }
+    }
+
+    protected function isShowcaseInstalled(): bool
+    {
+        return class_exists(self::SHOWCASE_BUNDLE);
     }
 
     /**
@@ -263,6 +281,14 @@ class TheliaKernel extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
+        // Before the routes of the core, of the modules and of the theme: the front theme answers any single
+        // segment. Under a prefix, because the index of the showcase is `/` and would take the home page; and
+        // without a slash on the root, which the router would redirect to the path without it, again and again.
+        if (isset($this->bundles['OpenStudioUxShowcaseBundle'])) {
+            $routes->import('@OpenStudioUxShowcaseBundle/config/routes.php')
+                ->prefix(self::SHOWCASE_ROUTE_PREFIX, false);
+        }
+
         $routes->import(__DIR__.'/../Config/Resources/routing/*.php');
 
         $envRouteDir = __DIR__.'/../Config/Resources/routing/'.$this->environment;
